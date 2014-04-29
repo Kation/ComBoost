@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Metadata;
+using System.Collections.ObjectModel;
 
 namespace System.Data.Entity
 {
@@ -85,6 +86,7 @@ namespace System.Data.Entity
             return _Metadata.DisplayProperty.Property.GetValue(this, null).ToString();
         }
 
+        private ReadOnlyCollection<ValidationResult> _NoError = new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>());
         /// <summary>
         /// Ensure that entity is valid.
         /// </summary>
@@ -92,8 +94,7 @@ namespace System.Data.Entity
         /// <returns>Collection that include error messages.</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (false)
-                yield return null;
+            return _NoError;
         }
     }
 }

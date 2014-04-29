@@ -12,17 +12,29 @@ namespace System.ComponentModel
     [AttributeUsage(AttributeTargets.Class)]
     public class MvcRouteAttribute : Attribute
     {
+        /// <summary>
+        /// Initialize mvc route attribute.
+        /// </summary>
+        /// <param name="area">Area name of entity controller.</param>
         public MvcRouteAttribute(string area)
         {
             Area = area;
         }
 
+        /// <summary>
+        /// Initialize mvc route attribute.
+        /// </summary>
+        /// <param name="area">Area name of entity controller.</param>
+        /// <param name="controller">Controller name of entity controller.</param>
         public MvcRouteAttribute(string area, string controller)
             : this(area)
         {
             Controller = controller;
         }
 
+        /// <summary>
+        /// Initialize mvc route attribute.
+        /// </summary>
         public MvcRouteAttribute()
         {
 

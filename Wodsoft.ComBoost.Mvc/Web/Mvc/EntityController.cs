@@ -11,17 +11,34 @@ using System.Threading.Tasks;
 
 namespace System.Web.Mvc
 {
+    /// <summary>
+    /// Entity controller.
+    /// </summary>
     public class EntityController : Controller
     {
+        /// <summary>
+        /// Get the context builder of entity.
+        /// </summary>
         public IEntityContextBuilder EntityBuilder { get; private set; }
 
+        /// <summary>
+        /// Initialize entity controller.
+        /// </summary>
+        /// <param name="builder">Context builder of entity.</param>
         public EntityController(IEntityContextBuilder builder)
         {
             if (builder == null)
                 throw new ArgumentNullException("builder");
-            EntityBuilder = builder;
+            EntityBuilder = builder;return File()
         }
-
+        
+        /// <summary>
+        /// Begins execution of the specified request context.
+        /// </summary>
+        /// <param name="requestContext">The request context.</param>
+        /// <param name="callback">The callback.</param>
+        /// <param name="state">The state.</param>
+        /// <returns>Returns an IAsyncController instance.</returns>
         protected override IAsyncResult BeginExecute(Routing.RequestContext requestContext, AsyncCallback callback, object state)
         {
             requestContext.HttpContext.Items["EntityBuilder"] = EntityBuilder;
@@ -29,14 +46,27 @@ namespace System.Web.Mvc
         }
     }
 
+    /// <summary>
+    /// Entity controller with actions.
+    /// </summary>
     public class EntityController<TEntity> : EntityController where TEntity : class, IEntity, new()
     {
         private EntityMetadata Metadata;
 
+        /// <summary>
+        /// Get or set default page size for this controller.
+        /// </summary>
         public int[] PageSize { get; protected set; }
 
+        /// <summary>
+        /// Get the queryable of entity.
+        /// </summary>
         public IEntityQueryable<TEntity> EntityQueryable { get; private set; }
 
+        /// <summary>
+        /// Initialize entity controller.
+        /// </summary>
+        /// <param name="builder">Context builder of entity.</param>
         public EntityController(IEntityContextBuilder builder)
             : base(builder)
         {
@@ -45,9 +75,22 @@ namespace System.Web.Mvc
             PageSize = EntityViewModel.DefaultPageSizeOption;
         }
 
+        /// <summary>
+        /// Entity list page.
+        /// </summary>
+        /// <param name="page">Number of current page.</param>
+        /// <param name="size">Number of entities per page.</param>
+        /// <param name="parentpath">Path of parent for entity.</param>
+        /// <param name="parentid">Parent id.</param>
+        /// <param name="search">Is a search result.</param>
+        /// <returns></returns>
         [HttpGet]
         public virtual ActionResult Index(int page = 1, int size = 20, string parentpath = null, Guid? parentid = null, bool search = false)
         {
+            if (page < 1)
+                return new HttpStatusCodeResult(400);
+            if (size < 1)
+                return new HttpStatusCodeResult(400);
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
                 return new HttpStatusCodeResult(403);
             for (int i = 0; i < Metadata.ViewRoles.Length; i++)
@@ -271,6 +314,11 @@ namespace System.Web.Mvc
             return Expression.Lambda(typeof(Func<,>).MakeGenericType(source, element), expression, parameter);
         }
 
+        /// <summary>
+        /// Create entity page.
+        /// </summary>
+        /// <param name="parent">Parent id.</param>
+        /// <returns></returns>
         [HttpGet]
         public virtual ActionResult Create(Guid? parent = null)
         {
@@ -293,15 +341,27 @@ namespace System.Web.Mvc
             return View("Edit", model);
         }
 
+        /// <summary>
+        /// Entity detail page.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns></returns>
         [HttpGet]
         public virtual ActionResult Detail(Guid id)
         {
             TEntity item = EntityQueryable.GetEntity(id);
             if (item == null)
                 return new HttpStatusCodeResult(404);
-            return View(item);
+            var model = new EntityEditModel<TEntity>(item);
+            model.Properties = Metadata.Properties;
+            return View(model);
         }
 
+        /// <summary>
+        /// Edit entity page.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns></returns>
         [HttpGet]
         public virtual ActionResult Edit(Guid id)
         {
@@ -320,6 +380,11 @@ namespace System.Web.Mvc
             return View(model);
         }
 
+        /// <summary>
+        /// Remove entity.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns></returns>
         [HttpPost]
         public virtual ActionResult Remove(Guid id)
         {
@@ -334,6 +399,11 @@ namespace System.Web.Mvc
                 return new HttpStatusCodeResult(404);
         }
 
+        /// <summary>
+        /// Update entity.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns></returns>
         [ValidateInput(false)]
         [HttpPost]
         public virtual ActionResult Update(Guid id)
@@ -447,8 +517,15 @@ namespace System.Web.Mvc
             }
         }
 
+        /// <summary>
+        /// Selector page.
+        /// </summary>
+        /// <param name="page">Number of current page.</param>
+        /// <param name="parentpath">Path of parent for entity.</param>
+        /// <param name="parentid">Parent id.</param>
+        /// <returns></returns>
         [HttpGet]
-        public virtual ActionResult Selector(int page = 1, int size = 10, string parentpath = null, Guid? parentid = null)
+        public virtual ActionResult Selector(int page = 1, string parentpath = null, Guid? parentid = null)
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
                 return new HttpStatusCodeResult(403);
@@ -467,7 +544,7 @@ namespace System.Web.Mvc
                     return new HttpStatusCodeResult(400);
                 }
             }
-            var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, size);
+            var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, 10);
             if (Metadata.ParentProperty != null)
                 model.Parent = GetParentModel(parentid);
             model.Headers = Metadata.ViewProperties;
@@ -475,6 +552,13 @@ namespace System.Web.Mvc
             return View(model);
         }
 
+        /// <summary>
+        /// Multiple selector page.
+        /// </summary>
+        /// <param name="page">Number of current page.</param>
+        /// <param name="parentpath">Path of parent for entity.</param>
+        /// <param name="parentid">Parent id.</param>
+        /// <returns></returns>
         [HttpGet]
         public virtual ActionResult MultipleSelector(int page = 1, string parentpath = null, Guid? parentid = null)
         {
@@ -503,6 +587,10 @@ namespace System.Web.Mvc
             return View(model);
         }
 
+        /// <summary>
+        /// Search page.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public virtual ActionResult Search()
         {

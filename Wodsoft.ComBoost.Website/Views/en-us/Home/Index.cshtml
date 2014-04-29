@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "ComBoost Home";
+    Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
+}
+<div class="jumbotron">
+    <h1>Welcome to ComBoost</h1>
+    <p>ComBoost is a repository entity framework, it can help you to build applications quickly.</p>
+    <p>Base:</p>
+    <ul>
+        <li>ComBoost<br />Base of whole framework.</li>
+        <li>ComBoost.Cache<br />Repository assembly with cache.</li>
+        <li>ComBoost.EntityFramework<br />Repository assembly using Microsoft's EntityFramework.</li>
+    </ul>
+    <p>Website:</p>
+    <ul>
+        <li>ComBoost.Mvc<br />Repository framework for Microsoft's Asp.Net Mvc framework website. Free your hands to build general code.</li>
+        <li>ComBoost.Mvc.Bootstrap<br />Bootstrap style views for Mvc respository framework.</li>
+        <li>ComBoost.Mvc.Unity<br />Unity for Mvc respository framework.</li>
+    </ul>
+    <p>Desktop:</p>
+    <ul>
+        <li>ComBoost.Wpf<br />Respository framework for Wpf desktop applications.</li>
+        <li>ComBoost.Wpf.Metro<br />Metro style UI for Wpf respository framework.</li>
+    </ul>
+    <p>Service:</p>
+    <ul>
+        <li>ComBoost.Service<br />Repository service base on WCF.</li>
+        <li>ComBoost.Cache.Service<br />Repository service base on WCF with cache.</li>
+    </ul>
+    <p class="text-center"><a class="btn btn-primary btn-lg" role="button" href="@Url.Action("Start","Document")">Begin</a></p>
+</div>

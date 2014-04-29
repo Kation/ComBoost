@@ -9,21 +9,37 @@ using System.Reflection;
 
 namespace System.Web.Mvc
 {
+    /// <summary>
+    /// Entity controller factory.
+    /// </summary>
     public class EntityControllerFactory : DefaultControllerFactory
     {
         private List<ControllerItem> _Items;
 
+        /// <summary>
+        /// Initialize entity controller factory.
+        /// </summary>
         public EntityControllerFactory()
         {
             _Items = new List<ControllerItem>();
         }
 
+        /// <summary>
+        /// Register entity controller.
+        /// </summary>
+        /// <typeparam name="TEntity">Type of entity.</typeparam>
         public void RegisterController<TEntity>() where TEntity : class, IEntity, new()
         {
             Type type = typeof(TEntity);
             RegisterController(type);
         }
 
+        /// <summary>
+        /// Register entity controller.
+        /// </summary>
+        /// <typeparam name="TEntity">Type of entity.</typeparam>
+        /// <param name="controller">Controller name for entity.</param>
+        /// <param name="area">Area name for entity.</param>
         public void RegisterController<TEntity>(string controller, string area = null) where TEntity : class, IEntity, new()
         {
             Type type = typeof(TEntity);
@@ -32,6 +48,10 @@ namespace System.Web.Mvc
             RegisterController(type, controller, area);
         }
 
+        /// <summary>
+        /// Register entity controller.
+        /// </summary>
+        /// <param name="type">Type of entity.</param>
         public void RegisterController(Type type)
         {
             if (type == null)
@@ -43,6 +63,12 @@ namespace System.Web.Mvc
                 RegisterController(type, route.Controller == null ? type.Name : route.Controller, route.Area);
         }
 
+        /// <summary>
+        /// Register entity controller.
+        /// </summary>
+        /// <param name="type">Type of entity.</param>
+        /// <param name="controller">Controller name for entity.</param>
+        /// <param name="area">Area name for entity.</param>
         public void RegisterController(Type type, string controller, string area = null)
         {
             if (type == null)
@@ -68,11 +94,19 @@ namespace System.Web.Mvc
             _Items.Add(item);
         }
 
+        /// <summary>
+        /// Unregister entity controller.
+        /// </summary>
+        /// <typeparam name="TEntity">Type of entity.</typeparam>
         public void UnregisterController<TEntity>() where TEntity : class, IEntity, new()
         {
             UnregisterController(typeof(TEntity));
         }
 
+        /// <summary>
+        /// Unregister entity controller.
+        /// </summary>
+        /// <param name="type">Type of entity.</param>
         public void UnregisterController(Type type)
         {
             if (type == null)
@@ -82,6 +116,12 @@ namespace System.Web.Mvc
                 _Items.Remove(item);
         }
 
+        /// <summary>
+        /// Retrieves the controller type for the specified name and request context.
+        /// </summary>
+        /// <param name="requestContext">The context of the HTTP request, which includes the HTTP context and route data.</param>
+        /// <param name="controllerName">The name of the controller.</param>
+        /// <returns>The controller type.</returns>
         protected override Type GetControllerType(Routing.RequestContext requestContext, string controllerName)
         {
             Type type = base.GetControllerType(requestContext, controllerName);

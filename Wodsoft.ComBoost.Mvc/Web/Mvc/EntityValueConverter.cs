@@ -9,6 +9,9 @@ using System.Web.Mvc.Converter;
 
 namespace System.Web.Mvc
 {
+    /// <summary>
+    /// Entity value converter.
+    /// </summary>
     public static class EntityValueConverter
     {
         private static Dictionary<Type, TypeConverter> _Items;
@@ -35,6 +38,11 @@ namespace System.Web.Mvc
             AddConverter<UInt64>(new UInt64Converter());
         }
 
+        /// <summary>
+        /// Add a converter for a type.
+        /// </summary>
+        /// <typeparam name="T">Type.</typeparam>
+        /// <param name="converter">Converter.</param>
         public static void AddConverter<T>(TypeConverter converter)
         {
             if (converter == null)
@@ -42,6 +50,11 @@ namespace System.Web.Mvc
             AddConverter(typeof(T), converter);
         }
 
+        /// <summary>
+        /// Add a converter for a type.
+        /// </summary>
+        /// <param name="type">Type.</param>
+        /// <param name="converter">Converter.</param>
         public static void AddConverter(Type type, TypeConverter converter)
         {
             if (type == null)
@@ -56,11 +69,19 @@ namespace System.Web.Mvc
                 _Items.Add(type, converter);
         }
 
+        /// <summary>
+        /// Remove converter for a type.
+        /// </summary>
+        /// <typeparam name="T">Type.</typeparam>
         public static void RemoveConverter<T>()
         {
             RemoveConverter(typeof(T));
         }
 
+        /// <summary>
+        /// Remove converter for a type.
+        /// </summary>
+        /// <param name="type">Type.</param>
         public static void RemoveConverter(Type type)
         {
             if (type == null)
@@ -69,11 +90,21 @@ namespace System.Web.Mvc
                 _Items.Remove(type);
         }
 
+        /// <summary>
+        /// Get converter for a type.
+        /// </summary>
+        /// <typeparam name="T">Type.</typeparam>
+        /// <returns></returns>
         public static TypeConverter GetConverter<T>()
         {
             return GetConverter(typeof(T));
         }
 
+        /// <summary>
+        /// Get converter for a type.
+        /// </summary>
+        /// <param name="type">Type.</param>
+        /// <returns></returns>
         public static TypeConverter GetConverter(Type type)
         {
             if (type == null)

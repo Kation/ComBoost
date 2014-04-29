@@ -84,7 +84,7 @@ namespace System.Data.Entity.Metadata
                     Type = CustomDataType.Other;
                     CustomType = "Collection";
                 }
-                else if (typeof(EntityBase).IsAssignableFrom(type))
+                else if (typeof(IEntity).IsAssignableFrom(type))
                 {
                     Type = CustomDataType.Other;
                     CustomType = "Entity";

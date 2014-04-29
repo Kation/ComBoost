@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace System.Web.Mvc
 {
+    /// <summary>
+    /// Entity extension class.
+    /// </summary>
     public static class EntityExtension
     {
         static EntityExtension()
@@ -17,21 +20,47 @@ namespace System.Web.Mvc
             _EnumCache = new Dictionary<Type, EnumItem[]>();
         }
 
+        /// <summary>
+        /// Clear a query for a path.
+        /// </summary>
+        /// <param name="helper">A urlhelper.</param>
+        /// <param name="name">Name of query.</param>
+        /// <returns></returns>
         public static string ClearQueryPath(this UrlHelper helper, string name)
         {
             return ClearQueryPath(helper.RequestContext.HttpContext.Request.Url.PathAndQuery, name);
         }
 
+        /// <summary>
+        /// Clear a query for a path.
+        /// </summary>
+        /// <param name="helper">A urlhelper.</param>
+        /// <param name="query">Query string.</param>
+        /// <param name="name">Name of query.</param>
+        /// <returns></returns>
         public static string ClearQueryPath(this UrlHelper helper, string query, string name)
         {
             return ClearQueryPath(query, name);
         }
 
+        /// <summary>
+        /// Set a query for a path.
+        /// </summary>
+        /// <param name="helper">A urlhelper.</param>
+        /// <param name="query">Query string.</param>
+        /// <param name="name">Name of query.</param>
+        /// <returns></returns>
         public static string SetQueryPath(this UrlHelper helper, string query, string name)
         {
             return SetQueryPath(query, name);
         }
 
+        /// <summary>
+        /// Set a query for a path.
+        /// </summary>
+        /// <param name="helper">A urlhelper.</param>
+        /// <param name="name">Name of query.</param>
+        /// <returns></returns>
         public static string SetQueryPath(this UrlHelper helper, string name)
         {
             return SetQueryPath(helper.RequestContext.HttpContext.Request.Url.PathAndQuery, name);
@@ -69,6 +98,12 @@ namespace System.Web.Mvc
             return query;
         }
 
+        /// <summary>
+        /// Get a html string of pagination.
+        /// </summary>
+        /// <param name="helper">A htmlhelper.</param>
+        /// <param name="model">Entity view model.</param>
+        /// <returns></returns>
         public static MvcHtmlString Pagination(this HtmlHelper helper, EntityViewModel model)
         {
             if (model == null)
@@ -105,6 +140,12 @@ namespace System.Web.Mvc
             return new MvcHtmlString(html);
         }
 
+        /// <summary>
+        /// Get a html string of pagination size button.
+        /// </summary>
+        /// <param name="helper">A htmlhelper.</param>
+        /// <param name="model">Entity view model.</param>
+        /// <returns></returns>
         public static MvcHtmlString PaginationButton(this HtmlHelper helper, EntityViewModel model)
         {
             if (model == null)
@@ -121,6 +162,12 @@ namespace System.Web.Mvc
             return new MvcHtmlString(html);
         }
 
+        /// <summary>
+        /// Render a property editor.
+        /// </summary>
+        /// <param name="helper">A htmlhelper.</param>
+        /// <param name="property">Property metadata.</param>
+        /// <param name="value">Property value.</param>
         public static void Editor(this HtmlHelper helper, PropertyMetadata property, object value)
         {
             if (helper == null)
@@ -136,6 +183,13 @@ namespace System.Web.Mvc
                 System.Web.Mvc.Html.RenderPartialExtensions.RenderPartial(helper, property.Type.ToString() + "Editor", model);
         }
 
+        /// <summary>
+        /// Generates a fully qualified URL for the entity.
+        /// </summary>
+        /// <param name="helper">A urlhelper.</param>
+        /// <param name="type">Type of entity.</param>
+        /// <param name="action">Page name.</param>
+        /// <returns></returns>
         public static string RouteUrl(this UrlHelper helper, Type type, string action)
         {
             MvcRouteAttribute route = type.GetCustomAttribute<MvcRouteAttribute>();
@@ -149,6 +203,12 @@ namespace System.Web.Mvc
         }
 
         private static Dictionary<Type, EnumItem[]> _EnumCache;
+        /// <summary>
+        /// Analyze a enum type.
+        /// </summary>
+        /// <param name="helper">A htmlhelper.</param>
+        /// <param name="type">Type of enum.</param>
+        /// <returns></returns>
         public static EnumItem[] EnumAnalyze(this HtmlHelper helper, Type type)
         {
             if (!type.IsEnum)
@@ -174,10 +234,19 @@ namespace System.Web.Mvc
             return _EnumCache[type];
         }
 
+        /// <summary>
+        /// A data for enum item.
+        /// </summary>
         public class EnumItem
         {
+            /// <summary>
+            /// Get or set the item name.
+            /// </summary>
             public string Name { get; set; }
 
+            /// <summary>
+            /// Get or set the item value.
+            /// </summary>
             public int Value { get; set; }
         }
     }

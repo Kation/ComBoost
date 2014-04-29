@@ -128,14 +128,26 @@ namespace System.Data.Entity
             if (item != entity)
                 foreach (var property in typeof(TEntity).GetProperties().Where(t => t.CanRead && t.CanWrite))
                     property.SetValue(item, property.GetValue(entity, null), null);
-            if (DbContext.Entry<TEntity>(item).GetValidationResult().ValidationErrors.Count > 0)
-            {
-                DbContext.Entry<TEntity>(item).Reload();
-                return false;
-            }
+            //if (DbContext.Entry<TEntity>(item).GetValidationResult().ValidationErrors.Count > 0)
+            //{
+            //    DbContext.Entry<TEntity>(item).Reload();
+            //    return false;
+            //}
             entity.OnEditCompleted();
             DbContext.SaveChanges();
             return true;
+        }
+
+        /// <summary>
+        /// Reload entity from database.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        public virtual void Reload(TEntity entity)
+        {
+            var entry = DbContext.Entry<TEntity>(entity);
+            if (entry.State == EntityState.Detached)
+                throw new InvalidOperationException("This entity is not belong to this context.");
+            entry.Reload();
         }
 
         /// <summary>

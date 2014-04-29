@@ -1,0 +1,250 @@
+﻿@{
+    ViewBag.Title = "Start";
+    Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
+}
+@Styles.Render("~/Content/docs.css")
+<script src="~/Scripts/docs.min.js"></script>
+<div class="row">
+    <div class="col-md-10">
+        <div class="bs-docs-section">
+            <div class="page-header" id="installPackage">
+                <h1>安装包</h1>
+            </div>
+            <p>首先，您可以在Visual Studio里选中您的实体项目（项目需要使用.Net 4.5以上版本），然后使用<code>管理NuGet程序包</code>下载<code>ComBoost</code>包。</p>
+            <p><img src="~/Content/Images/ComBoost.NuGetResult.png" /></p>
+            <p>或打开<code>程序包管理器控制台</code>使用如下命令：</p>
+<pre>
+PM> Install-Package ComBoost -Pre 
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="createEntity">
+                <h1>建立实体</h1>
+            </div>
+            <p>当包安装完毕后，您的实体项目会出现新的引用：<code>Wodsoft.ComBoost</code>，这是建立实体需要的引用。</p>
+
+            <h3 id="createEntity-IEntity">IEntity接口</h3>
+            <p>现在您可以开始创建您的实体。ComBoost要求每个实体必须继承接口<code>IEntity</code>。</p>
+            <p>该接口要求该实体的主键属性名称为<code>Index</code>，且主键类型为<code>Guid</code>，该属性应该拥有<code>KeyAttribute</code>特性。</p>
+            <div class="alert alert-info">注意，实体必须拥有无参数构造函数，只有带参数的构造函数的实体将无法使用。</div>
+            <p>例如：</p>
+<pre>
+public class YourEntity : IEntity
+{
+    public virtual DateTime CreateDate { get; set; }
+    [Key]
+    public virtual Guid Index { get; set; }
+    public virtual bool IsEditAllowed
+    {
+        get { return true; }
+    }
+    public virtual bool IsRemoveAllowed
+    {
+        get { return true; }
+    }
+    public void OnCreateCompleted()
+    {
+        
+    }
+    public void OnEditCompleted()
+    {
+        
+    }
+    private ReadOnlyCollection&lt;ValidationResult&gt; _NoError = new ReadOnlyCollection&lt;ValidationResult&gt;(new List&lt;ValidationResult&gt;());
+    public IEnumerable&lt;ValidationResult&gt; Validate(ValidationContext validationContext)
+    {
+        return _NoError;
+    }
+}
+</pre>
+            <p><code>IsEditAllowed</code>属性通常被<code>IEntityQueryable</code>接口的<code>Edit</code>方法获取，如果为False则不允许编辑。</p>
+            <p>同理，<code>IsEditAllowed</code>为False则不允许删除。</p>
+            <p><code>OnCreateCompleted</code>方法通常被<code>IEntityQueryable</code>接口的<code>Create</code>方法调用。</p>
+            <p><code>OnEditCompleted</code>方法通常被<code>IEntityQueryable</code>接口的<code>Edit</code>方法调用。</p>
+            <p>您可以在<code>Validate</code>方法里验证您的属性，返回每一个错误。</p>
+            <div class="alert alert-info">建议，每个属性请使用<code>virtual</code>标签以确保其能被重写，某些Repository库可以通过重写属性实现更多功能。</div>
+
+            <h3 id="createEntity-IPassword">IPassword接口</h3>
+            <p>该接口要求该实体拥有<code>SetPassword</code>与<code>VerifyPassword</code>方法。</p>
+            <p><code>SetPassword</code>方法应当实现设置密码的代码，通常该方法会加密密码然后储存到相应属性里。</p>
+            <p><code>VerifyPassword</code>方法应当实现验证密码的代码，通常该方法会加密密码然后对比相应储存密码的属性。</p>
+            <div class="alert alert-info">基于ComBoost框架的某些功能在设置密码的时候必须要求该实体继承这个接口。</div>
+
+            <h3 id="createEntity-Base">使用基类</h3>
+            <h4>EntityBase</h4>
+            <p>为了节省劳动力，您不必为每个实体实现<code>IEntity</code>接口，ComBoost提供了<code>EntityBase</code>基类，您的实体可以直接继承它来使用。</p>
+            <p>例如：</p>
+<pre>
+public class YourEntity : EntityBase
+{    
+    [Required]
+    public virtual string Name { get; set; }
+}
+</pre>
+            <p><code>EntityBase</code>的<code>ToString</code>方法默认返回<code>Index</code>属性值。</p>
+            <p>您可以在您的实体里重写各个属性或方法。</p>
+            <h4>UserBase</h4>
+            <p>该实体基类继承了<code>EntityBase</code>基类与<code>IPassword</code>接口。</p>
+            <p>该基类拥有<code>Password</code>与<code>Salt</code>属性用于存储密码。</p>
+            <p>实现的<code>SetPassword</code>把输入的密码进行SHA1加密，并串接随机生成6字节的Salt掩码再次进行SHA1加密，把结果保存到<code>Password</code>属性里。</p>
+            <p>您需要自定义其它用户信息属性。</p>
+<pre>
+public class Member : UserBase
+{    
+    [Required]
+    public virtual string Name { get; set; }
+
+    [Required]
+    public virtual MemberGroup Group { get; set; }
+}
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="use">
+                <h1>操作实体</h1>
+            </div>
+            <p>当您的实体创建完毕后，您可以通过继承于<code>IEntityQueryable&lt;TEntity&gt;</code>接口的类进行使用。</p>
+            <div class="alert alert-info">ComBoost已经帮您实现了基于微软EntityFramework的Repository库，<a href="@Url.Action("EntityFramework")">查看文档</a>。</div>
+            
+            <h3 id="createEntity-context">实体上下文</h3>
+            <h4>IEntityContextBuilder</h4>
+            <p>一般来说，实现Repository的库通常拥有继承于<code>IEntityContextBuilder</code>接口的类，这个类允许你获取相应的<code>IEntityQueryable&lt;TEntity&gt;</code>实体上下文。</p>
+            <p>实例化了实体上下文构造器后，可以通过<code>GetContext</code>方法获取相关实体上下文。</p>
+<pre>
+IEntityQueryable&lt;Member&gt; context = builder.GetContext&lt;Member&gt;();
+</pre>
+            <p>这个接口的<code>EntityTypes</code>属性包含了该实体上下文构造器所支持的实体类型，不包含在该数组里的实体类型一般不可从<code>GetContext</code>方法获取相关实体上下文。</p>
+            <p>该实体上下文构造器拥有一个<code>Query</code>方法，可以直接传入Sql语句与参数获取结果，但这个方法在某些Repository库可能不被支持。</p>
+<pre>
+IEnumerable&lt;Member&gt; result = builder.Query&lt;Member&gt;("select * from members where name={0}", "admin");
+</pre>
+            <h4>IEntityQueryable</h4>
+            <p>该接口定义了应用于实体的操作方法。</p>
+            <p>实现该接口的类并不一定只拥有该接口定义的方法，一些Repository库可能会提供更多操作实体的方法。</p>
+
+            <h3 id="createEntity-general">增删改</h3>
+            <p>当获取到实体的上下文后（<code>IEntityQueryable</code>）就可以对实体进行相关操作。</p>
+            <h4>创建实体</h4>
+            <p>创建实体请使用上下文中的<code>Create</code>方法，该方法会返回一个新实例化的实体</p>
+            <p>通常情况下<code>Create</code>方法内部在实例化实体后会调用实体的<code>OnCreateCompleted</code>方法。</p>
+<pre>
+Member item = context.Create();
+item.Name = "admin";
+</pre>
+            <div class="alert alert-info">我们推荐使用<code>Create</code>方法来创建实体，而不是使用<code>new</code>方法，Repository库需要在Create方法里执行相关代码。</div>
+            <h4>添加实体</h4>
+            <p>当使用<code>Create</code>方法创建实体后，该实体并没有添加到数据库。</p>
+            <p>请使用<code>Add</code>方法来添加实体。</p>
+            <p>该方法会返回布尔型结果以表示该实体是否添加成功。</p>
+<pre>
+bool success = context.Add(item);
+</pre>
+            <div class="alert alert-info">
+                <p>如果该实体不是通过<code>Create</code>创建的，那么该方法可能会报错，这取决于Repository库。</p>
+                <p>如果该实体的Index属性值为默认值（00000000-0000-0000-0000-000000000000），那么该方法可能会为Index赋予新值<code>Guid.New()</code>，这也取决于Repository库。</p>
+            </div>
+            <p>您也可以使用<code>AddRange</code>方法批量添加实体。</p>
+            <div class="alert alert-info">一般来说，使用该方法的情况是为了效率，所以该方法通常不检测实体是否正确。请在使用该方法时确保您的实体数据正确，如果不正确可能会引发异常，这取决于Repository库。</div>
+            <h4>编辑实体</h4>
+            <p>修改实体后可以通过<code>Edit</code>方法保存实体到数据库。</p>
+            <p>一般来说，该方法会执行实体的<code>Validate</code>方法，如果返回数量大于0，那么将不会添加到数据库。</p>
+            <p>然后该方法会继续验证其它内容，如果验证出错，同样不会添加到数据库。</p>
+            <p>该方法返回布尔型结果以表示该实体是否编辑成功。</p>
+<pre>
+item.Name = "admin2";
+bool success = context.Edit(item);
+</pre>
+            <h4>删除实体</h4>
+            <p>您可以通过<code>Remove</code>方法从数据库中删除该实体。</p>
+<pre>
+bool success = context.Remove(item);
+</pre>
+
+            <h2 id="createEntity-query">查询</h2>
+            <h4>Query</h4>
+            <p>您可以使用<code>Query</code>方法获取<code>IQueryable&lt;TEntity&gt;</code>来查询数据。</p>
+<pre>
+Member item = context.Query().SingleOrDefault(t=> t.Name == "admin");
+Member[] items = context.Query().Where(t=> t.Name.Contains("ad")).ToArray();
+</pre>
+            <p><code>Query</code>方法同样可以直接使用Sql语句与参数查询数据。</p>
+<pre>
+IEnumerable&lt;Member&gt; items = context.Query("select * from members where name={0}, "admin");
+</pre>
+            <h4>InParent</h4>
+            <p><code>InParent</code>方法可以构造一个<code>Linq</code>语句用来限定实体属于父级。</p>
+<pre>
+MemberGroup group = groupContext.Query().Single(t=> t.Name == "Admins");
+Member[] items = context.InParent(context.Query(), new Guid[]{ group.Index });
+</pre>
+            <p>或</p>
+<pre>
+MemberGroup group = groupContext.Query().Single(t=> t.Name == "Admins");
+Member[] items = context.InParent(context.Query(), "Group", group.Index);
+</pre>
+            <p>上下两个例子结果相同。</p>
+            <p>该例中<code>Member</code>需要使用<code>ParentAttribute</code>特性。</p>
+<pre>
+[Parent(typeof(MemberGroup), "Group")]
+public class Member : UserBase
+{    
+    [Required]
+    public virtual string Name { get; set; }
+
+    [Required]
+    public virtual MemberGroup Group { get; set; }
+}
+</pre>
+            <h4>Count与Contains</h4>
+            <p><code>Count</code>方法会返回数据库中的实体数量。</p>
+            <p><code>Contains</code>方法可以判断某个实体是否存在于数据库。</p>
+
+            <h3 id="createEntity-order">排序</h3>
+            <p><code>OrderBy</code>方法可以对实体进行排序。</p>
+<pre>
+IOrderedQueryable&lt;Member&gt; query1 = context.OrderBy(context.Where(t=> t.CreateDate < date));    
+IOrderedQueryable&lt;Member&gt; query2 = context.OrderBy().Where(t=> t.CreateDate < date);
+</pre>
+            <p>排序依据<code>DisplayColumnAttribute</code>特性。</p>
+            <p>如果没有该特性，默认排序属性通常为<code>CreateDate</code>这将取决于Repository库。</p>
+<pre>
+[Parent(typeof(MemberGroup), "Group")]
+[DisplayColumn("Name", "Name")]
+public class Member : UserBase
+{    
+    [Required]
+    public virtual string Name { get; set; }
+    [Required]
+    public virtual MemberGroup Group { get; set; }
+}
+</pre>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="bs-docs-sidebar affix" data-spy="affix" data-offset-top="60" data-offset-bottom="200">
+            <ul class="nav bs-docs-sidenav">
+                <li><a href="#installPackage">安装包</a></li>
+                <li>
+                    <a href="#createEntity">建立实体</a>
+                    <ul class="nav">
+                        <li><a href="#createEntity-IEntity">IEntity接口</a></li>
+                        <li><a href="#createEntity-IPassword">IPassword接口</a></li>
+                        <li><a href="#createEntity-Base">使用基类</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#use">操作实体</a>
+                    <ul class="nav">
+                        <li><a href="#createEntity-context">实体上下文</a></li>
+                        <li><a href="#createEntity-general">增删改</a></li>
+                        <li><a href="#createEntity-query">查询</a></li>
+                        <li><a href="#createEntity-order">排序</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <a class="back-to-top" href="#">顶部</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,91 @@
+﻿@{
+    ViewBag.Title = "EntityFramework";
+    Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
+}
+@Styles.Render("~/Content/docs.css")
+<script src="~/Scripts/docs.min.js"></script>
+<div class="row">
+    <div class="col-md-10">
+        <div class="bs-docs-section">
+            <div class="page-header" id="installPackage">
+                <h1>安装包</h1>
+            </div>
+            <p>首先，您可以在Visual Studio里选中您的业务项目（项目需要使用.Net 4.5以上版本），然后使用<code>管理NuGet程序包</code>下载<code>ComBoost.EntityFramework</code>包。</p>
+            <p><img src="~/Content/Images/ComBoost.EntityFramework.NuGetResult.png" /></p>
+            <p>或打开<code>程序包管理器控制台</code>使用如下命令：</p>
+<pre>
+PM> Install-Package ComBoost.EntityFramework -Pre 
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="createContext">
+                <h1>创建DbContext</h1>
+            </div>
+            <p>在创建完实体项目后，在您的业务项目请新建类继承<code>DbContext</code>。</p>
+            <p>并创建各个实体的<code>DbSet&lt;TEntity&gt;</code>属性。</p>
+            <p>例如：</p>
+<pre>
+public class DataContext : DbContext
+{
+    public DbSet&lt;Member&gt; Member { get; set; }
+
+    public DbSet&lt;MemberGroup&gt; MemberGroup { get; set; }
+}
+</pre>
+            <p>之后在App.config或Web.config填写您的数据库连接字符串。</p>
+            <p>连接字符串的名称对应您继承<code>DbContext</code>的类名。</p>
+            <p>例如：</p>
+<pre>
+&lt;connectionstrings&gt;
+  &lt;add name="DataContext" connectionstring="server=127.0.0.1;database=Test;Uid=sa;Pwd=123;MultipleActiveResultSets=True" providername="System.Data.SqlClient" /&gt;
+&lt;/connectionstrings&gt;
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="use">
+                <h1>使用</h1>
+            </div>
+            <p>当创建完<code>DbContext</code>子类后，即可使用Repository库。</p>
+
+            <h3 id="use-EntityContextBuilder">EntityContextBuilder</h3>
+            <p><code>EntityContextBuilder</code>的构造函数需要传入<code>DbContext</code>类型的数据库上下文。</p>
+            <p>实例化后即可通过<code>GetContext</code>方法获取实体操作上下文。</p>
+            <p><code>EntityContextBuilder</code>提供<code>DbContext</code>属性给开发者获取该上下文构造器使用的数据库上下文。</p>
+<pre>
+EntityContextBuilder builder = new EntityContextBuilder(new DataContext());
+</pre>
+
+            <h3 id="use-EntityQueryable">EntityQueryable</h3>
+            <p><code>EntityQueryable</code>可以通过<code>EntityContextBuilder</code>的<code>GetContext</code>方法获取。</p>
+<pre>
+EntityQueryable&lt;Member&gt; context = builder.GetContext&lt;Member&gt;();
+</pre>
+            <p>也可以手动实例化。</p>
+<pre>
+EntityQueryable&lt;Member&gt; context = new EntityQueryable&lt;Member&gt;(new DataContext());
+</pre>
+            <p><code>EntityQueryable</code>除了标准<code>IEntityQueryable</code>接口功能外还额外多出一个<code>Reload</code>方法，该方法可以重新载入该实体的数据库数据。</p>
+            <p><code>EntityQueryable</code>内的方法全部是带有<code>virtual</code>标签，是可重写的。</p>
+            <p>您可以基于<code>EntityQueryable</code>实现你自己的Repository库。</p>
+            <p><code>EntityQueryable</code>提供了<code>protected</code>级别的只读属性：<code>DbContext</code>、<code>DbSet</code>、<code>EntityMetadata</code>。</p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="bs-docs-sidebar affix" data-spy="affix" data-offset-top="60" data-offset-bottom="200">
+            <ul class="nav bs-docs-sidenav">
+                <li><a href="#installPackage">安装包</a></li>
+                <li><a href="#createContext">创建DbContext</a></li>
+                <li>
+                    <a href="#use">使用</a>
+                    <ul class="nav">
+                        <li><a href="#use-EntityContextBuilder">EntityContextBuilder</a></li>
+                        <li><a href="#use-EntityQueryable">EntityQueryable</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <a class="back-to-top" href="#">顶部</a>
+        </div>
+    </div>
+</div>

@@ -21,6 +21,8 @@ namespace Wodsoft.ComBoost.Website
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            ViewEngines.Engines.Insert(0, new LanguageViewEngine());
         }
     }
 }
