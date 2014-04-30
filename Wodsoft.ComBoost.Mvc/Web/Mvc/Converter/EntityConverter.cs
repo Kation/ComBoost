@@ -63,9 +63,9 @@ namespace System.Web.Mvc.Converter
         /// <returns>An System.Object that represents the converted value.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, Globalization.CultureInfo culture, object value, Type destinationType)
         {
-            if (!(value is EntityBase))
+            if (!(value is IEntity))
                 return null;
-            return ((EntityBase)value).ToString();
+            return ((IEntity)value).ToString();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace System.Web.Mvc
     /// Image supported controller.
     /// </summary>
     /// <typeparam name="TEntity">Type of entity.</typeparam>
-    public interface IImageController<TEntity> : IFileController<TEntity> where TEntity : EntityBase, new()
+    public interface IImageController<TEntity> : IFileController<TEntity> where TEntity : IEntity, new()
     {
         /// <summary>
         /// Get a image from property.
