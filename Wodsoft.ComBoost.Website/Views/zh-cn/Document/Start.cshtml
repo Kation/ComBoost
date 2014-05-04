@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Start";
+    ViewBag.Title = "快速开始";
     Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
 }
 @Styles.Render("~/Content/docs.css")
@@ -58,8 +58,8 @@ public class YourEntity : IEntity
     }
 }
 </pre>
-            <p><code>IsEditAllowed</code>属性通常被<code>IEntityQueryable</code>接口的<code>Edit</code>方法获取，如果为False则不允许编辑。</p>
-            <p>同理，<code>IsEditAllowed</code>为False则不允许删除。</p>
+            <p><code>IsEditAllowed</code>属性通常被<code>IEntityQueryable</code>接口的<code>Edit</code>方法获取，如果为<code>false</code>则不允许编辑。</p>
+            <p>同理，<code>IsRemoveAllowed</code>为<code>false</code>则不允许删除。</p>
             <p><code>OnCreateCompleted</code>方法通常被<code>IEntityQueryable</code>接口的<code>Create</code>方法调用。</p>
             <p><code>OnEditCompleted</code>方法通常被<code>IEntityQueryable</code>接口的<code>Edit</code>方法调用。</p>
             <p>您可以在<code>Validate</code>方法里验证您的属性，返回每一个错误。</p>

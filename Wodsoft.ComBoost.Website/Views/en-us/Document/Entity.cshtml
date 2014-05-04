@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "实体";
+    ViewBag.Title = "Entity";
     Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
 }
 @Styles.Render("~/Content/docs.css")
@@ -8,17 +8,17 @@
     <div class="col-md-10">
             <div class="bs-docs-section">
             <div class="page-header" id="entity">
-                <h1>实体特性</h1>
+                <h1>Entity Attribute</h1>
             </div>
-            <p>这些特性用于实体。</p>
-            <h3 id="entity-DisplayNameAttribute">DisplayNameAttribute<small>实体名称</small></h3>
-            <p>该特性用于注明该实体的名称。</p>
+            <p>These attributes can be used by entity class.</p>
+            <h3 id="entity-DisplayNameAttribute">DisplayNameAttribute<small>Name</small></h3>
+            <p>This attribute used to define the name of entity.</p>
 <pre>
-[DisplayName("会员信息")]
+[DisplayName("Member")]
 public class Member : UserBase
 </pre>
-            <h3 id="entity-DisplayColumnAttribute">DisplayColumnAttribute<small>实体显示</small></h3>
-            <p>该特性用于注明这个实体用于显示的属性、用于排序的属性。</p>
+            <h3 id="entity-DisplayColumnAttribute">DisplayColumnAttribute<small>Display</small></h3>
+            <p>This attribute used to define the display property and sorting property.</p>
 <pre>
 [DisplayColumn("Name", "Name")]
 public class Member : UserBase
@@ -27,8 +27,8 @@ public class Member : UserBase
     public virtual string Name { get; set; }
 }
 </pre>
-            <h3 id="entity-EntityAuthenticationAttribute">EntityAuthenticationAttribute<small>实体权限</small></h3>
-            <p>该特性用于设置实体访问权限。</p>
+            <h3 id="entity-EntityAuthenticationAttribute">EntityAuthenticationAttribute<small>Authentication</small></h3>
+            <p>This attribute used to define the authentication.</p>
 <pre>
 [EntityAuthentication(AllowAnonymous = false, 
                       ViewRolesRequired = new string[]{ "Admin" }),
@@ -41,8 +41,8 @@ public class Member : UserBase
     public virtual string Name { get; set; }
 }
 </pre>
-            <h3 id="entity-ParentAttribute">ParentAttribute<small>实体父级</small></h3>
-            <p>该特性用于设置实体父级类型与属性。</p>
+            <h3 id="entity-ParentAttribute">ParentAttribute<small>Parent</small></h3>
+            <p>This attribute used to define parent type and parent property.</p>
 <pre>
 [ParentAttribute(typeof(MemberGroup), "Group")]
 public class Member : UserBase
@@ -58,7 +58,7 @@ public class Member : UserBase
 
         <div class="bs-docs-section">
             <div class="page-header" id="property">
-                <h1>属性特性</h1>
+                <h1>Propery Attribute</h1>
             </div>
             <p>这些特性用于属性。</p>
             <h3 id="property-ColumnAttribute">ColumnAttribute<small>数据库类型</small></h3>
@@ -308,43 +308,43 @@ public class MemberGroup : EntityBase
         <div class="bs-docs-sidebar affix" data-spy="affix" data-offset-top="60" data-offset-bottom="200">
             <ul class="nav bs-docs-sidenav">
                 <li>
-                    <a href="#entity">实体特性</a>
+                    <a href="#entity">Entity Attribute</a>
                     <ul class="nav">
-                        <li><a href="#entity-DisplayNameAttribute">名称</a></li>
-                        <li><a href="#entity-DisplayColumnAttribute">显示</a></li>
-                        <li><a href="#entity-EntityAuthenticationAttribute">权限</a></li>
-                        <li><a href="#entity-ParentAttribute">父级</a></li>
+                        <li><a href="#entity-DisplayNameAttribute">Name</a></li>
+                        <li><a href="#entity-DisplayColumnAttribute">Display</a></li>
+                        <li><a href="#entity-EntityAuthenticationAttribute">Authentication</a></li>
+                        <li><a href="#entity-ParentAttribute">Parent</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#property">属性特性</a>
+                    <a href="#property">Property Attribute</a>
                     <ul class="nav">
-                        <li><a href="#property-ColumnAttribute">数据库类型</a></li>
-                        <li><a href="#property-CustomDataTypeAttribute">自定义类型</a></li>
-                        <li><a href="#property-DisplayAttribute">显示信息</a></li>
-                        <li><a href="#property-HideAttribute">隐藏属性</a></li>
-                        <li><a href="#property-KeyAttribute">主键</a></li>
-                        <li><a href="#property-MaxLengthAttribute">最大长度</a></li>
-                        <li><a href="#property-MinLengthAttribute">最小长度</a></li>
-                        <li><a href="#property-PropertyAuthenticationAttribute">权限</a></li>
-                        <li><a href="#property-RangeAttribute">范围</a></li>
-                        <li><a href="#property-RegularExpressionAttribute">正则表达式</a></li>
-                        <li><a href="#property-RequiredAttribute">必填项</a></li>
-                        <li><a href="#property-SearchableAttribute">可搜索</a></li>
+                        <li><a href="#property-ColumnAttribute">Database Type</a></li>
+                        <li><a href="#property-CustomDataTypeAttribute">Custom Type</a></li>
+                        <li><a href="#property-DisplayAttribute">Display Infomation</a></li>
+                        <li><a href="#property-HideAttribute">Hide Property</a></li>
+                        <li><a href="#property-KeyAttribute">Key</a></li>
+                        <li><a href="#property-MaxLengthAttribute">Maximum Length</a></li>
+                        <li><a href="#property-MinLengthAttribute">Minimun Length</a></li>
+                        <li><a href="#property-PropertyAuthenticationAttribute">Authentication</a></li>
+                        <li><a href="#property-RangeAttribute">Range</a></li>
+                        <li><a href="#property-RegularExpressionAttribute">Regular</a></li>
+                        <li><a href="#property-RequiredAttribute">Required</a></li>
+                        <li><a href="#property-SearchableAttribute">Searchable</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#override">重写</a>
+                    <a href="#override">Override</a>
                     <ul class="nav">
-                        <li><a href="#override-onCreate">创建时</a></li>
-                        <li><a href="#override-onEdit">编辑时</a></li>
-                        <li><a href="#override-canRemove">是否可删除</a></li>
-                        <li><a href="#override-canEdit">是否可编辑</a></li>
-                        <li><a href="#override-toString">转换字符串</a></li>
+                        <li><a href="#override-onCreate">On Create</a></li>
+                        <li><a href="#override-onEdit">On Edit</a></li>
+                        <li><a href="#override-canRemove">Remove Allowed</a></li>
+                        <li><a href="#override-canEdit">Edit Allowed</a></li>
+                        <li><a href="#override-toString">ToString</a></li>
                     </ul>
                 </li>
             </ul>
-            <a class="back-to-top" href="#">顶部</a>
+            <a class="back-to-top" href="#">Back to top</a>
         </div>
     </div>
 </div>

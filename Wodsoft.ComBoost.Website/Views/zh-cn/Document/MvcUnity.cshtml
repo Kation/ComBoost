@@ -19,6 +19,30 @@ PM> Install-Package ComBoost.Mvc.Unity -Pre
         </div>
 
         <div class="bs-docs-section">
+            <div class="page-header" id="ioc">
+                <h1>注入Repository库</h1>
+            </div>
+            <p>由于<code>EntityController</code>是有参数的构造函数，需要传入<code>IEntityContextBuilder</code>类型。</p>
+            <p>请先看一下您使用的Repository库的<code>EntityContextBuilder</code>的构造函数需要什么类型的参数，再到<code>UnityControllerFactory.cs</code>注入依赖参数。</p>
+            <p>例如<code>ComBoost.EntityFramework</code>Repository库的<code>EntityContextBuilder</code>的构造函数需要的参数类型是<code>DbContext</code>，那么您应该注入您的继承<code>DbContext</code>的实体上下文类。</p>
+<pre>
+public UnityControllerFactory(IUnityContainer container)
+{
+    _container = container;
+    //Change EntityContextBuilder to your class that inherit IEntityContextBuilder interface.
+    //If your entity context builder has constructor with arguments, continue register types that you need.
+    container.RegisterType&lt;DbContext, DataContext&gt;(new MvcLifetimeManager()); //DataContext inherit DbContext
+    container.RegisterType&lt;IEntityContextBuilder, EntityContextBuilder&gt;(new MvcLifetimeManager());
+
+    //Register your entity here:
+    //RegisterController&lt;EntityType&gt;();
+    //...
+}
+</pre>
+            <div class="alert alert-info">依赖注入最好使用<code>MvcLifetimeManager</code>生命周期管理器，每一次请求为一次周期。</div>
+        </div>
+
+        <div class="bs-docs-section">
             <div class="page-header" id="controller">
                 <h1>注册实体控制器</h1>
             </div>
@@ -33,7 +57,6 @@ PM> Install-Package ComBoost.Mvc.Unity -Pre
 public UnityControllerFactory(IUnityContainer container)
 {
     _container = container;
-
     //Change EntityContextBuilder to your class that inherit IEntityContextBuilder interface.
     //If your entity context builder has constructor with arguments, continue register types that you need.
     container.RegisterType&lt;IEntityContextBuilder, EntityContextBuilder&gt;(new MvcLifetimeManager());
@@ -41,7 +64,6 @@ public UnityControllerFactory(IUnityContainer container)
     //Register your entity here:
     //RegisterController&lt;EntityType&gt;();
     //...
-
     RegisterController&lt;Member&gt;();
 }
 </pre>
@@ -74,6 +96,7 @@ RegisterController&lt;Member&gt;();
         <div class="bs-docs-sidebar affix" data-spy="affix" data-offset-top="60" data-offset-bottom="200">
             <ul class="nav bs-docs-sidenav">
                 <li><a href="#installPackage">安装包</a></li>
+                <li><a href="#ioc">注入Repository库</a></li>
                 <li><a href="#controller">注册实体控制器</a></li>
             </ul>
             <a class="back-to-top" href="#">顶部</a>

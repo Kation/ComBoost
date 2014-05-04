@@ -13,6 +13,11 @@ namespace Wodsoft.ComBoost.Website.Controllers
             return View();
         }
 
+        private string[] _Supported = new string[]
+        {
+            "en-us",
+            "zh-cn"
+        };
         public ActionResult Init()
         {
             string[] langs = Request.UserLanguages;
@@ -23,6 +28,8 @@ namespace Wodsoft.ComBoost.Website.Controllers
                 lang = langs[0].ToLower();
             if (lang == "zh-hans-cn")
                 lang = "zh-cn";
+            if (!_Supported.Contains(lang))
+                lang = "en-us";
             return RedirectToAction("Index", new { lang = lang });
         }
     }

@@ -151,6 +151,9 @@
     <Content Include="Content\Images\ComBoost.Mvc.Unity.NuGetResult.png" />
     <Content Include="Content\Images\ComBoost.NuGetResult.png" />
     <Content Include="Content\Images\RateEditor.png" />
+    <Content Include="Content\Images\Sample1.png" />
+    <Content Include="Content\Images\Sample2.png" />
+    <Content Include="Content\Images\Sample3.png" />
     <Content Include="Content\Images\UnityControllerFactory.png" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -197,6 +200,7 @@
       <SubType>
       </SubType>
     </Content>
+    <Content Include="Views\zh-cn\Document\MvcQuickStart.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
