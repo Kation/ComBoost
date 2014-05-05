@@ -29,7 +29,7 @@ namespace System.Web.Mvc
         {
             if (builder == null)
                 throw new ArgumentNullException("builder");
-            EntityBuilder = builder;return File()
+            EntityBuilder = builder;
         }
         
         /// <summary>
@@ -42,6 +42,7 @@ namespace System.Web.Mvc
         protected override IAsyncResult BeginExecute(Routing.RequestContext requestContext, AsyncCallback callback, object state)
         {
             requestContext.HttpContext.Items["EntityBuilder"] = EntityBuilder;
+            requestContext.HttpContext.Items["RouteData"] = RouteData;
             return base.BeginExecute(requestContext, callback, state);
         }
     }

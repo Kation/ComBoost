@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Routing;
 
 namespace System.Web.Mvc
 {
@@ -18,16 +19,25 @@ namespace System.Web.Mvc
         protected IEntityContextBuilder EntityBuilder { get; private set; }
 
         /// <summary>
-        /// When overridden, provides an entry point for custom authorization checks.
+        /// Provides an entry point for custom authorization checks.
+        /// </summary>
+        /// <param name="httpContext">The HTTP context, which encapsulates all HTTP-specific information about an individual HTTP request.</param>
+        /// <param name="routeData">Information about route.</param>
+        /// <returns>true if the user is authorized; otherwise, false.</returns>
+        protected abstract bool Authorize(HttpContextBase httpContext, RouteData routeData);
+
+        /// <summary>
+        /// Provides an entry point for custom authorization checks.
         /// </summary>
         /// <param name="httpContext">The HTTP context, which encapsulates all HTTP-specific information about an individual HTTP request.</param>
         /// <returns>true if the user is authorized; otherwise, false.</returns>
-        protected override bool AuthorizeCore(HttpContextBase httpContext)
+        protected sealed override bool AuthorizeCore(HttpContextBase httpContext)
         {
             if (!httpContext.User.Identity.IsAuthenticated)
                 return false;
             EntityBuilder = httpContext.Items["EntityBuilder"] as IEntityContextBuilder;
-            return true;
+            RouteData routeData = httpContext.Items["routeData"] as RouteData;
+            return Authorize(httpContext, routeData);
         }
     }
 }
