@@ -39,6 +39,13 @@ namespace System.Data.Entity
         bool Remove(Guid id);
 
         /// <summary>
+        /// Remove a lot of entities from database.
+        /// </summary>
+        /// <param name="ids">IEnumerable of Guid of entities.</param>
+        /// <returns>true if success.</returns>
+        bool RemoveRange(IEnumerable<Guid> ids);
+
+        /// <summary>
         /// Edit an entity.
         /// </summary>
         /// <param name="entity">Entity.</param>

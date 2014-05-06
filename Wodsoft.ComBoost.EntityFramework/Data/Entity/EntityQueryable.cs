@@ -114,6 +114,21 @@ namespace System.Data.Entity
         }
 
         /// <summary>
+        /// Remove a lot of entities from database.
+        /// </summary>
+        /// <param name="ids">IEnumerable of Guid of entities.</param>
+        /// <returns>Always return true.</returns>
+        public virtual bool RemoveRange(IEnumerable<Guid> ids)
+        {
+            //Todo, use sql command to delete from database.
+            //Guid[] list = ids.ToArray();
+            //DbContext.Database.ExecuteSqlCommand("delete * from ?? where [Index] ")
+            foreach (var id in ids)
+                Remove(id);
+            return true;
+        }
+
+        /// <summary>
         /// Edit an entity.
         /// </summary>
         /// <param name="entity">Entity.</param>
