@@ -33,10 +33,8 @@ namespace System.Web.Mvc
         /// <returns>true if the user is authorized; otherwise, false.</returns>
         protected sealed override bool AuthorizeCore(HttpContextBase httpContext)
         {
-            if (!httpContext.User.Identity.IsAuthenticated)
-                return false;
             EntityBuilder = httpContext.Items["EntityBuilder"] as IEntityContextBuilder;
-            RouteData routeData = httpContext.Items["routeData"] as RouteData;
+            RouteData routeData = httpContext.Items["RouteData"] as RouteData;
             return Authorize(httpContext, routeData);
         }
     }

@@ -31,19 +31,16 @@ namespace System.Web.Mvc
                 throw new ArgumentNullException("builder");
             EntityBuilder = builder;
         }
-        
+
         /// <summary>
-        /// Begins execution of the specified request context.
+        /// Called when authorization occurs.
         /// </summary>
-        /// <param name="requestContext">The request context.</param>
-        /// <param name="callback">The callback.</param>
-        /// <param name="state">The state.</param>
-        /// <returns>Returns an IAsyncController instance.</returns>
-        protected override IAsyncResult BeginExecute(Routing.RequestContext requestContext, AsyncCallback callback, object state)
+        /// <param name="filterContext">Information about the current request and action.</param>
+        protected override void OnAuthorization(AuthorizationContext filterContext)
         {
-            requestContext.HttpContext.Items["EntityBuilder"] = EntityBuilder;
-            requestContext.HttpContext.Items["RouteData"] = RouteData;
-            return base.BeginExecute(requestContext, callback, state);
+            HttpContext.Items["EntityBuilder"] = EntityBuilder;
+            HttpContext.Items["RouteData"] = RouteData;
+            base.OnAuthorization(filterContext);
         }
     }
 
