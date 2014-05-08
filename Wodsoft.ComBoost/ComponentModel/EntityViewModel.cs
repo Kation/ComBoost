@@ -11,7 +11,7 @@ namespace System.ComponentModel
     /// <summary>
     /// Entity view model.
     /// </summary>
-    public abstract class EntityViewModel : NotifyBase
+    public abstract class EntityViewModel : NotifyBase, IPagination
     {
         /// <summary>
         /// Initialize entity view model.

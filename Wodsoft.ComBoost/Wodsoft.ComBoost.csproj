@@ -64,6 +64,7 @@
     <Compile Include="ComponentModel\EntitySearchModel.cs" />
     <Compile Include="ComponentModel\EntityViewButton.cs" />
     <Compile Include="ComponentModel\EntityViewModel.cs" />
+    <Compile Include="ComponentModel\IPagination.cs" />
     <Compile Include="ComponentModel\NotifyBase.cs" />
     <Compile Include="Data\Entity\EntityBase.cs" />
     <Compile Include="Data\Entity\EntityDescriptorContext.cs" />
