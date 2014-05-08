@@ -33,7 +33,6 @@ namespace System.ComponentModel
     /// Entity edit model.
     /// </summary>
     /// <typeparam name="TEntity">Type of Entity.</typeparam>
-    /// <typeparam name="TKey">Type of key of entity.</typeparam>
     public class EntityEditModel<TEntity> : EntityEditModel where TEntity : IEntity
     {
         /// <summary>
@@ -44,6 +43,7 @@ namespace System.ComponentModel
         {
             Item = entity;
             Metadata = EntityAnalyzer.GetMetadata<TEntity>();
+            Properties = Metadata.EditProperties;
         }
 
         /// <summary>
