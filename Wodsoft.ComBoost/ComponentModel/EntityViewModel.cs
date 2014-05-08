@@ -11,12 +11,12 @@ namespace System.ComponentModel
     /// <summary>
     /// Entity view model.
     /// </summary>
-    public class EntityViewModel : NotifyBase
+    public abstract class EntityViewModel : NotifyBase
     {
         /// <summary>
         /// Initialize entity view model.
         /// </summary>
-        public EntityViewModel()
+        protected EntityViewModel()
         {
             Buttons = new EntityViewButton[0];
         }
@@ -105,7 +105,18 @@ namespace System.ComponentModel
             CurrentSize = size;
             if (CurrentPage != 1)
                 SetPage(1);
+            UpdateTotalPage();
         }
+        
+        /// <summary>
+        /// Update total page.
+        /// </summary>
+        public abstract void UpdateTotalPage();
+
+        /// <summary>
+        /// Update items of current page.
+        /// </summary>
+        public abstract void UpdateItems();
     }
 
     /// <summary>
@@ -165,7 +176,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Update total page.
         /// </summary>
-        public void UpdateTotalPage()
+        public override void UpdateTotalPage()
         {
             int total = Queryable.Count();
             TotalPage = (int)Math.Ceiling(total / (double)CurrentSize);
@@ -176,7 +187,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Update items of current page.
         /// </summary>
-        public void UpdateItems()
+        public override void UpdateItems()
         {
             Items = Queryable.Skip((CurrentPage - 1) * CurrentSize).Take(CurrentSize).ToArray();
         }
