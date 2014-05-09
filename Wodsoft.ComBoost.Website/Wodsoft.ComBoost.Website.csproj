@@ -150,6 +150,16 @@
     <Content Include="Content\Images\ComBoost.Mvc.NuGetResult.png" />
     <Content Include="Content\Images\ComBoost.Mvc.Unity.NuGetResult.png" />
     <Content Include="Content\Images\ComBoost.NuGetResult.png" />
+    <Content Include="Content\Images\MvcSample\CreateProject.png" />
+    <Content Include="Content\Images\MvcSample\InstallComBoost.png" />
+    <Content Include="Content\Images\MvcSample\InstallEntityFramework.png" />
+    <Content Include="Content\Images\MvcSample\InstallPackages.png" />
+    <Content Include="Content\Images\MvcSample\Sample1.png" />
+    <Content Include="Content\Images\MvcSample\Sample2.png" />
+    <Content Include="Content\Images\MvcSample\Sample3.png" />
+    <Content Include="Content\Images\MvcSample\Sample4.png" />
+    <Content Include="Content\Images\MvcSample\Sample5.png" />
+    <Content Include="Content\Images\MvcSample\Sample6.png" />
     <Content Include="Content\Images\RateEditor.png" />
     <Content Include="Content\Images\Sample1.png" />
     <Content Include="Content\Images\Sample2.png" />
@@ -200,7 +210,8 @@
       <SubType>
       </SubType>
     </Content>
-    <Content Include="Views\zh-cn\Document\MvcQuickStart.cshtml" />
+    <Content Include="Views\zh-cn\Document\MvcSample.cshtml" />
+    <Content Include="Views\en-us\Document\MvcSample.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

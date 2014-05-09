@@ -38,7 +38,7 @@ namespace Wodsoft.ComBoost.Website.Controllers
             return View();
         }
 
-        public ActionResult MvcQuickStart()
+        public ActionResult MvcSample()
         {
             return View();
         }
