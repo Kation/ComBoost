@@ -94,6 +94,38 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="BootstrapView\BooleanEditor.cshtml" />
+    <None Include="BootstrapView\CollectionEditor.cshtml" />
+    <None Include="BootstrapView\CurrencyEditor.cshtml" />
+    <None Include="BootstrapView\DateEditor.cshtml" />
+    <None Include="BootstrapView\DateTimeEditor.cshtml" />
+    <None Include="BootstrapView\DefaultEditor.cshtml" />
+    <None Include="BootstrapView\Edit.cshtml" />
+    <None Include="BootstrapView\EmailAddressEditor.cshtml" />
+    <None Include="BootstrapView\EntityEditor.cshtml" />
+    <None Include="BootstrapView\EnumEditor.cshtml" />
+    <None Include="BootstrapView\FileEditor.cshtml" />
+    <None Include="BootstrapView\HtmlEditor.cshtml" />
+    <None Include="BootstrapView\ImageEditor.cshtml" />
+    <None Include="BootstrapView\ImageUrlEditor.cshtml" />
+    <None Include="BootstrapView\Index.cshtml" />
+    <None Include="BootstrapView\IntegerEditor.cshtml" />
+    <None Include="BootstrapView\MultilineTextEditor.cshtml" />
+    <None Include="BootstrapView\MultipleSelector.cshtml" />
+    <None Include="BootstrapView\NumberEditor.cshtml" />
+    <None Include="BootstrapView\ParentView.cshtml" />
+    <None Include="BootstrapView\PasswordEditor.cshtml" />
+    <None Include="BootstrapView\PhoneNumberEditor.cshtml" />
+    <None Include="BootstrapView\Search.cshtml" />
+    <None Include="BootstrapView\SearchItem.cshtml" />
+    <None Include="BootstrapView\Selector.cshtml" />
+    <None Include="BootstrapView\SexEditor.cshtml" />
+    <None Include="BootstrapView\TextEditor.cshtml" />
+    <None Include="BootstrapView\TimeEditor.cshtml" />
+    <None Include="BootstrapView\UrlEditor.cshtml" />
+    <None Include="BootstrapView\_Layout.cshtml" />
+    <None Include="BootstrapView\_Pagination.cshtml" />
+    <None Include="BootstrapView\_PaginationButton.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj">

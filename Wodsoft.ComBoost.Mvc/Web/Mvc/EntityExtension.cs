@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mvc.Html;
 
 namespace System.Web.Mvc
 {
@@ -103,41 +104,11 @@ namespace System.Web.Mvc
         /// </summary>
         /// <param name="helper">A htmlhelper.</param>
         /// <param name="model">Entity view model.</param>
-        /// <returns></returns>
-        public static MvcHtmlString Pagination(this HtmlHelper helper, EntityViewModel model)
+        public static void Pagination(this HtmlHelper helper, EntityViewModel model)
         {
             if (model == null)
                 throw new ArgumentNullException("model");
-            string url = helper.ViewContext.Controller.ControllerContext.HttpContext.Request.Url.PathAndQuery;
-            url = SetQueryPath(url, "page");
-
-            string html = "<ul class=\"pagination\" style=\"margin-top: 0px; margin-bottom: 0px;\">\r\n";
-            if (model.CurrentPage == 1)
-                html += "    <li class=\"disabled\"><a>&laquo;</a></li>";
-            else
-                html += "    <li><a data-nav=\"true\" href=\"" + url + "1\">&laquo;</a></li>";
-
-            int count = 0;
-            while (count < 5 && model.CurrentPage - 2 + count <= model.TotalPage)
-            {
-                if (model.CurrentPage - 2 + count < 1)
-                {
-                    count++;
-                    continue;
-                }
-                if (count == 2)
-                    html += "    <li class=\"active\"><a>" + (model.CurrentPage - 2 + count) + "</a></li>";
-                else
-                    html += "    <li><a data-nav=\"true\" href=\"" + url + (model.CurrentPage - 2 + count) + "\">" + (model.CurrentPage - 2 + count) + "</a></li>";
-                count++;
-            }
-
-            if (model.CurrentPage == model.TotalPage)
-                html += "    <li class=\"disabled\"><a>&raquo;</a></li>";
-            else
-                html += "    <li><a data-nav=\"true\" href=\"" + url + model.TotalPage + "\">&raquo;</a></li>";
-            html += "</ul>";
-            return new MvcHtmlString(html);
+            helper.RenderPartial("_Pagination", model);
         }
 
         /// <summary>
@@ -145,21 +116,11 @@ namespace System.Web.Mvc
         /// </summary>
         /// <param name="helper">A htmlhelper.</param>
         /// <param name="model">Entity view model.</param>
-        /// <returns></returns>
-        public static MvcHtmlString PaginationButton(this HtmlHelper helper, EntityViewModel model)
+        public static void PaginationButton(this HtmlHelper helper, EntityViewModel model)
         {
             if (model == null)
                 throw new ArgumentNullException("model");
-            string url = helper.ViewContext.Controller.ControllerContext.HttpContext.Request.Url.PathAndQuery;
-            url = SetQueryPath(ClearQueryPath(url, "page"), "size");
-
-            string html = "<div class=\"btn-group\">";
-            foreach (var item in model.PageSizeOption)
-            {
-                html += " <a data-nav=\"true\" href=\"" + url + item + "\" class=\"btn btn-default" + (model.CurrentSize == item ? " active" : "") + "\">" + item + "</a>";
-            }
-            html += "</div>";
-            return new MvcHtmlString(html);
+            helper.RenderPartial("_PaginationButton", model);
         }
 
         /// <summary>
