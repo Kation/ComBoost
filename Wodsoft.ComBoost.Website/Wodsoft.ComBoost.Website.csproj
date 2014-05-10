@@ -179,6 +179,7 @@
     <Content Include="Scripts\docs.min.js" />
     <Content Include="Scripts\jquery-2.1.0.js" />
     <Content Include="Scripts\jquery-2.1.0.min.js" />
+    <Content Include="Views\zh-cn\Document\MvcSample.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -210,7 +211,6 @@
       <SubType>
       </SubType>
     </Content>
-    <Content Include="Views\zh-cn\Document\MvcSample.cshtml" />
     <Content Include="Views\en-us\Document\MvcSample.cshtml" />
   </ItemGroup>
   <ItemGroup>
