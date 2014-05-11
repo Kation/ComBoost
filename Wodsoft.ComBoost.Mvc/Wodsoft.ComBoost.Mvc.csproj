@@ -27,12 +27,14 @@
     <DocumentationFile>bin\Debug\Wodsoft.ComBoost.Mvc.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Wodsoft.ComBoost.Mvc.XML</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -82,7 +84,10 @@
     <Compile Include="Web\Mvc\Converter\EntityConverter.cs" />
     <Compile Include="Web\Mvc\Converter\EnumConverter.cs" />
     <Compile Include="Web\Mvc\EntityAuthorizeAttribute.cs" />
-    <Compile Include="Web\Mvc\EntityController.cs" />
+    <Compile Include="Web\Mvc\EntityController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Web\Mvc\EntityController`.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Web\Mvc\EntityControllerFactory.cs" />
     <Compile Include="Web\Mvc\EntityValueConverterContext.cs" />
@@ -137,6 +142,7 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(SolutionDir)Bin" md "$(SolutionDir)Bin"
 copy "$(TargetPath)" "$(SolutionDir)Bin"
+copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)Bin"
 copy "$(TargetDir)$(TargetName).xml" "$(SolutionDir)Bin"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
