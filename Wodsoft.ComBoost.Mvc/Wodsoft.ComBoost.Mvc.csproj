@@ -99,44 +99,54 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="BootstrapView\BooleanEditor.cshtml" />
-    <None Include="BootstrapView\CollectionEditor.cshtml" />
-    <None Include="BootstrapView\CurrencyEditor.cshtml" />
-    <None Include="BootstrapView\DateEditor.cshtml" />
-    <None Include="BootstrapView\DateTimeEditor.cshtml" />
-    <None Include="BootstrapView\DefaultEditor.cshtml" />
-    <None Include="BootstrapView\Edit.cshtml" />
-    <None Include="BootstrapView\EmailAddressEditor.cshtml" />
-    <None Include="BootstrapView\EntityEditor.cshtml" />
-    <None Include="BootstrapView\EnumEditor.cshtml" />
-    <None Include="BootstrapView\FileEditor.cshtml" />
-    <None Include="BootstrapView\HtmlEditor.cshtml" />
-    <None Include="BootstrapView\ImageEditor.cshtml" />
-    <None Include="BootstrapView\ImageUrlEditor.cshtml" />
-    <None Include="BootstrapView\Index.cshtml" />
-    <None Include="BootstrapView\IntegerEditor.cshtml" />
-    <None Include="BootstrapView\MultilineTextEditor.cshtml" />
-    <None Include="BootstrapView\MultipleSelector.cshtml" />
-    <None Include="BootstrapView\NumberEditor.cshtml" />
-    <None Include="BootstrapView\ParentView.cshtml" />
-    <None Include="BootstrapView\PasswordEditor.cshtml" />
-    <None Include="BootstrapView\PhoneNumberEditor.cshtml" />
-    <None Include="BootstrapView\Search.cshtml" />
-    <None Include="BootstrapView\SearchItem.cshtml" />
-    <None Include="BootstrapView\Selector.cshtml" />
-    <None Include="BootstrapView\SexEditor.cshtml" />
-    <None Include="BootstrapView\TextEditor.cshtml" />
-    <None Include="BootstrapView\TimeEditor.cshtml" />
-    <None Include="BootstrapView\UrlEditor.cshtml" />
-    <None Include="BootstrapView\_Layout.cshtml" />
-    <None Include="BootstrapView\_Pagination.cshtml" />
-    <None Include="BootstrapView\_PaginationButton.cshtml" />
+    <None Include="Bootstrap\Views\Shared\BooleanEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\CollectionEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\CurrencyEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\DateEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\DateTimeEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\DefaultEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\Edit.cshtml" />
+    <None Include="Bootstrap\Views\Shared\EmailAddressEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\EntityEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\EnumEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\FileEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\HtmlEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ImageEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ImageUrlEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\Index.cshtml" />
+    <None Include="Bootstrap\Views\Shared\IntegerEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\MultilineTextEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\MultipleSelector.cshtml" />
+    <None Include="Bootstrap\Views\Shared\NumberEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ParentView.cshtml" />
+    <None Include="Bootstrap\Views\Shared\PasswordEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\PhoneNumberEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\Search.cshtml" />
+    <None Include="Bootstrap\Views\Shared\SearchItem.cshtml" />
+    <None Include="Bootstrap\Views\Shared\Selector.cshtml" />
+    <None Include="Bootstrap\Views\Shared\SexEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\TextEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\TimeEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\UrlEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\_Layout.cshtml" />
+    <None Include="Bootstrap\Views\Shared\_Pagination.cshtml" />
+    <None Include="Bootstrap\Views\Shared\_PaginationButton.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj">
       <Project>{f858395f-6a8a-4596-bac0-eaea21d24f82}</Project>
       <Name>Wodsoft.ComBoost</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Bootstrap\Content\jstree.css" />
+    <Content Include="Bootstrap\Content\jstree.min.css" />
+    <Content Include="Bootstrap\Content\themes\default\32px.png" />
+    <Content Include="Bootstrap\Content\themes\default\40px.png" />
+    <Content Include="Bootstrap\Content\themes\default\throbber.gif" />
+    <Content Include="Bootstrap\Scripts\jstree.js" />
+    <Content Include="Bootstrap\Scripts\jstree.min.js" />
+    <None Include="Bootstrap\Views\Web.config.transform" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

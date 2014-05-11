@@ -11,6 +11,7 @@ namespace System.Web.Mvc
     /// <summary>
     /// Entity authorize attribute base.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public abstract class EntityAuthorizeAttribute : AuthorizeAttribute
     {
         /// <summary>

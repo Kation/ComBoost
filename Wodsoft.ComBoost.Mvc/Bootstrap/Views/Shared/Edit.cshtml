@@ -1,0 +1,94 @@
+﻿@model EntityEditModel
+@{
+    ViewBag.Title = (Model.Item.Index == Guid.Empty ? "Create " : "Edit ") + Model.Metadata.Name;
+    object area = ViewContext.RouteData.DataTokens["Area"];
+    if (area == null)
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Areas/" + area.ToString() + "/Views/Shared/_Layout.cshtml";
+    }
+}
+@Scripts.Render("~/Scripts/jquery-ui-1.10.4.min.js")
+@Styles.Render("~/Content/themes/base/css")
+<script src="~/Scripts/tinymce/tinymce.min.js"></script>
+<script src="~/Scripts/tinymce/jquery.tinymce.min.js"></script>
+<link href="~/Content/jstree.css" rel="stylesheet" />
+<div class="modal fade" id="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="dialogTitle">Save Result</h4>
+            </div>
+            <div class="modal-body" id="dialogContent">
+            </div>
+            <div class="modal-footer">
+                <button id="dialogOK" type="button" class="btn btn-primary">OK</button>
+                <button id="dialogCancel" type="button" class="btn btn-default">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<ol class="breadcrumb">
+    <li><a href="#">Home</a></li>
+    <li><a href="@Url.Action("Index")">@Model.Metadata.Name</a></li>
+    <li class="active">@(Model.Item.Index == Guid.Empty ? "Create" : "Edit")</li>
+</ol>
+<br />
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">
+        <strong class="font-size20">@(Model.Item.Index == Guid.Empty ? "Create" : "Edit")</strong>
+    </div>
+    <div class="panel-body">
+        <form id="form" class="form-horizontal" role="form" action="@Url.Action("Update")" method="post">
+            @for (int i = 0; i < Model.Properties.Length; i++)
+            {
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">@Model.Properties[i].Name</label>
+                    <div class="col-sm-8">
+                        @{Html.Editor(Model.Properties[i], Model.Properties[i].Property.GetValue(Model.Item));}
+                    </div>
+                </div>
+            }
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <a href="@Url.Action("Index")" class="btn btn-default">Back</a>
+                    <input name="id" type="hidden" value="@Model.Item.Index" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="~/Scripts/jstree.js"></script>
+<script type="text/javascript" src="~/Scripts/jquery.form.js"></script>
+<script type="text/javascript">
+    function dialog(title, content, ok) {
+        $('#dialogTitle').html(title);
+        $('#dialogContent').html(content);
+        $('#dialog').modal('show');
+        $('#dialogOK').unbind('click');
+        if (ok == undefined)
+            $('#dialogOK').click(function () {
+                $('#dialog').modal('hide');
+            });
+        else
+            $('#dialogOK').click(ok);
+    }
+    $('#dialogCancel').click(function () {
+        $('#dialog').modal('hide');
+    });
+    $('#dialog').modal({ show: false });
+    $('#form').ajaxForm({
+        error: function (result) {
+            dialog('Save Result', '<p>Save failure. Reason:' + result.responseText + '。</p>', function () { $('#dialog').modal('hide'); });
+        },
+        success: function (result) {
+            dialog('Save Result', '<p>Save success, Return list view.</p>', function () { window.location = '@Url.Action("Index")'; });
+        }
+    });
+</script>
