@@ -1,0 +1,84 @@
+﻿@{
+    ViewBag.Title = "登录";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="page-header">
+    <h1 class="container">登录</h1>
+</div>
+<div class="container">
+    <form class="form-horizontal" role="form">
+        <div class="form-group">
+            <label for="userName" class="col-sm-2 control-label">账号</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="userName" placeholder="员工账号">
+                <span style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="userPwd" class="col-sm-2 control-label">账号</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" id="userPwd" placeholder="密码">
+                <span style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2">
+                <button type="button" class="btn btn-primary" onclick="login()">登录</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">提示</h4>
+            </div>
+            <div class="modal-body" id="resultContent">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#userName").change(change);
+    $("#userPwd").change(change);
+    function change() {
+        var input = $(this);
+        if (input.val() != '') {
+            input.parent().parent().removeClass('has-feedback');
+            input.parent().parent().removeClass('has-warning');
+            input.parent().children('span').hide();
+        }
+    }
+    function validate(input) {
+        if (input.val() != '')
+            return true;
+        input.parent().parent().addClass('has-feedback');
+        input.parent().parent().addClass('has-warning');
+        input.parent().children('span').show();
+        return false;
+    }
+    function login() {
+        if (!validate($("#userName")) || !validate($("#userPwd")))
+            return;
+        var username = $("#userName").val();
+        var pwd = $("#userPwd").val();
+        $.ajax({
+            url: '@Url.Action("Login","Account")',
+            type: 'post',
+            data: { username: username, password: pwd },
+            error: function (result) {
+                $("#resultContent").html(result.responseText);
+                $('#myModal').modal('show');
+            },
+            success: function () {
+                window.location.href = '@Html.Raw(Url.Action("Index","Home"))';
+            }
+        });
+    }
+</script>
