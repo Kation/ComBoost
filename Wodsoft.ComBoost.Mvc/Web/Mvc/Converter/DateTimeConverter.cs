@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace System.Web.Mvc.Converter
 {
-    public class DateConverter : TypeConverter
+    public class DateTimeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -26,7 +26,7 @@ namespace System.Web.Mvc.Converter
 
         public override object ConvertTo(ITypeDescriptorContext context, Globalization.CultureInfo culture, object value, Type destinationType)
         {
-            return ((DateTime)value).ToLongDateString();
+            return ((DateTime)value).ToLongDateString() + " " + ((DateTime)value).ToLongTimeString();
         }
     }
 }

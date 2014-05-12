@@ -81,8 +81,13 @@
     <Compile Include="ComponentModel\MvcEditorModel.cs" />
     <Compile Include="ComponentModel\MvcViewButton.cs" />
     <Compile Include="Web\Mvc\Converter\CollectionConverter.cs" />
+    <Compile Include="Web\Mvc\Converter\DateTimeConverter.cs" />
+    <Compile Include="Web\Mvc\Converter\DateConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Web\Mvc\Converter\EntityConverter.cs" />
     <Compile Include="Web\Mvc\Converter\EnumConverter.cs" />
+    <Compile Include="Web\Mvc\Converter\SexConverter.cs" />
     <Compile Include="Web\Mvc\EntityAuthorizeAttribute.cs" />
     <Compile Include="Web\Mvc\EntityRouteCollectionExtensions.cs" />
     <Compile Include="Web\Mvc\EntityController.cs">

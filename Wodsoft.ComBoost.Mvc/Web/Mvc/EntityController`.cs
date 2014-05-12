@@ -424,10 +424,10 @@ namespace System.Web.Mvc
                         Response.StatusCode = 400;
                         return Content(propertyMetadata.Name + "为必填项");
                     }
-                    Type type = propertyMetadata.Property.PropertyType;
-                    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-                        type = type.GetGenericArguments()[0];
-                    TypeConverter converter = EntityValueConverter.GetConverter(type);
+                    //Type type = propertyMetadata.Property.PropertyType;
+                    //if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    //    type = type.GetGenericArguments()[0];
+                    TypeConverter converter = EntityValueConverter.GetConverter(propertyMetadata);
                     if (converter == null)
                         if (propertyMetadata.Property.PropertyType.IsGenericType && propertyMetadata.Property.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>))
                             converter = new Converter.CollectionConverter();
