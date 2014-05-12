@@ -1,0 +1,52 @@
+﻿@model MvcEditorModel
+@{
+    EntityExtension.EnumItem[] items;
+    if (Model.Metadata.Property.PropertyType.IsGenericType)
+    {
+        items = Html.EnumAnalyze(Model.Metadata.Property.PropertyType.GetGenericArguments()[0]);
+    }
+    else
+    {
+        items = Html.EnumAnalyze(Model.Metadata.Property.PropertyType);
+    }
+}
+@if (Model.Metadata.Property.PropertyType.GetCustomAttributes(typeof(FlagsAttribute), true).Length == 0)
+{
+    <select id="@Model.Metadata.Property.Name" name="@Model.Metadata.Property.Name" class="form-control" style="padding-right: 12px;">
+        @if (Model.Metadata.Property.PropertyType.IsGenericType)
+        {
+            <option value="" @Html.Raw(Model.Value == null ? " selected=\"selected\"" : "")></option>
+        }
+        @for (int i = 0; i < items.Length; i++)
+        {
+            <option value="@items[i].Value" @Html.Raw(items[i].Value == (int)Model.Value ? " selected=\"selected\"" : "")>@items[i].Name</option>
+        }
+    </select>
+}
+else
+{
+    EnumConverter converter = new EnumConverter(Model.Metadata.Property.PropertyType);
+    <div id="@Model.Metadata.Property.Name">
+        @for (int i = 0; i < items.Length; i++)
+        {
+            <div class="checkbox-inline">
+                <label><input type="checkbox" value="@items[i].Value" @Html.Raw(((dynamic)Model.Value).HasFlag((Enum)Enum.ToObject(Model.Metadata.Property.PropertyType, items[i].Value)) ? " checked=\"checked\"" : "") />@items[i].Name</label>
+            </div>
+        }
+    </div>
+    <input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" value="@((int)Model.Value)" />
+    <script type="text/javascript">
+        $(function () {
+            var value = $('#@(Model.Metadata.Property.Name)_Value');
+            var checkbox = $('#@Model.Metadata.Property.Name').find(':checkbox');
+            checkbox.click(function () {
+                var num = 0;
+                checkbox.each(function (index, element) {
+                    if (element.checked)
+                        num += new Number(element.value);
+                });
+                value.val(num);
+            });
+        })
+    </script>
+}

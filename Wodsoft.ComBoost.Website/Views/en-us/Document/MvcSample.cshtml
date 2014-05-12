@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Mvc Sample";
+    Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
+}
+@Styles.Render("~/Content/docs.css")
+<script src="~/Scripts/docs.min.js"></script>
+<div class="row">
+    <div class="col-md-10">
+        <div class="bs-docs-section">
+            <div class="page-header" id="ready">
+                <h1>准备工作</h1>
+            </div>
+            <p>首先，在Visual Studio中创建Mvc4项目。</p>
+            <p><img src="~/Content/Images/MvcSample/CreateProject.png" /></p>
+            <p>然后使用NuGet安装<code>ComBoost</code>程序包。</p>
+            <p><img src="~/Content/Images/MvcSample/InstallComBoost.png" /></p>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="entity">
+                <h1>编写实体</h1>
+            </div>
+            <p>在<code>Models</code>文件夹里添加<code>EmployeeGroup</code>员工组类。</p>
+            <p><code>EmployeeGroup</code>继承<code>EntityBase</code>。</p>
+<pre>
+[DisplayName("员工组")]
+[DisplayColumn("GroupName", "GroupName")]
+public class EmployeeGroup : EntityBase
+{
+    [Required]
+    [Display(Name = "员工组名称", Order = 0)]
+    public virtual string GroupName { get; set; }
+    [Hide]
+    public virtual ICollection&lt;Employee&gt; Employees { get; set; }
+}
+</pre>
+            <p>在<code>Models</code>文件夹里添加<code>Employee</code>员工组类。</p>
+            <p><code>Employee</code>同样继承<code>EntityBase</code>。</p>
+<pre>
+[DisplayName("员工")]
+[DisplayColumn("Name", "Name")]
+public class Employee : EntityBase
+{
+    [Display(Name = "员工名称", Order = 0)]
+    [Required]
+    public virtual string Name { get; set; }
+    [Display(Name = "性别", Order = 10)]
+    [CustomDataType(CustomDataType.Sex)]
+    public virtual bool Sex { get; set; }
+    [Required]
+    [Display(Name = "员工工号", Order = 20)]
+    public virtual string JobNumber { get; set; }
+    [Column(TypeName = "datetime2")]
+    [Display(Name = "出生日期", Order = 30)]
+    public virtual DateTime Birth { get; set; }
+    [Display(Name = "婚否", Order = 40)]
+    public virtual bool Marital { get; set; }
+    [Required]
+    [Display(Name = "部门", Order = 50)]
+    public virtual EmployeeGroup Group { get; set; }
+    [Display(Name = "联系电话", Order = 60)]
+    public virtual string Tel { get; set; }
+    [Display(Name = "电子邮件", Order = 70)]
+    public virtual string Email { get; set; }
+    [Display(Name = "QQ", Order = 80)]
+    public virtual string QQ { get; set; }
+}
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="entityframework">
+                <h1>使用EntityFramework</h1>
+            </div>
+            <p>在NuGet里安装<code>EntityFramework</code>。</p>
+            <p><img src="~/Content/Images/MvcSample/InstallEntityFramework.png" /></p>
+            <p>安装好后在<code>Models</code>文件夹添加<code>DataContext</code>类。</p>
+            <p><code>DataContext</code>继承<code>EntityFramework</code>的<code>DbContext</code>类。</p>
+<pre>
+public class DataContext : DbContext
+{
+    public DbSet&lt;Employee&gt; Employee { get; set; }
+    public DbSet&lt;EmployeeGroup&gt; EmployeeGroup { get; set; }
+}
+</pre>
+            <p>之后在项目根目录下的<code>web.config</code>文件里添加数据连接字符串。</p>
+<pre>
+&lt;connectionStrings&gt;
+  &lt;add name="DataContext" connectionString="server=127.0.0.1;database=Test;Uid=sa;Pwd=123@abc;MultipleActiveResultSets=True" providerName="System.Data.SqlClient" /&gt;
+&lt;/connectionStrings&gt;
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="finally">
+                <h1>最后</h1>
+            </div>
+            <p>在NuGet里安装<code>ComBoost.Mvc</code>和<code>ComBoost.Unity</code>、<code>ComBoost.Bootstrap</code>程序包。</p>
+            <p><img src="~/Content/Images/MvcSample/InstallPackages.png" /></p>
+            <div class="alert alert-info">推荐更新所有程序包至最新！</div>
+            <p>修改<code>App_Start</code>文件夹里的<code>UnityControllerFactory.cs</code></p>
+            <p>依赖注入<code>DataContext</code>并注册实体控制器。</p>
+<pre>
+public UnityControllerFactory(IUnityContainer container)
+{
+    _container = container;
+    //Change EntityContextBuilder to your class that inherit IEntityContextBuilder interface.
+    //If your entity context builder has constructor with arguments, continue register types that you need.
+    container.RegisterType&lt;DbContext, DataContext&gt;(new MvcLifetimeManager());
+    container.RegisterType&lt;IEntityContextBuilder, EntityContextBuilder&gt;(new MvcLifetimeManager());
+    //Register your entity here:
+    //RegisterController&lt;EntityType&gt;();
+    //...
+    RegisterController&lt;Employee&gt;();
+    RegisterController&lt;EmployeeGroup&gt;();
+}
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="complete">
+                <h1>完成</h1>
+            </div>
+            <p>现在，您已经创建好项目了，您可以访问<code>/Employee</code>或<code>/EmployeeGroup</code>地址对实体进行编辑。</p>
+            <p><img src="~/Content/Images/MvcSample/Sample1.png" /></p>
+            <p><img src="~/Content/Images/MvcSample/Sample2.png" /></p>
+            <p><img src="~/Content/Images/MvcSample/Sample3.png" /></p>
+            <p><img src="~/Content/Images/MvcSample/Sample4.png" /></p>
+            <p><img src="~/Content/Images/MvcSample/Sample5.png" /></p>
+            <p><img src="~/Content/Images/MvcSample/Sample6.png" /></p>
+            <div class="alert alert-info">这是个最基础的用例，实际情况您需要对<code>_Layout.cshtml</code>进行编辑，更有可能创建控制器实现其它功能，详情请看相关文档。</div>
+            <p>示例项目文件下载：<a href="~/MvcSample.rar">MvcSample.rar</a></p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="bs-docs-sidebar affix" data-spy="affix" data-offset-top="60" data-offset-bottom="200">
+            <ul class="nav bs-docs-sidenav">
+                <li><a href="#ready">准备工作</a></li>
+                <li><a href="#entity">编写实体</a></li>
+                <li><a href="#entityframework">使用EntityFramework</a></li>
+                <li><a href="#finally">最后</a></li>
+                <li><a href="#complete">完成</a></li>
+            </ul>
+            <a class="back-to-top" href="#">顶部</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+﻿@model MvcEditorModel
+<div class="input-group">
+    <input type="text" id="@(Model.Metadata.Property.Name)_Name" readonly="readonly" class="form-control" value="@Model.Value">
+    <input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" value="@(Model.Value != null? ((System.Data.Entity.EntityBase)Model.Value).Index.ToString() : "")" />
+    <span class="input-group-btn">
+        <button id="@(Model.Metadata.Property.Name)_Select" class="btn btn-default" type="button">Select</button>
+        <button id="@(Model.Metadata.Property.Name)_Clear" class="btn btn-default" type="button">Clear</button>
+    </span>
+</div>
+<script type="text/javascript">
+    $(function () {
+        function initSelector(result) {
+            result.find('[data-nav=true]').each(function (index, element) {
+                element = $(element);
+                element.attr('data-href', element.attr('href'));
+                element.click(function () {
+                    $.ajax({
+                        cache: false,
+                        url: $(this).attr('data-href'),
+                        success: function (result) {
+                            result = $(result);
+                            initSelector(result);
+                            $('#dialogContent').html(result);
+                        }
+                    });
+                });
+                element.removeAttr('href');
+            });
+            var tree = result.find('#selectorparentview');
+            tree.find('[data-nav=true]').each(function (index, element) {
+                element = $(element);
+                element.attr('href', element.attr('data-href'));
+                element.removeAttr('data-href');
+            });
+            if (tree.length > 0) {
+                $(tree[0]).bind('select_node.jstree', function (node, selected) {
+                    $.ajax({
+                        cache: false,
+                        url: selected.node.a_attr.href,
+                        success: function (result) {
+                            result = $(result);
+                            initSelector(result);
+                            $('#dialogContent').html(result);
+                        }
+                    });
+                });
+                $(tree[0]).jstree();
+            }
+        }
+        var name = $('#@(Model.Metadata.Property.Name)_Name');
+        var value = $('#@(Model.Metadata.Property.Name)_Value');
+        $('#@(Model.Metadata.Property.Name)_Select').click(function () {
+            $.ajax({
+                cache: false,
+                url: '@Url.RouteUrl(new { controller = Model.Metadata.Property.PropertyType.Name, action = "Selector" })',
+                error: function (result) {
+                    if (result.status == 404)
+                        dialog('There is some errors', '<p>Can not found the selector.</p>', function () { $('#dialog').modal('hide'); });
+                    else
+                        dialog('There is some errors', '<p>Site throw unexpected errors.</p>', function () { $('#dialog').modal('hide'); });
+                },
+                success: function (result) {
+                    result = $(result);
+                    initSelector(result);
+                    dialog('@(Model.Metadata.Name) selector dialog', result, function () {
+                        var radios = $('#dialog').find(':checked');
+                        if (radios.length == 0) {
+                            alert('Please select a item.');
+                            return;
+                        }
+                        value.val($(radios[0]).val());
+                        name.val($(radios[0]).attr('data-name'));
+                        $('#dialog').modal('hide');
+                    });
+                }
+            });
+        });
+        $('#@(Model.Metadata.Property.Name)_Clear').click(function () {
+            name.val('');
+            value.val('');
+        });
+    });
+</script>

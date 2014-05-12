@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{868F1779-0830-4550-A293-35B27B8BFB3D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>System</RootNamespace>
+    <AssemblyName>Wodsoft.ComBoost.Mvc</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Wodsoft.ComBoost.Mvc.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Wodsoft.ComBoost.Mvc.XML</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ComponentModel\MvcRouteAttribute.cs" />
+    <Compile Include="ComponentModel\MvcEditorModel.cs" />
+    <Compile Include="ComponentModel\MvcViewButton.cs" />
+    <Compile Include="Web\Mvc\Converter\CollectionConverter.cs" />
+    <Compile Include="Web\Mvc\Converter\EntityConverter.cs" />
+    <Compile Include="Web\Mvc\Converter\EnumConverter.cs" />
+    <Compile Include="Web\Mvc\EntityAuthorizeAttribute.cs" />
+    <Compile Include="Web\Mvc\EntityRouteCollectionExtensions.cs" />
+    <Compile Include="Web\Mvc\EntityController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Web\Mvc\EntityController`.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Web\Mvc\EntityControllerFactory.cs" />
+    <Compile Include="Web\Mvc\EntityValueConverterContext.cs" />
+    <Compile Include="Web\Mvc\EntityExtension.cs" />
+    <Compile Include="Web\Mvc\EntityValueConverter.cs" />
+    <Compile Include="Web\Mvc\IFileController.cs" />
+    <Compile Include="Web\Mvc\IImageController.cs" />
+    <Compile Include="Web\Routing\EntityRoute.cs" />
+    <Compile Include="Web\Security\ComBoostAuthenticationModel.cs" />
+    <Compile Include="Web\Security\ComBoostPrincipal.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <None Include="Bootstrap\Views\Shared\BooleanEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\CollectionEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\CurrencyEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\DateEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\DateTimeEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\DefaultEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\Edit.cshtml" />
+    <None Include="Bootstrap\Views\Shared\EmailAddressEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\EntityEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\EnumEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\FileEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\HtmlEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ImageEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ImageUrlEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\Index.cshtml" />
+    <None Include="Bootstrap\Views\Shared\IntegerEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\MultilineTextEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\MultipleSelector.cshtml" />
+    <None Include="Bootstrap\Views\Shared\NumberEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ParentView.cshtml" />
+    <None Include="Bootstrap\Views\Shared\PasswordEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\PhoneNumberEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\Search.cshtml" />
+    <None Include="Bootstrap\Views\Shared\SearchItem.cshtml" />
+    <None Include="Bootstrap\Views\Shared\Selector.cshtml" />
+    <None Include="Bootstrap\Views\Shared\SexEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\TextEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\TimeEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\UrlEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\_Layout.cshtml" />
+    <None Include="Bootstrap\Views\Shared\_Pagination.cshtml" />
+    <None Include="Bootstrap\Views\Shared\_PaginationButton.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj">
+      <Project>{f858395f-6a8a-4596-bac0-eaea21d24f82}</Project>
+      <Name>Wodsoft.ComBoost</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Bootstrap\Content\jstree.css" />
+    <Content Include="Bootstrap\Content\jstree.min.css" />
+    <Content Include="Bootstrap\Content\themes\default\32px.png" />
+    <Content Include="Bootstrap\Content\themes\default\40px.png" />
+    <Content Include="Bootstrap\Content\themes\default\throbber.gif" />
+    <Content Include="Bootstrap\Scripts\jstree.js" />
+    <Content Include="Bootstrap\Scripts\jstree.min.js" />
+    <None Include="Bootstrap\Views\Web.config.transform" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if not exist "$(SolutionDir)Bin" md "$(SolutionDir)Bin"
+copy "$(TargetPath)" "$(SolutionDir)Bin"
+copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)Bin"
+copy "$(TargetDir)$(TargetName).xml" "$(SolutionDir)Bin"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

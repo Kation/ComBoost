@@ -1,0 +1,250 @@
+﻿@{
+    ViewBag.Title = "Quick Start";
+    Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
+}
+@Styles.Render("~/Content/docs.css")
+<script src="~/Scripts/docs.min.js"></script>
+<div class="row">
+    <div class="col-md-10">
+        <div class="bs-docs-section">
+            <div class="page-header" id="installPackage">
+                <h1>Install Package</h1>
+            </div>
+            <p>First, you can choose your entity project in Visual Studio(Required .Net 4.5 or higher). Then use <code>Manage NuGet Packages</code> to download <code>ComBoost</code> package.</p>
+            <p><img src="~/Content/Images/ComBoost.NuGetResult.png" /></p>
+            <p>Or open <code>Package Manager Console</code> and run this command.</p>
+<pre>
+PM> Install-Package ComBoost -Pre 
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="createEntity">
+                <h1>Create Entity</h1>
+            </div>
+            <p>There will be a new reference <code>Wodsoft.ComBoost</code> when package installed. Our entity need it.</p>
+
+            <h3 id="createEntity-IEntity">IEntity Interface</h3>
+            <p>Now, you can begin to create your entities. ComBoost require every entity to inherit <code>IEntity</code>.</p>
+            <p>The interface require a key property named <code>Index</code> and its type is <code>Guid</code>. This property also require a <code>KeyAttribute</code>.</p>
+            <div class="alert alert-info">Notice, entity class must has non argument constructor.</div>
+            <p>Example:</p>
+<pre>
+public class YourEntity : IEntity
+{
+    public virtual DateTime CreateDate { get; set; }
+    [Key]
+    public virtual Guid Index { get; set; }
+    public virtual bool IsEditAllowed
+    {
+        get { return true; }
+    }
+    public virtual bool IsRemoveAllowed
+    {
+        get { return true; }
+    }
+    public void OnCreateCompleted()
+    {
+        
+    }
+    public void OnEditCompleted()
+    {
+        
+    }
+    private ReadOnlyCollection&lt;ValidationResult&gt; _NoError = new ReadOnlyCollection&lt;ValidationResult&gt;(new List&lt;ValidationResult&gt;());
+    public IEnumerable&lt;ValidationResult&gt; Validate(ValidationContext validationContext)
+    {
+        return _NoError;
+    }
+}
+</pre>
+            <p>Proeprty <code>IsEditAllowed</code> used to get by method <code>Edit</code> of interface <code>IEntityQueryable</code>, Edit is not allowed if <code>false</code>.</p>
+            <p>In the same way. Remove is not allowed if <code>IsRemoveAllowed</code> is <code>false</code>.</p>
+            <p>Method <code>OnCreateCompleted</code> used to call by method <code>Create</code> of interface <code>IEntityQueryable</code>.</p>
+            <p>Method <code>OnEditCompleted</code> used to call by method <code>Edit</code> of interface <code>IEntityQueryable</code>.</p>
+            <p>In method <code>Validate</code>, you can validate your properties and return each error.</p>
+            <div class="alert alert-info">Suggestion. Use <code>virtual</code> for any property to ensure that property can be override. Some respository library maybe use it to implement more methods.</div>
+
+            <h3 id="createEntity-IPassword">IPassword Interface</h3>
+            <p>Interface require entity class has <code>SetPassword</code> and <code>VerifyPassword</code> method.</p>
+            <p>Method <code>SetPassword</code> should implement setting password code. In general, you need to hash password and set result to properties.</p>
+            <p>Method <code>VerifyPassword</code> should implement verify password code. In general, you need to hash password and compare to properties.</p>
+            <div class="alert alert-info">Entity should inherit this interface if there is a property that <code>CustomDataType</code> is <code>Password</code>.</div>
+
+            <h3 id="createEntity-Base">Use base class</h3>
+            <h4>EntityBase</h4>
+            <p>To save your work. You don't need to implement <code>IEntity</code> interface for every entity. ComBoost support <code>EntityBase</code> base class implemented <code>IEntity</code> interface, your entity class can inherit it.</p>
+            <p>Example:</p>
+<pre>
+public class YourEntity : EntityBase
+{    
+    [Required]
+    public virtual string Name { get; set; }
+}
+</pre>
+            <p>Method <code>ToString</code> of <code>EntityBase</code> return <code>Index</code> value by default.</p>
+            <p>You can override any property or method in your entity class.</p>
+            <h4>UserBase</h4>
+            <p>This base class inherited <code>EntityBase</code> class and <code>IPassword</code> interface.</p>
+            <p>This class has <code>Password</code> and <code>Salt</code> property for saving password information.</p>
+            <p>This method <code>SetPassword</code> of <code>UserBase</code> will hash password using SHA1, random generate a 6 length of byte data to <code>Salt</code>, concat it and hash again then save to <code>Password</code>.</p>
+            <p>You needed are going to create user information properties.</p>
+<pre>
+public class Member : UserBase
+{    
+    [Required]
+    public virtual string Name { get; set; }
+
+    [Required]
+    public virtual MemberGroup Group { get; set; }
+}
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="use">
+                <h1>Entity Operation</h1>
+            </div>
+            <p>You can through a class inherited <code>IEntityQueryable&lt;TEntity&gt;</code> interface to work with entity while your entity class is done.</p>
+            <div class="alert alert-info">ComBoost support a repository library base on Microsoft's EntityFramework, <a href="@Url.Action("EntityFramework")">click here</a>.</div>
+            
+            <h3 id="createEntity-context">Context</h3>
+            <h4>IEntityContextBuilder</h4>
+            <p>In general, there is a class inherited <code>IEntityContextBuilder</code> interface by respository library. This class allow you to get <code>IEntityQueryable&lt;TEntity&gt;</code> that you need.</p>
+            <p>When you have a entity context builder instantiated, you can use <code>GetContext</code> method to get entity context.</p>
+<pre>
+IEntityQueryable&lt;Member&gt; context = builder.GetContext&lt;Member&gt;();
+</pre>
+            <p>With the <code>EntityTypes</code> property of <code>IEntityContextBuilder</code> interface. It is include all support entity types by entity context builder. Usually, you can not get a entity context if entity type doesn't contains.</p>
+            <p>These entity context builder has a <code>Query</code> method, you can pass a sql command and parameters to get a result. But, this method maybe not support by repository library.</p>
+<pre>
+IEnumerable&lt;Member&gt; result = builder.Query&lt;Member&gt;("select * from members where name={0}", "admin");
+</pre>
+            <h4>IEntityQueryable</h4>
+            <p>This interface defined methods to operate entity.</p>
+            <p>It is not only methods that interface defined, some repository library maybe support more methods and operation.</p>
+
+            <h3 id="createEntity-general">Add, Edit, Remove</h3>
+            <p>You can operate entity when you get the entity context(<code>IEntityQueryable</code>).</p>
+            <h4>Create</h4>
+            <p>Using <code>Create</code> method to create a entity, this method will return a new instantiated entity.</p>
+            <p>Usually, <code>Create</code> method will call entity's <code>OnCreateCompleted</code> method when a entity instantiated.</p>
+<pre>
+Member item = context.Create();
+item.Name = "admin";
+</pre>
+            <div class="alert alert-info">We suggest to use <code>Create</code> method to create entity to instead <code>new</code> function. Repository need to do something in <code>Create</code> method for entity.</div>
+            <h4>Add</h4>
+            <p>You can use <code>Create</code> method to create a entity, however, it doesn't add to database.</p>
+            <p>Please use <code>Add</code> method to add a entity to database.</p>
+            <p>This method will return true if add success.</p>
+<pre>
+bool success = context.Add(item);
+</pre>
+            <div class="alert alert-info">
+                <p>If a entity is not created by <code>Create</code> method, it maybe throw a exception. It's depends on repository library.</p>
+                <p>If a entity has a default value of <code>Index</code> property, it will give <code>Guid.New()</code> to it. It's depends on respository library too.</p>
+            </div>
+            <p>You can use <code>AddRange</code> method to add entities to database.</p>
+            <div class="alert alert-info">Usually, we use this method for performance. So it doesn't validate entities and it will throw exception if any entity invalid.</div>
+            <h4>Edit</h4>
+            <p>You can use <code>Edit</code> method to edit a entity and save it to database.</p>
+            <p>In general, this method will call <code>Validate</code> method of entity. Fail if return count more than 0.</p>
+            <p>Then the method will continue to validate other content. Success if no error.</p>
+            <p><code>true</code> if edit success.</p>
+<pre>
+item.Name = "admin2";
+bool success = context.Edit(item);
+</pre>
+            <h4>Remove</h4>
+            <p>You can use <code>Remove</code> method to remove a entity from database.</p>
+<pre>
+bool success = context.Remove(item);
+</pre>
+
+            <h2 id="createEntity-query">Query</h2>
+            <h4>Query</h4>
+            <p>You can use <code>Query</code> method to get a <code>IQueryable&lt;TEntity&gt;</code> to query a data.</p>
+<pre>
+Member item = context.Query().SingleOrDefault(t=> t.Name == "admin");
+Member[] items = context.Query().Where(t=> t.Name.Contains("ad")).ToArray();
+</pre>
+            <p><code>Query</code> method also can use sql command and parameters to query a data directly.</p>
+<pre>
+IEnumerable&lt;Member&gt; items = context.Query("select * from members where name={0}, "admin");
+</pre>
+            <h4>InParent</h4>
+            <p><code>InParent</code> method can builde a <code>Linq</code> expression to qualify entites belong to a parent.</p>
+<pre>
+MemberGroup group = groupContext.Query().Single(t=> t.Name == "Admins");
+Member[] items = context.InParent(context.Query(), new Guid[]{ group.Index });
+</pre>
+            <p>Or</p>
+<pre>
+MemberGroup group = groupContext.Query().Single(t=> t.Name == "Admins");
+Member[] items = context.InParent(context.Query(), "Group", group.Index);
+</pre>
+            <p>The result is the same of two examples.</p>
+            <p>Class <code>Member</code> required a <code>ParentAttribute</code> that in the example.</p>
+<pre>
+[Parent(typeof(MemberGroup), "Group")]
+public class Member : UserBase
+{    
+    [Required]
+    public virtual string Name { get; set; }
+
+    [Required]
+    public virtual MemberGroup Group { get; set; }
+}
+</pre>
+            <h4>Count and Contains</h4>
+            <p><code>Count</code> method will return the count of entities in the database.</p>
+            <p><code>Contains</code> method will return <code>true</code> if a entity is in the database.</p>
+
+            <h3 id="createEntity-order">Sorting</h3>
+            <p><code>OrderBy</code>method can sort entities.</p>
+<pre>
+IOrderedQueryable&lt;Member&gt; query1 = context.OrderBy(context.Where(t=> t.CreateDate < date));    
+IOrderedQueryable&lt;Member&gt; query2 = context.OrderBy().Where(t=> t.CreateDate < date);
+</pre>
+            <p>The sorting according to the <code>DisplayColumnAttribute</code> of entity.</p>
+            <p>If there is no attribute, it sort by <code>CreateDate</code> property by default. It's depends on repository library.</p>
+<pre>
+[Parent(typeof(MemberGroup), "Group")]
+[DisplayColumn("Name", "Name")]
+public class Member : UserBase
+{    
+    [Required]
+    public virtual string Name { get; set; }
+    [Required]
+    public virtual MemberGroup Group { get; set; }
+}
+</pre>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="bs-docs-sidebar affix" data-spy="affix" data-offset-top="60" data-offset-bottom="200">
+            <ul class="nav bs-docs-sidenav">
+                <li><a href="#installPackage">Install Package</a></li>
+                <li>
+                    <a href="#createEntity">Create Entity</a>
+                    <ul class="nav">
+                        <li><a href="#createEntity-IEntity">IEntity interface</a></li>
+                        <li><a href="#createEntity-IPassword">IPassword interface</a></li>
+                        <li><a href="#createEntity-Base">User base class</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#use">Entity Operation</a>
+                    <ul class="nav">
+                        <li><a href="#createEntity-context">Context</a></li>
+                        <li><a href="#createEntity-general">Add, Edit, Remove</a></li>
+                        <li><a href="#createEntity-query">Query</a></li>
+                        <li><a href="#createEntity-order">Sorting</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <a class="back-to-top" href="#">Back to top</a>
+        </div>
+    </div>
+</div>

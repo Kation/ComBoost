@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = "ComBoost主页";
+    Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
+}
+<div class="jumbotron">
+    <h1>欢迎使用ComBoost</h1>
+    <p>ComBoost是一个Repository模式的实体框架，可以帮助你更快速的建立应用程序。</p>
+    <p>基础部分：</p>
+    <ul>
+        <li>ComBoost<br />整个架构基础部分</li>
+        <li>ComBoost.Cache<br />带缓存的Repository库。</li>
+        <li>ComBoost.EntityFramework<br />用微软的EntityFramework建立起的Repository库。</li>
+    </ul>
+    <p>网站部分：</p>
+    <ul>
+        <li>ComBoost.Mvc<br />专为微软Asp.Net Mvc架构设计的框架，免除增删查改系列代码工作。</li>
+        <li>ComBoost.Mvc.Bootstrap<br />使用Bootstrap3.0框架开发的页面。</li>
+        <li>ComBoost.Mvc.Unity<br />为适用EntityController而使用基于Unity的依赖注入。</li>
+    </ul>
+    <p>桌面部分：</p>
+    <ul>
+        <li>ComBoost.Wpf<br />专为Wpf设计的框架。</li>
+        <li>ComBoost.Wpf.Metro<br />专为Wpf设计的Metro风格界面。</li>
+    </ul>
+    <p>服务部分：</p>
+    <ul>
+        <li>ComBoost.Service<br />以WCF作为服务的Repository库。</li>
+        <li>ComBoost.Cache.Service<br />以WCF作为服务的带缓存的Repository库。</li>
+        <li>ComBoost.Mvc.Service<br />以Mvc WebAPI作为服务的Repository库。</li>
+        <li>ComBoost.Cache.Service<br />以Mvc WebAPI作为服务的带缓存的Repository库。</li>
+    </ul>
+    <p class="text-center"><a class="btn btn-primary btn-lg" role="button" href="@Url.Action("Start","Document")">开始使用</a></p>
+</div>

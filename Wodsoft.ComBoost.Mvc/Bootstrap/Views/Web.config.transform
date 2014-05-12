@@ -1,0 +1,11 @@
+﻿<configuration>
+  <system.web.webPages.razor>
+    <host/>
+    <pages>
+      <namespaces>
+        <add namespace="System.Web.Optimization"/>
+        <add namespace="System.ComponentModel" />
+      </namespaces>
+    </pages>
+  </system.web.webPages.razor>
+</configuration>

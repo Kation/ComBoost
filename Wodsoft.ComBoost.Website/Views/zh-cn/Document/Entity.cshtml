@@ -1,0 +1,350 @@
+﻿@{
+    ViewBag.Title = "实体";
+    Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
+}
+@Styles.Render("~/Content/docs.css")
+<script src="~/Scripts/docs.min.js"></script>
+<div class="row">
+    <div class="col-md-10">
+            <div class="bs-docs-section">
+            <div class="page-header" id="entity">
+                <h1>实体特性</h1>
+            </div>
+            <p>这些特性用于实体。</p>
+            <h3 id="entity-DisplayNameAttribute">DisplayNameAttribute<small>实体名称</small></h3>
+            <p>该特性用于注明该实体的名称。</p>
+<pre>
+[DisplayName("会员信息")]
+public class Member : UserBase
+</pre>
+            <h3 id="entity-DisplayColumnAttribute">DisplayColumnAttribute<small>实体显示</small></h3>
+            <p>该特性用于注明这个实体用于显示的属性、用于排序的属性。</p>
+<pre>
+[DisplayColumn("Name", "Name")]
+public class Member : UserBase
+{    
+    [Required]
+    public virtual string Name { get; set; }
+}
+</pre>
+            <h3 id="entity-EntityAuthenticationAttribute">EntityAuthenticationAttribute<small>实体权限</small></h3>
+            <p>该特性用于设置实体访问权限。</p>
+<pre>
+[EntityAuthentication(AllowAnonymous = false, 
+                      ViewRolesRequired = new string[]{ "Admin" }),
+                      AddRolesRequired = new string[]{ "Admin" }),
+                      EditRolesRequired = new string[]{ "Admin" }),    
+                      RemoveRolesRequired = new string[]{ "Admin" })]
+public class Member : UserBase
+{
+    [Required]
+    public virtual string Name { get; set; }
+}
+</pre>
+            <h3 id="entity-ParentAttribute">ParentAttribute<small>实体父级</small></h3>
+            <p>该特性用于设置实体父级类型与属性。</p>
+<pre>
+[ParentAttribute(typeof(MemberGroup), "Group")]
+public class Member : UserBase
+{    
+    [Required]
+    public virtual string Name { get; set; }
+    
+    [Required]
+    public virtual MemberGroup Group { get; set; }
+}
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="property">
+                <h1>属性特性</h1>
+            </div>
+            <p>这些特性用于属性。</p>
+            <h3 id="property-ColumnAttribute">ColumnAttribute<small>数据库类型</small></h3>
+            <p>该特性一般用于手动设定数据库字段类型。</p>
+            <p>例如常用于设定<code>DateTime</code>类型的属性。</p>
+<pre>
+[Column(TypeName = "datetime2")]
+public virtual DateTime CreateDate { get; set; }
+</pre>
+            <h3 id="property-CustomDataTypeAttribute">CustomDataTypeAttribute<small>自定义类型</small></h3>
+            <p>该特性用于为属性设定自定义类型，该类型不会影响数据库，只会用于Repository库。</p>
+            <p>可以设定类型为<code>CustomDataType</code>枚举中的值，或者直接设定类型名称字符串。</p>
+<pre>
+[CustomDataType(CustomDataType.Email)]
+public virtual string Email { get; set; }
+
+[CustomDataType("Entity")]
+publiv virtual Member Member { get; set; }
+</pre>
+            <div class="alert alert-info">设定类型为自定义字符串后，通常需要自己实现Repository库要求的自定义类型相关代码。</div>
+            <p>如果不使用<code>CustomDataTypeAttribute</code>，那么ComBoost将自动根据属性类型设置<code>CustomDataType</code>。</p>
+            <ul>
+                <li><code>DateTime</code>类型默认为<code>CustomDataType.Date</code>。</li>
+                <li><code>TimeSpan</code>类型默认为<code>CustomDataType.Time</code>。</li>
+                <li><code>bool</code>类型默认为<code>CustomDataType.Boolean</code>。</li>
+                <li><code>short</code>、<code>int</code>、<code>long</code>类型默认为<code>CustomDataType.Integer</code>。</li>
+                <li><code>float</code>、<code>double</code>类型默认为<code>CustomDataType.Number</code>。</li>
+                <li><code>decimal</code>类型默认为<code>CustomDataType.Currency</code>。</li>
+                <li><code>byte[]</code>类型默认为<code>CustomDataType.File</code>。</li>
+                <li><code>enum</code>类型默认为<code>"Enum"</code>。</li>
+                <li><code>ICollection<></code>类型默认为<code>"Collection"</code>。</li>
+                <li><code>IEntity</code>类型默认为<code>"IEntity"</code>。</li>
+            </ul>
+            <h3 id="property-DisplayAttribute">DisplayAttribute<small>显示信息</small></h3>
+            <p>该特性用于为属性设定显示信息，这几乎是每个属性必须设定的。</p>
+            <p><code>Name</code>属性为名称，在列表、编辑等功能时显示。</p>
+            <p><code>Description</code>属性为说明，通常用于该属性显示名称的弹出提示。</p>
+            <p><code>Order</code>属性为排序，从小到大，越小显示越靠前。</p>
+            <p><code>Prompt</code>属性为提示信息。</p>
+            <p><code>ShortName</code>属性为简写名称，通常用于列表头显示。</p>
+<pre>
+[Display(Name = "姓名", Order = 0)]
+public virtual string Name { get; set; }
+
+[Display(Name = "手机号", Order = 10, ShortName = "手机")]
+public virtual string Phone { get; set; }
+</pre>
+            <div class="alert alert-info">推荐您为Order设置整十数，如果需要插入新属性，可以直接将Order设置为上下属性之间的值。</div>
+            <h3 id="property-HideAttribute">HideAttribute</h3>
+            <p>该特性用于隐藏属性不被显示。</p>
+            <p><code>IsHiddenOnView</code>该属性为<code>true</code>时，属性将不被显示于列表，默认为<code>true</code>。</p>
+            <p><code>IsHiddenOnEdit</code>该属性为<code>true</code>时，属性在编辑时将不被现实，默认为<code>true</code>。</p>
+<pre>
+[Display(Name = "手机号", Order = 10, ShortName = "手机")]
+[Hide(IsHiddenOnEdit = false)]
+public virtual string Phone { get; set; }
+</pre>
+            <div class="alert alert-info">一般该特性用于隐藏属性过多的实体，防止列表太拥挤。</div>
+            <h3 id="property-KeyAttribute">KeyAttribute<small>主键</small></h3>
+            <p>该特性用于标识属性为主键，在属性中只用于<code>Index</code>。</p>
+<pre>
+[Key]
+public virtual Guid Index { get; set; }
+</pre>
+            <h3 id="property-MaxLengthAttribute">MaxLengthAttribute<small>最大长度</small></h3>
+            <p>该特性一般用于<code>string</code>和<code>byte[]</code>类型的属性。</p>
+            <p>使用该特性后，数据库字段的长度将被设置。</p>
+<pre>
+[MaxLength(20)]
+public virtual string Name { get; set; }
+
+[MaxLength(100000)]
+public virtual byte[] Image { get; set; }
+</pre>
+            <h3 id="property-MinLengthAttribute">MinLengthAttribute<small>最小长度</small></h3>
+            <p>该特性一般用于<code>string</code>和<code>byte[]</code>类型的属性。</p>
+            <p>使用该特性后，在保存数据时将会验证属性值的长度是否达到要求。</p>
+<pre>
+[MaxLength(20)]
+[MinLength(4)]
+public virtual string Name { get; set; }
+</pre>
+            <p>该特性不会影响数据库字段。</p>
+            <h3 id="property-PropertyAuthenticationAttribute">PropertyAuthenticationAttribute<small>权限</small></h3>
+            Todo
+            <h3 id="property-RangeAttribute">RangeAttribute<small>范围</small></h3>
+            <p>该特性用于设定属性值的范围，一般用于数字类型属性。</p>
+<pre>
+[Range(0, 24)]
+public virtual int Hours { get; set; }
+
+[Range(0, 60)]
+public virtual int Minutes { get; set; }
+
+[Range(0, 60)]
+public virtual int Seconds { get; set; }
+</pre>
+            <p>该特性不会影响数据库字段。</p>
+            <h3 id="property-RegularExpressionAttribute">RegularExpressionAttribute<small>正则表达式</small></h3>
+            <p>该特性用于验证属性值，一般用于字符串类型属性。</p>
+            <p>通常用于验证电子邮箱、IP地址、URL等类型。</p>
+<pre>
+[RegularExpression(@@"^([/w-/.]+)@@((/[[0-9]{1,3}/.[0-9] {1,3}/.[0-9]{1,3}/.)|(([/w-]+/.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(/)?]$")]
+publiv virtual string Email { get; set; }
+</pre>
+            <h3 id="property-RequiredAttribute">RequiredAttribute<small>必填项</small></h3>
+            <p>该特性用于设定属性值不能为<code>null</code>。</p>
+            <p>通常用于名称、父级属性。</p>
+<pre>
+[Required]
+public virtual string Name { get; set; }
+</pre>
+            <h3 id="property-SearchableAttribute">SearchableAttribute<small>可搜索</small></h3>
+            <p>该特性用于标注可以通过搜索该属性搜索到实体。</p>
+            <p>如果该实体没有任何属性使用该特性，那么该实体将不可搜索，不过这取决于Repository库。</p>
+<pre>
+[Searchable]
+public virtual string Name { get; set; }
+
+[Searchable]
+public virtual DateTime CreateDate { get; set; }
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="override">
+                <h1>重写</h1>
+            </div>
+            <p>通常实体都会继承于<code>EntityBase</code>而不会只继承<code>IEntity</code>接口而自己实现它。</p>
+            <p>有些实体继承<code>EntityBase</code>后需要重写基类而实现某些功能。</p>
+
+            <h3 id="override-onCreate">创建时</h3>
+            <p><code>OnCreateCompleted</code>方法通常于实体创建时调用，这取决于Repository库。</p>
+            <p>您可以重写该方法来达到您需要的功能。</p>
+            <p>通常可以在该方法内初始化属性值。</p>
+<pre>
+public class Member : UserBase
+{
+    [Required]
+    public virtual string Name { get; set; }
+
+    [Required]
+    public virtual decimal Discount { get; set; }
+
+    public override void OnCreateCompleted()
+    {
+        Discount = 1;
+    }
+}
+</pre>
+
+            <h3 id="override-onEdit">编辑时</h3>
+            <p><code>OnEditCompleted</code>方法通常于实体编辑时调用，这取决于Repository库。</p>
+            <p>您可以重写该方法来达到您需要的功能。</p>
+            <p>通常可以在该方法内计算隐藏属性的值。</p>
+<pre>
+public class Item : EntityBase
+{
+    [Required]
+    public virtual decimal Amount { get; set; }
+
+    [Required]
+    public virtual decimal Price { get; set; }
+
+    [Hide]
+    [Required]
+    public virtual decimal TotalPrice { get; set; }
+
+    public override void OnEditCompleted()
+    {
+        TotalPrice = Amount * Price;
+    }
+}
+</pre>
+
+            <h3 id="override-canRemove">是否可删除</h3>
+            <p><code>IsRemoveAllowed</code>属性通常于实体删除时获取，这取决于Repository库。</p>
+            <p>您可以重写该属性来达到您需要的功能。</p>
+            <p>通常可以在该方法内判断子项是否有值。</p>
+<pre>
+public class MemberGroup : EntityBase
+{
+    [Required]
+    public virtual string Name { get; set; }
+
+    [Hide]
+    public virtual ICollection&lt;Member&gt; Members { get; set; }
+
+    public override bool IsRemoveAllowed
+    {
+        get { return Members.Count == 0; }
+    }
+}
+</pre>
+
+            <h3 id="override-canEdit">是否可编辑</h3>
+            <p><code>IsEditAllowed</code>属性通常于实体编辑时获取，这取决于Repository库。</p>
+            <p>您可以重写该属性来达到您需要的功能。</p>
+            <p>通常可以在该方法内判断实体是否能编辑。</p>
+<pre>
+public class Member : UserBase
+{
+    [Required]
+    public virtual string Name { get; set; }
+
+    [Required]
+    public virtual bool Lock { get; set; }
+
+    public override bool IsEditAllowed
+    {
+        get { return !Lock; }
+    }
+}
+</pre>
+
+            <h3 id="override-toString">转换字符串</h3>
+            <p><code>ToString</code>方法用于很多个地方，例如实体显示于列表项中时。</p>
+            <p>您可以重写该属性来达到您需要显示的值。</p>
+<pre>
+public class MemberGroup : EntityBase
+{
+    [Required]
+    public virtual string Name { get; set; }
+
+    public override string ToString()
+    {
+        return Name;
+    }
+}
+</pre>
+            <div class="alert alert-info">
+                <p>基类里该方法会读取<code>DisplayColumnAttribute</code>特性的Name值，查找到Name值名称的属性并返回它的值的<code>ToString</code>方法。</p>
+                <p>所以通常情况下您只需要为实体设置<code>DisplayColumnAttribute</code>特性即可。</p>
+            </div>
+<pre>
+[DisplayColumn("Name")]
+public class MemberGroup : EntityBase
+{
+    [Required]
+    public virtual string Name { get; set; }
+}
+</pre>
+            <p>当然您可以根据需要自由组合返回需要显示的值。</p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="bs-docs-sidebar affix" data-spy="affix" data-offset-top="60" data-offset-bottom="200">
+            <ul class="nav bs-docs-sidenav">
+                <li>
+                    <a href="#entity">实体特性</a>
+                    <ul class="nav">
+                        <li><a href="#entity-DisplayNameAttribute">名称</a></li>
+                        <li><a href="#entity-DisplayColumnAttribute">显示</a></li>
+                        <li><a href="#entity-EntityAuthenticationAttribute">权限</a></li>
+                        <li><a href="#entity-ParentAttribute">父级</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#property">属性特性</a>
+                    <ul class="nav">
+                        <li><a href="#property-ColumnAttribute">数据库类型</a></li>
+                        <li><a href="#property-CustomDataTypeAttribute">自定义类型</a></li>
+                        <li><a href="#property-DisplayAttribute">显示信息</a></li>
+                        <li><a href="#property-HideAttribute">隐藏属性</a></li>
+                        <li><a href="#property-KeyAttribute">主键</a></li>
+                        <li><a href="#property-MaxLengthAttribute">最大长度</a></li>
+                        <li><a href="#property-MinLengthAttribute">最小长度</a></li>
+                        <li><a href="#property-PropertyAuthenticationAttribute">权限</a></li>
+                        <li><a href="#property-RangeAttribute">范围</a></li>
+                        <li><a href="#property-RegularExpressionAttribute">正则表达式</a></li>
+                        <li><a href="#property-RequiredAttribute">必填项</a></li>
+                        <li><a href="#property-SearchableAttribute">可搜索</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#override">重写</a>
+                    <ul class="nav">
+                        <li><a href="#override-onCreate">创建时</a></li>
+                        <li><a href="#override-onEdit">编辑时</a></li>
+                        <li><a href="#override-canRemove">是否可删除</a></li>
+                        <li><a href="#override-canEdit">是否可编辑</a></li>
+                        <li><a href="#override-toString">转换字符串</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <a class="back-to-top" href="#">顶部</a>
+        </div>
+    </div>
+</div>

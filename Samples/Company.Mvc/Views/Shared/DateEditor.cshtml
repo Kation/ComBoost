@@ -1,0 +1,7 @@
+﻿@model MvcEditorModel
+<div class="input-group col-md-4">
+    <input type="date" class="form-control" id="@Model.Metadata.Property.Name" name="@Model.Metadata.Property.Name" value="@(((DateTime)Model.Value).ToShortDateString())" />
+</div>
+<script type="text/javascript">
+    $('#@Model.Metadata.Property.Name').datepicker();
+</script>

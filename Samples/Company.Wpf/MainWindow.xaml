@@ -1,0 +1,26 @@
+﻿<Window x:Class="Company.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:comboost="http://schemas.wodsoft.com/comboost/presentation"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        Title="{Binding ElementName=frame, Path=Content.Title}" Height="350" Width="525">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="文件">
+                <MenuItem Header="退出" />
+            </MenuItem>
+            <MenuItem Header="人事管理">
+                <MenuItem x:Name="EmployeeManager" Header="员工管理" Click="EmployeeManager_Click" />
+                <Separator />
+                <MenuItem x:Name="EmployeeGroup" Header="员工组管理" Click="EmployeeGroup_Click" />
+            </MenuItem>
+        </Menu>
+        <comboost:EntityFrame x:Name="frame" Grid.Row="1">
+
+        </comboost:EntityFrame>
+    </Grid>
+</Window>

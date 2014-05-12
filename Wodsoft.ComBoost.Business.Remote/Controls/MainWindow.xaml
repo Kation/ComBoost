@@ -1,0 +1,22 @@
+﻿<Controls:MetroWindow xmlns:Controls1="clr-namespace:Wodsoft.ComBoost.Business.Controls"  x:Class="Wodsoft.ComBoost.Business.Controls.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro" 
+        Title="MetroWindow" Height="420" Width="603" Loaded="MetroWindow_Loaded" WindowStartupLocation="CenterScreen" WindowState="Maximized" MinWidth="800" MinHeight="480">
+    <Window.Resources>
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+    </Window.Resources>
+    <Controls:MetroWindow.WindowCommands>
+        <Controls:WindowCommands Name="TitleButton">
+            <Button Content="窗口" Click="WindowButton_Click">
+                <Button.ContextMenu>
+                    <ContextMenu Name="WindowMenu">
+                        <MenuItem Name="StartMenuItem" Header="功能" Click="Menu_Click" />
+                        <Separator />
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.WindowCommands>
+    <Controls:TransitioningContentControl Transition="LeftReplaceTransition" Name="ContentControl" />
+</Controls:MetroWindow>

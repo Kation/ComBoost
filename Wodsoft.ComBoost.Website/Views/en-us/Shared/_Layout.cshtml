@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/bootstrap")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+</head>
+<body>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="@Url.Action("Index","Home")">ComBoost</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li><a href="@Url.Action("Start","Document")">Quick Start</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Base <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="@Url.Action("Entity","Document")">Entity</a></li>
+                        <li class="disabled"><a href="#">Entity With Cache</a></li>
+                        <li class="divider"></li>
+                        <li><a href="@Url.Action("EntityFramework","Document")">EntityFramework For ComBoost</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Website <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="@Url.Action("Mvc","Document")">Asp.Net Mvc</a></li>
+                        <li class="divider"></li>
+                        <li><a href="@Url.Action("MvcBootstrap","Document")">Bootstrap Style</a></li>
+                        <li><a href="@Url.Action("MvcUnity","Document")">Unity IOC</a></li>
+                        <li class="divider"></li>
+                        <li><a href="@Url.Action("MvcSample","Document")">Sample</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown disabled">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Desktop <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li class="disabled"><a>Wpf</a></li>
+                        <li class="divider"></li>
+                        <li class="disabled"><a>Metro Style</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown disabled">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Service <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li class="disabled"><a>WCF Service</a></li>
+                        <li class="disabled"><a>WCF Service With Cache</a></li>
+                        <li class="divider"></li>
+                        <li class="disabled"><a>WebAPI Service</a></li>
+                        <li class="disabled"><a>WebAPI Service With Cache</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown disabled">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Extension <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li class="disabled"><a>Component Model</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="disabled"><a>Forum</a></li>
+                <li><a href="https://github.com/Kation/ComBoost/issues"><i class="glyphicon glyphicon-exclamation-sign"></i> Report Issues</a></li>
+                <li><a href="https://github.com/Kation/ComBoost"><i class="glyphicon glyphicon-eye-open"></i> Source</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        @RenderBody()
+    </div>
+    <div class="nav navbar-default">
+        <div class="container">
+            <form class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    <label><i class="glyphicon glyphicon-globe"></i> Language</label>
+                    <select class="form-control" id="language">
+                        <option value="@Url.RouteUrl("Default", new { lang = "en-us", controller = ViewContext.RouteData.Values["controller"], action = ViewContext.RouteData.Values["action"] })" selected="selected">English</option>
+                        <option value="@Url.RouteUrl("Default", new { lang = "zh-cn", controller = ViewContext.RouteData.Values["controller"], action = ViewContext.RouteData.Values["action"] })">简体中文</option>
+                    </select>
+                </div>
+            </form>
+            <p class="navbar-text navbar-right">&copy; 2014 Wodsoft</p>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $('#language').change(function () {
+            window.location.href = $(this).val();
+        });
+    </script>
+</body>
+</html>

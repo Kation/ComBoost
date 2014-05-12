@@ -1,0 +1,565 @@
+﻿@{
+    ViewBag.Title = "ComBoost For Mvc";
+    Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
+}
+@Styles.Render("~/Content/docs.css")
+<script src="~/Scripts/docs.min.js"></script>
+<div class="row">
+    <div class="col-md-10">
+        <div class="bs-docs-section">
+            <div class="page-header" id="installPackage">
+                <h1>安装包</h1>
+            </div>
+            <p>首先，您可以在Visual Studio里选中您的Mvc项目（项目需要使用.Net 4.5以上版本，Mvc4.0以上版本），然后使用<code>管理NuGet程序包</code>下载<code>ComBoost.Mvc</code>包。</p>
+            <p><img src="~/Content/Images/ComBoost.Mvc.NuGetResult.png" /></p>
+            <p>或打开<code>程序包管理器控制台</code>使用如下命令：</p>
+<pre>
+PM> Install-Package ComBoost.Mvc -Pre 
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="controller">
+                <h1>无形参控制器 <small>EntityController</small></h1>
+            </div>
+            <p>当包安装完毕后，您的实体项目会出现新的引用：<code>Wodsoft.ComBoost.Mvc</code>。</p>
+            <p>如果您的控制器只需要用实体上下文而不需要增删查改，那么您可以把您的控制器继承<code>EntityController</code>。</p>
+
+            <h2 id="controller-init">实例化</h2>
+            <p>您需要满足基类<code>EntityController</code>的构造参数<code>IEntityContextBuilder</code>。</p>
+<pre>
+public YourController(IEntityContextBuilder builder) : base(builder)
+{
+}
+</pre>
+            <div class="alert alert-info">由于构造函数需要参数，建议您使用依赖注入。ComBoost已经为您实现了基于Unity的依赖注入，<a href="@Url.Action("MvcUnity")">点击查看</a>。</div>
+        
+            <h2 id="controller-builder">EntityBuilder属性</h2>
+            <p>继承<code>EntityBuilder</code>后您可以通过<code>EntityBuilder</code>属性获取实体上下文构造器。</p>
+            <p>获取实体上下文后就可以使用它访问数据库。</p>
+<pre>
+public ActionResult Index()
+{
+    IEntityQueryable&lt;MemberGroup&gt; context = EntityBuilder.GetContext&lt;MemberGroup&gt;();
+    MemberGroup[] items = context.OrderBy().ToArray();
+    return View(items);
+}
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="entityController">
+                <h1>实体控制器 <small>EntityController&lt;TEntity&gt;</small></h1>
+            </div>
+            <p>实体控制器使用带形参的<code>EntityController</code>，使用方法和不带形参时一样需要调用基类的构造函数。</p>
+            <p>带形参的控制器已经帮您实现了增、删、查、改等必要方法，您只需要编写您需要的视图即可。</p>
+            <div class="alert alert-info">
+                <p>通常情况下，这些方法的视图文件都放置于<code>Shared</code>共享视图文件夹。</p>
+                <p>ComBoost已经为您制作了一套Boorstrap3风格的视图页面，<a href="@Url.Action("MvcBootstrap")">点击查看</a>。</p>
+            </div>
+
+            <h3 id="entityController-index">列表</h3>
+            <p><code>Index</code>页面用于显示实体列表。</p>
+            <h4>传入参数</h4>
+            <ul>
+                <li>
+                    <code>int: page</code>
+                    <p>列表当前页数，默认为1。如果小于1返回400页面。</p>
+                </li>
+                <li>
+                    <code>int: size</code>
+                    <p>列表显示实体个数，默认为20。如果小于1返回400页面。</p>
+                </li>
+                <li>
+                    <code>string: parentpath</code>
+                    <p>导航路径，默认为<code>null</code>。如果路径错误返回400页面。</p>
+                </li>
+                <li>
+                    <code>Guid?: parentid</code>
+                    <p>导航父级ID，默认为<code>null</code>。</p>
+                </li>
+                <li>
+                    <code>bool: search</code>
+                    <p>是否为搜索，默认为<code>false</code>。</p>
+                </li>
+            </ul>
+            <p>当<code>search</code>为<code>true</code>时，控制器会获取以<code>Search.</code>开头的客户端Query参数。</p>
+            <p>获取后进行处理得到搜索结果。</p>
+            <h4>视图模型</h4>
+            <p>该方法返回的视图模型为<code>EntityViewModel&lt;TEntity&gt;</code>，页面视图一般不需要知道泛型类型，只需要使用<code>EntityViewModel</code>类型模型即可。</p>
+            <p>该视图模型包含属性：</p>
+            <ul>
+                <li>
+                    <code>Buttons</code>
+                    <p>页面自定义按钮。</p>
+                </li>
+                <li>
+                    <code>CurrentSize</code>
+                    <p>当前显示实体个数。</p>
+                </li>
+                <li>
+                    <code>CurrentPage</code>
+                    <p>当前页数。</p>
+                </li>
+                <li>
+                    <code>Headers</code>
+                    <p>列表头。</p>
+                </li>
+                <li>
+                    <code>Items</code>
+                    <p>当前页面实体数组。</p>
+                </li>
+                <li>
+                    <code>Metadata</code>
+                    <p>实体元数据。</p>
+                </li>
+                <li>
+                    <code>Parent</code>
+                    <p>实体导航模型。</p>
+                </li>
+                <li>
+                    <code>SearchItem</code>
+                    <p>搜索内容项。</p>
+                </li>
+                <li>
+                    <code>TotalPage</code>
+                    <p>列表总页数。</p>
+                </li>
+            </ul>
+            <h4>重写</h4>
+            <p>您可以从基类获得<code>ActionResult</code>，并从<code>Model</code>属性获取<code>EntityViewModel&lt;TEntity&gt;</code>视图模型。</p>
+            <p>获取视图模型后您可以修改该模型达到您想要的功能。</p>
+<pre>
+public override ActionResult Index(int page = 1, int size = 20, string parentpath = null, Guid? parentid = null, bool search = false)
+{
+    ViewResult result = (ViewResult)base.Index(page, size, parentpath, parentid, search);
+    EntityViewModel&lt;Member&gt; model = (EntityViewModel&lt;Member&gt;)result.Model;
+    MvcViewButton button = new MvcViewButton();
+    button.StaticLink = "http://comboost.wodsoft.com";
+    model.Buttons = new EntityViewButton[] { button };
+    return result;
+}
+</pre>
+            <div class="alert alert-info">当然，您可以完全编写自己的代码，不必返回<code>EntityViewModel&lt;TEntity&gt;</code>视图模型，可以创建自己的视图。</div>
+
+            <h3 id="entityController-create">新增</h3>
+            <p><code>Create</code>页面用于显示实体列表。</p>
+            <h4>传入参数</h4>
+            <ul>
+                <li>
+                    <code>Guid?: parent</code>
+                    <p>父级ID。如果该实体拥有<code>ParentAttribute</code>特性，传入此参数将设定新实体的父级为该ID的实体。</p>
+                </li>
+            </ul>
+            <h4>视图模型</h4>
+            <p>该方法返回的视图模型为<code>EntityEditModel&lt;TEntity&gt;</code>，页面视图一般不需要知道泛型类型，只需要使用<code>EntityEditModel</code>类型模型即可。</p>
+            <p>该视图模型包含属性：</p>
+            <ul>
+                <li>
+                    <code>Item</code>
+                    <p>编辑的实体。</p>
+                </li>
+                <li>
+                    <code>Properties</code>
+                    <p>可以编辑的属性。</p>
+                </li>
+                <li>
+                    <code>Metadata</code>
+                    <p>实体元数据。</p>
+                </li>
+            </ul>
+            <div class="alert alert-info">该方法使用<code>Edit</code>视图页面。</div>
+            <h4>重写</h4>
+            <p>一般情况下不会需要重写该方法。</p>
+
+            <h3 id="entityController-edit">编辑</h3>
+            <p><code>Edit</code>页面用于显示实体列表。</p>
+            <h4>传入参数</h4>
+            <ul>
+                <li>
+                    <code>Guid: id</code>
+                    <p>实体ID。如果该实体不存在，则返回404页面。</p>
+                </li>
+            </ul>
+            <h4>视图模型</h4>
+            <p>该方法返回的视图模型为<code>EntityEditModel&lt;TEntity&gt;</code>，页面视图一般不需要知道泛型类型，只需要使用<code>EntityEditModel</code>类型模型即可。</p>
+            <p>该视图模型包含属性：</p>
+            <ul>
+                <li>
+                    <code>Item</code>
+                    <p>编辑的实体。</p>
+                </li>
+                <li>
+                    <code>Properties</code>
+                    <p>可以编辑的属性。</p>
+                </li>
+                <li>
+                    <code>Metadata</code>
+                    <p>实体元数据。</p>
+                </li>
+            </ul>
+            <div class="alert alert-info">该方法于<code>Create</code>页面使用同样的视图，需要在视图页面区分实体<code>Index</code>是否为默认值以区别是新建还是编辑。</div>
+            <h4>重写</h4>
+            <p>一般情况下不会需要重写该方法。</p>
+
+            <h3 id="entityController-update">更新</h3>
+            <p><code>Update</code>方法用于更新实体数据。</p>
+            <h4>传入参数</h4>
+            <ul>
+                <li>
+                    <code>Guid: id</code>
+                    <p>实体ID。如果该实体不存在，则返回404页面。</p>
+                </li>
+            </ul>
+            <div class="alert alert-info">该方法会根据实体元数据搜索<code>Request.Form</code>内容，自动修改实体并保存。</div>
+            <h4>视图</h4>
+            <p>该方法为<code>Ajax</code>提交方法，只需要返回<code>HttpStatusCodeResult</code>即可。</p>
+            <p>返回200状态即成功，返回400状态即失败，返回内容为错误内容。</p>
+            <h4>重写</h4>
+            <div class="alert alert-info">该方法工作量繁多，如需重写请摒弃基类方法，根据实体内容重新编写。</div>
+
+            <h3 id="entityController-remove">删除</h3>
+            <p>该方法为<code>Ajax</code>删除方法，只需要返回<code>HttpStatusCodeResult</code>即可。</p>
+            <h4>传入参数</h4>
+            <ul>
+                <li>
+                    <code>Guid: id</code>
+                    <p>实体ID。如果该实体不存在，则返回404页面。</p>
+                </li>
+            </ul>
+            <h4>视图</h4>
+            <p>该方法返回的视图为<code>HttpStatusCodeResult</code>。</p>
+            <p>返回200状态即成功，返回400状态即失败，返回内容为错误内容。</p>
+            <h4>重写</h4>
+            <p>一般情况下需要在删除前处理数据时才会重写该方法。</p>
+
+            <h3 id="entityController-detail">详细</h3>
+            <p><code>Detail</code>页面用于显示实体完整内容。</p>
+            <h4>传入参数</h4>
+            <ul>
+                <li>
+                    <code>Guid: id</code>
+                    <p>实体ID。如果该实体不存在，则返回404页面。</p>
+                </li>
+            </ul>
+            <h4>视图模型</h4>
+            <p>该方法返回的视图模型为<code>EntityEditModel&lt;TEntity&gt;</code>，页面视图一般不需要知道泛型类型，只需要使用<code>EntityEditModel</code>类型模型即可。</p>
+            <p>该视图模型包含属性：</p>
+            <ul>
+                <li>
+                    <code>Item</code>
+                    <p>编辑的实体。</p>
+                </li>
+                <li>
+                    <code>Properties</code>
+                    <p>显示的属性。</p>
+                </li>
+                <li>
+                    <code>Metadata</code>
+                    <p>实体元数据。</p>
+                </li>
+            </ul>
+            <h4>重写</h4>
+            <p>一般情况下不会需要重写该方法。</p>
+
+            <h3 id="entityController-search">搜索</h3>
+            <p><code>Search</code>页面用于填写实体搜索内容。</p>
+            <h4>视图模型</h4>
+            <p>该方法返回的视图模型为<code>EntitySearchModel&lt;TEntity&gt;</code>，页面视图一般不需要知道泛型类型，只需要使用<code>EntitySearchModel</code>类型模型即可。</p>
+            <p>该视图模型包含属性：</p>
+            <ul>
+                <li>
+                    <code>Properties</code>
+                    <p>可以搜索的属性。</p>
+                </li>
+                <li>
+                    <code>Metadata</code>
+                    <p>实体元数据。</p>
+                </li>
+            </ul>
+            <h4>重写</h4>
+            <p>一般情况下不会需要重写该方法。</p>
+
+            <h3 id="entityController-selector">单项选择器</h3>
+            <p><code>Selector</code>页面用于选择单一实体。</p>
+            <p>该页面通常用于实体编辑时的实体编辑器。</p>
+            <h4>传入参数</h4>
+            <ul>
+                <li>
+                    <code>int: page</code>
+                    <p>列表当前页数，默认为1。如果小于1返回400页面。</p>
+                </li>
+                <li>
+                    <code>string: parentpath</code>
+                    <p>导航路径，默认为<code>null</code>。如果路径错误返回400页面。</p>
+                </li>
+                <li>
+                    <code>Guid?: parentid</code>
+                    <p>导航父级ID，默认为<code>null</code>。</p>
+                </li>
+            </ul>
+            <div class="alert alert-info">固定每一页只显示10个实体。</div>
+            <h4>视图模型</h4>
+            <p>该方法返回的视图模型为<code>EntityViewModel&lt;TEntity&gt;</code>，页面视图一般不需要知道泛型类型，只需要使用<code>EntityViewModel</code>类型模型即可。</p>
+            <p>该视图模型包含属性：</p>
+            <ul>
+                <li>
+                    <code>Buttons</code>
+                    <p>页面自定义按钮。</p>
+                </li>
+                <li>
+                    <code>CurrentSize</code>
+                    <p>当前显示实体个数。</p>
+                </li>
+                <li>
+                    <code>CurrentPage</code>
+                    <p>当前页数。</p>
+                </li>
+                <li>
+                    <code>Headers</code>
+                    <p>列表头。</p>
+                </li>
+                <li>
+                    <code>Items</code>
+                    <p>当前页面实体数组。</p>
+                </li>
+                <li>
+                    <code>Metadata</code>
+                    <p>实体元数据。</p>
+                </li>
+                <li>
+                    <code>Parent</code>
+                    <p>实体导航模型。</p>
+                </li>
+                <li>
+                    <code>SearchItem</code>
+                    <p>搜索内容项。</p>
+                </li>
+                <li>
+                    <code>TotalPage</code>
+                    <p>列表总页数。</p>
+                </li>
+            </ul>
+            <h4>重写</h4>
+            <p>一般情况下不会需要重写该方法。</p>
+
+            <h3 id="entityController-multipleSelector">多项选择器</h3>
+            <p><code>MultipleSelector</code>页面用于选择多个实体。</p>
+            <p>该页面通常用于实体编辑时的实体编辑器。</p>
+            <h4>传入参数</h4>
+            <ul>
+                <li>
+                    <code>int: page</code>
+                    <p>列表当前页数，默认为1。如果小于1返回400页面。</p>
+                </li>
+                <li>
+                    <code>string: parentpath</code>
+                    <p>导航路径，默认为<code>null</code>。如果路径错误返回400页面。</p>
+                </li>
+                <li>
+                    <code>Guid?: parentid</code>
+                    <p>导航父级ID，默认为<code>null</code>。</p>
+                </li>
+            </ul>
+            <div class="alert alert-info">固定每一页只显示10个实体。</div>
+            <h4>视图模型</h4>
+            <p>该方法返回的视图模型为<code>EntityViewModel&lt;TEntity&gt;</code>，页面视图一般不需要知道泛型类型，只需要使用<code>EntityViewModel</code>类型模型即可。</p>
+            <p>该视图模型包含属性：</p>
+            <ul>
+                <li>
+                    <code>Buttons</code>
+                    <p>页面自定义按钮。</p>
+                </li>
+                <li>
+                    <code>CurrentSize</code>
+                    <p>当前显示实体个数。</p>
+                </li>
+                <li>
+                    <code>CurrentPage</code>
+                    <p>当前页数。</p>
+                </li>
+                <li>
+                    <code>Headers</code>
+                    <p>列表头。</p>
+                </li>
+                <li>
+                    <code>Items</code>
+                    <p>当前页面实体数组。</p>
+                </li>
+                <li>
+                    <code>Metadata</code>
+                    <p>实体元数据。</p>
+                </li>
+                <li>
+                    <code>Parent</code>
+                    <p>实体导航模型。</p>
+                </li>
+                <li>
+                    <code>SearchItem</code>
+                    <p>搜索内容项。</p>
+                </li>
+                <li>
+                    <code>TotalPage</code>
+                    <p>列表总页数。</p>
+                </li>
+            </ul>
+            <h4>重写</h4>
+            <p>一般情况下不会需要重写该方法。</p>
+
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="interface">
+                <h1>控制器接口</h1>
+            </div>
+            <h3 id="interface-file">保存文件</h3>
+            <p>如果您的属性设置了<code>CustomDataType</code>为<code>File</code>，那么您必须继承该接口。</p>
+            <p>该接口需要实现<code>SaveFileToProperty</code>方法。</p>
+            <p>实体控制器在<code>Update</code>方法里会调用该方法，传入要修改的实体与属性，并且提供用户上传的<code>HttpPostedFileBase</code>。</p>
+            <p>您需要做的就是把该文件保存到您需要的地方并且给该属性赋值。</p>
+<pre>
+public void SaveFileToProperty(TEntity entity, PropertyMetadata metadata, HttpPostedFileBase file)
+{
+    if (metadata.Property.Name == "Image")
+    {
+        Guid id = Guid.NewGuid();
+        file.SaveAs(Server.MapPath("~/uploads/" + id.ToString()));
+        entity.Image = id.ToString();
+    }
+}
+</pre>
+
+            <h3 id="interface-image">显示图片</h3>
+            <p>如果您的属性设置了<code>CustomDataType</code>为<code>Image</code>，那么您必须继承该接口。</p>
+            <p>该接口需要实现<code>ImageToProperty</code>方法。</p>
+            <p>视图会在<code>&lt;img&gt;</code>标签的<code>src</code>属性使用实体控制器的<code>ImageToProperty</code>方法来显示图片。</p>
+            <p>方法传入实体的Id与要显示的图片的属性名称。</p>
+            <p>您需要做的就是从数据库获取该实体，并返回图片文件结果。</p>
+<pre>
+FileResult ImageToProperty(Guid id, string property)
+{
+    var item = context.GetEntity(id);
+    return File(Server.MapPath("~/uploads/" + item.Image), "image/jpeg");
+}
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="editor">
+                <h1>编辑器</h1>
+            </div>
+            <p>每一个编辑器的视图模型都为<code>MvcEditorModel</code>。</p>
+            <p>这个模型拥有<code>Metadata</code>属性用于获取该属性类型元数据。</p>
+            <p><code>Value</code>属性用于获取该实体的属性的值。</p>
+            <p>编辑器的命名规则为<code>CustomDataType</code>类型名称+<code>Editor.cshtml</code>。</p>
+
+            <h3 id="editor-default">默认</h3>
+            <p>每一个<code>CustomDataType</code>枚举对应一个编辑器，它们都应存放于<code>Shared</code>共享视图文件夹里。</p>
+<pre>
+BooleanEditor.cshtml
+CurrencyEditor.cshtml    
+DateEditor.cshtml    
+DateTimeEditor.cshtml    
+DefaultEditor.cshtml
+...
+</pre>
+            <div class="alert alert-info">ComBoost已经为您制作了一套Boorstrap3风格的编辑器，<a href="@Url.Action("MvcBootstrap")">点击查看</a>。</div>
+
+            <h3 id="editor-custom">自定义编辑器</h3>
+            <p>当<code>CustomDataTypeAttribute</code>为自定义字符串时，则编辑器的名称也为该字符串+<code>Editor.cshtml</code>。</p>
+            <p>自定义名称不能与<code>CustomDataType</code>枚举名称相同。</p>
+            <div class="alert alert-info">
+                <p>自定义名称同时也不能为以下三个保留名称：</p>
+                <ul>
+                    <li>Collection</li>
+                    <li>Entity</li>
+                    <li>Enum</li>
+                </ul>
+            </div>
+            <p>您可以为您的属性设计自定义编辑器用于更好的UI体验。</p>
+            <p>例如下面的内容是一个自定义评分编辑器。</p>
+            <p><code>RateEditor.cshtml</code></p>
+<pre>
+@@model MvcEditorModel
+@@{
+    byte value = (byte)@@Model.Value;
+}
+&lt;div id="@@Model.Metadata.Property.Name"&gt;
+&lt;p class="form-control-static"&gt;
+        @@for (int i = 1; i &lt;= value; i++)
+        {
+&lt;i id="@@(Model.Metadata.Property.Name + "_" + i)" class="glyphicon glyphicon-star" style="cursor: pointer;" data-val="@@i"&gt;&lt;/i&gt;
+        }
+        @@for (int i = value + 1; i &lt; 6; i++)
+        {
+&lt;i id="@@(Model.Metadata.Property.Name + "_" + i)" class="glyphicon glyphicon-star-empty" style="cursor: pointer;" data-val="@@i"&gt;&lt;/i&gt;
+        }
+    &lt;/p&gt;
+&lt;input type="hidden" id="@@(Model.Metadata.Property.Name)_Value" name="@@Model.Metadata.Property.Name" value="@@Model.Value" /&gt;
+&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+    $('#@@Model.Metadata.Property.Name').find('i').click(function () {
+        var element = $(this);
+        var value = new Number(element.attr('data-val'));
+        $('#@@(Model.Metadata.Property.Name)_Value').val(value);
+        for (var i = 1 ; i &lt;= value ; i++) {
+            $('#@@(Model.Metadata.Property.Name)_' + i).removeClass('glyphicon-star-empty');
+            $('#@@(Model.Metadata.Property.Name)_' + i).addClass('glyphicon-star');
+        }
+        for (var i = value + 1 ; i &lt; 6 ; i++) {
+            $('#@@(Model.Metadata.Property.Name)_' + i).removeClass('glyphicon-star');
+            $('#@@(Model.Metadata.Property.Name)_' + i).addClass('glyphicon-star-empty');
+        }
+    });
+&lt;/script&gt;
+</pre>
+            <div class="bs-example">
+                <img src="~/Content/Images/RateEditor.png" />
+            </div>
+            <div class="alert alert-info">编辑器需要提交到服务器的<code>&lt;input&gt;</code>的<code>name</code>属性必须为该属性的名称。</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="bs-docs-sidebar affix" data-spy="affix" data-offset-top="60" data-offset-bottom="200">
+            <ul class="nav bs-docs-sidenav">
+                <li><a href="#installPackage">Install Package</a></li>
+                <li>
+                    <a href="#controller">Non Generic Controller</a>
+                    <ul class="nav">
+                        <li><a href="#controller-init">Instantiation</a></li>
+                        <li><a href="#controller-builder">Property EntityBuilder</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#entityController">Entity Controller</a>
+                    <ul class="nav">
+                        <li><a href="#entityController-index">List</a></li>
+                        <li><a href="#entityController-create">Create</a></li>
+                        <li><a href="#entityController-edit">Edit</a></li>
+                        <li><a href="#entityController-update">Update</a></li>
+                        <li><a href="#entityController-remove">Remove</a></li>
+                        <li><a href="#entityController-detail">Detail</a></li>
+                        <li><a href="#entityController-search">Search</a></li>
+                        <li><a href="#entityController-selector">Selector</a></li>
+                        <li><a href="#entityController-multipleSelector">Multiple Selector</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#interface">Interface of Controller</a>
+                    <ul class="nav">
+                        <li><a href="#interface-file">Save File</a></li>
+                        <li><a href="#interface-image">Show Image</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#editor">Editor</a>
+                    <ul class="nav">
+                        <li><a href="#editor-default">Default</a></li>
+                        <li><a href="#editor-custom">Custom</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <a class="back-to-top" href="#">Back to top</a>
+        </div>
+    </div>
+</div>

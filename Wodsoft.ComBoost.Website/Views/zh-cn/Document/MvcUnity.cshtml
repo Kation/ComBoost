@@ -1,0 +1,105 @@
+﻿@{
+    ViewBag.Title = "Unity For ComBoost Mvc";
+    Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
+}
+@Styles.Render("~/Content/docs.css")
+<script src="~/Scripts/docs.min.js"></script>
+<div class="row">
+    <div class="col-md-10">
+        <div class="bs-docs-section">
+            <div class="page-header" id="installPackage">
+                <h1>安装包</h1>
+            </div>
+            <p>首先，您可以在Visual Studio里选中您的业务项目（项目需要使用.Net 4.5以上版本，Mvc4.0以上版本），然后使用<code>管理NuGet程序包</code>下载<code>ComBoost.Mvc.Unity</code>包。</p>
+            <p><img src="~/Content/Images/ComBoost.Mvc.Unity.NuGetResult.png" /></p>
+            <p>或打开<code>程序包管理器控制台</code>使用如下命令：</p>
+<pre>
+PM> Install-Package ComBoost.Mvc.Unity -Pre 
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="ioc">
+                <h1>注入Repository库</h1>
+            </div>
+            <p>由于<code>EntityController</code>是有参数的构造函数，需要传入<code>IEntityContextBuilder</code>类型。</p>
+            <p>请先看一下您使用的Repository库的<code>EntityContextBuilder</code>的构造函数需要什么类型的参数，再到<code>UnityControllerFactory.cs</code>注入依赖参数。</p>
+            <p>例如<code>ComBoost.EntityFramework</code>Repository库的<code>EntityContextBuilder</code>的构造函数需要的参数类型是<code>DbContext</code>，那么您应该注入您的继承<code>DbContext</code>的实体上下文类。</p>
+<pre>
+public UnityControllerFactory(IUnityContainer container)
+{
+    _container = container;
+    //Change EntityContextBuilder to your class that inherit IEntityContextBuilder interface.
+    //If your entity context builder has constructor with arguments, continue register types that you need.
+    container.RegisterType&lt;DbContext, DataContext&gt;(new MvcLifetimeManager()); //DataContext inherit DbContext
+    container.RegisterType&lt;IEntityContextBuilder, EntityContextBuilder&gt;(new MvcLifetimeManager());
+
+    //Register your entity here:
+    //RegisterController&lt;EntityType&gt;();
+    //...
+}
+</pre>
+            <div class="alert alert-info">依赖注入最好使用<code>MvcLifetimeManager</code>生命周期管理器，每一次请求为一次周期。</div>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="controller">
+                <h1>注册实体控制器</h1>
+            </div>
+            <p>安装包后，您会在您的Mvc项目的<code>App_Start</code>文件夹看到<code>UnityControllerFactory.cs</code>文件。</p>
+            <p><img src="~/Content/Images/UnityControllerFactory.png" /></p>
+            <p>如果您的控制器只继承了<code>EntityController&lt;TEntity&gt;</code>而没有做任何修改。</p>
+            <p>您可以在<code>UnityControllerFactory</code>的构造函数里直接注册您的实体控制器而不必添加控制器文件。</p>
+            <p>使用<code>RegisterController</code>方法可以注册实体控制器。</p>
+            <p>不使用参数的情况下，如果该实体拥有<code>MvcRouteAttribute</code>特性，则控制器、区域的信息会从该特性中获取。</p>
+            <p>如果没有该特性，那么该实体控制器将没有区域，控制器路由名称为该实体名称。</p>
+<pre>
+public UnityControllerFactory(IUnityContainer container)
+{
+    _container = container;
+    //Change EntityContextBuilder to your class that inherit IEntityContextBuilder interface.
+    //If your entity context builder has constructor with arguments, continue register types that you need.
+    container.RegisterType&lt;IEntityContextBuilder, EntityContextBuilder&gt;(new MvcLifetimeManager());
+
+    //Register your entity here:
+    //RegisterController&lt;EntityType&gt;();
+    //...
+    RegisterController&lt;Member&gt;();
+}
+</pre>
+            <p>以上代码将使得用户可以通过<code>http://website/Member</code>访问<code>Member</code>实体的控制器。</p>
+<pre>
+RegisterController&lt;Member&gt;("MyMember");
+</pre>
+            <p>如果使用<code>controller</code>参数，那么用户可以通过<code>http://website/MyMember</code>访问<code>Member</code>实体的控制器。</p>
+            <p>一般我们把会员管理放入<code>Admin</code>区域，这里就可以使用以下代码。</p>
+<pre>
+RegisterController&lt;Member&gt;("Member", "Admin");
+</pre>
+            <p>这样这个控制器的地址就会变成<code>http://website/Admin/Member</code>。</p>
+            <p>您也可以通过直接给Member实体加上<code>MvcRouteAttribute</code>特性。</p>
+<pre>
+[MvcRoute("Admin")]
+public class Member : UserBase
+{
+    ...
+}
+</pre>
+            <p>注册时不必输入参数。</p>
+<pre>
+RegisterController&lt;Member&gt;();
+</pre>
+            <p>这样也可以达到目的，用户通过<code>http://website/Admin/Member</code>访问<code>Member</code>实体的控制器。</p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="bs-docs-sidebar affix" data-spy="affix" data-offset-top="60" data-offset-bottom="200">
+            <ul class="nav bs-docs-sidenav">
+                <li><a href="#installPackage">安装包</a></li>
+                <li><a href="#ioc">注入Repository库</a></li>
+                <li><a href="#controller">注册实体控制器</a></li>
+            </ul>
+            <a class="back-to-top" href="#">顶部</a>
+        </div>
+    </div>
+</div>

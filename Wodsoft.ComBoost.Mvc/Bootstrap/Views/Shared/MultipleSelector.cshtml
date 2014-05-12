@@ -1,0 +1,51 @@
+﻿@model EntityViewModel
+@{
+    Layout = null;
+}
+<div class="row">
+    @if (Model.Parent != null)
+    {
+        <div class="col-md-3" id="selectorparentview">
+            <ul>
+                <li class="jstree-open">
+                    <a data-nav="true" href="@Html.Raw(Url.ClearQueryPath("page"))">All</a>
+                    <ul>
+                        @{Html.RenderPartial("ParentView", Model.Parent);}
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    }
+    <div class="@(Model.Parent == null ? "col-md-12":"col-md-9")">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td class="text-center" width="36"><input type="checkbox" id="checkAll" /> </td>
+                    @for (int i = 0; i < Model.Headers.Length; i++)
+                    {
+                        <td title="@Model.Headers[i].Description">@Model.Headers[i].Name</td>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Items.Length; i++)
+                {
+                    <tr>
+                        <td class="text-center">
+                            <input type="checkbox" data-name="@Model.Items[i]" value="@Model.Items[i].Index" />
+                        </td>
+                        @for (int b = 0; b < Model.Headers.Length; b++)
+                        {
+                            <td>@EntityValueConverter.GetConverter(Model.Headers[b].Property.PropertyType).ConvertTo(Model.Headers[b].Property.GetValue(Model.Items[i]), typeof(string))</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 text-center">
+        @{Html.Pagination(Model);}
+    </div>
+</div>

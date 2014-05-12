@@ -1,0 +1,55 @@
+﻿@{
+    ViewBag.Title = "Bootsrtap For ComBoost Mvc";
+    Layout = "~/Views/" + (string)ViewContext.RouteData.Values["lang"] + "/Shared/_Layout.cshtml";
+}
+@Styles.Render("~/Content/docs.css")
+<script src="~/Scripts/docs.min.js"></script>
+<div class="row">
+    <div class="col-md-10">
+        <div class="bs-docs-section">
+            <div class="page-header" id="installPackage">
+                <h1>安装包</h1>
+            </div>
+            <p>首先，您可以在Visual Studio里选中您的业务项目（项目需要使用.Net 4.5以上版本，Mvc4.0以上版本），然后使用<code>管理NuGet程序包</code>下载<code>ComBoost.Mvc.Bootstrap</code>包。</p>
+            <p><img src="~/Content/Images/ComBoost.Mvc.Bootstrap.NuGetResult.png" /></p>
+            <p>或打开<code>程序包管理器控制台</code>使用如下命令：</p>
+<pre>
+PM> Install-Package ComBoost.Mvc.Bootstrap -Pre 
+</pre>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="description">
+                <h1>说明</h1>                
+            </div>
+            <p>安装包后，您的项目的<code>~/Views/Shared</code>文件夹会多出一些公共视图。</p>
+            <p>这些视图是<code>ComBoost.Mvc</code>需要的，这些视图的使用的CSS框架为Bootstrap。</p>
+            <p><code>~/Scripts</code>文件夹会多出<code>jstree</code>脚本文件，用于显示实体导航。</p>
+            <p>包会修改您的<code>~/Views/Web.config</code>文件，使得<code>Razor</code>视图直接支持命名空间<code>System.ComponentModel</code>。</p>
+<pre>
+&lt;configuration&gt;
+  &lt;system.web.webPages.razor&gt;
+    &lt;pages&gt;
+      &lt;namespaces&gt;
+        &lt;add namespace="System.ComponentModel" /&gt;
+      &lt;/namespaces&gt;
+    &lt;/pages&gt;
+  &lt;/system.web.webPages.razor&gt;
+&lt;/configuration&gt;
+</pre>
+            <p>以下是新增文件列表。</p>
+            <p><img src="~/Content/Images/BoorstrapFiles.png" /></p>
+            <p>您需要做的事情是修改<code>_Layout.cshtml</code>母版页视图文件。</p>
+            <p>母版页视图带有导航栏，但是是空的，需要您自己修改。</p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="bs-docs-sidebar affix" data-spy="affix" data-offset-top="60" data-offset-bottom="200">
+            <ul class="nav bs-docs-sidenav">
+                <li><a href="#installPackage">Install Package</a></li>
+                <li><a href="#description">Instruction</a></li>
+            </ul>
+            <a class="back-to-top" href="#">Back to top</a>
+        </div>
+    </div>
+</div>
