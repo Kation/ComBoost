@@ -222,6 +222,8 @@ namespace System.Web.Mvc
                 {
                     Type ft = f.GetType();
                     IEntity entity = ft.GetProperty("Key").GetValue(f);
+                    if (entity == null)
+                        continue;
                     EntityParentModel item = new EntityParentModel();
                     item.Path = path;
                     item.Name = entity.ToString();
