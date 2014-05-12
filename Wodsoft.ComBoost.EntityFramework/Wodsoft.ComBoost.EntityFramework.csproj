@@ -27,12 +27,14 @@
     <DocumentationFile>bin\Debug\Wodsoft.ComBoost.EntityFramework.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Wodsoft.ComBoost.EntityFramework.XML</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework">
@@ -69,6 +71,7 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(SolutionDir)Bin" md "$(SolutionDir)Bin"
 copy "$(TargetPath)" "$(SolutionDir)Bin"
+copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)Bin"
 copy "$(TargetDir)$(TargetName).xml" "$(SolutionDir)Bin"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

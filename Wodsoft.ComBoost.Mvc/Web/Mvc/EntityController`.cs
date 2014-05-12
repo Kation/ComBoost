@@ -14,6 +14,7 @@ namespace System.Web.Mvc
     /// <summary>
     /// Entity controller with actions.
     /// </summary>
+    [EntityAuthorize]
     public class EntityController<TEntity> : EntityController where TEntity : class, IEntity, new()
     {
         private EntityMetadata Metadata;
@@ -56,11 +57,8 @@ namespace System.Web.Mvc
                 return new HttpStatusCodeResult(400);
             if (size < 1)
                 return new HttpStatusCodeResult(400);
-            if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
+            if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
                 return new HttpStatusCodeResult(403);
-            for (int i = 0; i < Metadata.ViewRoles.Length; i++)
-                if (!User.IsInRole(Metadata.ViewRoles[i]))
-                    return new HttpStatusCodeResult(403);
             IQueryable<TEntity> queryable = EntityQueryable.Query();
             List<EntitySearchItem> searchItems = new List<EntitySearchItem>();
             if (search)
@@ -289,11 +287,8 @@ namespace System.Web.Mvc
         {
             if (!EntityQueryable.Addable())
                 return new HttpStatusCodeResult(403);
-            if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
+            if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
                 return new HttpStatusCodeResult(403);
-            for (int i = 0; i < Metadata.AddRoles.Length; i++)
-                if (!User.IsInRole(Metadata.AddRoles[i]))
-                    return new HttpStatusCodeResult(403);
             var model = new EntityEditModel<TEntity>(EntityQueryable.Create());
             model.Item.Index = Guid.Empty;
             model.Properties = Metadata.EditProperties;
@@ -318,7 +313,7 @@ namespace System.Web.Mvc
             if (item == null)
                 return new HttpStatusCodeResult(404);
             var model = new EntityEditModel<TEntity>(item);
-            model.Properties = Metadata.Properties;
+            model.Properties = Metadata.DetailProperties;
             return View(model);
         }
 

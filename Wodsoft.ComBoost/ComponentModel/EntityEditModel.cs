@@ -43,7 +43,8 @@ namespace System.ComponentModel
         {
             Item = entity;
             Metadata = EntityAnalyzer.GetMetadata<TEntity>();
-            Properties = Metadata.EditProperties;
+            //Let repository library to set Properties value.
+            //Don't: Properties = Metadata.EditProperties;
         }
 
         /// <summary>

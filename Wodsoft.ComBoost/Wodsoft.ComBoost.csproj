@@ -30,13 +30,15 @@
     <DocumentationFile>bin\Debug\Wodsoft.ComBoost.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Release\Wodsoft.ComBoost.XML</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -71,6 +73,7 @@
     <Compile Include="Data\Entity\IEntity.cs" />
     <Compile Include="Data\Entity\IEntityContextBuilder.cs" />
     <Compile Include="Data\Entity\IEntityQueryable.cs" />
+    <Compile Include="Data\Entity\IRoleEntity.cs" />
     <Compile Include="Data\Entity\Metadata\EntityAnalyzer.cs" />
     <Compile Include="Data\Entity\Metadata\EntityMetadata.cs" />
     <Compile Include="Data\Entity\Metadata\PropertyMetadata.cs" />
@@ -83,6 +86,7 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(SolutionDir)Bin" md "$(SolutionDir)Bin"
 copy "$(TargetPath)" "$(SolutionDir)Bin"
+copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)Bin"
 copy "$(TargetDir)$(TargetName).xml" "$(SolutionDir)Bin"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

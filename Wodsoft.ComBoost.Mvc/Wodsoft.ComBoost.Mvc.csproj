@@ -84,6 +84,7 @@
     <Compile Include="Web\Mvc\Converter\EntityConverter.cs" />
     <Compile Include="Web\Mvc\Converter\EnumConverter.cs" />
     <Compile Include="Web\Mvc\EntityAuthorizeAttribute.cs" />
+    <Compile Include="Web\Mvc\EntityRouteCollectionExtensions.cs" />
     <Compile Include="Web\Mvc\EntityController.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -95,6 +96,9 @@
     <Compile Include="Web\Mvc\EntityValueConverter.cs" />
     <Compile Include="Web\Mvc\IFileController.cs" />
     <Compile Include="Web\Mvc\IImageController.cs" />
+    <Compile Include="Web\Routing\EntityRoute.cs" />
+    <Compile Include="Web\Security\ComBoostAuthenticationModel.cs" />
+    <Compile Include="Web\Security\ComBoostPrincipal.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -148,6 +152,7 @@
     <Content Include="Bootstrap\Scripts\jstree.min.js" />
     <None Include="Bootstrap\Views\Web.config.transform" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(SolutionDir)Bin" md "$(SolutionDir)Bin"

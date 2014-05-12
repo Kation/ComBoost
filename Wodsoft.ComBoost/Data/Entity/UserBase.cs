@@ -9,7 +9,7 @@ namespace System.Data.Entity
     /// <summary>
     /// Entity base object for user.
     /// </summary>
-    public abstract class UserBase : EntityBase, IPassword
+    public abstract class UserBase : EntityBase, IPassword, IRoleEntity
     {
         /// <summary>
         /// Get or set the sha1 hashed password.
@@ -58,6 +58,16 @@ namespace System.Data.Entity
                         return false;
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Ensure this user is belong to a role.
+        /// </summary>
+        /// <param name="role">Role name.</param>
+        /// <returns>true if user is member of this role.</returns>
+        public virtual bool IsInRole(string role)
+        {
+            return true;
         }
     }
 }

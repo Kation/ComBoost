@@ -118,5 +118,10 @@ namespace System.Data.Entity
         {
             throw new NotImplementedException();
         }
+
+        public bool RemoveRange(IEnumerable<Guid> ids)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

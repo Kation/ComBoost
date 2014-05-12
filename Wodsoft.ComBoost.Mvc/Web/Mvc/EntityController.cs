@@ -38,8 +38,6 @@ namespace System.Web.Mvc
         /// <param name="filterContext">Information about the current request and action.</param>
         protected override void OnAuthorization(AuthorizationContext filterContext)
         {
-            HttpContext.Items["EntityBuilder"] = EntityBuilder;
-            HttpContext.Items["RouteData"] = RouteData;
             base.OnAuthorization(filterContext);
         }
     }

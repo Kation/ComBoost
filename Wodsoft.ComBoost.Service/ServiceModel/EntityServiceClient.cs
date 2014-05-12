@@ -43,6 +43,13 @@ namespace System.ServiceModel
             return Channel.Remove(id);
         }
 
+        public virtual bool RemoveRange(IEnumerable<Guid> ids)
+        {
+            foreach (var id in ids)
+                Channel.Remove(id);
+            return true;
+        }
+
         public virtual bool Edit(TEntity entity)
         {
             return Channel.Edit(entity);

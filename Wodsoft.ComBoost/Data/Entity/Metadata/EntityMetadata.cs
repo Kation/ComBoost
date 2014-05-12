@@ -33,6 +33,7 @@ namespace System.Data.Entity.Metadata
             ViewProperties = Properties.Where(t => !t.IsHiddenOnView).ToArray();
             EditProperties = Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
             SearchProperties = Properties.Where(t => t.Searchable).ToArray();
+            DetailProperties = Properties.Where(t => !t.IsHiddenOnView || !t.IsHiddenOnEdit).ToArray();
 
             _Properties = new Dictionary<string, PropertyMetadata>();
             for (int i = 0; i < Properties.Length; i++)
@@ -133,6 +134,11 @@ namespace System.Data.Entity.Metadata
         /// Get the properties of entity while search.
         /// </summary>
         public PropertyMetadata[] SearchProperties { get; private set; }
+        
+        /// <summary>
+        /// Get the properties of entity in detail.
+        /// </summary>
+        public PropertyMetadata[] DetailProperties { get; private set; }
 
         /// <summary>
         /// Get is entity allow anonymous operate.
