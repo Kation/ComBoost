@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace System.Data.Entity
 {
-    public class CacheUserBase : CacheEntityBase, IPassword
+    public class CacheUserBase : CacheEntityBase, IPassword, IRoleEntity
     {
         /// <summary>
         /// Get or set the sha1 hashed password.
@@ -56,6 +56,11 @@ namespace System.Data.Entity
                         return false;
                 return true;
             }
+        }
+
+        public virtual bool IsInRole(string role)
+        {
+            return true;
         }
     }
 }

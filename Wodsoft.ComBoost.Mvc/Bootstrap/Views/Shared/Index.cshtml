@@ -82,9 +82,14 @@
                                             <span class="caret"></span>
                                         </a>
                                         <ul class="dropdown-menu">
-                                            <li><a class="btn" href="@Html.Raw(Url.Action("Edit", new { id = Model.Items[i].Index }))"><i class="glyphicon glyphicon-edit"></i>Edit</a></li>
-                                            <li><a class="btn" href="javascript:remove('@Model.Items[i].Index')"><i class="glyphicon glyphicon-remove"></i>Delete</a></li>
-                                            @*<li class="divider"></li>*@
+                                            @if (Model.Metadata.EditRoles.All(t => User.IsInRole(t)))
+                                            {
+                                                <li><a class="btn" href="@Html.Raw(Url.Action("Edit", new { id = Model.Items[i].Index }))"><i class="glyphicon glyphicon-edit"></i>Edit</a></li>
+                                            }
+                                            @if (Model.Metadata.RemoveRoles.All(t => User.IsInRole(t)))
+                                            {
+                                                <li><a class="btn" href="javascript:remove('@Model.Items[i].Index')"><i class="glyphicon glyphicon-remove"></i>Delete</a></li>
+                                            }
                                             @for (int c = 0; c < Model.Buttons.Length; c++)
                                             {
                                                 MvcViewButton button = Model.Buttons[c] as MvcViewButton;
@@ -106,7 +111,10 @@
                     </div>
                     <div class="col-md-4 text-center">
                         <div class="btn-group">
-                            <a href="@Html.Raw(Url.Action("Create"))" class="btn btn-default">Create</a>
+                            @if (Model.Metadata.AddRoles.All(t => User.IsInRole(t)))
+                            {
+                                <a href="@Html.Raw(Url.Action("Create"))" class="btn btn-default">Create</a>
+                            }
                             @if (Model.Metadata.SearchProperties.Length > 0)
                             {
                                 <a href="@Html.Raw(Url.Action("Search"))" class="btn btn-default">Search</a>

@@ -31,13 +31,18 @@ namespace System.Web.Security
         {
             if (Resolve == null)
                 return OriginPrincipal.IsInRole(role);
-            RouteData routeData = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
-            EntityRoute route = routeData.Route as EntityRoute;
-            if (route == null)
-                return OriginPrincipal.IsInRole(role);
-            IRoleEntity entity = Resolve(route.UserType, Identity.Name);
+            IRoleEntity entity = HttpContext.Current.Items["RoleEntity"] as IRoleEntity;
             if (entity == null)
-                return false;
+            {
+                RouteData routeData = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
+                EntityRoute route = routeData.Route as EntityRoute;
+                if (route == null)
+                    return OriginPrincipal.IsInRole(role);
+                entity = Resolve(route.UserType, Identity.Name);
+                if (entity == null)
+                    return false;
+                HttpContext.Current.Items["RoleEntity"] = entity;
+            }
             return entity.IsInRole(role);
         }
     }

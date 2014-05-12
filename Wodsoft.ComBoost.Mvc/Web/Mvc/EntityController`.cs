@@ -198,6 +198,7 @@ namespace System.Web.Mvc
             model.Headers = Metadata.ViewProperties;
             model.PageSizeOption = PageSize;
             model.UpdateItems();
+
             return View(model);
         }
 
