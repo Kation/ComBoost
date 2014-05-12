@@ -436,7 +436,8 @@ namespace System.Web.Mvc
                                 throw new NotSupportedException("Type of \"" + propertyMetadata.Property.PropertyType.Name + "\" converter not found.");
                     if (propertyMetadata.Type == ComponentModel.DataAnnotations.CustomDataType.Password && entity is IPassword)
                     {
-                        ((IPassword)entity).SetPassword(originValue);
+                        if (originValue != propertyMetadata.Property.GetValue(entity).ToString())
+                            ((IPassword)entity).SetPassword(originValue);
                     }
                     else
                     {
