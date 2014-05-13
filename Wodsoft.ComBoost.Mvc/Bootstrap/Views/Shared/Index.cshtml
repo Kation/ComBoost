@@ -11,6 +11,10 @@
         Layout = "~/Areas/" + area.ToString() + "/Views/Shared/_Layout.cshtml";
     }
 }
+<ol class="breadcrumb">
+    <li><a href="@Url.Action("Index","Home")">Home</a></li>
+    <li class="active">@Model.Metadata.Name</li>
+</ol>
 @if (Model.SearchItem.Length > 0)
 {
     <div class="alert alert-success alert-dismissable">
@@ -82,6 +86,7 @@
                                             <span class="caret"></span>
                                         </a>
                                         <ul class="dropdown-menu">
+                                            <li><a class="btn" href="@Html.Raw(Url.Action("Detail", new { id = Model.Items[i].Index }))"><i class="glyphicon glyphicon-edit"></i>Detail</a></li>
                                             @if (Model.Metadata.EditRoles.All(t => User.IsInRole(t)))
                                             {
                                                 <li><a class="btn" href="@Html.Raw(Url.Action("Edit", new { id = Model.Items[i].Index }))"><i class="glyphicon glyphicon-edit"></i>Edit</a></li>

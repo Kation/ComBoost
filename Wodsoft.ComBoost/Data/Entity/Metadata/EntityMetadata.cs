@@ -33,7 +33,7 @@ namespace System.Data.Entity.Metadata
             ViewProperties = Properties.Where(t => !t.IsHiddenOnView).ToArray();
             EditProperties = Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
             SearchProperties = Properties.Where(t => t.Searchable).ToArray();
-            DetailProperties = Properties.Where(t => !t.IsHiddenOnView || !t.IsHiddenOnEdit).ToArray();
+            DetailProperties = Properties.Where(t => !t.IsHiddenOnDetail).ToArray();
 
             _Properties = new Dictionary<string, PropertyMetadata>();
             for (int i = 0; i < Properties.Length; i++)

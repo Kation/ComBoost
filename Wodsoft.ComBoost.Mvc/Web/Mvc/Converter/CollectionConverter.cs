@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace System.Web.Mvc.Converter
         /// <returns>true if this converter can perform the conversion; otherwise, false.</returns>
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return false;
+            return destinationType == typeof(string);
         }
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace System.Web.Mvc.Converter
             string[] ids = ((string)value).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             List<object> items = new List<object>();
             dynamic queryable = context.GetService(((EntityValueConverterContext)context).Property.Property.PropertyType.GetGenericArguments()[0]);
-            for (int i = 0; i < ids.Length;i++ )
+            for (int i = 0; i < ids.Length; i++)
             {
                 Guid id;
                 if (!Guid.TryParse(ids[i], out id))
@@ -58,6 +59,20 @@ namespace System.Web.Mvc.Converter
                     items.Add(item);
             }
             return items.ToArray();
+        }
+
+        /// <summary>
+        /// Converts the given value object to the specified type, using the specified context and culture information.
+        /// </summary>
+        /// <param name="context">An System.ComponentModel.ITypeDescriptorContext that provides a format context.</param>
+        /// <param name="culture">A System.Globalization.CultureInfo. If null is passed, the current culture is assumed.</param>
+        /// <param name="value">The System.Object to convert.</param>
+        /// <param name="destinationType">The System.Type to convert the value parameter to.</param>
+        /// <returns>An System.Object that represents the converted value.</returns>
+        public override object ConvertTo(ITypeDescriptorContext context, Globalization.CultureInfo culture, object value, Type destinationType)
+        {
+            IEnumerable<IEntity> collection = (IEnumerable<IEntity>)value;
+            return string.Join(",", collection.Select(t => t.ToString()).ToArray());
         }
     }
 }

@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Bootstrap\Views\Shared\Detail.cshtml" />
     <None Include="packages.config" />
     <None Include="Bootstrap\Views\Shared\BooleanEditor.cshtml" />
     <None Include="Bootstrap\Views\Shared\CollectionEditor.cshtml" />

@@ -42,6 +42,7 @@ namespace System.Data.Entity.Metadata
             {
                 IsHiddenOnEdit = hide.IsHiddenOnEdit;
                 IsHiddenOnView = hide.IsHiddenOnView;
+                IsHiddenOnDetail = hide.IsHiddenOnDetail;
             }
             else
             {
@@ -145,6 +146,11 @@ namespace System.Data.Entity.Metadata
         /// Get is the property hidden in viewlist.
         /// </summary>
         public bool IsHiddenOnView { get; private set; }
+        
+        /// <summary>
+        /// Get is the property hidden in detail.
+        /// </summary>
+        public bool IsHiddenOnDetail { get; private set; }
 
         /// <summary>
         /// Get the order of property.
