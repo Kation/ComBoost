@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Wodsoft.ComBoost.Wpf.Editor
+namespace Wodsoft.ComBoost.Wpf
 {
     public abstract class EditorBase : Control
     {
@@ -45,7 +45,7 @@ namespace Wodsoft.ComBoost.Wpf.Editor
         public static readonly DependencyProperty HasErrorProperty = HasErrorPropertyKey.DependencyProperty;
 
         public EntityEditor Editor { get { return (EntityEditor)GetValue(EditorProperty); } set { SetValue(EditorProperty, value); } }
-        protected static readonly DependencyProperty EditorProperty = DependencyProperty.Register("Editor", typeof(EntityEditor), typeof(EditorBase), new PropertyMetadata());
+        public static readonly DependencyProperty EditorProperty = DependencyProperty.Register("Editor", typeof(EntityEditor), typeof(EditorBase), new PropertyMetadata());
 
         public string ErrorMessage { get { return (string)GetValue(ErrorMessageProperty); } protected set { SetValue(ErrorMessagePropertyKey, value); } }
         protected static readonly DependencyPropertyKey ErrorMessagePropertyKey = DependencyProperty.RegisterReadOnly("ErrorMessage", typeof(string), typeof(EditorBase), new PropertyMetadata());

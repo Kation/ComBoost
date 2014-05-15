@@ -9,13 +9,13 @@ namespace Wodsoft.ComBoost.Wpf
 {
     public abstract class EntityPage : Page
     {
-        protected EntityPage(EntityPageController controller)
+        protected EntityPage(EntityController controller)
         {
             if (controller == null)
                 throw new ArgumentNullException("controller");
             Controller = controller;
         }
 
-        public EntityPageController Controller { get; private set; }
+        public EntityController Controller { get; private set; }
     }
 }

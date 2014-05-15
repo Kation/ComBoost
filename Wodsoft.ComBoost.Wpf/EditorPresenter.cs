@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Wodsoft.ComBoost.Wpf.Editor
+namespace Wodsoft.ComBoost.Wpf
 {
     public class EditorPresenter : ContentControl
     {

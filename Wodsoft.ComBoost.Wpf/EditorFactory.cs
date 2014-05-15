@@ -4,8 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wodsoft.ComBoost.Wpf.Editor;
 
-namespace Wodsoft.ComBoost.Wpf.Editor
+namespace Wodsoft.ComBoost.Wpf
 {
     public static class EditorFactory
     {
@@ -17,28 +18,28 @@ namespace Wodsoft.ComBoost.Wpf.Editor
             _CustomStringEditor = new Dictionary<string, Type>();
             _CustomTypeEditor = new Dictionary<CustomDataType, Type>();
 
-            AddEditor<DefaultEditor>(CustomDataType.Boolean);
-            AddEditor<DefaultEditor>(CustomDataType.Currency);
-            AddEditor<DefaultEditor>(CustomDataType.Date);
-            AddEditor<DefaultEditor>(CustomDataType.DateTime);
+            AddEditor<BooleanEditor>(CustomDataType.Boolean);
+            AddEditor<CurrencyEditor>(CustomDataType.Currency);
+            AddEditor<DateEditor>(CustomDataType.Date);
+            AddEditor<DateTimeEditor>(CustomDataType.DateTime);
             AddEditor<DefaultEditor>(CustomDataType.Default);
-            AddEditor<DefaultEditor>(CustomDataType.EmailAddress);
+            AddEditor<EmailAddressEditor>(CustomDataType.EmailAddress);
             AddEditor<DefaultEditor>(CustomDataType.File);
-            AddEditor<DefaultEditor>(CustomDataType.Html);
+            AddEditor<HtmlEditor>(CustomDataType.Html);
             AddEditor<DefaultEditor>(CustomDataType.Image);
-            AddEditor<DefaultEditor>(CustomDataType.ImageUrl);
-            AddEditor<DefaultEditor>(CustomDataType.Integer);
-            AddEditor<DefaultEditor>(CustomDataType.MultilineText);
-            AddEditor<DefaultEditor>(CustomDataType.Number);
-            AddEditor<DefaultEditor>(CustomDataType.Password);
-            AddEditor<DefaultEditor>(CustomDataType.PhoneNumber);
-            AddEditor<DefaultEditor>(CustomDataType.Sex);
-            AddEditor<DefaultEditor>(CustomDataType.Text);
-            AddEditor<DefaultEditor>(CustomDataType.Time);
-            AddEditor<DefaultEditor>(CustomDataType.Url);
+            AddEditor<ImageUrlEditor>(CustomDataType.ImageUrl);
+            AddEditor<IntegerEditor>(CustomDataType.Integer);
+            AddEditor<MultilineTextEditor>(CustomDataType.MultilineText);
+            AddEditor<NumberEditor>(CustomDataType.Number);
+            AddEditor<PasswordEditor>(CustomDataType.Password);
+            AddEditor<PhoneNumberEditor>(CustomDataType.PhoneNumber);
+            AddEditor<SexEditor>(CustomDataType.Sex);
+            AddEditor<TextEditor>(CustomDataType.Text);
+            AddEditor<TimeEditor>(CustomDataType.Time);
+            AddEditor<UrlEditor>(CustomDataType.Url);
 
             AddEditor<DefaultEditor>("Collection");
-            AddEditor<DefaultEditor>("Entity");
+            AddEditor<Editor.EntityEditor>("Entity");
             AddEditor<DefaultEditor>("Enum");
         }
 

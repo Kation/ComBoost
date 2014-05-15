@@ -16,13 +16,12 @@ using System.Windows.Shapes;
 namespace Wodsoft.ComBoost.Wpf.Editor
 {
     [TemplatePart(Name = "PART_TextBox", Type = typeof(TextBox))]
-    public class DefaultEditor : EditorBase
+    public class NumberEditor : EditorBase
     {
-        static DefaultEditor()
+        static NumberEditor()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(DefaultEditor), new FrameworkPropertyMetadata(typeof(DefaultEditor)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(NumberEditor), new FrameworkPropertyMetadata(typeof(NumberEditor)));
         }
-
         protected TextBox TextBox { get; private set; }
 
         public override void OnApplyTemplate()
@@ -30,12 +29,15 @@ namespace Wodsoft.ComBoost.Wpf.Editor
             base.OnApplyTemplate();
 
             TextBox = (TextBox)GetTemplateChild("PART_TextBox");
-            TextBox.SetBinding(TextBox.TextProperty, new Binding { Source = this, Path = new PropertyPath(CurrentValueProperty), Mode = BindingMode.TwoWay });
+            TextBox.SetBinding(TextBox.TextProperty, new Binding { Source = this, Path = new PropertyPath(CurrentValueProperty), Mode = BindingMode.OneWay });
             TextBox.TextChanged += TextBox_TextChanged;
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            double value;
+            double.TryParse(TextBox.Text, out value);
+            CurrentValue = value;
             IsChanged = true;
         }
     }

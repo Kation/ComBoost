@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Wpf
 {
-    public class EntityPageController
+    public class EntityController
     {
         public IEntityContextBuilder EntityBuilder { get; private set; }
 
-        public EntityPageController(IEntityContextBuilder builder)
+        public EntityController(IEntityContextBuilder builder)
         {
             if (builder == null)
                 throw new ArgumentNullException("builder");

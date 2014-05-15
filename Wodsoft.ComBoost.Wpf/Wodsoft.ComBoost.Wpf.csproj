@@ -62,15 +62,45 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BooleanReverseValueConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DateToTimespanValueConverter.cs" />
+    <Compile Include="Editor\BooleanEditor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Editor\CurrencyEditor.cs" />
+    <Compile Include="Editor\CollectionEditor.cs" />
+    <Compile Include="Editor\EntityEditor.cs" />
+    <Compile Include="Editor\DateEditor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Editor\DateTimeEditor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Editor\SexEditor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Editor\TimeEditor.cs" />
+    <Compile Include="Editor\PhoneNumberEditor.cs" />
+    <Compile Include="Editor\ImageUrlEditor.cs" />
+    <Compile Include="Editor\UrlEditor.cs" />
+    <Compile Include="Editor\TextEditor.cs" />
+    <Compile Include="Editor\PasswordEditor.cs" />
+    <Compile Include="Editor\EmailAddressEditor.cs" />
+    <Compile Include="Editor\HtmlEditor.cs" />
+    <Compile Include="Editor\NumberEditor.cs" />
+    <Compile Include="Editor\IntegerEditor.cs" />
+    <Compile Include="Editor\MultilineTextEditor.cs" />
     <Compile Include="EntityCommand.cs" />
     <Compile Include="Editor\DefaultEditor.cs" />
-    <Compile Include="Editor\EditorBase.cs" />
-    <Compile Include="Editor\EditorFactory.cs" />
-    <Compile Include="Editor\EditorPresenter.cs" />
+    <Compile Include="EditorBase.cs" />
+    <Compile Include="EditorFactory.cs" />
+    <Compile Include="EditorPresenter.cs" />
     <Compile Include="EntityFrame.cs" />
     <Compile Include="EntityEditor.cs" />
     <Compile Include="EntityPage.cs" />
-    <Compile Include="EntityPageController.cs" />
+    <Compile Include="EntityController.cs" />
     <Compile Include="WpfViewButton.cs" />
     <Compile Include="EntityViewer.cs" />
     <Compile Include="IntAddValueConverter.cs" />

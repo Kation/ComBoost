@@ -1,0 +1,55 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace Wodsoft.ComBoost.Wpf.Editor
+{
+    [TemplatePart(Name = "PART_TextBox", Type = typeof(TextBox))]
+    public class EntityEditor : EditorBase
+    {
+        static EntityEditor()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(EntityEditor), new FrameworkPropertyMetadata(typeof(EntityEditor)));
+        }
+
+        public EntityEditor()
+        {
+            SelectCommand = new EntityCommand(SelectEntity);
+            ClearCommand = new EntityCommand(SelectEntity);
+        }
+
+        protected TextBox TextBox { get; private set; }
+
+        public override void OnApplyTemplate()
+        {
+            TextBox = (TextBox)GetTemplateChild("PART_TextBox");
+            TextBox.SetBinding(TextBox.TextProperty, new Binding { Source = this, Path = new PropertyPath(CurrentValueProperty), Mode = BindingMode.OneWay });
+        }
+
+        private void SelectEntity(IEntity entity)
+        {
+            //Editor.Controller
+        }
+        private void ClearEntity(IEntity entity)
+        {
+            CurrentValue = null;
+            IsChanged = OriginValue == null;
+        }
+
+        public ICommand SelectCommand { get; private set; }
+
+        public ICommand ClearCommand { get; private set; }
+    }
+}

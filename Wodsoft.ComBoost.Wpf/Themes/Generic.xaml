@@ -103,7 +103,7 @@
                                                 <ColumnDefinition />
                                             </Grid.ColumnDefinitions>
                                             <Label ToolTip="{Binding Description}" Content="{Binding Name}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                            <editor:EditorPresenter Grid.Column="1" Editor="{Binding ElementName=layout, Path=DataContext}" Metadata="{Binding}" Entity="{Binding ElementName=EditorItems, Path=DataContext.Item}"/>
+                                            <local:EditorPresenter Grid.Column="1" VerticalAlignment="Center" Editor="{Binding ElementName=layout, Path=DataContext}" Metadata="{Binding}" Entity="{Binding ElementName=EditorItems, Path=DataContext.Item}"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -215,6 +215,78 @@
         </Setter>
     </Style>
 
+    <Style TargetType="{x:Type editor:BooleanEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:BooleanEditor}">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Name="PART_True" GroupName="editor" Content="True" />
+                        <RadioButton Name="PART_False" GroupName="editor" Content="False" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:DateEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:DateEditor}">
+                    <DatePicker Name="PART_DatePicker"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:DateTimeEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:DateTimeEditor}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <DatePicker Name="PART_Date"/>
+                        <TextBox Name="PART_Time">
+                            <TextBox.InputScope>
+                                <InputScope>
+                                    <InputScope.Names>
+                                        <InputScopeName NameValue="Time"/>
+                                    </InputScope.Names>
+                                </InputScope>
+                            </TextBox.InputScope>
+                        </TextBox>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="{x:Type editor:DefaultEditor}">
         <Style.Triggers>
             <Trigger Property="HasError" Value="True">
@@ -229,6 +301,361 @@
                 <ControlTemplate TargetType="{x:Type editor:DefaultEditor}">
                     <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
                              VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style TargetType="{x:Type editor:EmailAddressEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:EmailAddressEditor}">
+                    <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}">
+                        <TextBox.InputScope>
+                            <InputScope>
+                                <InputScope.Names>
+                                    <InputScopeName NameValue="EmailSmtpAddress"/>
+                                </InputScope.Names>
+                            </InputScope>
+                        </TextBox.InputScope>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:HtmlEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:HtmlEditor}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition MinHeight="80" />
+                        </Grid.RowDefinitions>
+                        <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}"
+                             Margin="0,0,0,8" AcceptsReturn="True" AcceptsTab="True"/>
+                        <GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="8" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:SexEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:SexEditor}">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Name="PART_Male" GroupName="editor" Content="True" />
+                        <RadioButton Name="PART_Female" GroupName="editor" Content="False" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:MultilineTextEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:HtmlEditor}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition MinHeight="80" />
+                        </Grid.RowDefinitions>
+                        <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}"
+                             Margin="0,0,0,8" AcceptsReturn="True" AcceptsTab="True"/>
+                        <GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="8" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:CurrencyEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:DefaultEditor}">
+                    <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}">
+                        <TextBox.InputScope>
+                            <InputScope>
+                                <InputScope.Names>
+                                    <InputScopeName NameValue="CurrencyAmount"/>
+                                </InputScope.Names>
+                            </InputScope>
+                        </TextBox.InputScope>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:IntegerEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:DefaultEditor}">
+                    <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}">
+                        <TextBox.InputScope>
+                            <InputScope>
+                                <InputScope.Names>
+                                    <InputScopeName NameValue="Number"/>
+                                </InputScope.Names>
+                            </InputScope>
+                        </TextBox.InputScope>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:NumberEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:NumberEditor}">
+                    <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}">
+                        <TextBox.InputScope>
+                            <InputScope>
+                                <InputScope.Names>
+                                    <InputScopeName NameValue="Number"/>
+                                </InputScope.Names>
+                            </InputScope>
+                        </TextBox.InputScope>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:PasswordEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:PasswordEditor}">
+                    <PasswordBox Name="PART_PasswordBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:TextEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:TextEditor}">
+                    <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:PhoneNumberEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:PhoneNumberEditor}">
+                    <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}">
+                        <TextBox.InputScope>
+                            <InputScope>
+                                <InputScope.Names>
+                                    <InputScopeName NameValue="TelephoneNumber"/>
+                                </InputScope.Names>
+                            </InputScope>
+                        </TextBox.InputScope>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:UrlEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:UrlEditor}">
+                    <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}">
+                        <TextBox.InputScope>
+                            <InputScope>
+                                <InputScope.Names>
+                                    <InputScopeName NameValue="Url"/>
+                                </InputScope.Names>
+                            </InputScope>
+                        </TextBox.InputScope>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:TimeEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:TimeEditor}">
+                    <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}">
+                        <TextBox.InputScope>
+                            <InputScope>
+                                <InputScope.Names>
+                                    <InputScopeName NameValue="Time"/>
+                                </InputScope.Names>
+                            </InputScope>
+                        </TextBox.InputScope>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:ImageUrlEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:ImageUrlEditor}">
+                    <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}">
+                        <TextBox.InputScope>
+                            <InputScope>
+                                <InputScope.Names>
+                                    <InputScopeName NameValue="Url"/>
+                                </InputScope.Names>
+                            </InputScope>
+                        </TextBox.InputScope>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:EntityEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:EntityEditor}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}" IsReadOnly="True"
+                             VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}"/>
+                        <Button Grid.Column="1" Content="Select" Command="{TemplateBinding SelectCommand}" />
+                        <Button Grid.Column="2" Content="Clear" Command="{TemplateBinding ClearCommand}"/>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
