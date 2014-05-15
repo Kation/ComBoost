@@ -90,14 +90,14 @@ namespace System.Data.Entity.Metadata
                     Type = CustomDataType.Other;
                     CustomType = "Entity";
                 }
+            }
 
-                if (Type != CustomDataType.Image && Type != CustomDataType.Password && Type != CustomDataType.Time)
+            if (Type != CustomDataType.Image && Type != CustomDataType.Password && Type != CustomDataType.Time)
+            {
+                if (CustomType == null || CustomType == "Entity" || CustomType == "Enum")
                 {
-                    if (CustomType == null || CustomType == "Entity" || CustomType == "Enum")
-                    {
-                        SearchableAttribute searchable = propertyInfo.GetCustomAttribute<SearchableAttribute>();
-                        Searchable = searchable != null;
-                    }
+                    SearchableAttribute searchable = propertyInfo.GetCustomAttribute<SearchableAttribute>();
+                    Searchable = searchable != null;
                 }
             }
         }
