@@ -23,29 +23,6 @@ namespace Company.Mvc
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-
-            DataContext context = new DataContext();
-            if (!context.Database.Exists())
-            {
-                context.Database.Create();
-
-                EmployeeGroup group = context.EmployeeGroup.Create();
-                group.Index = Guid.NewGuid();
-                group.CreateDate = DateTime.Now;
-                group.Name = "Admins";
-                group.Power = EmployeePower.Admin;
-                context.EmployeeGroup.Add(group);
-
-                Employee admin = context.Employee.Create();
-                admin.Index = Guid.NewGuid();
-                admin.CreateDate = DateTime.Now;
-                admin.Name = "admin";
-                admin.Group = group;
-                admin.SetPassword("admin");
-                context.Employee.Add(admin);
-                context.SaveChanges();
-            }
-            context.Dispose();
         }
     }
 }
