@@ -124,22 +124,21 @@ namespace System.Web.Mvc
         /// <returns>The controller type.</returns>
         protected override Type GetControllerType(Routing.RequestContext requestContext, string controllerName)
         {
-            Type type = base.GetControllerType(requestContext, controllerName);
+            Type type = null;
+            string areaString = requestContext.RouteData.DataTokens["Area"] as string;
+            ControllerItem[] items;
+            items = _Items.Where(t => t.Controller == controllerName.ToLower()).ToArray();
+            if (items.Length > 1 && areaString != null)
+                items = items.Where(t => t.Area == areaString.ToLower()).ToArray();
+            if (items.Length > 0)
+                type = typeof(EntityController<>).MakeGenericType(items[0].EntityType);
+            if (type != null &&
+                ((areaString != null && items[0].Area == null) ||
+                (areaString != null && items[0].Area != areaString.ToLower()) ||
+                (areaString == null && items[0].Area != null)))
+                type = null;
             if (type == null)
-            {
-                string areaString = requestContext.RouteData.DataTokens["Area"] as string;
-                ControllerItem[] items;
-                items = _Items.Where(t => t.Controller == controllerName.ToLower()).ToArray();
-                if (items.Length > 1 && areaString != null)
-                    items = items.Where(t => t.Area == areaString.ToLower()).ToArray();
-                if (items.Length > 0)
-                    type = typeof(EntityController<>).MakeGenericType(items[0].EntityType);
-                if (type != null &&
-                    ((areaString != null && items[0].Area == null) ||
-                    (areaString != null && items[0].Area != areaString.ToLower()) ||
-                    (areaString == null && items[0].Area != null)))
-                    type = null;
-            }
+                type = base.GetControllerType(requestContext, controllerName);
             return type;
         }
 
