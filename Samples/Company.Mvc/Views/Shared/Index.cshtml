@@ -86,7 +86,7 @@
                                             <span class="caret"></span>
                                         </a>
                                         <ul class="dropdown-menu">
-                                            <li><a class="btn" href="@Html.Raw(Url.Action("Detail", new { id = Model.Items[i].Index }))"><i class="glyphicon glyphicon-edit"></i>Detail</a></li>
+                                            <li><a class="btn" href="@Html.Raw(Url.Action("Detail", new { id = Model.Items[i].Index }))"><i class="glyphicon glyphicon-list-alt"></i>Detail</a></li>
                                             @if (Model.Metadata.EditRoles.All(t => User.IsInRole(t)))
                                             {
                                                 <li><a class="btn" href="@Html.Raw(Url.Action("Edit", new { id = Model.Items[i].Index }))"><i class="glyphicon glyphicon-edit"></i>Edit</a></li>
