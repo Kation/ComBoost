@@ -47,9 +47,12 @@ namespace Wodsoft.ComBoost.Wpf.Editor
             CurrentValue = null;
             IsChanged = OriginValue == null;
         }
+        public ICommand SelectCommand { get { return (ICommand)GetValue(SelectCommandProperty); } protected set { SetValue(SelectCommandPropertyKey, value); } }
+        protected static readonly DependencyPropertyKey SelectCommandPropertyKey = DependencyProperty.RegisterReadOnly("SelectCommand", typeof(ICommand), typeof(EntityEditor), new PropertyMetadata());
+        public static readonly DependencyProperty SelectCommandProperty = SelectCommandPropertyKey.DependencyProperty;
 
-        public ICommand SelectCommand { get; private set; }
-
-        public ICommand ClearCommand { get; private set; }
+        public ICommand ClearCommand { get { return (ICommand)GetValue(ClearCommandProperty); } protected set { SetValue(ClearCommandPropertyKey, value); } }
+        protected static readonly DependencyPropertyKey ClearCommandPropertyKey = DependencyProperty.RegisterReadOnly("ClearCommand", typeof(ICommand), typeof(EntityEditor), new PropertyMetadata());
+        public static readonly DependencyProperty ClearCommandProperty = ClearCommandPropertyKey.DependencyProperty;
     }
 }
