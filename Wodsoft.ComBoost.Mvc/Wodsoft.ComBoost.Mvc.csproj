@@ -103,6 +103,7 @@
     <Compile Include="Web\Mvc\IImageController.cs" />
     <Compile Include="Web\Routing\EntityRoute.cs" />
     <Compile Include="Web\Security\ComBoostAuthenticationModel.cs" />
+    <Compile Include="Web\Security\ComBoostIdentity.cs" />
     <Compile Include="Web\Security\ComBoostPrincipal.cs" />
   </ItemGroup>
   <ItemGroup>
