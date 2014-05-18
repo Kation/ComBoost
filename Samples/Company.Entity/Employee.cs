@@ -15,6 +15,7 @@ namespace Company.Entity
     [EntityAuthentication(AllowAnonymous = false, ViewRolesRequired = new string[] { "Admin" })]
     public class Employee : UserBase
     {
+        [Searchable]
         [Display(Name = "员工姓名", Order = 0)]
         [Required]
         public virtual string Name { get; set; }
@@ -23,6 +24,7 @@ namespace Company.Entity
         [Required]
         public virtual EmployeeGroup Group { get; set; }
 
+        [Searchable]
         [Display(Name = "性别", Order = 20)]
         [CustomDataType(CustomDataType.Sex)]
         [Required]
