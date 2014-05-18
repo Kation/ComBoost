@@ -6,7 +6,7 @@
             <option value="@v.Index">@v</option>
         }
     </select>
-    <input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" />
+    <input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" value="@(string.Join(",",((System.Collections.IEnumerable)Model.Value).Cast<System.Data.Entity.IEntity>().Select(t=>t. Index).ToArray()))" />
 </div>
 <div class="col-md-2">
     <div class="btn-group-vertical">
@@ -81,7 +81,6 @@
                 result.find(':checkbox[value]').each(function (index, element) {
                     element.checked = r;
                 });
-
             });
         }
         add.click(function () {
@@ -114,6 +113,7 @@
                             option.val(id);
                             select.append(option);
                         });
+                        update();
                         $('#dialog').modal('hide');
                     });
                 }

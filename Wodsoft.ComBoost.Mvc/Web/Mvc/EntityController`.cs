@@ -17,7 +17,7 @@ namespace System.Web.Mvc
     [EntityAuthorize]
     public class EntityController<TEntity> : EntityController where TEntity : class, IEntity, new()
     {
-        private EntityMetadata Metadata;
+        public EntityMetadata Metadata { get; private set; }
 
         /// <summary>
         /// Get or set default page size for this controller.
@@ -312,6 +312,8 @@ namespace System.Web.Mvc
         [HttpGet]
         public virtual ActionResult Detail(Guid id)
         {
+            if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
+                return new HttpStatusCodeResult(403);
             TEntity item = EntityQueryable.GetEntity(id);
             if (item == null)
                 return new HttpStatusCodeResult(404);
@@ -332,9 +334,8 @@ namespace System.Web.Mvc
                 return new HttpStatusCodeResult(403);
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
                 return new HttpStatusCodeResult(403);
-            for (int i = 0; i < Metadata.EditRoles.Length; i++)
-                if (!User.IsInRole(Metadata.EditRoles[i]))
-                    return new HttpStatusCodeResult(403);
+            if (!Metadata.EditRoles.All(t => User.IsInRole(t)))
+                return new HttpStatusCodeResult(403);
             TEntity item = EntityQueryable.GetEntity(id);
             if (item == null)
                 return new HttpStatusCodeResult(404);
@@ -353,9 +354,8 @@ namespace System.Web.Mvc
         {
             if (!EntityQueryable.Removeable())
                 return new HttpStatusCodeResult(403);
-            for (int i = 0; i < Metadata.RemoveRoles.Length; i++)
-                if (!User.IsInRole(Metadata.RemoveRoles[i]))
-                    return new HttpStatusCodeResult(403);
+            if (!Metadata.RemoveRoles.All(t => User.IsInRole(t)))
+                return new HttpStatusCodeResult(403);
             if (EntityQueryable.Remove(id))
                 return new HttpStatusCodeResult(200);
             else
@@ -376,18 +376,16 @@ namespace System.Web.Mvc
             {
                 if (!EntityQueryable.Addable())
                     return new HttpStatusCodeResult(403);
-                for (int i = 0; i < Metadata.AddRoles.Length; i++)
-                    if (!User.IsInRole(Metadata.AddRoles[i]))
-                        return new HttpStatusCodeResult(403);
+                if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
+                    return new HttpStatusCodeResult(403);
                 entity = EntityQueryable.Create();
             }
             else
             {
                 if (!EntityQueryable.Editable())
                     return new HttpStatusCodeResult(403);
-                for (int i = 0; i < Metadata.EditRoles.Length; i++)
-                    if (!User.IsInRole(Metadata.EditRoles[i]))
-                        return new HttpStatusCodeResult(403);
+                if (!Metadata.EditRoles.All(t => User.IsInRole(t)))
+                    return new HttpStatusCodeResult(403);
                 entity = EntityQueryable.GetEntity(id);
                 if (entity == null)
                     return new HttpStatusCodeResult(404);
@@ -448,11 +446,12 @@ namespace System.Web.Mvc
                         object value = converter.ConvertFrom(context, null, originValue);
                         if (converter.GetType() == typeof(Converter.CollectionConverter))
                         {
-                            dynamic collection = propertyMetadata.Property.GetValue(entity);
-                            collection.Clear();
+                            object collection = propertyMetadata.Property.GetValue(entity);
+                            ((dynamic)collection).Clear();
+                            var addMethod = collection.GetType().GetMethod("Add");
                             object[] array = (object[])value;
                             for (int a = 0; a < array.Length; a++)
-                                collection.Add(array[a]);
+                                addMethod.Invoke(collection, new object[] { array[a] });
                         }
                         else
                         {
@@ -494,9 +493,8 @@ namespace System.Web.Mvc
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
                 return new HttpStatusCodeResult(403);
-            for (int i = 0; i < Metadata.ViewRoles.Length; i++)
-                if (!User.IsInRole(Metadata.ViewRoles[i]))
-                    return new HttpStatusCodeResult(403);
+            if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
+                return new HttpStatusCodeResult(403);
             IQueryable<TEntity> queryable = EntityQueryable.Query();
             if (parentpath != null && parentid.HasValue)
             {
@@ -529,9 +527,8 @@ namespace System.Web.Mvc
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
                 return new HttpStatusCodeResult(403);
-            for (int i = 0; i < Metadata.ViewRoles.Length; i++)
-                if (!User.IsInRole(Metadata.ViewRoles[i]))
-                    return new HttpStatusCodeResult(403);
+            if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
+                return new HttpStatusCodeResult(403);
             IQueryable<TEntity> queryable = EntityQueryable.Query();
             if (parentpath != null && parentid.HasValue)
             {
@@ -559,6 +556,8 @@ namespace System.Web.Mvc
         [HttpGet]
         public virtual ActionResult Search()
         {
+            if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
+                return new HttpStatusCodeResult(403);
             EntitySearchModel<TEntity> model = new EntitySearchModel<TEntity>();
             return View(model);
         }
