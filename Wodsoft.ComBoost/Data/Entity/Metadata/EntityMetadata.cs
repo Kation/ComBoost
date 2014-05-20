@@ -77,7 +77,10 @@ namespace System.Data.Entity.Metadata
                 DisplayProperty = GetProperty("Index");
             ParentAttribute parent = type.GetCustomAttribute<ParentAttribute>();
             if (parent != null)
+            {
                 ParentProperty = Properties.SingleOrDefault(t => t.Property.Name == parent.PropertyName);
+                ParentLevel = parent.Level;
+            }
         }
 
         /// <summary>
@@ -109,6 +112,11 @@ namespace System.Data.Entity.Metadata
         /// Get the parent property of entity.
         /// </summary>
         public PropertyMetadata ParentProperty { get; private set; }
+
+        /// <summary>
+        /// Get the parent level of entity.
+        /// </summary>
+        public int ParentLevel { get; private set; }
 
         /// <summary>
         /// Get the sort mode of entity.

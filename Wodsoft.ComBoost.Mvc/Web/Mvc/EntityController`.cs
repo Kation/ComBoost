@@ -193,7 +193,7 @@ namespace System.Web.Mvc
             }
             var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, size);
             if (Metadata.ParentProperty != null && !search)
-                model.Parent = GetParentModel(parentid);
+                model.Parent = GetParentModel(parentid, Metadata.ParentLevel);
             model.SearchItem = searchItems.ToArray();
             model.Headers = Metadata.ViewProperties;
             model.PageSizeOption = PageSize;
@@ -202,7 +202,7 @@ namespace System.Web.Mvc
             return View(model);
         }
 
-        private EntityParentModel[] GetParentModel(Guid? selected)
+        private EntityParentModel[] GetParentModel(Guid? selected, int level)
         {
             EntityMetadata metadata = Metadata;
 
@@ -224,17 +224,24 @@ namespace System.Web.Mvc
                     IEntity entity = ft.GetProperty("Key").GetValue(f);
                     if (entity == null)
                         continue;
-                    EntityParentModel item = new EntityParentModel();
+                    EntityParentModel item = final.SingleOrDefault(t => t.Index == entity.Index);
+                    if (item == null)
+                    {
+                        item = new EntityParentModel();
                     item.Path = path;
                     item.Name = entity.ToString();
                     item.Index = entity.Index;
+                    }
                     if (selected.HasValue && item.Index == selected)
                         item.Selected = true;
                     //ParameterExpression dp = Expression.Parameter(metadata.Type);
                     //dynamic dChildren = _ESelectMethod.MakeGenericMethod(metadata.Type, typeof(Guid)).Invoke(null, new object[] { f, GetLambda(metadata.Type, typeof(Guid), Expression.Property(dp, typeof(EntityBase).GetProperty("BaseIndex")), dp) });
                     dynamic dChildren = _ESelectMethod.MakeGenericMethod(metadata.Type, typeof(Guid)).Invoke(null, new object[] { f, new Func<IEntity, Guid>(GetBaseIndex) });
                     Guid[] children = Linq.Enumerable.ToArray<Guid>(dChildren);
-                    item.Items = parents.Where(t => children.Contains(t.Index)).ToArray();
+                    if (item.Items != null)
+                        item.Items = item.Items.Concat(parents.Where(t => children.Contains(t.Index))).ToArray();
+                    else
+                        item.Items = parents.Where(t => children.Contains(t.Index)).ToArray();
                     if (!item.Selected && item.Items.Count(t => t.Selected) > 0)
                         item.Opened = true;
                     parents.RemoveAll(t => children.Contains(t.Index));
@@ -247,6 +254,13 @@ namespace System.Web.Mvc
 
                 metadata = EntityAnalyzer.GetMetadata(metadata.ParentProperty.Property.PropertyType);
                 if (metadata.ParentProperty == null || parents.Count == 0)
+                {
+                    final.AddRange(parents);
+                    break;
+                }
+
+                level--;
+                if (level == 0)
                 {
                     final.AddRange(parents);
                     break;
@@ -509,7 +523,7 @@ namespace System.Web.Mvc
             }
             var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, 10);
             if (Metadata.ParentProperty != null)
-                model.Parent = GetParentModel(parentid);
+                model.Parent = GetParentModel(parentid, 3);
             model.Headers = Metadata.ViewProperties;
             model.UpdateItems();
             return View(model);
@@ -543,7 +557,7 @@ namespace System.Web.Mvc
             }
             var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, 10);
             if (Metadata.ParentProperty != null)
-                model.Parent = GetParentModel(parentid);
+                model.Parent = GetParentModel(parentid, 3);
             model.Headers = Metadata.ViewProperties;
             model.UpdateItems();
             return View(model);
