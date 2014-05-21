@@ -169,6 +169,8 @@ namespace System.ComponentModel
             PageSizeOption = DefaultPageSizeOption;
             Metadata = EntityAnalyzer.GetMetadata<TEntity>();
             Queryable = queryable;
+            UpdateTotalPage();
+            SetPage(page);
         }
 
         /// <summary>
