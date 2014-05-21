@@ -35,7 +35,7 @@ namespace System.ComponentModel.DataAnnotations
         private bool? _IsHiddenOnDetail;
         /// <summary>
         /// Get or set is property hidden while editing.
-        /// Default is IsHiddenOnView && IsHiddenOnEdit.
+        /// Default is IsHiddenOnView &amp;&amp; IsHiddenOnEdit.
         /// </summary>
         public bool IsHiddenOnDetail
         {

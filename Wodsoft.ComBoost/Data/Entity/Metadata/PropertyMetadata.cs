@@ -100,6 +100,8 @@ namespace System.Data.Entity.Metadata
                     Searchable = searchable != null;
                 }
             }
+
+            IsDistinct = propertyInfo.GetCustomAttribute<DistinctAttribute>() != null;
         }
 
         /// <summary>
@@ -121,6 +123,11 @@ namespace System.Data.Entity.Metadata
         /// Get the description of property.
         /// </summary>
         public string Description { get; private set; }
+
+        /// <summary>
+        /// Get the property is distinct.
+        /// </summary>
+        public bool IsDistinct { get; private set; }
 
         /// <summary>
         /// Get the type of property.
