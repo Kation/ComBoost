@@ -42,6 +42,7 @@ namespace System.Data.Entity.Metadata
             {
                 IsHiddenOnEdit = hide.IsHiddenOnEdit;
                 IsHiddenOnView = hide.IsHiddenOnView;
+                IsHiddenOnDetail = hide.IsHiddenOnDetail;
             }
             else
             {
@@ -89,16 +90,18 @@ namespace System.Data.Entity.Metadata
                     Type = CustomDataType.Other;
                     CustomType = "Entity";
                 }
+            }
 
-                if (Type != CustomDataType.Image && Type != CustomDataType.Password && Type != CustomDataType.Time)
+            if (Type != CustomDataType.Image && Type != CustomDataType.Password && Type != CustomDataType.Time)
+            {
+                if (CustomType == null || CustomType == "Entity" || CustomType == "Enum")
                 {
-                    if (CustomType == null || CustomType == "Entity" || CustomType == "Enum")
-                    {
-                        SearchableAttribute searchable = propertyInfo.GetCustomAttribute<SearchableAttribute>();
-                        Searchable = searchable != null;
-                    }
+                    SearchableAttribute searchable = propertyInfo.GetCustomAttribute<SearchableAttribute>();
+                    Searchable = searchable != null;
                 }
             }
+
+            IsDistinct = propertyInfo.GetCustomAttribute<DistinctAttribute>() != null;
         }
 
         /// <summary>
@@ -120,6 +123,11 @@ namespace System.Data.Entity.Metadata
         /// Get the description of property.
         /// </summary>
         public string Description { get; private set; }
+
+        /// <summary>
+        /// Get the property is distinct.
+        /// </summary>
+        public bool IsDistinct { get; private set; }
 
         /// <summary>
         /// Get the type of property.
@@ -145,6 +153,11 @@ namespace System.Data.Entity.Metadata
         /// Get is the property hidden in viewlist.
         /// </summary>
         public bool IsHiddenOnView { get; private set; }
+        
+        /// <summary>
+        /// Get is the property hidden in detail.
+        /// </summary>
+        public bool IsHiddenOnDetail { get; private set; }
 
         /// <summary>
         /// Get the order of property.

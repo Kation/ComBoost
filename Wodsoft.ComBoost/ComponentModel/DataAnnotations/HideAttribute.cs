@@ -22,12 +22,33 @@ namespace System.ComponentModel.DataAnnotations
 
         /// <summary>
         /// Get or set is property hidden in viewlist.
+        /// Default is true.
         /// </summary>
         public bool IsHiddenOnView { get; set; }
 
         /// <summary>
         /// Get or set is property hidden while editing.
+        /// Default is true.
         /// </summary>
         public bool IsHiddenOnEdit { get; set; }
+
+        private bool? _IsHiddenOnDetail;
+        /// <summary>
+        /// Get or set is property hidden while editing.
+        /// Default is IsHiddenOnView &amp;&amp; IsHiddenOnEdit.
+        /// </summary>
+        public bool IsHiddenOnDetail
+        {
+            get
+            {
+                if (_IsHiddenOnDetail.HasValue)
+                    return _IsHiddenOnDetail.Value;
+                return IsHiddenOnView && IsHiddenOnEdit;
+            }
+            set
+            {
+                _IsHiddenOnDetail = value;
+            }
+        }
     }
 }

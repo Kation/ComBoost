@@ -212,6 +212,7 @@
       </SubType>
     </Content>
     <Content Include="Views\en-us\Document\MvcSample.cshtml" />
+    <Content Include="Views\Shared\License.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

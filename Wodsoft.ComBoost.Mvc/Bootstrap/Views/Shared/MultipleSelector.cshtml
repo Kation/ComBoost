@@ -23,7 +23,7 @@
                     <td class="text-center" width="36"><input type="checkbox" id="checkAll" /> </td>
                     @for (int i = 0; i < Model.Headers.Length; i++)
                     {
-                        <td title="@Model.Headers[i].Description">@Model.Headers[i].Name</td>
+                        <td title="@Model.Headers[i].Description">@(Model.Headers[i].ShortName ?? Model.Headers[i].Name)</td>
                     }
                 </tr>
             </thead>
@@ -36,7 +36,7 @@
                         </td>
                         @for (int b = 0; b < Model.Headers.Length; b++)
                         {
-                            <td>@EntityValueConverter.GetConverter(Model.Headers[b].Property.PropertyType).ConvertTo(Model.Headers[b].Property.GetValue(Model.Items[i]), typeof(string))</td>
+                            <td>@EntityValueConverter.GetConverter(Model.Headers[b]).ConvertTo(Model.Headers[b].Property.GetValue(Model.Items[i]), typeof(string))</td>
                         }
                     </tr>
                 }

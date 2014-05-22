@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Entity;
+using System.ComponentModel.DataAnnotations;
+using System.Data.Entity.Metadata;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,119 +15,130 @@ namespace System.Web.Mvc
     /// </summary>
     public static class EntityValueConverter
     {
-        private static Dictionary<Type, TypeConverter> _Items;
+        private static Dictionary<CustomDataType, TypeConverter> _DefaultItems;
+        private static Dictionary<string, TypeConverter> _CustomItems;
 
         static EntityValueConverter()
         {
-            _Items = new Dictionary<Type, TypeConverter>();
-            AddConverter<Boolean>(new BooleanConverter());
-            AddConverter<Byte>(new ByteConverter());
-            AddConverter<DateTime>(new DateTimeConverter());
-            AddConverter<Decimal>(new DecimalConverter());
-            AddConverter<Double>(new DoubleConverter());
-            AddConverter<IEntity>(new EntityConverter());
-            AddConverter<Enum>(new System.Web.Mvc.Converter.EnumConverter());
-            AddConverter<Int16>(new Int16Converter());
-            AddConverter<Int32>(new Int32Converter());
-            AddConverter<Int64>(new Int64Converter());
-            AddConverter<SByte>(new SByteConverter());
-            AddConverter<Single>(new SingleConverter());
-            AddConverter<String>(new StringConverter());
-            AddConverter<TimeSpan>(new TimeSpanConverter());
-            AddConverter<UInt16>(new UInt16Converter());
-            AddConverter<UInt32>(new UInt32Converter());
-            AddConverter<UInt64>(new UInt64Converter());
-        }
+            _DefaultItems = new Dictionary<CustomDataType, TypeConverter>();
+            _CustomItems = new Dictionary<string, TypeConverter>();
 
-        /// <summary>
-        /// Add a converter for a type.
-        /// </summary>
-        /// <typeparam name="T">Type.</typeparam>
-        /// <param name="converter">Converter.</param>
-        public static void AddConverter<T>(TypeConverter converter)
-        {
-            if (converter == null)
-                throw new ArgumentNullException("converter");
-            AddConverter(typeof(T), converter);
-        }
+            AddConverter(CustomDataType.Boolean, new BooleanConverter());
+            AddConverter(CustomDataType.Currency, new DecimalConverter());
+            AddConverter(CustomDataType.Date, new DateConverter());
+            AddConverter(CustomDataType.DateTime, new System.Web.Mvc.Converter.DateTimeConverter());
+            AddConverter(CustomDataType.Default, new StringConverter());
+            AddConverter(CustomDataType.EmailAddress, new StringConverter());
+            AddConverter(CustomDataType.File, new StringConverter());
+            AddConverter(CustomDataType.Html, new StringConverter());
+            AddConverter(CustomDataType.Image, new StringConverter());
+            AddConverter(CustomDataType.ImageUrl, new StringConverter());
+            AddConverter(CustomDataType.Integer, new Int32Converter());
+            AddConverter(CustomDataType.MultilineText, new StringConverter());
+            AddConverter(CustomDataType.Number, new DoubleConverter());
+            AddConverter(CustomDataType.Password, new StringConverter());
+            AddConverter(CustomDataType.PhoneNumber, new StringConverter());
+            AddConverter(CustomDataType.Sex, new SexConverter());
+            AddConverter(CustomDataType.Text, new StringConverter());
+            AddConverter(CustomDataType.Time, new TimeSpanConverter());
+            AddConverter(CustomDataType.Url, new StringConverter());
 
+            AddConverter("Enum", new System.Web.Mvc.Converter.EnumConverter());
+            AddConverter("Entity", new EntityConverter());
+            AddConverter("Collection", new System.Web.Mvc.Converter.CollectionConverter());
+        }
+        
         /// <summary>
         /// Add a converter for a type.
         /// </summary>
         /// <param name="type">Type.</param>
         /// <param name="converter">Converter.</param>
-        public static void AddConverter(Type type, TypeConverter converter)
+        public static void AddConverter(CustomDataType type, TypeConverter converter)
         {
-            if (type == null)
-                throw new ArgumentNullException("type");
+            if (type == CustomDataType.Other)
+                throw new InvalidOperationException("Not support Other type.");
             if (converter == null)
                 throw new ArgumentNullException("converter");
-            if (!converter.CanConvertFrom(typeof(string)))
-                throw new ArgumentException("Can not converter value from string.");
-            if (_Items.ContainsKey(type))
-                _Items[type] = converter;
+            if (_DefaultItems.ContainsKey(type))
+                _DefaultItems[type] = converter;
             else
-                _Items.Add(type, converter);
+                _DefaultItems.Add(type, converter);
+        }
+
+        /// <summary>
+        /// Add a converter for a type.
+        /// </summary>
+        /// <param name="type">Type.</param>
+        /// <param name="converter">Converter.</param>
+        public static void AddConverter(string type, TypeConverter converter)
+        {
+            if (type == null)
+                throw new ArgumentNullException("type");
+            if (converter == null)
+                throw new ArgumentNullException("converter");
+            if (_CustomItems.ContainsKey(type))
+                _CustomItems[type] = converter;
+            else
+                _CustomItems.Add(type, converter);
         }
 
         /// <summary>
         /// Remove converter for a type.
         /// </summary>
-        /// <typeparam name="T">Type.</typeparam>
-        public static void RemoveConverter<T>()
+        /// <param name="type">Defined type.</param>
+        public static void RemoveConverter(CustomDataType type)
         {
-            RemoveConverter(typeof(T));
+            if (_DefaultItems.ContainsKey(type))
+                _DefaultItems.Remove(type);
         }
 
         /// <summary>
         /// Remove converter for a type.
         /// </summary>
-        /// <param name="type">Type.</param>
-        public static void RemoveConverter(Type type)
+        /// <param name="type">Custom type.</param>
+        public static void RemoveConverter(string type)
         {
-            if (type == null)
-                throw new ArgumentNullException("type");
-            if (_Items.ContainsKey(type))
-                _Items.Remove(type);
+            if (_CustomItems.ContainsKey(type))
+                _CustomItems.Remove(type);
         }
 
         /// <summary>
         /// Get converter for a type.
         /// </summary>
-        /// <typeparam name="T">Type.</typeparam>
+        /// <param name="metadata">Property metadata.</param>
         /// <returns></returns>
-        public static TypeConverter GetConverter<T>()
+        public static TypeConverter GetConverter(PropertyMetadata metadata)
         {
-            return GetConverter(typeof(T));
+            if (metadata == null)
+                throw new ArgumentNullException("metadata");
+            if (metadata.Type == CustomDataType.Other)
+                return GetConverter(metadata.CustomType);
+            else
+                return GetConverter(metadata.Type);
         }
 
         /// <summary>
         /// Get converter for a type.
         /// </summary>
-        /// <param name="type">Type.</param>
+        /// <param name="type">Defined type.</param>
         /// <returns></returns>
-        public static TypeConverter GetConverter(Type type)
+        public static TypeConverter GetConverter(CustomDataType type)
         {
-            if (type == null)
-                throw new ArgumentNullException("type");
-            foreach (var t in type.GetInterfaces())
-            {
-                if (_Items.ContainsKey(t))
-                    return _Items[t];
-                if (t.IsGenericType)
-                    if (_Items.ContainsKey(t.GetGenericTypeDefinition()))
-                        return _Items[t.GetGenericTypeDefinition()];
-            }
-            while (!_Items.ContainsKey(type))
-            {
-                if (type.IsAbstract || type == typeof(object))
-                    return null;
-                type = type.BaseType;
-                if (type.IsGenericType)
-                    if (_Items.ContainsKey(type.GetGenericTypeDefinition()))
-                        return _Items[type.GetGenericTypeDefinition()];
-            }
-            return _Items[type];
+            TypeConverter converter;
+            _DefaultItems.TryGetValue(type, out converter);
+            return converter;
+        }
+
+        /// <summary>
+        /// Get converter for a type.
+        /// </summary>
+        /// <param name="type">Custom type.</param>
+        /// <returns></returns>
+        public static TypeConverter GetConverter(string type)
+        {
+            TypeConverter converter;
+            _CustomItems.TryGetValue(type, out converter);
+            return converter;
         }
     }
 }

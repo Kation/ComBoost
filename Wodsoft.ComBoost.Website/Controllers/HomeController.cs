@@ -32,5 +32,10 @@ namespace Wodsoft.ComBoost.Website.Controllers
                 lang = "en-us";
             return RedirectToAction("Index", new { lang = lang });
         }
+
+        public ActionResult License()
+        {
+            return View();
+        }
     }
 }

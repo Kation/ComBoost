@@ -61,16 +61,16 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Wodsoft.ComBoost">
-      <HintPath>..\Bin\Wodsoft.ComBoost.dll</HintPath>
+      <HintPath>..\..\Bin\Wodsoft.ComBoost.dll</HintPath>
     </Reference>
     <Reference Include="Wodsoft.ComBoost.EntityFramework">
-      <HintPath>..\Bin\Wodsoft.ComBoost.EntityFramework.dll</HintPath>
+      <HintPath>..\..\Bin\Wodsoft.ComBoost.EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="Wodsoft.ComBoost.Wpf">
-      <HintPath>..\Bin\Wodsoft.ComBoost.Wpf.dll</HintPath>
+      <HintPath>..\..\Bin\Wodsoft.ComBoost.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Wodsoft.ComBoost.Wpf.Metro">
-      <HintPath>..\Bin\Wodsoft.ComBoost.Wpf.Metro.dll</HintPath>
+      <HintPath>..\..\Bin\Wodsoft.ComBoost.Wpf.Metro.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -118,7 +118,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Company.Entity\Company.Entity.csproj">

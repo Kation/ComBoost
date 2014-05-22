@@ -31,7 +31,12 @@ namespace Wodsoft.ComBoost.Wpf.Editor
 
             TextBox = (TextBox)GetTemplateChild("PART_TextBox");
             TextBox.SetBinding(TextBox.TextProperty, new Binding { Source = this, Path = new PropertyPath(CurrentValueProperty), Mode = BindingMode.TwoWay });
-            //TextBox.TextChanged += TextBox_TextChanged;
+            TextBox.TextChanged += TextBox_TextChanged;
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            IsChanged = true;
         }
     }
 }

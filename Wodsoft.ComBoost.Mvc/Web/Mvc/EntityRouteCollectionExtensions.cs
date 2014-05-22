@@ -79,11 +79,6 @@ namespace System.Web.Mvc
             return route;
         }
 
-        /// <summary>
-        /// The callers to this method are used at startup only, thus it's a bit better to use
-        /// the uncached method because it will run faster for the first few times, and will not
-        /// consume memory long term.
-        /// </summary>
         private static RouteValueDictionary CreateRouteValueDictionaryUncached(object values)
         {
             var dictionary = values as IDictionary<string, object>;

@@ -16,31 +16,57 @@ namespace System.Web.Security
             if (user == null)
                 throw new ArgumentNullException("user");
             OriginPrincipal = user;
+            Identity = new ComBoostIdentity(this);
         }
 
         public IPrincipal OriginPrincipal { get; private set; }
 
-        public IIdentity Identity
-        {
-            get { return OriginPrincipal.Identity; }
-        }
+        public IIdentity Identity { get; private set; }
 
         public static RoleEntityResolveDelegate Resolve { get; set; }
 
-        public bool IsInRole(string role)
+        public IRoleEntity RoleEntity { get; private set; }
+        private bool _IsFailure;
+
+        internal bool InitRoleEntity()
         {
-            if (Resolve == null)
-                return OriginPrincipal.IsInRole(role);
+            if (_IsFailure)
+                return false;
+            if (RoleEntity != null)
+                return true;
             RouteData routeData = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
             EntityRoute route = routeData.Route as EntityRoute;
             if (route == null)
-                return OriginPrincipal.IsInRole(role);
-            IRoleEntity entity = Resolve(route.UserType, Identity.Name);
-            if (entity == null)
+            {
+                _IsFailure = true;
                 return false;
-            return entity.IsInRole(role);
+            }
+            RoleEntity = Resolve(route.UserType, Identity.Name);
+            if (RoleEntity == null)
+            {
+                _IsFailure = true;
+                return false;
+            }
+            return true;
+        }
+
+        public bool IsInRole(string role)
+        {
+            if (!OriginPrincipal.Identity.IsAuthenticated)
+                return false;
+            if (Resolve == null)
+                return OriginPrincipal.IsInRole(role);
+            if (!InitRoleEntity())
+                return false;
+            return RoleEntity.IsInRole(role);
         }
     }
 
+    /// <summary>
+    /// Delegate for getting IRoleEntity.
+    /// </summary>
+    /// <param name="entityType">Entity type.</param>
+    /// <param name="username">Username.</param>
+    /// <returns></returns>
     public delegate IRoleEntity RoleEntityResolveDelegate(Type entityType, string username);
 }

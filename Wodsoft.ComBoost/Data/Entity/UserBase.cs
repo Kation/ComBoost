@@ -14,7 +14,7 @@ namespace System.Data.Entity
         /// <summary>
         /// Get or set the sha1 hashed password.
         /// </summary>
-        [Hide(IsHiddenOnEdit = false)]
+        [Hide(IsHiddenOnEdit = false, IsHiddenOnDetail = true)]
         [Required]
         [CustomDataType(CustomDataType.Password)]
         [MaxLength(20)]

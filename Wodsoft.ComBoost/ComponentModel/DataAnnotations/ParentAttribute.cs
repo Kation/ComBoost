@@ -23,6 +23,7 @@ namespace System.ComponentModel.DataAnnotations
                 throw new NotSupportedException("Type of parent must inherit IEntity.");
             Parent = parent;
             PropertyName = propertyName;
+            Level = 3;
         }
 
         /// <summary>
@@ -34,5 +35,10 @@ namespace System.ComponentModel.DataAnnotations
         /// Get the property of parent.
         /// </summary>
         public string PropertyName { get; private set; }
+
+        /// <summary>
+        /// Get or set the level of tree.
+        /// </summary>
+        public int Level { get; set; }
     }
 }

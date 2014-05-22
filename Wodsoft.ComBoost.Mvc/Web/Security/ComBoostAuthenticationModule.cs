@@ -6,13 +6,23 @@ using System.Threading.Tasks;
 
 namespace System.Web.Security
 {
-    public class ComBoostAuthenticationModel : IHttpModule
+    /// <summary>
+    /// Comboost authentication http module.
+    /// </summary>
+    public class ComBoostAuthenticationModule : IHttpModule
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
         public void Init(HttpApplication context)
         {
             context.AuthorizeRequest += context_AuthorizeRequest;

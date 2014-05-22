@@ -24,7 +24,7 @@ namespace Wodsoft.ComBoost.Wpf
             DefaultStyleKeyProperty.OverrideMetadata(typeof(EntityViewer), new FrameworkPropertyMetadata(typeof(EntityViewer)));
         }
 
-        public EntityViewer(EntityPageController controller)
+        public EntityViewer(EntityController controller)
             : base(controller)
         {
             Loaded += EntityViewer_Loaded;

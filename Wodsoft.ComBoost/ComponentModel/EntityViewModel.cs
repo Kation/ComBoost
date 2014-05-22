@@ -107,7 +107,7 @@ namespace System.ComponentModel
                 SetPage(1);
             UpdateTotalPage();
         }
-        
+
         /// <summary>
         /// Update total page.
         /// </summary>
@@ -125,10 +125,25 @@ namespace System.ComponentModel
     /// <typeparam name="TEntity">Type of entity.</typeparam>
     public class EntityViewModel<TEntity> : EntityViewModel where TEntity : IEntity
     {
+        private IQueryable<TEntity> _Queryable;
         /// <summary>
         /// Get the queryable of entity.
         /// </summary>
-        public IQueryable<TEntity> Queryable { get; private set; }
+        public IQueryable<TEntity> Queryable
+        {
+            get
+            {
+                return _Queryable;
+            }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+                _Queryable = value;
+                UpdateTotalPage();
+                CurrentPage = 1;
+            }
+        }
 
         /// <summary>
         /// Initialize entity view model.
@@ -150,13 +165,12 @@ namespace System.ComponentModel
                 throw new ArgumentException("Can not less than 1.", "page");
             if (size < 1)
                 throw new ArgumentException("Can not less than 1.", "size");
-            CurrentPage = 1;
-            Queryable = queryable;
-            SetSize(size);
-            UpdateTotalPage();
-            SetPage(page);
+            CurrentSize = size;
             PageSizeOption = DefaultPageSizeOption;
             Metadata = EntityAnalyzer.GetMetadata<TEntity>();
+            Queryable = queryable;
+            UpdateTotalPage();
+            SetPage(page);
         }
 
         /// <summary>
