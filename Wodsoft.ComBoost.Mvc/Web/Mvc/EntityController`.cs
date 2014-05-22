@@ -17,6 +17,9 @@ namespace System.Web.Mvc
     [EntityAuthorize]
     public class EntityController<TEntity> : EntityController where TEntity : class, IEntity, new()
     {
+        /// <summary>
+        /// Metadata of entity.
+        /// </summary>
         public EntityMetadata Metadata { get; private set; }
 
         /// <summary>

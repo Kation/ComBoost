@@ -47,13 +47,11 @@ namespace System.Web.Mvc
             AddConverter("Entity", new EntityConverter());
             AddConverter("Collection", new System.Web.Mvc.Converter.CollectionConverter());
         }
-
-
-
+        
         /// <summary>
         /// Add a converter for a type.
         /// </summary>
-        /// <typeparam name="T">Type.</typeparam>
+        /// <param name="type">Type.</param>
         /// <param name="converter">Converter.</param>
         public static void AddConverter(CustomDataType type, TypeConverter converter)
         {
@@ -107,7 +105,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Get converter for a type.
         /// </summary>
-        /// <typeparam name="T">Property metadata.</typeparam>
+        /// <param name="metadata">Property metadata.</param>
         /// <returns></returns>
         public static TypeConverter GetConverter(PropertyMetadata metadata)
         {
@@ -122,7 +120,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Get converter for a type.
         /// </summary>
-        /// <typeparam name="T">Defined type.</typeparam>
+        /// <param name="type">Defined type.</param>
         /// <returns></returns>
         public static TypeConverter GetConverter(CustomDataType type)
         {

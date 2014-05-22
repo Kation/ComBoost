@@ -62,5 +62,11 @@ namespace System.Web.Security
         }
     }
 
+    /// <summary>
+    /// Delegate for getting IRoleEntity.
+    /// </summary>
+    /// <param name="entityType">Entity type.</param>
+    /// <param name="username">Username.</param>
+    /// <returns></returns>
     public delegate IRoleEntity RoleEntityResolveDelegate(Type entityType, string username);
 }

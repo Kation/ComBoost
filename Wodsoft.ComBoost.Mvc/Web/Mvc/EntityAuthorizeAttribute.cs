@@ -16,24 +16,6 @@ namespace System.Web.Mvc
     public class EntityAuthorizeAttribute : FilterAttribute, IAuthorizationFilter
     {
         /// <summary>
-        /// Initialize EntityAuthorizeAttribute with area General.
-        /// </summary>
-        public EntityAuthorizeAttribute() : this("General") { }
-        
-        /// <summary>
-        /// Initialize EntityAuthorizeAttribute.
-        /// </summary>
-        /// <param name="authorizationArea">Authorization area. </param>
-        public EntityAuthorizeAttribute(string authorizationArea)
-        {
-            if (authorizationArea == null)
-                throw new ArgumentNullException("authorizationArea");
-            AuthorizationArea = authorizationArea;
-        }
-
-        public string AuthorizationArea { get; private set; }
-
-        /// <summary>
         /// Get the context builder of entity.
         /// </summary>
         protected IEntityContextBuilder EntityBuilder { get; private set; }
@@ -101,7 +83,7 @@ namespace System.Web.Mvc
             if (filterContext.Controller.GetType().IsGenericType)
                 Metadata = EntityAnalyzer.GetMetadata(filterContext.Controller.GetType().GetGenericArguments()[0]);
             RouteData = filterContext.RouteData;
-            
+
             if (!Authorize(filterContext))
                 filterContext.Result = new HttpStatusCodeResult(403);
         }
