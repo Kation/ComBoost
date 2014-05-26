@@ -22,7 +22,7 @@ namespace Wodsoft.ComBoost.Website.Controllers
         {
             string[] langs = Request.UserLanguages;
             string lang;
-            if (langs.Length == 0)
+            if (langs == null || langs.Length == 0)
                 lang = "en-us";
             else
                 lang = langs[0].ToLower();
