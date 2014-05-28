@@ -3,11 +3,11 @@
     <input type="date" class="form-control col-md-6" id="@(Model.Metadata.Property.Name)_Date" value="@(((DateTime)Model.Value).ToShortDateString())" />
 </div>
 <div class="input-group col-md-4" style="float:left" id="@Model.Metadata.Property.Name">
-    <input type="number" id="@(Model.Metadata.Property.Name)_Hour" min="0" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Hours)">
+    <input type="number" id="@(Model.Metadata.Property.Name)_Hour" min="0" max="23" step="1" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Hours)">
     <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
-    <input type="number" id="@(Model.Metadata.Property.Name)_Minute" min="0" max="59" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Minutes)">
+    <input type="number" id="@(Model.Metadata.Property.Name)_Minute" min="0" max="59" step="1" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Minutes)">
     <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
-    <input type="number" id="@(Model.Metadata.Property.Name)_Seconds" min="0" max="59" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Seconds)">
+    <input type="number" id="@(Model.Metadata.Property.Name)_Seconds" min="0" max="59" step="1" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Seconds)">
 </div>
 <input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" value="@Model.Value" />
 <script type="text/javascript">
@@ -37,6 +37,8 @@
             number = Math.round(number);
             if (number < 0)
                 number = 0;
+            if (number > 23)
+                number = 23;
             $(this).val(number);
         }
         function change() {
