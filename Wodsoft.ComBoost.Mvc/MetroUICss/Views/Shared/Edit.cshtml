@@ -1,0 +1,90 @@
+﻿@model EntityEditModel
+@{
+    ViewBag.Title = (Model.Item.Index == Guid.Empty ? "Create " : "Edit ") + Model.Metadata.Name;
+    object area = ViewContext.RouteData.DataTokens["Area"];
+    if (area == null)
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Areas/" + area.ToString() + "/Views/Shared/_Layout.cshtml";
+    }
+}
+<div class="grid fluid">
+    <div class="row">
+        <nav class="breadcrumbs">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="@Url.Action("Index")">@Model.Metadata.Name</a></li>
+                <li class="active"><a>@(Model.Item.Index == Guid.Empty ? "Create" : "Edit")</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="row">
+        <form id="form" action="@Url.Action("Update")" method="post">
+            <fieldset>
+                <legend>@(Model.Item.Index == Guid.Empty ? "Create" : "Edit")</legend>
+            </fieldset>
+            <div class="grid">
+                @for (int i = 0; i < Model.Properties.Length; i++)
+                {
+                    <div class="row">
+                        <div class="span2 text-right">
+                            <label>@Model.Properties[i].Name</label>
+                        </div>
+                        <div class="span8">                            
+                            @{Html.Editor(Model.Properties[i], Model.Properties[i].Property.GetValue(Model.Item));}
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <div class="offset2 span8">
+                        <input type="submit" class="btn btn-primary" value="Save" />
+                        <a href="@Url.Action("Index")" class="button">Back</a>
+                        <input name="id" type="hidden" value="@Model.Item.Index" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript" src="~/Scripts/jquery.form.js"></script>
+<script type="text/javascript">
+    $('#form').ajaxForm({
+        error: function (result) {
+            $.Dialog({
+                overlay: true,
+                shadow: true,
+                flat: true,
+                title: 'Save Result',
+                padding: 6,
+                overlayClickClose: false,
+                sysButtons: {
+                    btnClose: true,
+                    btnOK: true,
+                    btnCancel: false,
+                    btnOKText: 'OK'
+                },
+                content: '<p>Save failure. Reason:' + result.responseText + '。</p>'
+            });
+        },
+        success: function (result) {
+            $.Dialog({
+                overlay: true,
+                shadow: true,
+                flat: true,
+                title: 'Save Result',
+                padding: 6,
+                overlayClickClose: false,
+                content: '<p>Save success, Return list view.</p>',
+                sysBtnOKClick: function () {
+                    location.href = '@Url.Action("Index")';
+                },
+                sysBtnCancelClick: function () {
+                    location.reload();
+                }
+            });
+        }
+    });
+</script>

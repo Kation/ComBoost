@@ -1,0 +1,14 @@
+﻿@model MvcEditorModel
+<div class="input-control number">
+    <input type="number" id="@Model.Metadata.Property.Name" name="@Model.Metadata.Property.Name" value="@Model.Value" step="any" />
+    <button class="btn-clear"></button>
+</div>
+<script type="text/javascript">
+    $('#@Model.Metadata.Property.Name').change(function () {
+        var number = new Number($(this).val());
+        if (isNaN(number)) {
+            $(this).val(0);
+            return;
+        }
+    });
+</script>

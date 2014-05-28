@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/metro-ui/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/metro-ui")
+</head>
+<body class="metro">
+    <header class="bg-dark" style="height: 45px">
+        <nav class="navigation-bar dark fixed-top">
+            <nav class="navigation-bar-content">
+                <div class="element"><b>ComBoost</b></div>
+                <div class="element-divider"></div>
+            </nav>
+        </nav>
+    </header>
+    <div style="padding: 0px 10px">
+        @RenderBody()
+    </div>
+</body>
+</html>
