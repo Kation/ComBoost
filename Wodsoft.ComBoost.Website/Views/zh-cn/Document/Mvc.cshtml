@@ -513,9 +513,14 @@ DefaultEditor.cshtml
     });
 &lt;/script&gt;
 </pre>
+            <p>在服务器启动时，需要为该自定义类型添加转换器。</p>
+            <p>我们将该自定义类型设置为<code>byte</code>类型时，需要添加<code>ByteConverter</code>。</p>
+<pre>
+EntityValueConverter.AddConverter("Rate", new ByteConverter());
+</pre>
             <div class="bs-example">
                 <img src="~/Content/Images/RateEditor.png" />
-            </div>
+            </div>            
             <div class="alert alert-info">编辑器需要提交到服务器的<code>&lt;input&gt;</code>的<code>name</code>属性必须为该属性的名称。</div>
         </div>
     </div>
