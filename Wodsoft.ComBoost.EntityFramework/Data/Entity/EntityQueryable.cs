@@ -59,11 +59,11 @@ namespace System.Data.Entity
             if (Contains(entity.Index))
                 throw new ArgumentException("Index已存在。");
             DbSet.Add(entity);
-            if (DbContext.Entry<TEntity>(entity).GetValidationResult().ValidationErrors.Count > 0)
-            {
-                DbSet.Remove(entity);
-                return false;
-            }
+            //if (DbContext.Entry<TEntity>(entity).GetValidationResult().ValidationErrors.Count > 0)
+            //{
+            //    DbSet.Remove(entity);
+            //    return false;
+            //}
             DbContext.SaveChanges();
             return true;
         }

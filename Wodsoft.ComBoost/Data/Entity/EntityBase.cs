@@ -86,7 +86,7 @@ namespace System.Data.Entity
             return _Metadata.DisplayProperty.Property.GetValue(this, null).ToString();
         }
 
-        private ReadOnlyCollection<ValidationResult> _NoError = new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>());
+        //private ReadOnlyCollection<ValidationResult> _NoError = new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>());
         /// <summary>
         /// Ensure that entity is valid.
         /// </summary>
@@ -94,7 +94,19 @@ namespace System.Data.Entity
         /// <returns>Collection that include error messages.</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            return _NoError;
+            var result = new List<ValidationResult>();
+            EntityMetadata metadata = Metadata.EntityAnalyzer.GetMetadata(GetType());
+            foreach (var property in metadata.Properties)
+            {
+                var list = property.Property.GetCustomAttributes(typeof(ValidationAttribute), true).Cast<ValidationAttribute>();
+                foreach (var item in list)
+                {
+                    var r = item.GetValidationResult(property.Property.GetValue(this), validationContext);
+                    if (r != ValidationResult.Success)
+                        result.Add(r);
+                }
+            }
+            return result;
         }
     }
 }
