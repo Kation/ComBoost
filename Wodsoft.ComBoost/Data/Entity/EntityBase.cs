@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Metadata;
 using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace System.Data.Entity
 {
@@ -98,11 +99,13 @@ namespace System.Data.Entity
             EntityMetadata metadata = Metadata.EntityAnalyzer.GetMetadata(GetType());
             foreach (var property in metadata.Properties)
             {
-                var list = property.Property.GetCustomAttributes(typeof(ValidationAttribute), true).Cast<ValidationAttribute>();
+                validationContext.MemberName = property.Property.Name;
+                validationContext.DisplayName = property.Name;
+                var list = property.Property.GetCustomAttributes<ValidationAttribute>(true);
                 foreach (var item in list)
                 {
                     var r = item.GetValidationResult(property.Property.GetValue(this), validationContext);
-                    if (r != ValidationResult.Success)
+                    if (r != null && r != ValidationResult.Success)
                         result.Add(r);
                 }
             }

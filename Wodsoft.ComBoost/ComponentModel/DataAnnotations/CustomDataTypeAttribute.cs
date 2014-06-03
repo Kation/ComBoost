@@ -18,13 +18,16 @@ namespace System.ComponentModel.DataAnnotations
         public CustomDataTypeAttribute(CustomDataType type)
         {
             Type = type;
+            if (type == CustomDataType.File || type == CustomDataType.Image)
+                IsFileUpload = true;
         }
 
         /// <summary>
         /// Initialize attribute.
         /// </summary>
         /// <param name="custom">Custom type of property.</param>
-        public CustomDataTypeAttribute(string custom)
+        /// <param name="isFileUpload">Is property base on upload file.</param>
+        public CustomDataTypeAttribute(string custom, bool isFileUpload = false)
         {
             if (custom == null)
                 throw new ArgumentNullException("custom");
@@ -41,5 +44,10 @@ namespace System.ComponentModel.DataAnnotations
         /// Get the custom type of property.
         /// </summary>
         public string Custom { get; private set; }
+
+        /// <summary>
+        /// Get the property is base on upload file.
+        /// </summary>
+        public bool IsFileUpload { get; private set; }
     }
 }
