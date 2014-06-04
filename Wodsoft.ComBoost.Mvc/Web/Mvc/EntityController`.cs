@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Data.Entity.Metadata;
 using System.Linq;
@@ -411,7 +412,7 @@ namespace System.Web.Mvc
             for (int i = 0; i < properties.Length; i++)
             {
                 PropertyMetadata propertyMetadata = properties[i];
-                if (propertyMetadata.Type == ComponentModel.DataAnnotations.CustomDataType.File || propertyMetadata.Type == ComponentModel.DataAnnotations.CustomDataType.Image)
+                if (propertyMetadata.IsFileUpload)
                 {
                     #region File Path Value
                     if (!Request.Files.AllKeys.Contains(propertyMetadata.Property.Name))
@@ -478,11 +479,12 @@ namespace System.Web.Mvc
                     #endregion
                 }
             }
-            var validateResult = entity.Validate(null);
+            ValidationContext validationContext = new ValidationContext(entity, new EntityDescriptorContext(EntityBuilder), null);
+            var validateResult = entity.Validate(validationContext);
             if (validateResult.Count() != 0)
             {
                 Response.StatusCode = 400;
-                return Content(new string(validateResult.SelectMany(t => t.ErrorMessage += "/r/n").ToArray()));
+                return Content(new string(validateResult.SelectMany(t => t.ErrorMessage += "\r\n").ToArray()));
             }
             bool result;
             if (id == Guid.Empty)

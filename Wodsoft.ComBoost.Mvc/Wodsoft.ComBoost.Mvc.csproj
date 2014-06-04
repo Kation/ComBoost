@@ -36,6 +36,9 @@
     <DocumentationFile>bin\Release\Wodsoft.ComBoost.Mvc.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -109,6 +112,47 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Bootstrap\Views\Shared\Detail.cshtml" />
+    <None Include="MetroUICss\App_Start\MetroUICSSBundleConfig.cs.pp" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.eot" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.json" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.ttf" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.woff" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\metroSysIcons.ttf" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\metroSysIcons.woff" />
+    <None Include="MetroUICss\Views\Shared\BooleanEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\CollectionEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\CurrencyEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\DateEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\DateTimeEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\DefaultEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\Detail.cshtml" />
+    <None Include="MetroUICss\Views\Shared\Edit.cshtml" />
+    <None Include="MetroUICss\Views\Shared\EmailAddressEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\EntityEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\EnumEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\FileEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\HtmlEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\ImageEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\ImageUrlEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\Index.cshtml" />
+    <None Include="MetroUICss\Views\Shared\IntegerEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\MultilineTextEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\MultipleSelector.cshtml" />
+    <None Include="MetroUICss\Views\Shared\NumberEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\ParentView.cshtml" />
+    <None Include="MetroUICss\Views\Shared\PasswordEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\PhoneNumberEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\Search.cshtml" />
+    <None Include="MetroUICss\Views\Shared\SearchItem.cshtml" />
+    <None Include="MetroUICss\Views\Shared\Selector.cshtml" />
+    <None Include="MetroUICss\Views\Shared\SexEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\TextEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\TimeEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\UrlEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\_Layout.cshtml" />
+    <None Include="MetroUICss\Views\Shared\_Pagination.cshtml" />
+    <None Include="MetroUICss\Views\Shared\_PaginationButton.cshtml" />
+    <None Include="MetroUICss\Views\Web.config.transform" />
     <None Include="packages.config" />
     <None Include="Bootstrap\Views\Shared\BooleanEditor.cshtml" />
     <None Include="Bootstrap\Views\Shared\CollectionEditor.cshtml" />
@@ -157,6 +201,17 @@
     <Content Include="Bootstrap\Content\themes\default\throbber.gif" />
     <Content Include="Bootstrap\Scripts\jstree.js" />
     <Content Include="Bootstrap\Scripts\jstree.min.js" />
+    <Content Include="MetroUICss\Content\metro-ui\css\iconFont.min.css" />
+    <Content Include="MetroUICss\Content\metro-ui\css\metro-bootstrap-responsive.css" />
+    <Content Include="MetroUICss\Content\metro-ui\css\metro-bootstrap-responsive.min.css" />
+    <Content Include="MetroUICss\Content\metro-ui\css\metro-bootstrap.css" />
+    <Content Include="MetroUICss\Content\metro-ui\css\metro-bootstrap.min.css" />
+    <Content Include="MetroUICss\Content\metro-ui\fonts\iconFont.dev.svg" />
+    <Content Include="MetroUICss\Content\metro-ui\fonts\iconFont.svg" />
+    <Content Include="MetroUICss\Content\metro-ui\fonts\metroSysIcons.svg" />
+    <Content Include="MetroUICss\Scripts\metro-ui\jquery.ui.widget.js" />
+    <Content Include="MetroUICss\Scripts\metro-ui\metro-dialog.js" />
+    <Content Include="MetroUICss\Scripts\metro-ui\metro.min.js" />
     <None Include="Bootstrap\Views\Web.config.transform" />
   </ItemGroup>
   <ItemGroup />

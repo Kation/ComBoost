@@ -1,0 +1,149 @@
+﻿@model MvcEditorModel
+<div class="input-control select size4 place-left">
+    <select id="@Model.Metadata.Property.Name" multiple="multiple" style="height: 78px">
+        @foreach (System.Data.Entity.EntityBase v in (System.Collections.IEnumerable)Model.Value)
+        {
+            <option value="@v.Index">@v</option>
+        }
+    </select>
+    <input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" value="@(string.Join(",",((System.Collections.IEnumerable)Model.Value).Cast<System.Data.Entity.IEntity>().Select(t=>t. Index).ToArray()))" />
+</div>
+<div class="pos-rel inline-block size2">    
+    <button id="@(Model.Metadata.Property.Name)_Add" type="button" class="size2 place-left">Add</button>
+    <button id="@(Model.Metadata.Property.Name)_Remove" disabled="disabled" type="button" class="size2 place-left">Remove</button>
+    <button id="@(Model.Metadata.Property.Name)_Clear" type="button" class="size2 place-left">Clear</button>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var select = $('#@Model.Metadata.Property.Name');
+        var add = $('#@(Model.Metadata.Property.Name)_Add');
+        var remove = $('#@(Model.Metadata.Property.Name)_Remove');
+        var clear = $('#@(Model.Metadata.Property.Name)_Clear');
+        var value = $('#@(Model.Metadata.Property.Name)_Value');
+        select.change(function () {
+            if (select.val() != '')
+                remove.removeAttr('disabled');
+            else
+                remove.attr('disabled', 'disabled');
+        });
+        remove.click(function () {
+            var id = select.val();
+            select.children('[value=' + id + ']').remove();
+            remove.attr('disabled', 'disabled');
+            update();
+        });
+        clear.click(function () {
+            select.html('');
+            value.val('');
+        });
+        function initSelector(result) {
+            //result = $(result);
+            result.find('[data-nav=true]').each(function (index, element) {
+                element = $(element);
+                element.attr('data-href', element.attr('href'));
+                element.click(function () {
+                    $.ajax({
+                        cache: false,
+                        url: $(this).attr('data-href'),
+                        success: function (result) {
+                            result = $(result);
+                            initSelector(result);
+                            $('#dialogContent').html(result);
+                        }
+                    });
+                });
+                element.removeAttr('href');
+            });
+            result.find('#checkAll').click(function () {
+                var r = this.checked;
+                result.find(':checkbox[value]').each(function (index, element) {
+                    element.checked = r;
+                });
+            });
+        }
+        add.click(function () {
+            $.ajax({
+                cache: false,
+                url: '@Url.RouteUrl(new { controller = Model.Metadata.Property.PropertyType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
+                error: function (result) {
+                    if (result.status == 404)
+                        $.Dialog({
+                            overlay: true,
+                            shadow: true,
+                            flat: false,
+                            title: 'There is some errors',
+                            padding: 6,
+                            overlayClickClose: false,
+                            sysButtons: {
+                                btnClose: true,
+                                btnOK: true,
+                                btnCancel: false,
+                                btnOKText: 'OK'
+                            },
+                            content: '<p>Can not found the selector.</p>'
+                        });
+                    else
+                        $.Dialog({
+                            overlay: true,
+                            shadow: true,
+                            flat: false,
+                            title: 'There is some errors',
+                            padding: 6,
+                            overlayClickClose: false,
+                            sysButtons: {
+                                btnClose: true,
+                                btnOK: true,
+                                btnCancel: false,
+                                btnOKText: 'OK'
+                            },
+                            content: '<p>Site throw unexpected errors.</p>'
+                        });
+                },
+                success: function (result) {
+                    result = $(result);
+                    initSelector(result);
+                    $.Dialog({
+                        overlay: true,
+                        shadow: true,
+                        flat: false,
+                        title: '@(Model.Metadata.Name) multiple selector dialog',
+                        padding: 6,
+                        width: $(window).width() - 200,
+                        height: $(window).height() - 200,
+                        overlayClickClose: false,
+                        content: result,
+                        sysBtnOKClick: function () {
+                            var radios = $('#dialog').find(':checked[value]');
+                            if (radios.length == 0) {
+                                alert('Please select at least one.');
+                                return;
+                            }
+                            radios.each(function (index, element) {
+                                element = $(element);
+                                var id = element.val();
+                                if (select.children('[value=' + id + ']').length > 0)
+                                    return;
+                                var name = element.attr('data-name');
+                                var option = $('<option></option>');
+                                option.html(name);
+                                option.val(id);
+                                select.append(option);
+                            });
+                            update();
+                            $.Dialog.close();
+                        }
+                    });
+                }
+            })
+        });
+        function update() {
+            var val = '';
+            select.children().each(function (index, element) {
+                val += $(element).val() + ',';
+            });
+            if (val.length > 0)
+                val = val.substring(0, val.length - 1);
+            value.val(val);
+        }
+    });
+</script>

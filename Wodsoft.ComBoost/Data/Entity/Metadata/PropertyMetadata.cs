@@ -55,6 +55,7 @@ namespace System.Data.Entity.Metadata
             {
                 Type = customDataType.Type;
                 CustomType = customDataType.Custom;
+                IsFileUpload = customDataType.IsFileUpload;
             }
             else
             {
@@ -74,7 +75,10 @@ namespace System.Data.Entity.Metadata
                 else if (type == typeof(decimal))
                     Type = CustomDataType.Currency;
                 else if (type == typeof(byte[]))
+                {
                     Type = CustomDataType.File;
+                    IsFileUpload = true;
+                }
                 else if (type.IsEnum)
                 {
                     Type = CustomDataType.Other;
@@ -138,6 +142,11 @@ namespace System.Data.Entity.Metadata
         /// Get the custom data type of property.
         /// </summary>
         public string CustomType { get; private set; }
+
+        /// <summary>
+        /// Get the property is base on upload file.
+        /// </summary>
+        public bool IsFileUpload { get; private set; }
 
         /// <summary>
         /// Get is the property must has data.

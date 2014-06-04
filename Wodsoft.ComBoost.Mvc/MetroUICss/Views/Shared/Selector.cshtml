@@ -1,0 +1,58 @@
+﻿@model EntityViewModel
+@{
+    Layout = null;
+}
+<div class="grid fluid">
+    <div class="row">
+        @if (Model.Parent != null)
+        {
+            <div class="span3" id="selectorparentview">
+                <ul class="treeview" data-role="treeview">
+                    <li class="node">
+                        <a data-nav="true" href="@Html.Raw(Url.Action("Selector"))"><span class="node-toggle"></span>All</a>
+                        <ul>
+                            @{Html.RenderPartial("ParentView", Model.Parent);}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        }
+        <div class="@(Model.Parent == null ? "span12":"span9")">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td width="36"></td>
+                        @for (int i = 0; i < Model.Headers.Length; i++)
+                        {
+                            <td title="@Model.Headers[i].Description">@(Model.Headers[i].ShortName ?? Model.Headers[i].Name)</td>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Items.Length; i++)
+                    {
+                        <tr>
+                            <td class="text-center">
+                                <div class="input-control radio default-style no-margin">
+                                    <label class="no-margin">
+                                        <input type="radio" data-name="@Model.Items[i]" name="value" value="@Model.Items[i].Index" />
+                                        <span class="check"></span>
+                                    </label>
+                                </div>
+                            </td>
+                            @for (int b = 0; b < Model.Headers.Length; b++)
+                            {
+                                <td>@EntityValueConverter.GetConverter(Model.Headers[b]).ConvertTo(Model.Headers[b].Property.GetValue(Model.Items[i]), typeof(string))</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span12 text-center">
+            @{Html.Pagination(Model);}
+        </div>
+    </div>
+</div>

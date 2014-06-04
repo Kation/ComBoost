@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Metadata;
 using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace System.Data.Entity
 {
@@ -86,7 +87,7 @@ namespace System.Data.Entity
             return _Metadata.DisplayProperty.Property.GetValue(this, null).ToString();
         }
 
-        private ReadOnlyCollection<ValidationResult> _NoError = new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>());
+        //private ReadOnlyCollection<ValidationResult> _NoError = new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>());
         /// <summary>
         /// Ensure that entity is valid.
         /// </summary>
@@ -94,7 +95,21 @@ namespace System.Data.Entity
         /// <returns>Collection that include error messages.</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            return _NoError;
+            var result = new List<ValidationResult>();
+            EntityMetadata metadata = Metadata.EntityAnalyzer.GetMetadata(GetType());
+            foreach (var property in metadata.Properties)
+            {
+                validationContext.MemberName = property.Property.Name;
+                validationContext.DisplayName = property.Name;
+                var list = property.Property.GetCustomAttributes<ValidationAttribute>(true);
+                foreach (var item in list)
+                {
+                    var r = item.GetValidationResult(property.Property.GetValue(this), validationContext);
+                    if (r != null && r != ValidationResult.Success)
+                        result.Add(r);
+                }
+            }
+            return result;
         }
     }
 }

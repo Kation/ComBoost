@@ -22,6 +22,7 @@ namespace System.Data.Entity
             if (context == null)
                 throw new ArgumentNullException("context");
             DbContext = context;
+            context.Configuration.ValidateOnSaveEnabled = false;
             List<Type> types = new List<Type>();
             foreach (var property in context.GetType().GetProperties())
             {

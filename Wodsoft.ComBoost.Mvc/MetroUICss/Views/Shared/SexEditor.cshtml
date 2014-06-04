@@ -1,0 +1,15 @@
+﻿@model MvcEditorModel
+<div class="input-control radio default-style">
+    <label>
+        <input type="radio" name="@Model.Metadata.Property.Name" value="true" @Html.Raw((bool)Model.Value ? " checked=\"checked\"" : "") />
+        <span class="check"></span>
+        Male
+    </label>
+</div>
+<div class="input-control radio default-style">
+    <label>
+        <input type="radio" name="@Model.Metadata.Property.Name" value="false" @Html.Raw((bool)Model.Value ? "" : "checked=\"checked\"") />
+        <span class="check"></span>
+        Female
+    </label>
+</div>

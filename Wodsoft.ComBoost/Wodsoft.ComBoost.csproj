@@ -53,13 +53,16 @@
   <ItemGroup>
     <Compile Include="ComponentModel\DataAnnotations\CustomDataType.cs" />
     <Compile Include="ComponentModel\DataAnnotations\CustomDataTypeAttribute.cs" />
-    <Compile Include="ComponentModel\DataAnnotations\DistinctAttribute.cs" />
+    <Compile Include="ComponentModel\DataAnnotations\DistinctAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ComponentModel\DataAnnotations\EntityAuthenticationAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\HideAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\ParentAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\PasswordAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\PropertyAuthenticationAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\SearchableAttribute.cs" />
+    <Compile Include="ComponentModel\DataAnnotations\ValueFilterAttribute.cs" />
     <Compile Include="ComponentModel\EntityEditModel.cs" />
     <Compile Include="ComponentModel\EntityParentModel.cs" />
     <Compile Include="ComponentModel\EntitySearchItem.cs" />

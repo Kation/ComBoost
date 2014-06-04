@@ -1,0 +1,44 @@
+﻿@model EntityEditModel
+@{
+    ViewBag.Title = Model.Metadata.Name + " Detail";
+    object area = ViewContext.RouteData.DataTokens["Area"];
+    if (area == null)
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Areas/" + area.ToString() + "/Views/Shared/_Layout.cshtml";
+    }
+}
+<div class="grid fluid">
+    <div class="row">
+        <nav class="breadcrumbs">
+            <ul>
+                <li><a href="@Url.Action("Index","Home")">Home</a></li>
+                <li><a href="@Url.Action("Index")">@Model.Metadata.Name</a></li>
+                <li class="active"><a>Detail</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="row">
+        <div class="panel">
+            <div class="panel-header">Detail</div>
+            <div class="panel-content">
+                <div class="grid">
+                    @for (int i = 0; i < Model.Properties.Length; i++)
+                    {
+                        <div class="row">
+                            <label class="span2 text-right">@Model.Properties[i].Name</label>
+                            <label class="span10">@EntityValueConverter.GetConverter(Model.Properties[i]).ConvertToString(Model.Properties[i].Property.GetValue(Model.Item))</label>
+                        </div>
+                    }
+                    <div class="row text-center">
+                        <a href="@Url.Action("Index")" class="button">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

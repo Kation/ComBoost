@@ -110,7 +110,8 @@ public virtual string Phone { get; set; }
             <h3 id="property-HideAttribute">HideAttribute</h3>
             <p>该特性用于隐藏属性不被显示。</p>
             <p><code>IsHiddenOnView</code>该属性为<code>true</code>时，属性将不被显示于列表，默认为<code>true</code>。</p>
-            <p><code>IsHiddenOnEdit</code>该属性为<code>true</code>时，属性在编辑时将不被现实，默认为<code>true</code>。</p>
+            <p><code>IsHiddenOnEdit</code>该属性为<code>true</code>时，属性在编辑时将不被显示，默认为<code>true</code>。</p>
+            <p><code>IsHiddenOnDetail</code>该属性为<code>true</code>时，属性在详情页将不被显示，默认为<code>IsHiddenOnView</code>与<code>IsHiddenOnEdit</code>的与运算。</p>
 <pre>
 [Display(Name = "手机号", Order = 10, ShortName = "手机")]
 [Hide(IsHiddenOnEdit = false)]
