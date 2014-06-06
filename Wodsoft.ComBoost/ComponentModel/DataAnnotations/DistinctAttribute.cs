@@ -15,6 +15,11 @@ namespace System.ComponentModel.DataAnnotations
     [AttributeUsage(AttributeTargets.Property)]
     public class DistinctAttribute : ValidationAttribute
     {
+        /// <summary>
+        /// Get or set is case sensitive for string property.
+        /// </summary>
+        public bool IsCaseSensitive { get; set; }
+
         public override bool RequiresValidationContext { get { return true; } }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
@@ -36,9 +41,15 @@ namespace System.ComponentModel.DataAnnotations
                     type = type.BaseType;
                 }
             }
+            if (value is string && IsCaseSensitive)
+                value = ((string)value).ToLower();
             ParameterExpression parameter = Expression.Parameter(type);
             Expression left = Expression.NotEqual(Expression.Property(parameter, "Index"), Expression.Constant(entity.Index));
-            Expression right = Expression.Equal(Expression.Property(parameter, validationContext.MemberName), Expression.Constant(value));
+            Expression right;
+            if (value is string && IsCaseSensitive)
+                right = Expression.Equal(Expression.Call(Expression.Property(parameter, validationContext.MemberName), typeof(string).GetMethod("ToLower")), Expression.Constant(value));
+            else
+                right = Expression.Equal(Expression.Property(parameter, validationContext.MemberName), Expression.Constant(value));
             Expression expression = Expression.And(left, right);
             expression = Expression.Lambda(typeof(Func<,>).MakeGenericType(type, typeof(bool)), expression, parameter);
             object where = _QWhereMethod.MakeGenericMethod(type).Invoke(null, new[] { entityContext.Query(), expression });
