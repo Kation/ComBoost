@@ -60,11 +60,17 @@ namespace System.Data.Entity.Metadata
             else
             {
                 Type type = propertyInfo.PropertyType;
+                ValueFilterAttribute filter = propertyInfo.GetCustomAttribute<ValueFilterAttribute>();
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
                     type = type.GetGenericArguments()[0];
-                if (type == typeof(DateTime))
+                if (filter != null)
+                {
+                    Type = CustomDataType.Other;
+                    CustomType = "ValueFilter";
+                }
+                else if (type == typeof(DateTime))
                     Type = CustomDataType.Date;
-                if (type == typeof(TimeSpan))
+                else if (type == typeof(TimeSpan))
                     Type = CustomDataType.Time;
                 else if (type == typeof(bool))
                     Type = CustomDataType.Boolean;

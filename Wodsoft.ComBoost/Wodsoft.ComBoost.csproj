@@ -62,7 +62,9 @@
     <Compile Include="ComponentModel\DataAnnotations\PasswordAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\PropertyAuthenticationAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\SearchableAttribute.cs" />
-    <Compile Include="ComponentModel\DataAnnotations\ValueFilterAttribute.cs" />
+    <Compile Include="ComponentModel\DataAnnotations\ValueFilterAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ComponentModel\EntityEditModel.cs" />
     <Compile Include="ComponentModel\EntityParentModel.cs" />
     <Compile Include="ComponentModel\EntitySearchItem.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="ComponentModel\EntityViewModel.cs" />
     <Compile Include="ComponentModel\IPagination.cs" />
     <Compile Include="ComponentModel\NotifyBase.cs" />
+    <Compile Include="ComponentModel\ValueFilter.cs" />
     <Compile Include="Data\Entity\EntityBase.cs" />
     <Compile Include="Data\Entity\EntityDescriptorContext.cs" />
     <Compile Include="Data\Entity\IEntity.cs" />
