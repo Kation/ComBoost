@@ -46,6 +46,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -105,7 +106,9 @@
     <Compile Include="Web\Mvc\IFileController.cs" />
     <Compile Include="Web\Mvc\IImageController.cs" />
     <Compile Include="Web\Routing\EntityRoute.cs" />
+    <Compile Include="Web\Security\ComBoostAuthentication.cs" />
     <Compile Include="Web\Security\ComBoostAuthenticationModule.cs" />
+    <Compile Include="Web\Security\ComBoostCookiesToken.cs" />
     <Compile Include="Web\Security\ComBoostIdentity.cs" />
     <Compile Include="Web\Security\ComBoostPrincipal.cs" />
   </ItemGroup>

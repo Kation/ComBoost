@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,22 +20,58 @@ namespace System.Web.Security
 
         public string AuthenticationType
         {
-            get { return _Principal.OriginPrincipal.Identity.AuthenticationType; }
+            get { return "Forms"; }
         }
 
+        private bool? _IsAuthenticated;
         public bool IsAuthenticated
         {
             get
             {
-                if (_Principal.OriginPrincipal.Identity.IsAuthenticated)
-                    return _Principal.InitRoleEntity();
-                return false;
+                if (_IsAuthenticated == null)
+                {
+                    HttpContext context = HttpContext.Current;
+                    string name;
+                    string authArea = null;
+                    if (!_Principal.CurrentRoute.DataTokens.ContainsKey("authArea"))
+                        name = ComBoostAuthentication.CookieName;
+                    else
+                    {
+                        authArea = _Principal.CurrentRoute.DataTokens["authArea"].ToString();
+                        name = ComBoostAuthentication.CookieName + "_" + authArea;
+                    }
+                    
+                    object state = context.Items[ComBoostAuthentication.CookieName];
+                    if (state == null)
+                    {
+                        if (!context.Request.Cookies.AllKeys.Contains(ComBoostAuthentication.CookieName))
+                        {
+                            _IsAuthenticated = false;
+                        }
+                        else
+                        {
+                            string cookies = context.Request.Cookies[ComBoostAuthentication.CookieName].Value;
+                            _IsAuthenticated = ComBoostAuthentication.VerifyCookie(cookies, authArea, out _Name);
+                        }
+                    }
+                    else
+                    {
+                        _IsAuthenticated = (bool)state;
+                    }
+                }
+                return _IsAuthenticated.Value;
             }
         }
 
+        private string _Name;
         public string Name
         {
-            get { return _Principal.OriginPrincipal.Identity.Name; }
+            get
+            {
+                if (!IsAuthenticated)
+                    return null;
+                return _Name;
+            }
         }
     }
 }

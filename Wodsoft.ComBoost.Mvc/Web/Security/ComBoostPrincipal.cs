@@ -16,7 +16,11 @@ namespace System.Web.Security
             if (user == null)
                 throw new ArgumentNullException("user");
             OriginPrincipal = user;
-            Identity = new ComBoostIdentity(this);
+            CurrentRoute = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
+            if (ComBoostAuthentication.IsEnabled)
+                Identity = new ComBoostIdentity(this);
+            else
+                Identity = user.Identity;
         }
 
         public IPrincipal OriginPrincipal { get; private set; }
@@ -24,6 +28,8 @@ namespace System.Web.Security
         public IIdentity Identity { get; private set; }
 
         public static RoleEntityResolveDelegate Resolve { get; set; }
+
+        public RouteData CurrentRoute { get; private set; }
 
         public IRoleEntity RoleEntity { get; private set; }
         private bool _IsFailure;
@@ -34,8 +40,7 @@ namespace System.Web.Security
                 return false;
             if (RoleEntity != null)
                 return true;
-            RouteData routeData = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
-            EntityRoute route = routeData.Route as EntityRoute;
+            EntityRoute route = CurrentRoute.Route as EntityRoute;
             if (route == null)
             {
                 _IsFailure = true;
