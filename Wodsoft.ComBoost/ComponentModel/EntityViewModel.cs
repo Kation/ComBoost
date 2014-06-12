@@ -34,27 +34,27 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the items per page options.
         /// </summary>
-        public int[] PageSizeOption { get { return (int[])GetValue("PageSizeOption"); } set { SetValue("PageSizeOption", value); } }
+        public int[] PageSizeOption { get { return (int[])GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the total page.
         /// </summary>
-        public int TotalPage { get { return (int)GetValue("TotalPage"); } set { SetValue("TotalPage", value); } }
+        public int TotalPage { get { return (int)GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the items per page.
         /// </summary>
-        public int CurrentSize { get { return (int)GetValue("CurrentSize"); } set { SetValue("CurrentSize", value); } }
+        public int CurrentSize { get { return (int)GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the current page.
         /// </summary>
-        public int CurrentPage { get { return (int)GetValue("CurrentPage"); } set { SetValue("CurrentPage", value); } }
+        public int CurrentPage { get { return (int)GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the items of current page.
         /// </summary>
-        public IEntity[] Items { get { return (IEntity[])GetValue("Items"); } set { SetValue("Items", value); } }
+        public IEntity[] Items { get { return (IEntity[])GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the metadata of entity.

@@ -32,7 +32,7 @@ namespace System.Data.Entity
         [Key]
         [Required]
         [Hide]
-        public virtual Guid Index { get { return (Guid)GetValue("Index"); } set { SetValue("Index", value); } }
+        public virtual Guid Index { get { return (Guid)GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the create date of entity.
@@ -40,7 +40,7 @@ namespace System.Data.Entity
         [Required]
         [Hide]
         [Column(TypeName = "Datetime2")]
-        public virtual DateTime CreateDate { get { return (DateTime)GetValue("CreateDate"); } set { SetValue("CreateDate", value); } }
+        public virtual DateTime CreateDate { get { return (DateTime)GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Call when entity created.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 
 namespace System.ComponentModel
 {
@@ -19,16 +20,16 @@ namespace System.ComponentModel
         public NotifyBase()
         {
             data = new Dictionary<string, object>();
-            foreach (var property in this.GetType().GetProperties())
-            {
-                if (data.ContainsKey(property.Name))
-                    continue;
-                if (property.GetGetMethod() != null && property.GetSetMethod() != null)
-                    if (property.PropertyType.IsValueType)
-                        data.Add(property.Name, Activator.CreateInstance(property.PropertyType));
-                    else
-                        data.Add(property.Name, null);
-            }
+            //foreach (var property in this.GetType().GetProperties())
+            //{
+            //    if (data.ContainsKey(property.Name))
+            //        continue;
+            //    if (property.GetGetMethod() != null && property.GetSetMethod() != null)
+            //        if (property.PropertyType.IsValueType)
+            //            data.Add(property.Name, Activator.CreateInstance(property.PropertyType));
+            //        else
+            //            data.Add(property.Name, null);
+            //}
         }
 
         /// <summary>
@@ -36,11 +37,13 @@ namespace System.ComponentModel
         /// </summary>
         /// <param name="propertyName">Name of property.</param>
         /// <returns></returns>
-        protected object GetValue(string propertyName)
+        protected object GetValue([CallerMemberName] string propertyName = null)
         {
-            if (!data.ContainsKey(propertyName))
-                throw new ArgumentException("Property \"" + propertyName + "\" doesn't exists.");
-            object value = data[propertyName];
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
+            object value = null;
+            if (data.ContainsKey(propertyName))
+                value = data[propertyName];
             if (value == null && this.GetType().GetProperty(propertyName).PropertyType.IsValueType)
                 return Activator.CreateInstance(this.GetType().GetProperty(propertyName).PropertyType);
             return value;
@@ -49,8 +52,8 @@ namespace System.ComponentModel
         /// <summary>
         /// Get a property is setting value enabled.
         /// </summary>
-        /// <param name="propertyName"></param>
-        /// <returns></returns>
+        /// <param name="propertyName">Name of property.</param>
+        /// <returns>true if property can be set.</returns>
         protected virtual bool CanSetValue(string propertyName)
         {
             return true;
@@ -61,27 +64,33 @@ namespace System.ComponentModel
         /// </summary>
         /// <param name="propertyName">Name of property.</param>
         /// <param name="value">Value.</param>
-        protected void SetValue(string propertyName, object value)
+        protected void SetValue(object value, [CallerMemberName] string propertyName = null)
         {
-            if (!data.ContainsKey(propertyName))
-                throw new ArgumentException("Property \"" + propertyName + "\" doesn't exists.");
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
             if (!CanSetValue(propertyName))
                 throw new InvalidOperationException("Property \"" + propertyName + "\" can not modify.");
             OnPropertyChanging(propertyName);
-            data[propertyName] = value;
+            if (!data.ContainsKey(propertyName))
+                data.Add(propertyName, value);
+            else
+                data[propertyName] = value;
             OnPropertyChanged(propertyName);
         }
 
         /// <summary>
         /// Set the value of property without notify.
         /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="value"></param>
-        protected void SetValueWithoutNotify(string propertyName, object value)
+        /// <param name="propertyName">Name of property.</param>
+        /// <param name="value">Value.</param>
+        protected void SetValueWithoutNotify(object value, [CallerMemberName] string propertyName = null)
         {
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
             if (!data.ContainsKey(propertyName))
-                throw new ArgumentException("Property \"" + propertyName + "\" doesn't exists.");
-            data[propertyName] = value;
+                data.Add(propertyName, value);
+            else
+                data[propertyName] = value;
         }
 
         /// <summary>
@@ -90,6 +99,8 @@ namespace System.ComponentModel
         /// <param name="propertyName">Name of property.</param>
         protected void OnPropertyChanged(string propertyName)
         {
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -100,6 +111,8 @@ namespace System.ComponentModel
         /// <param name="propertyName">Name of property.</param>
         protected void OnPropertyChanging(string propertyName)
         {
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
             if (PropertyChanging != null)
                 PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
         }

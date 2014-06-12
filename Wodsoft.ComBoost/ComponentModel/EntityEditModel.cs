@@ -16,12 +16,12 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the item to edit.
         /// </summary>
-        public IEntity Item { get { return (IEntity)GetValue("Item"); } set { SetValue("Item", value); } }
+        public IEntity Item { get { return (IEntity)GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the properties to edit.
         /// </summary>
-        public PropertyMetadata[] Properties { get { return (PropertyMetadata[])GetValue("Properties"); } set { SetValue("Properties", value); } }
+        public PropertyMetadata[] Properties { get { return (PropertyMetadata[])GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the metadata of entity.

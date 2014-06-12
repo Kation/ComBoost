@@ -16,7 +16,7 @@ namespace System.Data.Entity
         [Required]
         [CustomDataType(CustomDataType.Password)]
         [MaxLength(20)]
-        public virtual byte[] Password { get { return (byte[])GetValue("Password"); } set { SetValue("Password", value); } }
+        public virtual byte[] Password { get { return (byte[])GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the salt data for password.
@@ -24,7 +24,7 @@ namespace System.Data.Entity
         [MaxLength(6)]
         [Hide]
         [Required]
-        public virtual byte[] Salt { get { return (byte[])GetValue("Salt"); } set { SetValue("Salt", value); } }
+        public virtual byte[] Salt { get { return (byte[])GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Set a new password.
