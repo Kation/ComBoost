@@ -39,8 +39,11 @@ namespace System.ComponentModel.DataAnnotations
                 catch
                 {
                     type = type.BaseType;
+                    entityContext = validationContext.GetService(type);
                 }
             }
+            if (entityContext == null)
+                return null;
             if (value is string && IsCaseSensitive)
                 value = ((string)value).ToLower();
             ParameterExpression parameter = Expression.Parameter(type);
