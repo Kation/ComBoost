@@ -107,7 +107,10 @@ public virtual string Name { get; set; }
 public virtual string Phone { get; set; }
 </pre>
             <div class="alert alert-info">推荐您为Order设置整十数，如果需要插入新属性，可以直接将Order设置为上下属性之间的值。</div>
-            <h3 id="property-HideAttribute">HideAttribute</h3>
+            <h3 id="property-DistinctAttribute">DistinctAttribute<small>不同内容</small></h3>
+            <p>该特性用于设定属性值不能重复。</p>
+            <div class="alert alert-info">只能用于值类型属性。</div>
+            <h3 id="property-HideAttribute">HideAttribute<small>隐藏字段</small></h3>
             <p>该特性用于隐藏属性不被显示。</p>
             <p><code>IsHiddenOnView</code>该属性为<code>true</code>时，属性将不被显示于列表，默认为<code>true</code>。</p>
             <p><code>IsHiddenOnEdit</code>该属性为<code>true</code>时，属性在编辑时将不被显示，默认为<code>true</code>。</p>
@@ -323,6 +326,7 @@ public class MemberGroup : EntityBase
                         <li><a href="#property-ColumnAttribute">数据库类型</a></li>
                         <li><a href="#property-CustomDataTypeAttribute">自定义类型</a></li>
                         <li><a href="#property-DisplayAttribute">显示信息</a></li>
+                        <li><a href="#property-DistinctAttribute">显示信息</a></li>
                         <li><a href="#property-HideAttribute">隐藏属性</a></li>
                         <li><a href="#property-KeyAttribute">主键</a></li>
                         <li><a href="#property-MaxLengthAttribute">最大长度</a></li>
