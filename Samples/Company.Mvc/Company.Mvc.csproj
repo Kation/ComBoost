@@ -322,6 +322,8 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Shared\Detail.cshtml" />
+    <Content Include="Views\Shared\ValueFilterEditor.cshtml" />
+    <Content Include="Views\Shared\ValueFilter.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

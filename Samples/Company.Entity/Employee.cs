@@ -18,7 +18,11 @@ namespace Company.Entity
         [Searchable]
         [Display(Name = "员工姓名", Order = 0)]
         [Required]
+        [Distinct]
         public virtual string Name { get; set; }
+
+        [Display(Name = "密码", Order = 5)]
+        public override byte[] Password { get { return base.Password; } set { base.Password = value; } }
 
         [Display(Name = "员工组", Order = 10)]
         [Required]
@@ -33,6 +37,12 @@ namespace Company.Entity
         [Display(Name = "创建日期", Order = 20)]
         [Hide(IsHiddenOnView = false)]
         public override DateTime CreateDate { get { return base.CreateDate; } set { base.CreateDate = value; } }
+
+        [ValueFilter(typeof(LocationProvider), null)]
+        public virtual string Province { get; set; }
+
+        [ValueFilter(typeof(LocationProvider), "Province")]
+        public virtual string City { get; set; }
 
         public override bool IsInRole(string role)
         {
