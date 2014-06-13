@@ -46,24 +46,6 @@ namespace System.Web.Mvc
             if (Metadata != null)
             {
                 result &= (Metadata.AllowAnonymous || filterContext.HttpContext.User.Identity.IsAuthenticated);
-                //if (filterContext.ActionDescriptor.ActionName == "Index")
-                //{
-                //    foreach (var role in Metadata.ViewRoles)
-                //        if (!filterContext.HttpContext.User.IsInRole(role))
-                //            return false;
-                //}
-                //else if (filterContext.ActionDescriptor.ActionName == "Index")
-                //{
-                //    foreach (var role in Metadata.ViewRoles)
-                //        if (!filterContext.HttpContext.User.IsInRole(role))
-                //            return false;
-                //}
-                //else if (filterContext.ActionDescriptor.ActionName == "Index")
-                //{
-                //    foreach (var role in Metadata.ViewRoles)
-                //        if (!filterContext.HttpContext.User.IsInRole(role))
-                //            return false;
-                //}
             }
             if (result)
                 result = AuthorizeCore(filterContext.HttpContext);
@@ -85,7 +67,12 @@ namespace System.Web.Mvc
             RouteData = filterContext.RouteData;
 
             if (!Authorize(filterContext))
-                filterContext.Result = new HttpStatusCodeResult(403);
+            {
+                if (filterContext.HttpContext.User.Identity.IsAuthenticated)
+                    filterContext.Result = new HttpUnauthorizedResult();
+                else
+                    filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl);
+            }
         }
     }
 }

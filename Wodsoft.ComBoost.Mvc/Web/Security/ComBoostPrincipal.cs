@@ -18,7 +18,10 @@ namespace System.Web.Security
             OriginPrincipal = user;
             CurrentRoute = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
             if (ComBoostAuthentication.IsEnabled)
+            {
                 Identity = new ComBoostIdentity(this);
+                OriginPrincipal = this;
+            }
             else
                 Identity = user.Identity;
         }

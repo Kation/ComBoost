@@ -37,8 +37,11 @@ namespace System.Web.Security
             CookieName = "comboostauth";
             CookieName = system.Authentication.Forms.Name;
             CookiePath = system.Authentication.Forms.Path;
+            LoginUrl = system.Authentication.Forms.LoginUrl;
             Timeout = system.Authentication.Forms.Timeout;
         }
+
+        public static string LoginUrl { get; private set; }
 
         public static string CookieDomain { get; private set; }
 
@@ -163,13 +166,21 @@ namespace System.Web.Security
                 authArea = route.DataTokens["authArea"].ToString();
             if (authArea == null)
             {
-                if (HttpContext.Current.Response.Cookies.AllKeys.Contains(CookieName))
-                    HttpContext.Current.Response.Cookies.Remove(CookieName);
+                if (HttpContext.Current.Request.Cookies.AllKeys.Contains(CookieName))
+                {
+                    HttpCookie cookie = HttpContext.Current.Request.Cookies[CookieName];
+                    cookie.Expires = DateTime.Now.AddDays(-1);
+                    HttpContext.Current.Response.Cookies.Set(cookie);
+                }
             }
             else
             {
-                if (HttpContext.Current.Response.Cookies.AllKeys.Contains(CookieName + "_" + authArea))
-                    HttpContext.Current.Response.Cookies.Remove(CookieName + "_" + authArea);
+                if (HttpContext.Current.Request.Cookies.AllKeys.Contains(CookieName + "_" + authArea))
+                {
+                    HttpCookie cookie = HttpContext.Current.Request.Cookies[CookieName + "_" + authArea];
+                    cookie.Expires = DateTime.Now.AddDays(-1);
+                    HttpContext.Current.Response.Cookies.Set(cookie);
+                }
             }
         }
     }
