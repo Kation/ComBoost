@@ -1,0 +1,12 @@
+﻿@model System.Collections.Specialized.NameValueCollection
+@{
+    Layout = null;
+}
+@if (!ViewBag.IsRequired)
+{
+    <option value="" @(ViewBag.Selected == "" || ViewBag.Selected == null ? " selected=\"selected\"" : "")></option>
+}
+@foreach (var key in Model.AllKeys)
+{
+    <option value="@Model[key]" @(ViewBag.Selected == key ? " selected=\"selected\"" : "")>@key</option>
+}

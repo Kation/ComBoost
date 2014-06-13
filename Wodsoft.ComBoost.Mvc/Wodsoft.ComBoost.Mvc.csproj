@@ -115,6 +115,8 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Bootstrap\Views\Shared\Detail.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ValueFilter.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ValueFilterEditor.cshtml" />
     <None Include="MetroUICss\App_Start\MetroUICSSBundleConfig.cs.pp" />
     <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.eot" />
     <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.json" />
@@ -152,6 +154,8 @@
     <None Include="MetroUICss\Views\Shared\TextEditor.cshtml" />
     <None Include="MetroUICss\Views\Shared\TimeEditor.cshtml" />
     <None Include="MetroUICss\Views\Shared\UrlEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\ValueFilter.cshtml" />
+    <None Include="MetroUICss\Views\Shared\ValueFilterEditor.cshtml" />
     <None Include="MetroUICss\Views\Shared\_Layout.cshtml" />
     <None Include="MetroUICss\Views\Shared\_Pagination.cshtml" />
     <None Include="MetroUICss\Views\Shared\_PaginationButton.cshtml" />

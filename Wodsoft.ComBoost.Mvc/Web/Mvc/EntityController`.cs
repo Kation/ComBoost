@@ -62,7 +62,7 @@ namespace System.Web.Mvc
             if (size < 1)
                 return new HttpStatusCodeResult(400);
             if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             IQueryable<TEntity> queryable = EntityQueryable.Query();
             List<EntitySearchItem> searchItems = new List<EntitySearchItem>();
             if (search)
@@ -206,7 +206,7 @@ namespace System.Web.Mvc
             return View(model);
         }
 
-        private EntityParentModel[] GetParentModel(Guid? selected, int level)
+        protected EntityParentModel[] GetParentModel(Guid? selected, int level)
         {
             EntityMetadata metadata = Metadata;
 
@@ -232,9 +232,9 @@ namespace System.Web.Mvc
                     if (item == null)
                     {
                         item = new EntityParentModel();
-                    item.Path = path;
-                    item.Name = entity.ToString();
-                    item.Index = entity.Index;
+                        item.Path = path;
+                        item.Name = entity.ToString();
+                        item.Index = entity.Index;
                     }
                     if (selected.HasValue && item.Index == selected)
                         item.Selected = true;
@@ -307,9 +307,9 @@ namespace System.Web.Mvc
         public virtual ActionResult Create(Guid? parent = null)
         {
             if (!EntityQueryable.Addable())
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             var model = new EntityEditModel<TEntity>(EntityQueryable.Create());
             model.Item.Index = Guid.Empty;
             model.Properties = Metadata.EditProperties;
@@ -331,7 +331,7 @@ namespace System.Web.Mvc
         public virtual ActionResult Detail(Guid id)
         {
             if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             TEntity item = EntityQueryable.GetEntity(id);
             if (item == null)
                 return new HttpStatusCodeResult(404);
@@ -349,11 +349,11 @@ namespace System.Web.Mvc
         public virtual ActionResult Edit(Guid id)
         {
             if (!EntityQueryable.Editable())
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             if (!Metadata.EditRoles.All(t => User.IsInRole(t)))
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             TEntity item = EntityQueryable.GetEntity(id);
             if (item == null)
                 return new HttpStatusCodeResult(404);
@@ -371,9 +371,9 @@ namespace System.Web.Mvc
         public virtual ActionResult Remove(Guid id)
         {
             if (!EntityQueryable.Removeable())
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             if (!Metadata.RemoveRoles.All(t => User.IsInRole(t)))
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             if (EntityQueryable.Remove(id))
                 return new HttpStatusCodeResult(200);
             else
@@ -393,17 +393,17 @@ namespace System.Web.Mvc
             if (id == Guid.Empty)
             {
                 if (!EntityQueryable.Addable())
-                    return new HttpStatusCodeResult(403);
+                    return new HttpUnauthorizedResult();
                 if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
-                    return new HttpStatusCodeResult(403);
+                    return new HttpUnauthorizedResult();
                 entity = EntityQueryable.Create();
             }
             else
             {
                 if (!EntityQueryable.Editable())
-                    return new HttpStatusCodeResult(403);
+                    return new HttpUnauthorizedResult();
                 if (!Metadata.EditRoles.All(t => User.IsInRole(t)))
-                    return new HttpStatusCodeResult(403);
+                    return new HttpUnauthorizedResult();
                 entity = EntityQueryable.GetEntity(id);
                 if (entity == null)
                     return new HttpStatusCodeResult(404);
@@ -484,7 +484,7 @@ namespace System.Web.Mvc
             if (validateResult.Count() != 0)
             {
                 Response.StatusCode = 400;
-                return Content(new string(validateResult.SelectMany(t => t.ErrorMessage += "\r\n").ToArray()));
+                return Content(string.Join("\r\n", validateResult.Select(t => t.ErrorMessage)));
             }
             bool result;
             if (id == Guid.Empty)
@@ -511,9 +511,9 @@ namespace System.Web.Mvc
         public virtual ActionResult Selector(int page = 1, string parentpath = null, Guid? parentid = null)
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             IQueryable<TEntity> queryable = EntityQueryable.Query();
             if (parentpath != null && parentid.HasValue)
             {
@@ -545,9 +545,9 @@ namespace System.Web.Mvc
         public virtual ActionResult MultipleSelector(int page = 1, string parentpath = null, Guid? parentid = null)
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             IQueryable<TEntity> queryable = EntityQueryable.Query();
             if (parentpath != null && parentid.HasValue)
             {
@@ -576,10 +576,32 @@ namespace System.Web.Mvc
         public virtual ActionResult Search()
         {
             if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
-                return new HttpStatusCodeResult(403);
+                return new HttpUnauthorizedResult();
             EntitySearchModel<TEntity> model = new EntitySearchModel<TEntity>();
             return View(model);
         }
 
+        /// <summary>
+        /// ValueFilterPage.
+        /// </summary>
+        /// <param name="property">Dependency property.</param>
+        /// <param name="value">Value of dependency property.</param>
+        /// <param name="selected">Value of selected.</param>
+        /// <returns></returns>
+        [HttpPost]
+        public virtual ActionResult ValueFilter(string property, string value, string selected = null)
+        {
+            PropertyMetadata p = Metadata.GetProperty(property);
+            if (p == null)
+                return new HttpStatusCodeResult(404);
+            ValueFilterAttribute filterAttribute = p.Property.GetCustomAttribute<ValueFilterAttribute>(true);
+            if (filterAttribute == null)
+                return new HttpStatusCodeResult(400);
+            ValueFilter filter = (ValueFilter)Activator.CreateInstance(filterAttribute.ValueFilter);
+            ViewBag.Selected = selected;
+            ViewBag.IsRequired = p.IsRequired;
+            var collection = filter.GetValues(filterAttribute.DependencyProperty, value);
+            return View(collection);
+        }
     }
 }

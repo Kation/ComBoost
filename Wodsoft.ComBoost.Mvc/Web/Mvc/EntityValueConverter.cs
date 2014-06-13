@@ -46,6 +46,7 @@ namespace System.Web.Mvc
             AddConverter("Enum", new System.Web.Mvc.Converter.EnumConverter());
             AddConverter("Entity", new EntityConverter());
             AddConverter("Collection", new System.Web.Mvc.Converter.CollectionConverter());
+            AddConverter("ValueFilter", new StringConverter());
         }
         
         /// <summary>
