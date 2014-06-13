@@ -185,6 +185,60 @@ public virtual string Name { get; set; }
 [Searchable]
 public virtual DateTime CreateDate { get; set; }
 </pre>
+
+            <h3 id="property-ValueFilterAttribute">ValueFilterAttribute<small>值筛选（级联）</small></h3>
+            <p>该特性用于标注属性的值只能从通过特定程序筛选出可选值。</p>
+            <p>该构造函数的<code>valueFilter</code>参数用于传入继承于<code>ValueFilter</code>的类型，如果不继承则会抛出异常。</p>
+            <p><code>dependencyProperty</code>参数用于传入筛选依赖的属性名称，可以为空。</p>
+<pre>
+[ValueFilter(typeof(LocationProvider), null)]
+public virtual string Province { get; set; }
+
+[ValueFilter(typeof(LocationProvider), "Province")]
+public virtual string City { get; set; }
+</pre>
+            <p>您需要实现您自己的<code>ValueFilter</code>，用于返回筛选出的可选值。</p>
+            <p>示例：</p>
+<pre>
+public class LocationProvider : ValueFilter
+{
+    public override NameValueCollection GetValues(string dependencyProperty, string dependencyValue)
+    {
+        NameValueCollection collection = new NameValueCollection();
+        switch (dependencyProperty)
+        {
+            case null:
+                collection.Add("北京", "北京");
+                collection.Add("广东", "广东");
+                collection.Add("广西", "广西");
+                break;
+            case "Province":
+                switch(dependencyValue)
+                {
+                    case "北京":
+                        collection.Add("北京市", "北京市");
+                        break;
+                    case "广东":
+                        collection.Add("广州市", "广州市");
+                        collection.Add("佛山市", "佛山市");
+                        collection.Add("深圳市", "深圳市");
+                        break;
+                    case "广西":
+                        collection.Add("南宁市", "南宁市");
+                        collection.Add("柳州市", "柳州市");
+                        collection.Add("桂林市", "桂林市");
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+                break;
+            default:
+                throw new NotSupportedException();
+        }
+        return collection;
+    }
+}
+</pre>
         </div>
 
         <div class="bs-docs-section">
@@ -336,6 +390,7 @@ public class MemberGroup : EntityBase
                         <li><a href="#property-RegularExpressionAttribute">正则表达式</a></li>
                         <li><a href="#property-RequiredAttribute">必填项</a></li>
                         <li><a href="#property-SearchableAttribute">可搜索</a></li>
+                        <li><a href="#property-ValueFilterAttribute">值筛选（级联）</a></li>
                     </ul>
                 </li>
                 <li>

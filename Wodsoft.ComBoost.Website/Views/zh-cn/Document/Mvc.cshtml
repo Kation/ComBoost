@@ -533,11 +533,13 @@ EntityValueConverter.AddConverter("Rate", new ByteConverter());
 &lt;configuration&gt;
     &lt;system.webServer&gt;
         &lt;modules&gt;
+            &lt;remove name="FormsAuthentication" /&gt;
             &lt;add name="ComBoostAuthentication" type="System.Web.Security.ComBoostAuthenticationModule"/&gt;
         &lt;/modules&gt;
     &lt;/system.webServer&gt;
 &lt;/configuration&gt;
 </pre>
+            <div class="alert alert-info">移除<code>FormsAuthentication</code>模块以确保<code>ComBoostAuthentication</code>的正确运行。</div>
 
             <h3 id="authentication-entity">权限实体</h3>
             <p>在使用权限系统前，您需要定义一个带权限判断的实体。</p>
@@ -639,8 +641,22 @@ public ActionResult Login(string username, string password)
     return new HttpStatusCodeResult(200);
 }
 </pre>
-            <div class="alert alert-info"><code>FormsAuthentication.SetAuthCookie</code>方法设置的用户名会被传入<code>System.Web.Security.ComBoostPrincipal.Resolve</code>委托，一般情况下使用实体Index作为用户名。</div>
+            <div class="alert alert-info"><code>ComBoostAuthentication.SignIn</code>方法设置的用户名会被传入<code>System.Web.Security.ComBoostPrincipal.Resolve</code>委托，一般情况下使用实体Index作为用户名。</div>
             <p>登录后，所有的<code>User.IsInRole</code>权限判断方法将由该<code>User</code>实体进行判断。</p>
+
+            <h3 id="authentication-sign">登录与登出</h3>
+            <p>如果您使用Forms验证，那么使用<code>ComBoostAuthentication.SignIn</code>方法设置用户登录Cookie。</p>
+            <p>使用<code>ComBoostAuthentication.SignOut</code>方法注销用户登录。</p>
+            <p>为您注册的路由<code>Route</code>添加Token数据可以区分用户登录区域。</p>
+<pre>
+Route myRoute = routes.MapRoute(
+    name: "Default",
+    url: "{controller}/{action}/{id}",
+    defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+);
+myRoute.DataTokens.Add("authArea","LoginArea");
+</pre>
+            <p>不同的authArea将不能互相登录。</p>
         </div>
     </div>
     <div class="col-md-2">
@@ -689,6 +705,7 @@ public ActionResult Login(string username, string password)
                         <li><a href="#authentication-resolve">实体解释器</a></li>
                         <li><a href="#authentication-route">修改路由</a></li>
                         <li><a href="#authentication-use">权限的使用</a></li>
+                        <li><a href="#authentication-sign">登录与登出</a></li>
                     </ul>
                 </li>
             </ul>
