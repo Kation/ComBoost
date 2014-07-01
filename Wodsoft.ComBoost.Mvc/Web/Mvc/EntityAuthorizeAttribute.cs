@@ -37,7 +37,7 @@ namespace System.Web.Mvc
         /// <returns>true if the user is authorized; otherwise, false.</returns>
         protected virtual bool AuthorizeCore(HttpContextBase httpContext)
         {
-            return true;
+            return httpContext.User.Identity.IsAuthenticated;
         }
 
         private bool Authorize(AuthorizationContext filterContext)
@@ -61,7 +61,11 @@ namespace System.Web.Mvc
             if (filterContext.Controller is EntityController)
                 EntityBuilder = ((EntityController)filterContext.Controller).EntityBuilder;
             else
+            {
+                if (!filterContext.HttpContext.User.Identity.IsAuthenticated)
+                    filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl);
                 return;
+            }
             if (filterContext.Controller.GetType().IsGenericType)
                 Metadata = EntityAnalyzer.GetMetadata(filterContext.Controller.GetType().GetGenericArguments()[0]);
             RouteData = filterContext.RouteData;
