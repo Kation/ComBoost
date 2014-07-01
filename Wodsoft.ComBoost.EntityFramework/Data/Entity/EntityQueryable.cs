@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Linq.Expressions;
 using System.Data.Entity.Metadata;
+using System.Threading.Tasks;
 
 namespace System.Data.Entity
 {
@@ -39,7 +40,7 @@ namespace System.Data.Entity
             DbContext = dbContext;
             var dbset = DbContext.GetType().GetProperties().FirstOrDefault(t => t.PropertyType == typeof(DbSet<TEntity>));
             if (dbset == null)
-                throw new ArgumentException("dbContext不包含DbSet<" + typeof(TEntity).Name + ">");
+                throw new ArgumentException("dbContext doesn't contains DbSet<" + typeof(TEntity).Name + ">");
             DbSet = (DbSet<TEntity>)dbset.GetValue(DbContext, null);
             Metadata = EntityAnalyzer.GetMetadata<TEntity>();
         }
@@ -57,14 +58,42 @@ namespace System.Data.Entity
             if (entity.Index == Guid.Empty)
                 entity.Index = Guid.NewGuid();
             if (Contains(entity.Index))
-                throw new ArgumentException("Index已存在。");
+                throw new ArgumentException("Index is already exists.");
             DbSet.Add(entity);
-            //if (DbContext.Entry<TEntity>(entity).GetValidationResult().ValidationErrors.Count > 0)
-            //{
-            //    DbSet.Remove(entity);
-            //    return false;
-            //}
-            DbContext.SaveChanges();
+            try
+            {
+                DbContext.SaveChanges();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Add an entity to database.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Return false if detect any error.</returns>
+        /// <exception cref="ArgumentException">Id of entity is already exists in database.</exception>
+        public virtual async Task<bool> AddAsync(TEntity entity)
+        {
+            if (entity == null)
+                return false;
+            if (entity.Index == Guid.Empty)
+                entity.Index = Guid.NewGuid();
+            if (Contains(entity.Index))
+                throw new ArgumentException("Index is already exists.");
+            DbSet.Add(entity);
+            try
+            {
+                await DbContext.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
             return true;
         }
 
@@ -79,6 +108,26 @@ namespace System.Data.Entity
             try
             {
                 DbContext.SaveChanges();
+            }
+            catch
+            {
+                DbSet.RemoveRange(entities);
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Add a lot of entity to database.
+        /// </summary>
+        /// <param name="entities">IEnumerable of entity.</param>
+        /// <returns>Return true if success.</returns>
+        public virtual async Task<bool> AddRangeAsync(IEnumerable<TEntity> entities)
+        {
+            DbSet.AddRange(entities);
+            try
+            {
+                await DbContext.SaveChangesAsync();
             }
             catch
             {
@@ -114,6 +163,31 @@ namespace System.Data.Entity
         }
 
         /// <summary>
+        /// Remove an entity from database.
+        /// </summary>
+        /// <param name="entityID">Entity id.</param>
+        /// <returns>Return true if success.</returns>
+        public virtual async Task<bool> RemoveAsync(Guid entityID)
+        {
+            TEntity entity = DbSet.Find(entityID);
+            if (entity == null)
+                return false;
+            if (!entity.IsRemoveAllowed)
+                return false;
+            DbSet.Remove(entity);
+            try
+            {
+                await DbContext.SaveChangesAsync();
+            }
+            catch
+            {
+                DbContext.Entry<TEntity>(entity).State = EntityState.Unchanged;
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Remove a lot of entities from database.
         /// </summary>
         /// <param name="ids">IEnumerable of Guid of entities.</param>
@@ -125,6 +199,20 @@ namespace System.Data.Entity
             //DbContext.Database.ExecuteSqlCommand("delete * from ?? where [Index] ")
             foreach (var id in ids)
                 Remove(id);
+            return true;
+        }
+
+        /// <summary>
+        /// Remove a lot of entities from database.
+        /// </summary>
+        /// <param name="ids">IEnumerable of Guid of entities.</param>
+        /// <returns>Always return true.</returns>
+        public virtual async Task<bool> RemoveRangeAsync(IEnumerable<Guid> ids)
+        {
+            //Todo, use sql command to delete from database.
+            //Guid[] list = ids.ToArray();
+            //DbContext.Database.ExecuteSqlCommand("delete * from ?? where [Index] ")
+            await Task.WhenAll(ids.Select(t => RemoveAsync(t)).ToArray());
             return true;
         }
 
@@ -143,13 +231,28 @@ namespace System.Data.Entity
             if (item != entity)
                 foreach (var property in typeof(TEntity).GetProperties().Where(t => t.CanRead && t.CanWrite))
                     property.SetValue(item, property.GetValue(entity, null), null);
-            //if (DbContext.Entry<TEntity>(item).GetValidationResult().ValidationErrors.Count > 0)
-            //{
-            //    DbContext.Entry<TEntity>(item).Reload();
-            //    return false;
-            //}
             entity.OnEditCompleted();
             DbContext.SaveChanges();
+            return true;
+        }
+
+        /// <summary>
+        /// Edit an entity.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Return true if success.</returns>
+        public virtual async Task<bool> EditAsync(TEntity entity)
+        {
+            TEntity item = DbSet.Find(entity.Index);
+            if (item == null)
+                return false;
+            if (!item.IsEditAllowed)
+                return false;
+            if (item != entity)
+                foreach (var property in typeof(TEntity).GetProperties().Where(t => t.CanRead && t.CanWrite))
+                    property.SetValue(item, property.GetValue(entity, null), null);
+            entity.OnEditCompleted();
+            await DbContext.SaveChangesAsync();
             return true;
         }
 
@@ -166,6 +269,18 @@ namespace System.Data.Entity
         }
 
         /// <summary>
+        /// Reload entity from database.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        public virtual async Task ReloadAsync(TEntity entity)
+        {
+            var entry = DbContext.Entry<TEntity>(entity);
+            if (entry.State == EntityState.Detached)
+                throw new InvalidOperationException("This entity is not belong to this context.");
+            await entry.ReloadAsync();
+        }
+
+        /// <summary>
         /// Get an entity by id.
         /// </summary>
         /// <param name="entityID">Entity id.</param>
@@ -173,6 +288,16 @@ namespace System.Data.Entity
         public virtual TEntity GetEntity(Guid entityID)
         {
             return DbSet.Find(entityID);
+        }
+
+        /// <summary>
+        /// Get an entity by id.
+        /// </summary>
+        /// <param name="entityID">Entity id.</param>
+        /// <returns>Return entity. Return null if entity doesn't exists.</returns>
+        public virtual async Task<TEntity> GetEntityAsync(Guid entityID)
+        {
+            return await DbSet.FindAsync(entityID);
         }
 
         /// <summary>
@@ -291,6 +416,15 @@ namespace System.Data.Entity
         }
 
         /// <summary>
+        /// Get total entity count from database.
+        /// </summary>
+        /// <returns>Return total entity count number.</returns>
+        public virtual async Task<int> CountAsync()
+        {
+            return await DbSet.CountAsync();
+        }
+
+        /// <summary>
         /// Get an entity is added to database.
         /// </summary>
         /// <param name="entity">Entity.</param>
@@ -303,11 +437,31 @@ namespace System.Data.Entity
         /// <summary>
         /// Get an entity is added to database.
         /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Return true if database contains this entity.</returns>
+        public virtual async Task<bool> ContainsAsync(TEntity entity)
+        {
+            return await ContainsAsync(entity.Index);
+        }
+
+        /// <summary>
+        /// Get an entity is added to database.
+        /// </summary>
         /// <param name="id">Entity.</param>
         /// <returns>Return true if database contains this entity.</returns>
         public virtual bool Contains(Guid id)
         {
             return DbSet.Count(t => t.Index == id) > 0;
+        }
+
+        /// <summary>
+        /// Get an entity is added to database.
+        /// </summary>
+        /// <param name="id">Entity.</param>
+        /// <returns>Return true if database contains this entity.</returns>
+        public virtual async Task<bool> ContainsAsync(Guid id)
+        {
+            return await DbSet.CountAsync(t => t.Index == id) > 0;
         }
 
         /// <summary>
@@ -368,5 +522,24 @@ namespace System.Data.Entity
             return DbContext.Database.SqlQuery<TEntity>(sql, parameters);
         }
 
+        /// <summary>
+        /// Get array from a queryable.
+        /// </summary>
+        /// <param name="queryable">Entity queryable interface.</param>
+        /// <returns>Return array of entity.</returns>
+        public async Task<TEntity[]> ToArrayAsync(IQueryable<TEntity> queryable)
+        {
+            return await queryable.ToArrayAsync();
+        }
+
+        /// <summary>
+        /// Get list from a queryable.
+        /// </summary>
+        /// <param name="queryable">Entity queryable interface.</param>
+        /// <returns>Return list of entity.</returns>
+        public async Task<List<TEntity>> ToListAsync(IQueryable<TEntity> queryable)
+        {
+            return await queryable.ToListAsync();
+        }
     }
 }
