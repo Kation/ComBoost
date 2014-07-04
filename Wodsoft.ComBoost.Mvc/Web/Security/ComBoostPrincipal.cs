@@ -15,7 +15,6 @@ namespace System.Web.Security
         {
             if (user == null)
                 throw new ArgumentNullException("user");
-            OriginPrincipal = user;
             CurrentRoute = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
             if (ComBoostAuthentication.IsEnabled)
             {
@@ -23,7 +22,10 @@ namespace System.Web.Security
                 OriginPrincipal = this;
             }
             else
+            {
                 Identity = user.Identity;
+                OriginPrincipal = user;
+            }
         }
 
         public IPrincipal OriginPrincipal { get; private set; }
@@ -63,7 +65,10 @@ namespace System.Web.Security
             if (!OriginPrincipal.Identity.IsAuthenticated)
                 return false;
             if (Resolve == null)
-                return OriginPrincipal.IsInRole(role);
+                if (OriginPrincipal == this)
+                    return false;
+                else
+                    return OriginPrincipal.IsInRole(role);
             if (!InitRoleEntity())
                 return false;
             return RoleEntity.IsInRole(role);

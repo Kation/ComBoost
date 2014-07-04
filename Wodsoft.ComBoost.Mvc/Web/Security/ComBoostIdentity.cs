@@ -40,17 +40,17 @@ namespace System.Web.Security
                         authArea = _Principal.CurrentRoute.DataTokens["authArea"].ToString();
                         name = ComBoostAuthentication.CookieName + "_" + authArea;
                     }
-                    
-                    object state = context.Items[ComBoostAuthentication.CookieName];
+
+                    object state = context.Items[name];
                     if (state == null)
                     {
-                        if (!context.Request.Cookies.AllKeys.Contains(ComBoostAuthentication.CookieName))
+                        if (!context.Request.Cookies.AllKeys.Contains(name))
                         {
                             _IsAuthenticated = false;
                         }
                         else
                         {
-                            string cookies = context.Request.Cookies[ComBoostAuthentication.CookieName].Value;
+                            string cookies = context.Request.Cookies[name].Value;
                             _IsAuthenticated = ComBoostAuthentication.VerifyCookie(cookies, authArea, out _Name);
                         }
                     }
