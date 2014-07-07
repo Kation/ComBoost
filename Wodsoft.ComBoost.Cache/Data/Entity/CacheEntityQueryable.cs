@@ -123,5 +123,61 @@ namespace System.Data.Entity
         {
             throw new NotImplementedException();
         }
+
+
+        public Threading.Tasks.Task<bool> AddAsync(TEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Threading.Tasks.Task<bool> AddRangeAsync(IEnumerable<TEntity> entities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Threading.Tasks.Task<bool> RemoveAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Threading.Tasks.Task<bool> RemoveRangeAsync(IEnumerable<Guid> ids)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Threading.Tasks.Task<bool> EditAsync(TEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Threading.Tasks.Task<TEntity> GetEntityAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Threading.Tasks.Task<int> CountAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Threading.Tasks.Task<bool> ContainsAsync(TEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Threading.Tasks.Task<bool> ContainsAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Threading.Tasks.Task<TEntity[]> ToArrayAsync(IQueryable<TEntity> queryable)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Threading.Tasks.Task<List<TEntity>> ToListAsync(IQueryable<TEntity> queryable)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
