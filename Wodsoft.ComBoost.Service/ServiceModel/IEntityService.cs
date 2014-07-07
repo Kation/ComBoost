@@ -9,40 +9,68 @@ using System.Threading.Tasks;
 
 namespace System.ServiceModel
 {
-    [ServiceContract]
     public interface IEntityService<TEntity> where TEntity : class, IEntity, new()
     {
-        [OperationContract]
         bool Authenticate(string data);
 
-        [OperationContract]
-        TEntity GetEntity(Guid key);
+        bool IsAuthenticated();
 
-        [OperationContract]
+        TEntity GetEntity(Guid id);
+
+        Task<TEntity> GetEntityAsync(Guid id);
+
         bool Add(TEntity entity);
 
-        [OperationContract]
+        Task<bool> AddAsync(TEntity entity);
+
         bool AddRange(TEntity[] entities);
 
-        [OperationContract]
+        Task<bool> AddRangeAsync(TEntity[] entities);
+
+        TEntity Create();
+
         bool Edit(TEntity entity);
 
-        [OperationContract]
-        bool Remove(Guid key);
+        Task<bool> EditAsync(TEntity entity);
 
-        [OperationContract]
-        ReadOnlyCollection<TEntity> Query(Expression expression);
+        bool Remove(Guid id);
 
-        [OperationContract]
+        Task<bool> RemoveAsync(Guid id);
+
+        bool RemoveRange(Guid[] keys);
+
+        Task<bool> RemoveRangeAsync(Guid[] keys);
+
+        IEnumerable<TEntity> Query(Expression expression);
+
+        Task<IEnumerable<TEntity>> QueryAsync(Expression expression);
+
         TEntity QuerySingle(Expression expression);
 
-        [OperationContract]
-        ReadOnlyCollection<TEntity> QuerySql(string sql, System.Data.SqlClient.SqlParameter[] parameters);
+        Task<TEntity> QuerySingleAsync(Expression expression);
 
-        [OperationContract]
+        IEnumerable<TEntity> QuerySql(string sql, params object[] parameters);
+
+        Task<IEnumerable<TEntity>> QuerySqlAsync(string sql, params object[] parameters);
+
         int Count();
 
-        [OperationContract]
-        bool Contains(Guid key);
+        Task<int> CountAsync();
+
+        bool Contains(Guid id);
+
+        Task<bool> ContainsAsync(Guid id);
+
+        bool Reload(Guid id);
+
+        Task<bool> ReloadAsync(Guid id);
+        
+        bool Editable();
+
+        bool Addable();
+
+        bool Removeable();
+
+        bool Readable();
     }
 }
