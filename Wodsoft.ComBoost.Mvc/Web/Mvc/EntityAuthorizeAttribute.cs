@@ -75,7 +75,11 @@ namespace System.Web.Mvc
                 if (filterContext.HttpContext.User.Identity.IsAuthenticated)
                     filterContext.Result = new HttpUnauthorizedResult();
                 else
-                    filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl);
+                    if (filterContext.RouteData.DataTokens["loginUrl"] == null)
+                        filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl);
+                    else
+                        filterContext.Result = new RedirectResult(filterContext.RouteData.DataTokens["loginUrl"].ToString());
+
             }
         }
     }

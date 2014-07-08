@@ -538,7 +538,7 @@ namespace System.Web.Mvc
                     }
                     else
                     {
-                        propertyMetadata.Property.SetValue(entity, value);
+                        propertyMetadata.Property.SetValue(entity, cvalue);
                     }
                 }
             }
