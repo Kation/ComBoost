@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace Company.Mvc.Controllers
 {
-    [Authorize]
+    [EntityAuthorize]
     public class HomeController : Controller
     {
         public ActionResult Index()

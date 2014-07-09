@@ -16,21 +16,21 @@ namespace Company.Mvc.Migrations
 
         protected override void Seed(Company.Mvc.DataContext context)
         {
-            EmployeeGroup group = context.EmployeeGroup.Create();
-            group.Index = Guid.NewGuid();
-            group.CreateDate = DateTime.Now;
-            group.Name = "Admins";
-            group.Power = EmployeePower.Admin;
-            context.EmployeeGroup.Add(group);
+            //EmployeeGroup group = context.EmployeeGroup.Create();
+            //group.Index = Guid.NewGuid();
+            //group.CreateDate = DateTime.Now;
+            //group.Name = "Admins";
+            //group.Power = EmployeePower.Admin;
+            //context.EmployeeGroup.Add(group);
 
-            Employee admin = context.Employee.Create();
-            admin.Index = Guid.NewGuid();
-            admin.CreateDate = DateTime.Now;
-            admin.Name = "admin";
-            admin.Group = group;
-            admin.SetPassword("admin");
-            context.Employee.Add(admin);
-            context.SaveChanges();
+            //Employee admin = context.Employee.Create();
+            //admin.Index = Guid.NewGuid();
+            //admin.CreateDate = DateTime.Now;
+            //admin.Name = "admin";
+            //admin.Group = group;
+            //admin.SetPassword("admin");
+            //context.Employee.Add(admin);
+            //context.SaveChanges();
         }
     }
 }
