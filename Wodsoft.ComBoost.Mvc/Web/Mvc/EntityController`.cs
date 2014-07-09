@@ -456,19 +456,21 @@ namespace System.Web.Mvc
                     return new HttpStatusCodeResult(404);
             }
             var properties = Metadata.Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
-            _ErrorMessage = null;
+            ErrorMessage = null;
             if (!await UpdateCore(entity))
             {
-                Response.StatusCode = 400;
-                if (_ErrorMessage == null)
+                Response.StatusCode = 400; 
+                //Important!!!
+                Response.TrySkipIisCustomErrors = true;
+                if (ErrorMessage == null)
                     return Content("未知");
                 else
-                    return Content(_ErrorMessage);
+                    return Content(ErrorMessage);
             }
             return new HttpStatusCodeResult(200);
         }
 
-        private string _ErrorMessage;
+        protected string ErrorMessage { get; set; }
         protected virtual async Task<bool> UpdateCore(TEntity entity)
         {
             var properties = Metadata.Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
@@ -480,7 +482,7 @@ namespace System.Web.Mvc
             var validateResult = entity.Validate(validationContext);
             if (validateResult.Count() != 0)
             {
-                _ErrorMessage = string.Join("\r\n", validateResult.Select(t => t.ErrorMessage));
+                ErrorMessage = string.Join("\r\n", validateResult.Select(t => t.ErrorMessage));
                 return false;
             }
             bool result;
