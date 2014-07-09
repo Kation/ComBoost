@@ -26,14 +26,14 @@ namespace Company.Wpf
     /// </summary>
     public partial class MainWindow : Window
     {
-        private EntityPageController _Controller;
+        private EntityController _Controller;
 
         public MainWindow()
         {
             InitializeComponent();
 
             EntityContextBuilder builder = new EntityContextBuilder(new DataContext());
-            _Controller = new EntityPageController(builder);
+            _Controller = new EntityController(builder);
         }
         
         private void EmployeeManager_Click(object sender, RoutedEventArgs e)
