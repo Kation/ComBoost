@@ -459,7 +459,7 @@ namespace System.Web.Mvc
             ErrorMessage = null;
             if (!await UpdateCore(entity))
             {
-                Response.StatusCode = 400; 
+                Response.StatusCode = 400;
                 //Important!!!
                 Response.TrySkipIisCustomErrors = true;
                 if (ErrorMessage == null)
@@ -478,6 +478,8 @@ namespace System.Web.Mvc
             {
                 UpdateProperty(entity, property);
             });
+            if (ErrorMessage != null)
+                return false;
             ValidationContext validationContext = new ValidationContext(entity, new EntityDescriptorContext(EntityBuilder), null);
             var validateResult = entity.Validate(validationContext);
             if (validateResult.Count() != 0)
@@ -528,7 +530,16 @@ namespace System.Web.Mvc
                 else
                 {
                     EntityValueConverterContext context = new EntityValueConverterContext(EntityBuilder.DescriptorContext, propertyMetadata);
-                    object cvalue = converter.ConvertFrom(context, null, value);
+                    object cvalue;
+                    try
+                    {
+                        cvalue = converter.ConvertFrom(context, null, value);
+                    }
+                    catch(Exception ex)
+                    {
+                        ErrorMessage = ex.Message;
+                        return;
+                    }
                     if (converter.GetType() == typeof(Converter.CollectionConverter))
                     {
                         object collection = propertyMetadata.Property.GetValue(entity);
