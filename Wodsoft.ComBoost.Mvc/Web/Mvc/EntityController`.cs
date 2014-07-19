@@ -474,10 +474,10 @@ namespace System.Web.Mvc
         protected virtual async Task<bool> UpdateCore(TEntity entity)
         {
             var properties = Metadata.Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
-            Parallel.ForEach(properties, property =>
+            foreach (var property in properties)
             {
                 UpdateProperty(entity, property);
-            });
+            }
             if (ErrorMessage != null)
                 return false;
             ValidationContext validationContext = new ValidationContext(entity, new EntityDescriptorContext(EntityBuilder), null);
@@ -535,7 +535,7 @@ namespace System.Web.Mvc
                     {
                         cvalue = converter.ConvertFrom(context, null, value);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         ErrorMessage = ex.Message;
                         return;

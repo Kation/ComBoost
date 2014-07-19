@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Web.Routing;
 
 namespace System.Web.Mvc
 {
@@ -122,7 +123,7 @@ namespace System.Web.Mvc
         /// <param name="requestContext">The context of the HTTP request, which includes the HTTP context and route data.</param>
         /// <param name="controllerName">The name of the controller.</param>
         /// <returns>The controller type.</returns>
-        protected override Type GetControllerType(Routing.RequestContext requestContext, string controllerName)
+        protected override Type GetControllerType(RequestContext requestContext, string controllerName)
         {
             Type type = null;
             string areaString = requestContext.RouteData.DataTokens["Area"] as string;
