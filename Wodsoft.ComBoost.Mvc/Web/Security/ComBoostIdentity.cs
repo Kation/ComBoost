@@ -33,7 +33,7 @@ namespace System.Web.Security
                     HttpContext context = HttpContext.Current;
                     string name;
                     string authArea = null;
-                    if (!_Principal.CurrentRoute.DataTokens.ContainsKey("authArea"))
+                    if (_Principal.CurrentRoute == null || !_Principal.CurrentRoute.DataTokens.ContainsKey("authArea"))
                         name = ComBoostAuthentication.CookieName;
                     else
                     {
@@ -52,6 +52,8 @@ namespace System.Web.Security
                         {
                             string cookies = context.Request.Cookies[name].Value;
                             _IsAuthenticated = ComBoostAuthentication.VerifyCookie(cookies, authArea, out _Name);
+                            if (_IsAuthenticated.Value && _Principal.RoleEntity != null)
+                                ComBoostAuthentication.SignIn(_Name, false);
                         }
                     }
                     else

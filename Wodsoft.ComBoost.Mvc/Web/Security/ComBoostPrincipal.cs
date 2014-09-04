@@ -36,29 +36,37 @@ namespace System.Web.Security
 
         public RouteData CurrentRoute { get; private set; }
 
-        public IRoleEntity RoleEntity { get; private set; }
-        private bool _IsFailure;
-
-        internal bool InitRoleEntity()
+        private IRoleEntity _RoleEntity;
+        public IRoleEntity RoleEntity
         {
-            if (_IsFailure)
-                return false;
-            if (RoleEntity != null)
-                return true;
-            EntityRoute route = CurrentRoute.Route as EntityRoute;
-            if (route == null)
+            get
             {
-                _IsFailure = true;
-                return false;
+                if (_IsFailure)
+                    return null;
+                if (_RoleEntity == null)
+                {
+                    if (CurrentRoute == null)
+                    {
+                        _IsFailure = true;
+                        return null;
+                    }
+                    EntityRoute route = CurrentRoute.Route as EntityRoute;
+                    if (route == null)
+                    {
+                        _IsFailure = true;
+                        return null;
+                    }
+                    _RoleEntity = Resolve(route.UserType, Identity.Name);
+                    if (_RoleEntity == null)
+                    {
+                        _IsFailure = true;
+                        return null;
+                    }
+                }
+                return _RoleEntity;
             }
-            RoleEntity = Resolve(route.UserType, Identity.Name);
-            if (RoleEntity == null)
-            {
-                _IsFailure = true;
-                return false;
-            }
-            return true;
         }
+        private bool _IsFailure;
 
         public bool IsInRole(string role)
         {
@@ -69,7 +77,7 @@ namespace System.Web.Security
                     return false;
                 else
                     return OriginPrincipal.IsInRole(role);
-            if (!InitRoleEntity())
+            if (RoleEntity == null)
                 return false;
             return RoleEntity.IsInRole(role);
         }
