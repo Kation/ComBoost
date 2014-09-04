@@ -37,7 +37,11 @@ namespace System.Data.Entity.Metadata
 
             _Properties = new Dictionary<string, PropertyMetadata>();
             for (int i = 0; i < Properties.Length; i++)
+            {
+                if (_Properties.ContainsKey(Properties[i].Property.Name))
+                    continue;
                 _Properties.Add(Properties[i].Property.Name, Properties[i]);
+            }
 
             EntityAuthenticationAttribute authenticate = type.GetCustomAttribute<EntityAuthenticationAttribute>();
             if (authenticate == null)
