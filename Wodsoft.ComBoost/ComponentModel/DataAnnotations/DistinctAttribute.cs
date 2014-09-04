@@ -33,13 +33,13 @@ namespace System.ComponentModel.DataAnnotations
             {
                 try
                 {
-                    entityContext = validationContext.GetService(type);
+                    entityContext = validationContext.GetService(typeof(IEntityQueryable<>).MakeGenericType(type));
                     break;
                 }
                 catch
                 {
                     type = type.BaseType;
-                    entityContext = validationContext.GetService(type);
+                    entityContext = validationContext.GetService(typeof(IEntityQueryable<>).MakeGenericType(type));
                 }
             }
             if (entityContext == null)
