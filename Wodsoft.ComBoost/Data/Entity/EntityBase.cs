@@ -17,15 +17,19 @@ namespace System.Data.Entity
     public abstract class EntityBase : NotifyBase, IEntity
     {
         private EntityMetadata _Metadata;
-
         /// <summary>
-        /// Initialize entity.
+        /// Get the metadata of entity.
         /// </summary>
-        public EntityBase()
+        protected EntityMetadata Metadata
         {
-            _Metadata = EntityAnalyzer.GetMetadata(this.GetType());
+            get
+            {
+                if (_Metadata == null)
+                    _Metadata = EntityAnalyzer.GetMetadata(GetType());
+                return _Metadata;
+            }
         }
-
+        
         /// <summary>
         /// Get or set the id of entity.
         /// </summary>
@@ -82,9 +86,9 @@ namespace System.Data.Entity
         /// <returns></returns>
         public override string ToString()
         {
-            if (_Metadata.DisplayProperty == null)
+            if (Metadata.DisplayProperty == null)
                 return base.ToString();
-            return _Metadata.DisplayProperty.Property.GetValue(this, null).ToString();
+            return Metadata.DisplayProperty.Property.GetValue(this, null).ToString();
         }
 
         //private ReadOnlyCollection<ValidationResult> _NoError = new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>());
@@ -96,8 +100,7 @@ namespace System.Data.Entity
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var result = new List<ValidationResult>();
-            EntityMetadata metadata = Metadata.EntityAnalyzer.GetMetadata(GetType());
-            foreach (var property in metadata.Properties)
+            foreach (var property in Metadata.Properties)
             {
                 validationContext.MemberName = property.Property.Name;
                 validationContext.DisplayName = property.Name;
