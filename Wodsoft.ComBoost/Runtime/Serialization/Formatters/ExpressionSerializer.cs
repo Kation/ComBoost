@@ -72,21 +72,21 @@ namespace System.Runtime.Serialization.Formatters
 
         #region Deserialize
 
-        private IQueryable _Queryable;
+        private IQueryProvider _Queryable;
         /// <summary>
         /// Deserialize expression from stream to build a queryalbe.
         /// </summary>
         /// <param name="stream">Stream data.</param>
-        /// <param name="queryable">Queryable object.</param>
+        /// <param name="queryableProvider">Queryable object.</param>
         /// <returns></returns>
-        public IQueryable Deserialize(Stream stream, IQueryable queryable)
+        public IQueryable Deserialize(Stream stream, IQueryProvider queryableProvider)
         {
             if (stream == null)
                 throw new ArgumentNullException("stream");
 
             _Parameters = new SerializerHeader<ParameterExpression>();
             _Types = new SerializerHeader<Type>();
-            _Queryable = queryable;
+            _Queryable = queryableProvider;
 
             int count = stream.ReadByte();
             for (int i = 0; i < count; i++)
@@ -117,7 +117,54 @@ namespace System.Runtime.Serialization.Formatters
             _Types = null;
             _Queryable = null;
 
-            return queryable.Provider.CreateQuery(expression);
+            return queryableProvider.CreateQuery(expression);
+        }
+
+        /// <summary>
+        /// Deserialize expression from stream to build a queryalbe.
+        /// </summary>
+        /// <param name="stream">Stream data.</param>
+        /// <param name="queryableProvider">Query single object.</param>
+        /// <returns></returns>
+        public object DeserializeSingle(Stream stream, IQueryProvider queryableProvider)
+        {
+                        if (stream == null)
+                throw new ArgumentNullException("stream");
+
+            _Parameters = new SerializerHeader<ParameterExpression>();
+            _Types = new SerializerHeader<Type>();
+            _Queryable = queryableProvider;
+
+            int count = stream.ReadByte();
+            for (int i = 0; i < count; i++)
+            {
+                Type type = ReadTypeCore(stream);
+                _Types.AddHeader(type);
+            }
+
+            count = stream.ReadByte();
+            for (int i = 0; i < count; i++)
+            {
+                //Read Expression Type
+                Type type = _Types.GetHeader(stream.ReadByte());
+
+                //Read Member Name
+                int length = stream.ReadByte();
+                byte[] nameData = new byte[length];
+                stream.Read(nameData, 0, length);
+                string name = Encoding.UTF8.GetString(nameData, 0, length);
+
+                ParameterExpression parameter = Expression.Parameter(type, name);
+                _Parameters.AddHeader(parameter);
+            }
+
+            Expression expression = Deserialize(stream);
+
+            _Parameters = null;
+            _Types = null;
+            _Queryable = null;
+
+            return queryableProvider.Execute(expression);
         }
 
         private Expression Deserialize(Stream stream)
