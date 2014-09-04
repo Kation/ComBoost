@@ -48,7 +48,7 @@ namespace System.Web.Mvc.Converter
                 throw new ArgumentNullException("context");
             string[] ids = ((string)value).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             List<object> items = new List<object>();
-            dynamic queryable = context.GetService(((EntityValueConverterContext)context).Property.Property.PropertyType.GetGenericArguments()[0]);
+            dynamic queryable = context.GetService(typeof(IEntityQueryable<>).MakeGenericType(((EntityValueConverterContext)context).Property.Property.PropertyType.GetGenericArguments()[0]));
             for (int i = 0; i < ids.Length; i++)
             {
                 Guid id;

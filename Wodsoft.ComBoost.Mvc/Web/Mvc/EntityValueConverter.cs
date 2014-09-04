@@ -23,32 +23,32 @@ namespace System.Web.Mvc
             _DefaultItems = new Dictionary<CustomDataType, TypeConverter>();
             _CustomItems = new Dictionary<string, TypeConverter>();
 
-            AddConverter(CustomDataType.Boolean, new BooleanConverter());
-            AddConverter(CustomDataType.Currency, new DecimalConverter());
-            AddConverter(CustomDataType.Date, new DateConverter());
+            //AddConverter(CustomDataType.Boolean, new BooleanConverter());
+            //AddConverter(CustomDataType.Currency, new DecimalConverter());
+            //AddConverter(CustomDataType.Date, new DateConverter());
             AddConverter(CustomDataType.DateTime, new System.Web.Mvc.Converter.DateTimeConverter());
-            AddConverter(CustomDataType.Default, new StringConverter());
-            AddConverter(CustomDataType.EmailAddress, new StringConverter());
-            AddConverter(CustomDataType.File, new StringConverter());
-            AddConverter(CustomDataType.Html, new StringConverter());
-            AddConverter(CustomDataType.Image, new StringConverter());
-            AddConverter(CustomDataType.ImageUrl, new StringConverter());
-            AddConverter(CustomDataType.Integer, new Int32Converter());
-            AddConverter(CustomDataType.MultilineText, new StringConverter());
-            AddConverter(CustomDataType.Number, new DoubleConverter());
-            AddConverter(CustomDataType.Password, new StringConverter());
-            AddConverter(CustomDataType.PhoneNumber, new StringConverter());
+            //AddConverter(CustomDataType.Default, new StringConverter());
+            //AddConverter(CustomDataType.EmailAddress, new StringConverter());
+            //AddConverter(CustomDataType.File, new StringConverter());
+            //AddConverter(CustomDataType.Html, new StringConverter());
+            //AddConverter(CustomDataType.Image, new StringConverter());
+            //AddConverter(CustomDataType.ImageUrl, new StringConverter());
+            //AddConverter(CustomDataType.Integer, new Int32Converter());
+            //AddConverter(CustomDataType.MultilineText, new StringConverter());
+            //AddConverter(CustomDataType.Number, new DoubleConverter());
+            //AddConverter(CustomDataType.Password, new StringConverter());
+            //AddConverter(CustomDataType.PhoneNumber, new StringConverter());
             AddConverter(CustomDataType.Sex, new SexConverter());
-            AddConverter(CustomDataType.Text, new StringConverter());
-            AddConverter(CustomDataType.Time, new TimeSpanConverter());
-            AddConverter(CustomDataType.Url, new StringConverter());
+            //AddConverter(CustomDataType.Text, new StringConverter());
+            //AddConverter(CustomDataType.Time, new TimeSpanConverter());
+            //AddConverter(CustomDataType.Url, new StringConverter());
 
             AddConverter("Enum", new System.Web.Mvc.Converter.EnumConverter());
             AddConverter("Entity", new EntityConverter());
             AddConverter("Collection", new System.Web.Mvc.Converter.CollectionConverter());
             AddConverter("ValueFilter", new StringConverter());
         }
-        
+
         /// <summary>
         /// Add a converter for a type.
         /// </summary>
@@ -112,10 +112,14 @@ namespace System.Web.Mvc
         {
             if (metadata == null)
                 throw new ArgumentNullException("metadata");
+            TypeConverter converter;
             if (metadata.Type == CustomDataType.Other)
-                return GetConverter(metadata.CustomType);
+                converter = GetConverter(metadata.CustomType);
             else
-                return GetConverter(metadata.Type);
+                converter = GetConverter(metadata.Type);
+            if (converter == null)
+                converter = TypeDescriptor.GetConverter(metadata.Property.PropertyType);
+            return converter;
         }
 
         /// <summary>
