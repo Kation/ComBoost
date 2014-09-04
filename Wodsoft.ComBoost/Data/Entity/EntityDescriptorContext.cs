@@ -73,7 +73,21 @@ namespace System.Data.Entity
         /// <returns>Return IEntityQueryable of entity.</returns>
         public object GetService(Type serviceType)
         {
-            return _Builder.GetContext(serviceType);
+            if (serviceType.IsGenericType)
+            {
+                Type definition = serviceType.GetGenericTypeDefinition();
+                if (definition == typeof(IEntityQueryable<>))
+                    return _Builder.GetContext(serviceType.GetGenericArguments()[0]);
+                else
+                    return null;
+            }
+            else
+            {
+                if (typeof(IEntity).IsAssignableFrom(serviceType))
+                    return _Builder.GetContext(serviceType);
+                else
+                    return null;
+            }
         }
     }
 }
