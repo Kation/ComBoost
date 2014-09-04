@@ -92,6 +92,11 @@ namespace System.Web.Mvc
             return View(model);
         }
 
+        /// <summary>
+        /// Get search item in request.
+        /// </summary>
+        /// <param name="queryable">Queryable of TEntity.</param>
+        /// <returns>Search item of TEntity.</returns>
         protected virtual EntitySearchItem[] GetSearchItem(ref IQueryable<TEntity> queryable)
         {
             List<EntitySearchItem> searchItems = new List<EntitySearchItem>();
@@ -211,6 +216,13 @@ namespace System.Web.Mvc
             return searchItems.ToArray();
         }
 
+        /// <summary>
+        /// Get index action model.
+        /// </summary>
+        /// <param name="queryable">Queryable object of TEntity.</param>
+        /// <param name="page">Current page.</param>
+        /// <param name="size">Current page size.</param>
+        /// <returns>View model of TEntity.</returns>
         protected virtual EntityViewModel<TEntity> GetIndexModel(IQueryable<TEntity> queryable, int page, int size)
         {
             var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, size);
@@ -223,6 +235,12 @@ namespace System.Web.Mvc
             return model;
         }
 
+        /// <summary>
+        /// Get parent model.
+        /// </summary>
+        /// <param name="selected">Selected parent id.</param>
+        /// <param name="level">Max tree level.</param>
+        /// <returns>Parent model.</returns>
         protected virtual EntityParentModel[] GetParentModel(Guid? selected, int level)
         {
             EntityMetadata metadata = Metadata;
@@ -331,6 +349,11 @@ namespace System.Web.Mvc
             return View("Edit", model);
         }
 
+        /// <summary>
+        /// Get create action model.
+        /// </summary>
+        /// <param name="parent">Parent id.</param>
+        /// <returns>Edit model with new entity item of TEntity.</returns>
         protected virtual async Task<EntityEditModel<TEntity>> GetCreateModel(Guid? parent = null)
         {
             var model = new EntityEditModel<TEntity>(EntityQueryable.Create());
@@ -361,6 +384,11 @@ namespace System.Web.Mvc
             return View(model);
         }
 
+        /// <summary>
+        /// Get detail action model.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns>Edit model with detail properties of TEntity.</returns>
         protected virtual async Task<EntityEditModel<TEntity>> GetDetailModel(Guid id)
         {
             TEntity item = await EntityQueryable.GetEntityAsync(id);
@@ -391,6 +419,11 @@ namespace System.Web.Mvc
             return View(model);
         }
 
+        /// <summary>
+        /// Get edit action model.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns>Edit model of TEntity.</returns>
         protected virtual async Task<EntityEditModel<TEntity>> GetEditModel(Guid id)
         {
             TEntity item = await EntityQueryable.GetEntityAsync(id);
@@ -419,6 +452,11 @@ namespace System.Web.Mvc
                 return new HttpStatusCodeResult(404);
         }
 
+        /// <summary>
+        /// Remoce action core method.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns>True if success, otherwise is false.</returns>
         protected virtual async Task<bool> RemoveCore(Guid id)
         {
             if (await EntityQueryable.RemoveAsync(id))
@@ -470,13 +508,23 @@ namespace System.Web.Mvc
             return new HttpStatusCodeResult(200);
         }
 
+        /// <summary>
+        /// Get or set the error message.
+        /// This will make update action stop and return error message.
+        /// </summary>
         protected string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Update action core method.
+        /// </summary>
+        /// <param name="entity">Entity to edit or create.</param>
+        /// <returns>True if success, otherwise is false.</returns>
         protected virtual async Task<bool> UpdateCore(TEntity entity)
         {
             var properties = Metadata.Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
             foreach (var property in properties)
             {
-                UpdateProperty(entity, property);
+                await UpdateProperty(entity, property);
             }
             if (ErrorMessage != null)
                 return false;
@@ -495,7 +543,13 @@ namespace System.Web.Mvc
             return result;
         }
 
-        protected virtual void UpdateProperty(TEntity entity, PropertyMetadata propertyMetadata)
+        /// <summary>
+        /// Update property for entity.
+        /// </summary>
+        /// <param name="entity">Entity to update.</param>
+        /// <param name="propertyMetadata">Property metadata.</param>
+        /// <returns></returns>
+        protected virtual async Task UpdateProperty(TEntity entity, PropertyMetadata propertyMetadata)
         {
             if (propertyMetadata.IsFileUpload)
             {
@@ -504,7 +558,7 @@ namespace System.Web.Mvc
                     return;
                 if (!(this is IFileController<TEntity>))
                     throw new NotSupportedException("Controller doesn't support upload file.");
-                ((IFileController<TEntity>)this).SaveFileToProperty(entity, propertyMetadata, Request.Files[propertyMetadata.Property.Name]);
+                await ((IFileController<TEntity>)this).SaveFileToProperty(entity, propertyMetadata, Request.Files[propertyMetadata.Property.Name]);
                 #endregion
             }
             else
@@ -519,8 +573,11 @@ namespace System.Web.Mvc
                     else if (propertyMetadata.Property.PropertyType.IsEnum)
                         converter = new EnumConverter(propertyMetadata.Property.PropertyType);
                     else
-                        if (propertyMetadata.Type != ComponentModel.DataAnnotations.CustomDataType.Password)
+                    {
+                        converter = TypeDescriptor.GetConverter(propertyMetadata.Property.PropertyType);
+                        if (converter == null && propertyMetadata.Type != ComponentModel.DataAnnotations.CustomDataType.Password)
                             throw new NotSupportedException("Type of \"" + propertyMetadata.Property.PropertyType.Name + "\" converter not found.");
+                    }
                 if (propertyMetadata.Type == ComponentModel.DataAnnotations.CustomDataType.Password && entity is IPassword)
                 {
                     object v = propertyMetadata.Property.GetValue(entity);
@@ -561,17 +618,24 @@ namespace System.Web.Mvc
         /// Selector page.
         /// </summary>
         /// <param name="page">Number of current page.</param>
+        /// <param name="size">Number of entities per page.</param>
         /// <param name="parentpath">Path of parent for entity.</param>
         /// <param name="parentid">Parent id.</param>
+        /// <param name="search">Is a search result.</param>
         /// <returns></returns>
         [HttpGet]
-        public virtual async Task<ActionResult> Selector(int page = 1, string parentpath = null, Guid? parentid = null)
+        public virtual async Task<ActionResult> Selector(int page = 1, int size = 10, string parentpath = null, Guid? parentid = null, bool search = false)
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
                 return new HttpUnauthorizedResult();
             if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
                 return new HttpUnauthorizedResult();
             IQueryable<TEntity> queryable = EntityQueryable.Query();
+            EntitySearchItem[] searchItems = null;
+            if (search)
+            {
+                searchItems = GetSearchItem(ref queryable);
+            }
             if (parentpath != null && parentid.HasValue)
             {
                 try
@@ -583,10 +647,11 @@ namespace System.Web.Mvc
                     return new HttpStatusCodeResult(400);
                 }
             }
-            var model = GetIndexModel(EntityQueryable.OrderBy(queryable), page, 10);
+            var model = GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
             if (Metadata.ParentProperty != null)
                 model.Parent = GetParentModel(parentid, 3);
             model.Headers = Metadata.ViewProperties;
+            model.SearchItem = searchItems;
             model.Items = await EntityQueryable.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
             return View(model);
         }
@@ -595,17 +660,24 @@ namespace System.Web.Mvc
         /// Multiple selector page.
         /// </summary>
         /// <param name="page">Number of current page.</param>
+        /// <param name="size">Number of entities per page.</param>
         /// <param name="parentpath">Path of parent for entity.</param>
         /// <param name="parentid">Parent id.</param>
+        /// <param name="search">Is a search result.</param>
         /// <returns></returns>
         [HttpGet]
-        public virtual async Task<ActionResult> MultipleSelector(int page = 1, string parentpath = null, Guid? parentid = null)
+        public virtual async Task<ActionResult> MultipleSelector(int page = 1, int size = 10, string parentpath = null, Guid? parentid = null, bool search = false)
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
                 return new HttpUnauthorizedResult();
             if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
                 return new HttpUnauthorizedResult();
             IQueryable<TEntity> queryable = EntityQueryable.Query();
+            EntitySearchItem[] searchItems = null;
+            if (search)
+            {
+                searchItems = GetSearchItem(ref queryable);
+            }
             if (parentpath != null && parentid.HasValue)
             {
                 try
@@ -617,10 +689,11 @@ namespace System.Web.Mvc
                     return new HttpStatusCodeResult(400);
                 }
             }
-            var model = GetIndexModel(EntityQueryable.OrderBy(queryable), page, 10);
+            var model = GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
             if (Metadata.ParentProperty != null)
                 model.Parent = GetParentModel(parentid, 3);
             model.Headers = Metadata.ViewProperties;
+            model.SearchItem = searchItems;
             model.Items = await EntityQueryable.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
             return View(model);
         }
@@ -630,12 +703,16 @@ namespace System.Web.Mvc
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public virtual ActionResult Search()
+        public virtual Task<ActionResult> Search(string actionName = "Index")
         {
-            if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
-                return new HttpUnauthorizedResult();
-            EntitySearchModel<TEntity> model = new EntitySearchModel<TEntity>();
-            return View(model);
+            return Task.Run<ActionResult>(() =>
+            {
+                if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
+                    return new HttpUnauthorizedResult();
+                EntitySearchModel<TEntity> model = new EntitySearchModel<TEntity>();
+                ViewBag.Action = actionName;
+                return View(model);
+            });
         }
 
         /// <summary>
@@ -646,19 +723,23 @@ namespace System.Web.Mvc
         /// <param name="selected">Value of selected.</param>
         /// <returns></returns>
         [HttpPost]
-        public virtual ActionResult ValueFilter(string property, string value, string selected = null)
+        public virtual Task<ActionResult> ValueFilter(string property, string value, string selected = null)
         {
-            PropertyMetadata p = Metadata.GetProperty(property);
-            if (p == null)
-                return new HttpStatusCodeResult(404);
-            ValueFilterAttribute filterAttribute = p.Property.GetCustomAttribute<ValueFilterAttribute>(true);
-            if (filterAttribute == null)
-                return new HttpStatusCodeResult(400);
-            ValueFilter filter = (ValueFilter)Activator.CreateInstance(filterAttribute.ValueFilter);
-            ViewBag.Selected = selected;
-            ViewBag.IsRequired = p.IsRequired;
-            var collection = filter.GetValues(filterAttribute.DependencyProperty, value);
-            return View(collection);
+            return Task.Run<ActionResult>(() =>
+            {
+
+                PropertyMetadata p = Metadata.GetProperty(property);
+                if (p == null)
+                    return new HttpStatusCodeResult(404);
+                ValueFilterAttribute filterAttribute = p.Property.GetCustomAttribute<ValueFilterAttribute>(true);
+                if (filterAttribute == null)
+                    return new HttpStatusCodeResult(400);
+                ValueFilter filter = (ValueFilter)Activator.CreateInstance(filterAttribute.ValueFilter);
+                ViewBag.Selected = selected;
+                ViewBag.IsRequired = p.IsRequired;
+                var collection = filter.GetValues(filterAttribute.DependencyProperty, value);
+                return View(collection);
+            });
         }
     }
 }
