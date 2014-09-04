@@ -11,10 +11,6 @@ namespace System.Data.Entity
     public interface IEntityContextBuilder : IDisposable
     {
         /// <summary>
-        /// Get support entity types array.
-        /// </summary>
-        Type[] EntityTypes { get; }
-        /// <summary>
         /// Get entity context.
         /// </summary>
         /// <typeparam name="TEntity">Type of entity.</typeparam>
