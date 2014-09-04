@@ -225,5 +225,14 @@ namespace System.Data.Entity.Metadata
         /// Get is the property search able.
         /// </summary>
         public bool Searchable { get; private set; }
+
+        /// <summary>
+        /// Get property display name.
+        /// </summary>
+        /// <returns>Default return name of display + "-" + name of property.</returns>
+        public override string ToString()
+        {
+            return Name + "-" + Property.Name;
+        }
     }
 }
