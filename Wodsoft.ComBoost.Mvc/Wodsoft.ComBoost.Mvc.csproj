@@ -92,12 +92,13 @@
     <Compile Include="ComponentModel\MvcViewButton.cs" />
     <Compile Include="Web\Mvc\Converter\CollectionConverter.cs" />
     <Compile Include="Web\Mvc\Converter\DateTimeConverter.cs" />
-    <Compile Include="Web\Mvc\Converter\DateConverter.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Web\Mvc\Converter\EntityConverter.cs" />
     <Compile Include="Web\Mvc\Converter\EnumConverter.cs" />
     <Compile Include="Web\Mvc\Converter\SexConverter.cs" />
+    <Compile Include="Web\Mvc\EntityAPIController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Web\Mvc\EntityAPIController`.cs" />
     <Compile Include="Web\Mvc\EntityAuthorizeAttribute.cs" />
     <Compile Include="Web\Mvc\EntityRouteCollectionExtensions.cs" />
     <Compile Include="Web\Mvc\EntityController.cs">
@@ -123,6 +124,7 @@
     <None Include="Bootstrap\Views\Shared\Detail.cshtml" />
     <None Include="Bootstrap\Views\Shared\ValueFilter.cshtml" />
     <None Include="Bootstrap\Views\Shared\ValueFilterEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\_DialogLayout.cshtml" />
     <None Include="MetroUICss\App_Start\MetroUICSSBundleConfig.cs.pp" />
     <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.eot" />
     <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.json" />
