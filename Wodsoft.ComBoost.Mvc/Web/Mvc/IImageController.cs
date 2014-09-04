@@ -20,6 +20,6 @@ namespace System.Web.Mvc
         /// <param name="id">Entity id.</param>
         /// <param name="property">Property name.</param>
         /// <returns></returns>
-        FileResult ImageToProperty(Guid id, string property);
+        Task<FileResult> ImageToProperty(Guid id, string property);
     }
 }
