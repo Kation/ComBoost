@@ -16,7 +16,7 @@ namespace System.Web.Mvc
     /// Entity controller with actions.
     /// </summary>
     [EntityAuthorize]
-    public class EntityController<TEntity> : EntityController where TEntity : class, IEntity, new()
+    public class EntityController<TEntity> : EntityController, IEntityMetadata where TEntity : class, IEntity, new()
     {
         /// <summary>
         /// Metadata of entity.

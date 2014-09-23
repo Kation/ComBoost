@@ -42,12 +42,10 @@ namespace System.Web.Mvc
 
         private bool Authorize(AuthorizationContext filterContext)
         {
-            bool result = true;
+            bool result = false;
             if (Metadata != null)
-            {
-                result &= (Metadata.AllowAnonymous || filterContext.HttpContext.User.Identity.IsAuthenticated);
-            }
-            if (result)
+                result = Metadata.AllowAnonymous;
+            if (!result)
                 result = AuthorizeCore(filterContext.HttpContext);
             return result;
         }
@@ -66,8 +64,8 @@ namespace System.Web.Mvc
                     filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl);
                 return;
             }
-            if (filterContext.Controller.GetType().IsGenericType)
-                Metadata = EntityAnalyzer.GetMetadata(filterContext.Controller.GetType().GetGenericArguments()[0]);
+            if (filterContext.Controller is IEntityMetadata)
+                Metadata = ((IEntityMetadata)filterContext.Controller).Metadata;
             RouteData = filterContext.RouteData;
 
             if (!Authorize(filterContext))
