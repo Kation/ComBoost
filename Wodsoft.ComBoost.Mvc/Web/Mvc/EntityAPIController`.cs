@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace System.Web.Mvc
 {
-    public class EntityAPIController<TEntity> : EntityAPIController where TEntity : class, IEntity, new()
+    public class EntityAPIController<TEntity> : EntityAPIController, IEntityMetadata where TEntity : class, IEntity, new()
     {
         /// <summary>
         /// Metadata of entity.

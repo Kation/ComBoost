@@ -110,6 +110,7 @@
     <Compile Include="Web\Mvc\EntityValueConverterContext.cs" />
     <Compile Include="Web\Mvc\EntityExtension.cs" />
     <Compile Include="Web\Mvc\EntityValueConverter.cs" />
+    <Compile Include="Web\Mvc\IEntityMetadata.cs" />
     <Compile Include="Web\Mvc\IFileController.cs" />
     <Compile Include="Web\Mvc\IImageController.cs" />
     <Compile Include="Web\Routing\EntityRoute.cs" />
