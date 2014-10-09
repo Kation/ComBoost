@@ -86,9 +86,10 @@ namespace System.Web.Security
 
         }
 
-        public static bool VerifyCookie(string cookieValue, string authArea, out string username)
+        public static bool VerifyCookie(string cookieValue, string authArea, out string username, out DateTime expiredDate)
         {
             username = null;
+            expiredDate = DateTime.MinValue;
             byte[] data;
             try
             {
@@ -115,6 +116,7 @@ namespace System.Web.Security
                     if (data[i] != token.Signature[i])
                         return false;
                 username = token.Username;
+                expiredDate = token.ExpiredDate;
                 return true;
             }
             catch

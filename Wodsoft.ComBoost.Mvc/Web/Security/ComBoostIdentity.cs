@@ -51,9 +51,11 @@ namespace System.Web.Security
                         else
                         {
                             string cookies = context.Request.Cookies[name].Value;
-                            _IsAuthenticated = ComBoostAuthentication.VerifyCookie(cookies, authArea, out _Name);
+                            DateTime expiredDate;
+                            _IsAuthenticated = ComBoostAuthentication.VerifyCookie(cookies, authArea, out _Name, out expiredDate);
                             if (_IsAuthenticated.Value && _Principal.RoleEntity != null)
-                                ComBoostAuthentication.SignIn(_Name, false);
+                                if (expiredDate < DateTime.Now.Add(ComBoostAuthentication.Timeout))
+                                    ComBoostAuthentication.SignIn(_Name, false);
                         }
                     }
                     else
