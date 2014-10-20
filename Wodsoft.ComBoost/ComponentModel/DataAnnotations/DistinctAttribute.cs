@@ -29,19 +29,9 @@ namespace System.ComponentModel.DataAnnotations
             IEntity entity = (IEntity)validationContext.ObjectInstance;
             dynamic entityContext;
             Type type = validationContext.ObjectType;
-            while (true)
-            {
-                try
-                {
-                    entityContext = validationContext.GetService(typeof(IEntityQueryable<>).MakeGenericType(type));
-                    break;
-                }
-                catch
-                {
-                    type = type.BaseType;
-                    entityContext = validationContext.GetService(typeof(IEntityQueryable<>).MakeGenericType(type));
-                }
-            }
+            while (type.Assembly.IsDynamic)
+                type = type.BaseType;
+            entityContext = validationContext.GetService(typeof(IEntityQueryable<>).MakeGenericType(type));
             if (entityContext == null)
                 return null;
             if (value is string && IsCaseSensitive)

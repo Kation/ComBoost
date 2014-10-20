@@ -27,6 +27,8 @@ namespace System.Data.Entity.Metadata
         /// <returns>Return entity metadata. If find any error when analyze will return null.</returns>
         public static EntityMetadata GetMetadata(Type type)
         {
+            while (type.Assembly.IsDynamic)
+                type = type.BaseType;
             lock (_Metadata)
                 if (!_Metadata.ContainsKey(type))
                     _Metadata.Add(type, BuildMetadata(type));
