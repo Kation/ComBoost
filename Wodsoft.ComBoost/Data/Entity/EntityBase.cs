@@ -66,6 +66,7 @@ namespace System.Data.Entity
         /// Get is the entity can remove.
         /// </summary>
         /// <returns></returns>
+        [Hide]
         public virtual bool IsRemoveAllowed
         {
             get { return true; }
@@ -75,6 +76,7 @@ namespace System.Data.Entity
         /// Get is the entity can edit.
         /// </summary>
         /// <returns></returns>
+        [Hide]
         public virtual bool IsEditAllowed
         {
             get { return true; }

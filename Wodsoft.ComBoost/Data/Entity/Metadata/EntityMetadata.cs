@@ -27,11 +27,11 @@ namespace System.Data.Entity.Metadata
             Type = type;
             KeyType = type.GetProperty("Index").PropertyType;
 
-            PropertyInfo[] properties = type.GetProperties().Where(t => t.GetGetMethod() != null && t.GetSetMethod() != null).ToArray();
+            PropertyInfo[] properties = type.GetProperties().ToArray();
             Properties = properties.Select(t => new PropertyMetadata(t)).OrderBy(t => t.Order).ToArray();
 
             ViewProperties = Properties.Where(t => !t.IsHiddenOnView).ToArray();
-            EditProperties = Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
+            EditProperties = Properties.Where(t => !t.IsHiddenOnEdit && t.Property.GetSetMethod() != null).ToArray();
             SearchProperties = Properties.Where(t => t.Searchable).ToArray();
             DetailProperties = Properties.Where(t => !t.IsHiddenOnDetail).ToArray();
 
@@ -146,7 +146,7 @@ namespace System.Data.Entity.Metadata
         /// Get the properties of entity while search.
         /// </summary>
         public PropertyMetadata[] SearchProperties { get; private set; }
-        
+
         /// <summary>
         /// Get the properties of entity in detail.
         /// </summary>
