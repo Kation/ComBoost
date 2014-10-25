@@ -15,6 +15,16 @@ namespace System.Web.Mvc
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class EntityAuthorizeAttribute : FilterAttribute, IAuthorizationFilter
     {
+        public EntityAuthorizeAttribute()
+            : this(EntityAuthorizeAction.None) { }
+
+        public EntityAuthorizeAttribute(EntityAuthorizeAction action)
+        {
+            Action = action;
+        }
+
+        public EntityAuthorizeAction Action { get; private set; }
+
         /// <summary>
         /// Get the context builder of entity.
         /// </summary>
@@ -37,17 +47,33 @@ namespace System.Web.Mvc
         /// <returns>true if the user is authorized; otherwise, false.</returns>
         protected virtual bool AuthorizeCore(HttpContextBase httpContext)
         {
-            return httpContext.User.Identity.IsAuthenticated;
+            return true;
         }
 
         private bool Authorize(AuthorizationContext filterContext)
         {
-            bool result = false;
             if (Metadata != null)
-                result = Metadata.AllowAnonymous;
-            if (!result)
-                result = AuthorizeCore(filterContext.HttpContext);
-            return result;
+            {
+                if (!Metadata.AllowAnonymous && !filterContext.RequestContext.HttpContext.User.Identity.IsAuthenticated)
+                    return false;
+                switch (Action)
+                {
+                    case EntityAuthorizeAction.Create:
+                        return Metadata.AddRoles.All(t => filterContext.RequestContext.HttpContext.User.IsInRole(t));
+                    case EntityAuthorizeAction.Edit:
+                        return Metadata.EditRoles.All(t => filterContext.RequestContext.HttpContext.User.IsInRole(t));
+                    case EntityAuthorizeAction.Remove:
+                        return Metadata.RemoveRoles.All(t => filterContext.RequestContext.HttpContext.User.IsInRole(t));
+                    case EntityAuthorizeAction.View:
+                        return Metadata.ViewRoles.All(t => filterContext.RequestContext.HttpContext.User.IsInRole(t));
+                    case EntityAuthorizeAction.None:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            else
+                return AuthorizeCore(filterContext.RequestContext.HttpContext);
         }
 
         /// <summary>
@@ -74,11 +100,19 @@ namespace System.Web.Mvc
                     filterContext.Result = new HttpUnauthorizedResult();
                 else
                     if (filterContext.RouteData.DataTokens["loginUrl"] == null)
-                        filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl);
+                        filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
                     else
-                        filterContext.Result = new RedirectResult(filterContext.RouteData.DataTokens["loginUrl"].ToString());
-
+                        filterContext.Result = new RedirectResult(filterContext.RouteData.DataTokens["loginUrl"].ToString() + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
             }
         }
+    }
+
+    public enum EntityAuthorizeAction
+    {
+        None = 0,
+        View = 1,
+        Create = 2,
+        Edit = 3,
+        Remove = 4
     }
 }

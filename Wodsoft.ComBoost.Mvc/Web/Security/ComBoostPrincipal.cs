@@ -45,6 +45,11 @@ namespace System.Web.Security
                     return null;
                 if (_RoleEntity == null)
                 {
+                    if (!Identity.IsAuthenticated)
+                    {
+                        _IsFailure = true;
+                        return null;
+                    }
                     if (CurrentRoute == null)
                     {
                         _IsFailure = true;

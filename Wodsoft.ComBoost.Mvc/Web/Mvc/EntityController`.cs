@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace System.Web.Mvc
 {
@@ -55,14 +56,15 @@ namespace System.Web.Mvc
         /// <param name="search">Is a search result.</param>
         /// <returns></returns>
         [HttpGet]
+        [EntityAuthorize(EntityAuthorizeAction.View)]
         public virtual async Task<ActionResult> Index(int page = 1, int size = 20, string parentpath = null, Guid? parentid = null, bool search = false)
         {
             if (page < 1)
                 return new HttpStatusCodeResult(400);
             if (size < 1)
                 return new HttpStatusCodeResult(400);
-            if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
-                return new HttpUnauthorizedResult();
+            //if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
+            //    return new HttpUnauthorizedResult();
             IQueryable<TEntity> queryable = EntityQueryable.Query();
             EntitySearchItem[] searchItems;
             if (search)
@@ -339,12 +341,13 @@ namespace System.Web.Mvc
         /// <param name="parent">Parent id.</param>
         /// <returns></returns>
         [HttpGet]
+        [EntityAuthorize(EntityAuthorizeAction.Create)]
         public virtual async Task<ActionResult> Create(Guid? parent = null)
         {
             if (!EntityQueryable.Addable())
-                return new HttpUnauthorizedResult();
-            if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
-                return new HttpUnauthorizedResult();
+                return new HttpStatusCodeResult(403);
+            //if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
+            //    return new HttpUnauthorizedResult();
             var model = await GetCreateModel(parent);
             return View("Edit", model);
         }
@@ -374,10 +377,11 @@ namespace System.Web.Mvc
         /// <param name="id">Entity id.</param>
         /// <returns></returns>
         [HttpGet]
+        [EntityAuthorize(EntityAuthorizeAction.View)]
         public virtual async Task<ActionResult> Detail(Guid id)
         {
-            if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
-                return new HttpUnauthorizedResult();
+            //if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
+            //    return new HttpUnauthorizedResult();
             var model = await GetDetailModel(id);
             if (model == null)
                 return new HttpStatusCodeResult(404);
@@ -405,14 +409,15 @@ namespace System.Web.Mvc
         /// <param name="id">Entity id.</param>
         /// <returns></returns>
         [HttpGet]
+        [EntityAuthorize(EntityAuthorizeAction.Edit)]
         public virtual async Task<ActionResult> Edit(Guid id)
         {
             if (!EntityQueryable.Editable())
-                return new HttpUnauthorizedResult();
-            if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
-                return new HttpUnauthorizedResult();
-            if (!Metadata.EditRoles.All(t => User.IsInRole(t)))
-                return new HttpUnauthorizedResult();
+                return new HttpStatusCodeResult(403);
+            //if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
+            //    return new HttpUnauthorizedResult();
+            //if (!Metadata.EditRoles.All(t => User.IsInRole(t)))
+            //    return new HttpUnauthorizedResult();
             var model = await GetEditModel(id);
             if (model == null)
                 return new HttpStatusCodeResult(404);
@@ -440,16 +445,26 @@ namespace System.Web.Mvc
         /// <param name="id">Entity id.</param>
         /// <returns></returns>
         [HttpPost]
+        [EntityAuthorize(EntityAuthorizeAction.Remove)]
         public virtual async Task<ActionResult> Remove(Guid id)
         {
-            if (!EntityQueryable.Removeable())
-                return new HttpUnauthorizedResult();
-            if (!Metadata.RemoveRoles.All(t => User.IsInRole(t)))
-                return new HttpUnauthorizedResult();
-            if (await RemoveCore(id))
-                return new HttpStatusCodeResult(200);
-            else
-                return new HttpStatusCodeResult(404);
+            using (TransactionScope transaction = new TransactionScope())
+            {
+                if (!EntityQueryable.Removeable())
+                    return new HttpStatusCodeResult(403);
+                //if (!Metadata.RemoveRoles.All(t => User.IsInRole(t)))
+                //    return new HttpUnauthorizedResult();
+                if (await RemoveCore(id))
+                {
+                    transaction.Complete();
+                    return new HttpStatusCodeResult(200);
+                }
+                else
+                {
+                    transaction.Complete();
+                    return new HttpStatusCodeResult(404);
+                }
+            }
         }
 
         /// <summary>
@@ -472,40 +487,46 @@ namespace System.Web.Mvc
         /// <returns></returns>
         [ValidateInput(false)]
         [HttpPost]
+        [EntityAuthorize]
         public virtual async Task<ActionResult> Update(Guid id)
         {
-            TEntity entity;
-            if (id == Guid.Empty)
+            using (TransactionScope transaction = new TransactionScope())
             {
-                if (!EntityQueryable.Addable())
-                    return new HttpUnauthorizedResult();
-                if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
-                    return new HttpUnauthorizedResult();
-                entity = EntityQueryable.Create();
-            }
-            else
-            {
-                if (!EntityQueryable.Editable())
-                    return new HttpUnauthorizedResult();
-                if (!Metadata.EditRoles.All(t => User.IsInRole(t)))
-                    return new HttpUnauthorizedResult();
-                entity = EntityQueryable.GetEntity(id);
-                if (entity == null)
-                    return new HttpStatusCodeResult(404);
-            }
-            var properties = Metadata.Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
-            ErrorMessage = null;
-            if (!await UpdateCore(entity))
-            {
-                Response.StatusCode = 400;
-                //Important!!!
-                Response.TrySkipIisCustomErrors = true;
-                if (ErrorMessage == null)
-                    return Content("未知");
+                TEntity entity;
+                if (id == Guid.Empty)
+                {
+                    if (!EntityQueryable.Addable())
+                        return new HttpUnauthorizedResult();
+                    if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
+                        return new HttpUnauthorizedResult();
+                    entity = EntityQueryable.Create();
+                }
                 else
-                    return Content(ErrorMessage);
+                {
+                    if (!EntityQueryable.Editable())
+                        return new HttpUnauthorizedResult();
+                    if (!Metadata.EditRoles.All(t => User.IsInRole(t)))
+                        return new HttpUnauthorizedResult();
+                    entity = EntityQueryable.GetEntity(id);
+                    if (entity == null)
+                        return new HttpStatusCodeResult(404);
+                }
+                var properties = Metadata.Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
+                ErrorMessage = null;
+                if (!await UpdateCore(entity))
+                {
+                    Response.StatusCode = 400;
+                    //Important!!!
+                    Response.TrySkipIisCustomErrors = true;
+                    transaction.Complete();
+                    if (ErrorMessage == null)
+                        return Content("未知");
+                    else
+                        return Content(ErrorMessage);
+                }
+                transaction.Complete();
+                return new HttpStatusCodeResult(200);
             }
-            return new HttpStatusCodeResult(200);
         }
 
         /// <summary>
@@ -624,6 +645,7 @@ namespace System.Web.Mvc
         /// <param name="search">Is a search result.</param>
         /// <returns></returns>
         [HttpGet]
+        [EntityAuthorize(EntityAuthorizeAction.View)]
         public virtual async Task<ActionResult> Selector(int page = 1, int size = 10, string parentpath = null, Guid? parentid = null, bool search = false)
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
@@ -666,6 +688,7 @@ namespace System.Web.Mvc
         /// <param name="search">Is a search result.</param>
         /// <returns></returns>
         [HttpGet]
+        [EntityAuthorize(EntityAuthorizeAction.View)]
         public virtual async Task<ActionResult> MultipleSelector(int page = 1, int size = 10, string parentpath = null, Guid? parentid = null, bool search = false)
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
@@ -703,6 +726,7 @@ namespace System.Web.Mvc
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [EntityAuthorize(EntityAuthorizeAction.View)]
         public virtual Task<ActionResult> Search(string actionName = "Index")
         {
             return Task.Run<ActionResult>(() =>
