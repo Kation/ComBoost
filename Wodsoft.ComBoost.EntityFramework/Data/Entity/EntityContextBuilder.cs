@@ -58,7 +58,7 @@ namespace System.Data.Entity
             if (disposed)
                 throw new ObjectDisposedException("EntityContextBuilder");
             if (!EntityTypes.Contains(typeof(TEntity)))
-                throw new ArgumentException("TEntity不属于该Context。");
+                throw new ArgumentException(typeof(TEntity).Name + " doesn't belong to this context。");
             Type type = typeof(TEntity);
             if (!cache.ContainsKey(type))
             {
@@ -85,7 +85,7 @@ namespace System.Data.Entity
             if (disposed)
                 throw new ObjectDisposedException("EntityContextBuilder");
             if (!EntityTypes.Contains(entityType))
-                throw new ArgumentException("TEntity不属于该Context。");
+                throw new ArgumentException(entityType.Name + " doesn't belong to this context.");
             if (!cache.ContainsKey(entityType))
             {
                 object result = Activator.CreateInstance(typeof(EntityQueryable<>).MakeGenericType(entityType), DbContext);

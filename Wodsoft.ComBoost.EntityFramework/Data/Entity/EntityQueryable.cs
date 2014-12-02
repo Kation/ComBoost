@@ -306,9 +306,7 @@ namespace System.Data.Entity
         /// <returns>Return queryable interface of entity.</returns>
         public virtual IQueryable<TEntity> Query()
         {
-            if (Metadata.SortProperty == null)
-                return DbSet;
-            return OrderBy(DbSet);
+            return DbSet;
         }
 
         /// <summary>
