@@ -525,7 +525,7 @@ namespace System.Web.Mvc
                         return Content(ErrorMessage);
                 }
                 transaction.Complete();
-                return new HttpStatusCodeResult(200);
+                return Content(entity.Index.ToString());
             }
         }
 
