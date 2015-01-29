@@ -86,7 +86,7 @@ namespace System.Web.Mvc
                     }
                 }
             }
-            var model = GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
+            var model = await GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
             if (Metadata.ParentProperty != null && !search)
                 model.Parent = GetParentModel(parentid, Metadata.ParentLevel);
             model.SearchItem = searchItems;
@@ -225,7 +225,7 @@ namespace System.Web.Mvc
         /// <param name="page">Current page.</param>
         /// <param name="size">Current page size.</param>
         /// <returns>View model of TEntity.</returns>
-        protected virtual EntityViewModel<TEntity> GetIndexModel(IQueryable<TEntity> queryable, int page, int size)
+        protected virtual async Task<EntityViewModel<TEntity>> GetIndexModel(IQueryable<TEntity> queryable, int page, int size)
         {
             var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, size);
             //if (Metadata.ParentProperty != null && !search)
@@ -448,23 +448,12 @@ namespace System.Web.Mvc
         [EntityAuthorize(EntityAuthorizeAction.Remove)]
         public virtual async Task<ActionResult> Remove(Guid id)
         {
-            using (TransactionScope transaction = new TransactionScope())
-            {
-                if (!EntityQueryable.Removeable())
-                    return new HttpStatusCodeResult(403);
-                //if (!Metadata.RemoveRoles.All(t => User.IsInRole(t)))
-                //    return new HttpUnauthorizedResult();
-                if (await RemoveCore(id))
-                {
-                    transaction.Complete();
-                    return new HttpStatusCodeResult(200);
-                }
-                else
-                {
-                    transaction.Complete();
-                    return new HttpStatusCodeResult(404);
-                }
-            }
+            if (!EntityQueryable.Removeable())
+                return new HttpStatusCodeResult(403);
+            if (await RemoveCore(id))
+                return new HttpStatusCodeResult(200);
+            else
+                return new HttpStatusCodeResult(404);
         }
 
         /// <summary>
@@ -490,43 +479,38 @@ namespace System.Web.Mvc
         [EntityAuthorize]
         public virtual async Task<ActionResult> Update(Guid id)
         {
-            using (TransactionScope transaction = new TransactionScope())
+            TEntity entity;
+            if (id == Guid.Empty)
             {
-                TEntity entity;
-                if (id == Guid.Empty)
-                {
-                    if (!EntityQueryable.Addable())
-                        return new HttpUnauthorizedResult();
-                    if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
-                        return new HttpUnauthorizedResult();
-                    entity = EntityQueryable.Create();
-                }
-                else
-                {
-                    if (!EntityQueryable.Editable())
-                        return new HttpUnauthorizedResult();
-                    if (!Metadata.EditRoles.All(t => User.IsInRole(t)))
-                        return new HttpUnauthorizedResult();
-                    entity = EntityQueryable.GetEntity(id);
-                    if (entity == null)
-                        return new HttpStatusCodeResult(404);
-                }
-                var properties = Metadata.Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
-                ErrorMessage = null;
-                if (!await UpdateCore(entity))
-                {
-                    Response.StatusCode = 400;
-                    //Important!!!
-                    Response.TrySkipIisCustomErrors = true;
-                    transaction.Complete();
-                    if (ErrorMessage == null)
-                        return Content("未知");
-                    else
-                        return Content(ErrorMessage);
-                }
-                transaction.Complete();
-                return Content(entity.Index.ToString());
+                if (!EntityQueryable.Addable())
+                    return new HttpUnauthorizedResult();
+                if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
+                    return new HttpUnauthorizedResult();
+                entity = EntityQueryable.Create();
             }
+            else
+            {
+                if (!EntityQueryable.Editable())
+                    return new HttpUnauthorizedResult();
+                if (!Metadata.EditRoles.All(t => User.IsInRole(t)))
+                    return new HttpUnauthorizedResult();
+                entity = EntityQueryable.GetEntity(id);
+                if (entity == null)
+                    return new HttpStatusCodeResult(404);
+            }
+            var properties = Metadata.Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
+            ErrorMessage = null;
+            if (!await UpdateCore(entity))
+            {
+                Response.StatusCode = 400;
+                //Important!!!
+                Response.TrySkipIisCustomErrors = true;
+                if (ErrorMessage == null)
+                    return Content("未知");
+                else
+                    return Content(ErrorMessage);
+            }
+            return Content(entity.Index.ToString());
         }
 
         /// <summary>
@@ -542,7 +526,7 @@ namespace System.Web.Mvc
         /// <returns>True if success, otherwise is false.</returns>
         protected virtual async Task<bool> UpdateCore(TEntity entity)
         {
-            var properties = Metadata.Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
+            var properties = Metadata.EditProperties.ToArray();
             foreach (var property in properties)
             {
                 await UpdateProperty(entity, property);
@@ -669,7 +653,7 @@ namespace System.Web.Mvc
                     return new HttpStatusCodeResult(400);
                 }
             }
-            var model = GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
+            var model = await GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
             if (Metadata.ParentProperty != null)
                 model.Parent = GetParentModel(parentid, 3);
             model.Headers = Metadata.ViewProperties;
@@ -712,7 +696,7 @@ namespace System.Web.Mvc
                     return new HttpStatusCodeResult(400);
                 }
             }
-            var model = GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
+            var model = await GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
             if (Metadata.ParentProperty != null)
                 model.Parent = GetParentModel(parentid, 3);
             model.Headers = Metadata.ViewProperties;
