@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -27,7 +28,7 @@ namespace System.Data.Entity.Metadata
             Type = type;
             KeyType = type.GetProperty("Index").PropertyType;
 
-            PropertyInfo[] properties = type.GetProperties().ToArray();
+            PropertyInfo[] properties = type.GetProperties().Where(t=>t.GetCustomAttribute<NotMappedAttribute>() == null).ToArray();
             Properties = properties.Select(t => new PropertyMetadata(t)).OrderBy(t => t.Order).ToArray();
 
             ViewProperties = Properties.Where(t => !t.IsHiddenOnView).ToArray();

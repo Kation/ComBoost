@@ -67,6 +67,7 @@ namespace System.Data.Entity
         /// </summary>
         /// <returns></returns>
         [Hide]
+        [NotMapped]
         public virtual bool IsRemoveAllowed
         {
             get { return true; }
@@ -77,6 +78,7 @@ namespace System.Data.Entity
         /// </summary>
         /// <returns></returns>
         [Hide]
+        [NotMapped]
         public virtual bool IsEditAllowed
         {
             get { return true; }
