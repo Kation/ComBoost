@@ -20,8 +20,17 @@ namespace System.ComponentModel.DataAnnotations
         /// </summary>
         public bool IsCaseSensitive { get; set; }
 
+        /// <summary>
+        /// Gets a value that indicates whether the attribute requires validation context.
+        /// </summary>
         public override bool RequiresValidationContext { get { return true; } }
 
+        /// <summary>
+        /// Validates the specified value with respect to the current validation attribute.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="validationContext"></param>
+        /// <returns></returns>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if (value == null)

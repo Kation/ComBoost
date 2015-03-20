@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace System.ComponentModel
 {
     /// <summary>
-    /// Pagination.
+    /// Pagination interface.
     /// </summary>
     public interface IPagination
     {

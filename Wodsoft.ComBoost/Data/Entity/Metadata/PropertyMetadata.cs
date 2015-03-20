@@ -112,6 +112,8 @@ namespace System.Data.Entity.Metadata
             }
 
             IsDistinct = propertyInfo.GetCustomAttribute<DistinctAttribute>() != null;
+
+            IsExpended = propertyInfo.GetCustomAttribute<ExpendEntityAttribute>() != null || propertyInfo.PropertyType.GetCustomAttribute<ExpendEntityAttribute>() != null;
         }
 
         /// <summary>
@@ -138,6 +140,11 @@ namespace System.Data.Entity.Metadata
         /// Get the property is distinct.
         /// </summary>
         public bool IsDistinct { get; private set; }
+
+        /// <summary>
+        /// Get the property is expended.
+        /// </summary>
+        public bool IsExpended { get; private set; }
 
         /// <summary>
         /// Get the type of property.
