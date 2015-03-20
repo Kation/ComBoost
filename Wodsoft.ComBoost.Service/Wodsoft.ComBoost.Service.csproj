@@ -37,7 +37,6 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,11 +45,33 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceModel\EntityService.cs" />
-    <Compile Include="ServiceModel\EntityServiceClient.cs" />
-    <Compile Include="ServiceModel\EntityServiceQueryableProvider.cs" />
-    <Compile Include="ServiceModel\EntityServiceQueryable.cs" />
+    <Compile Include="ServiceModel\EntityServiceBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ServiceModel\IEntityService.cs" />
+    <Compile Include="ServiceModel\IEntityServiceProvider.cs" />
+    <Compile Include="ServiceModel\ServiceEntityCache.cs" />
+    <Compile Include="ServiceModel\ServiceEntityCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceModel\ServiceEntityEnumerable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceModel\ServiceEntityEnumerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceModel\ServiceEntityProxyBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceModel\ServiceEntityQuery.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceModel\ServiceEntityQueryable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceModel\ServiceEntityQueryProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj">

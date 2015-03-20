@@ -43,8 +43,16 @@ namespace Company.Mvc.Controllers
                 Response.StatusCode = 400;
                 return Content("密码错误！");
             }
-            FormsAuthentication.SetAuthCookie(employee.Index.ToString(), false);
+            ComBoostAuthentication.SignIn(employee.Index.ToString(), false);
+            //FormsAuthentication.SetAuthCookie(employee.Index.ToString(), false);
             return new HttpStatusCodeResult(200);
+        }
+
+        [Authorize]
+        public ActionResult Logout()
+        {
+            ComBoostAuthentication.SignOut();
+            return RedirectToAction("Login");
         }
     }
 }

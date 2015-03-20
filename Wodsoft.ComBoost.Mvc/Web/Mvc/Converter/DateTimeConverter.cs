@@ -43,6 +43,8 @@ namespace System.Web.Mvc.Converter
         /// <returns>An System.Object that represents the converted value.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, Globalization.CultureInfo culture, object value)
         {
+            if (string.IsNullOrEmpty((string)value))
+                return null;
             return DateTime.Parse((string)value);
         }
 
@@ -56,6 +58,8 @@ namespace System.Web.Mvc.Converter
         /// <returns>An System.Object that represents the converted value.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, Globalization.CultureInfo culture, object value, Type destinationType)
         {
+            if (value == null)
+                return "";
             return ((DateTime)value).ToLongDateString() + " " + ((DateTime)value).ToLongTimeString();
         }
     }

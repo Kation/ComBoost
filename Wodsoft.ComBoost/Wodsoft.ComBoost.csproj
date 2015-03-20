@@ -49,17 +49,26 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Wodsoft.DynamicAssembly">
+      <HintPath>..\..\Wodsoft.DynamicAssembly\Wodsoft.DynamicAssembly\bin\Debug\Wodsoft.DynamicAssembly.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\DataAnnotations\CustomDataType.cs" />
     <Compile Include="ComponentModel\DataAnnotations\CustomDataTypeAttribute.cs" />
-    <Compile Include="ComponentModel\DataAnnotations\DistinctAttribute.cs" />
+    <Compile Include="ComponentModel\DataAnnotations\DistinctAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ComponentModel\DataAnnotations\EntityAuthenticationAttribute.cs" />
+    <Compile Include="ComponentModel\DataAnnotations\ExpendEntityAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\HideAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\ParentAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\PasswordAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\PropertyAuthenticationAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\SearchableAttribute.cs" />
+    <Compile Include="ComponentModel\DataAnnotations\ValueFilterAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ComponentModel\EntityEditModel.cs" />
     <Compile Include="ComponentModel\EntityParentModel.cs" />
     <Compile Include="ComponentModel\EntitySearchItem.cs" />
@@ -68,6 +77,8 @@
     <Compile Include="ComponentModel\EntityViewModel.cs" />
     <Compile Include="ComponentModel\IPagination.cs" />
     <Compile Include="ComponentModel\NotifyBase.cs" />
+    <Compile Include="ComponentModel\Pagination.cs" />
+    <Compile Include="ComponentModel\IValueFilter.cs" />
     <Compile Include="Data\Entity\EntityBase.cs" />
     <Compile Include="Data\Entity\EntityDescriptorContext.cs" />
     <Compile Include="Data\Entity\IEntity.cs" />
@@ -80,6 +91,8 @@
     <Compile Include="Data\Entity\IPassword.cs" />
     <Compile Include="Data\Entity\UserBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Runtime\Serialization\ComBoostSerializer.cs" />
+    <Compile Include="Runtime\Serialization\EntitySerializer.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

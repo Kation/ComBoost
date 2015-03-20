@@ -1,6 +1,15 @@
 ﻿@model EntityViewModel
 @{
-    Layout = null;
+    object area = ViewContext.RouteData.DataTokens["Area"];
+    if (area == null)
+    {
+        Layout = "~/Views/Shared/_DialogLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Areas/" + area.ToString() + "/Views/Shared/_DialogLayout.cshtml";
+    }
+    ViewBag.Title = Model.Metadata.Name + " Selector";
 }
 <div class="row">
     @if (Model.Parent != null)
@@ -20,10 +29,10 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <td width="36"></td>
+                    <th width="36"></th>
                     @for (int i = 0; i < Model.Headers.Length; i++)
                     {
-                        <td title="@Model.Headers[i].Description">@(Model.Headers[i].ShortName ?? Model.Headers[i].Name)</td>
+                        <th title="@Model.Headers[i].Description">@(Model.Headers[i].ShortName ?? Model.Headers[i].Name)</th>
                     }
                 </tr>
             </thead>
@@ -45,7 +54,36 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-12 text-center">
+    <div class="col-md-4">
+        @{Html.PaginationButton(Model);}
+    </div>
+    <div class="col-md-4 text-center">
+        <div class="btn-group">
+            @if (Model.Metadata.SearchProperties.Length > 0)
+            {
+                <a class="btn btn-default" href="@Url.Action("Search",new {actionName = "MultipleSelector"})">Search</a>
+            }
+            <button class="btn btn-default" onclick="ok()">OK</button>
+        </div>
+    </div>
+    <div class="col-md-4 text-right">
         @{Html.Pagination(Model);}
     </div>
 </div>
+<script type="text/javascript">
+    function ok() {
+        var items = $(':checked[value]');
+        if (items.length == 0) {
+            alert('Please select an item.');
+            return;
+        }
+        window.returnValue = {
+            name: items.attr('data-name'),
+            value: items.val()
+        };
+        if (window.opener) {
+            window.opener.returnValue = window.returnValue;
+        }
+        window.close();
+    }
+</script>

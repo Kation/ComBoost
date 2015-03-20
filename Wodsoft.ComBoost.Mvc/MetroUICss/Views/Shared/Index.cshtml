@@ -1,0 +1,174 @@
+﻿@model EntityViewModel
+@{
+    ViewBag.Title = Model.Metadata.Name + " List";
+    object area = ViewContext.RouteData.DataTokens["Area"];
+    if (area == null)
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Areas/" + area.ToString() + "/Views/Shared/_Layout.cshtml";
+    }
+}
+<div class="grid fluid">
+    <div class="row">
+        <nav class="breadcrumbs">
+            <ul>
+                <li><a href="@Url.Action("Index","Home")">Home</a></li>
+                <li class="active"><a>@Model.Metadata.Name</a></li>
+            </ul>
+        </nav>
+    </div>
+    @if (Model.SearchItem.Length > 0)
+    {
+        <div class="row">
+            <div class="alert alert-success alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <p><h4>Search content</h4></p>
+                @for (int i = 0; i < Model.SearchItem.Length; i++)
+                {
+                    Html.RenderPartial("SearchItem", Model.SearchItem[i]);
+                }
+            </div>
+        </div>
+    }
+    <div class="row">
+        @if (Model.Parent != null)
+        {
+            <div class="span3">
+                <div class="panel">
+                    <div class="panel-header">@(Model.Metadata.Name)Navigation</div>
+                    <div class="panel-content" id="parentview">
+                        <ul class="treeview" data-role="treeview">
+                            <li class="node">
+                                <a data-nav="true" href="@Html.Raw(Url.Action("Index"))"><span class="node-toggle"></span>All</a>
+                                <ul>
+                                    @{Html.RenderPartial("ParentView", Model.Parent);}
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="@(Model.Parent == null ? "span12":"span9")">
+            <div class="panel">
+                <div class="panel-header">
+                    @(Model.Metadata.Name) List
+                    <div class="input-control text place-right size3" style="margin-top:-5px">
+                            <input type="text" />
+                            <button class="btn-search"></button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                @for (int i = 0; i < Model.Headers.Length; i++)
+                                {
+                                    <td title="@Model.Headers[i].Description">@(Model.Headers[i].ShortName ?? Model.Headers[i].Name)</td>
+                                }
+                                <td class="text-center" style="width: 64px">Operation</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Items.Length; i++)
+                            {
+                                <tr>
+                                    @for (int b = 0; b < Model.Headers.Length; b++)
+                                    {
+                                        <td>@EntityValueConverter.GetConverter(Model.Headers[b]).ConvertToString(Model.Headers[b].Property.GetValue(Model.Items[i]))</td>
+                                    }
+                                    <td class="text-center" style="width: 64px;">
+                                        <div class="button-dropdown">
+                                            <button class="dropdown-toggle mini"></button>
+                                            <ul class="dropdown-menu place-right text-left" data-role="dropdown">
+                                                <li><a href="@Html.Raw(Url.Action("Detail", new { id = Model.Items[i].Index }))"><i class="icon-list"></i> Detail</a></li>
+                                                @if (Model.Metadata.EditRoles.All(t => User.IsInRole(t)))
+                                                {
+                                                    <li><a href="@Html.Raw(Url.Action("Edit", new { id = Model.Items[i].Index }))"><i class="icon-pencil"></i> Edit</a></li>
+                                                }
+                                                @if (Model.Metadata.RemoveRoles.All(t => User.IsInRole(t)))
+                                                {
+                                                    <li><a href="javascript:remove('@Model.Items[i].Index')"><i class="icon-remove"></i> Delete</a></li>
+                                                }
+                                                @for (int c = 0; c < Model.Buttons.Length; c++)
+                                                {
+                                                    MvcViewButton button = Model.Buttons[c] as MvcViewButton;
+                                                    if (button != null && button.GetLink != null)
+                                                    {
+                                                        <li><a href="@Html.Raw(button.GetLink(Url, Model.Items[i]))">@Html.Raw(button.Icon + " ")@Html.Raw(button.Name)</a></li>
+                                                    }
+                                                }
+                                            </ul>
+                                        </div>
+                                        <div class="btn-group btn-group-xs">
+                                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                                                <span class="caret"></span>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="span4">
+                            @{Html.PaginationButton(Model);}
+                        </div>
+                        <div class="span4 text-center">
+                            <div class="button-set no-spaces" style="display: inline-block">
+                                @if (Model.Metadata.AddRoles.All(t => User.IsInRole(t)))
+                                {
+                                    <a href="@Html.Raw(Url.Action("Create"))" class="button">Create</a>
+                                }
+                                @if (Model.Metadata.SearchProperties.Length > 0)
+                                {
+                                    <a href="@Html.Raw(Url.Action("Search"))" class="button">Search</a>
+                                }
+                                @for (int i = 0; i < Model.Buttons.Length; i++)
+                                {
+                                    MvcViewButton button = Model.Buttons[i] as MvcViewButton;
+                                    if (button != null && button.StaticLink != null)
+                                    {
+                                        <a href="@Html.Raw(button.StaticLink)" class="button">@Html.Raw(button.Icon)@Html.Raw(button.Name)</a>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <div class="span4 text-right">
+                            @{Html.Pagination(Model);}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function remove(id) {
+        $.ajax({
+            url: '@Html.Raw(Url.Action("Remove"))/' + id,
+            cache: false,
+            type: 'POST',
+            success: function () {
+                location.reload();
+            },
+            error: function () {
+                $.Dialog({
+                    overlay: true,
+                    shadow: true,
+                    flat: true,
+                    title: 'Result',
+                    padding: 6,
+                    overlayClickClose: false,
+                    content: '<p>This item is reference by other item, can not delete.</p>'
+                });
+            }
+        })
+    }
+</script>

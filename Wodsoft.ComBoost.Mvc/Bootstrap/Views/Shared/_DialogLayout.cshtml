@@ -1,0 +1,16 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <base target="_self" />
+    @System.Web.Optimization.Styles.Render("~/Content/bootstrap.css")
+    @System.Web.Optimization.Scripts.Render("~/bundles/jquery")
+    @System.Web.Optimization.Scripts.Render("~/Scripts/bootstrap.js")
+</head>
+<body>
+    <div class="container-fluid">
+        @RenderBody()
+    </div>
+</body>
+</html>

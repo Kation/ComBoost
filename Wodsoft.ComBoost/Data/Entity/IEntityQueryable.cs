@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace System.Data.Entity
 {
@@ -19,11 +20,25 @@ namespace System.Data.Entity
         bool Add(TEntity entity);
 
         /// <summary>
+        /// Add an entity to database.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Return false if detect any error.</returns>
+        Task<bool> AddAsync(TEntity entity);
+
+        /// <summary>
         /// Add a lot of entity to database.
         /// </summary>
         /// <param name="entities">IEnumerable of entity.</param>
         /// <returns>Return true if success.</returns>
         bool AddRange(IEnumerable<TEntity> entities);
+
+        /// <summary>
+        /// Add a lot of entity to database.
+        /// </summary>
+        /// <param name="entities">IEnumerable of entity.</param>
+        /// <returns>Return true if success.</returns>
+        Task<bool> AddRangeAsync(IEnumerable<TEntity> entities);
 
         /// <summary>
         /// Create an entity. Not added to database.
@@ -39,11 +54,25 @@ namespace System.Data.Entity
         bool Remove(Guid id);
 
         /// <summary>
+        /// Remove an entity from database.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns>Return true if success.</returns>
+        Task<bool> RemoveAsync(Guid id);
+
+        /// <summary>
         /// Remove a lot of entities from database.
         /// </summary>
         /// <param name="ids">IEnumerable of Guid of entities.</param>
         /// <returns>true if success.</returns>
         bool RemoveRange(IEnumerable<Guid> ids);
+
+        /// <summary>
+        /// Remove a lot of entities from database.
+        /// </summary>
+        /// <param name="ids">IEnumerable of Guid of entities.</param>
+        /// <returns>true if success.</returns>
+        Task<bool> RemoveRangeAsync(IEnumerable<Guid> ids);
 
         /// <summary>
         /// Edit an entity.
@@ -53,11 +82,25 @@ namespace System.Data.Entity
         bool Edit(TEntity entity);
 
         /// <summary>
+        /// Edit an entity.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Return true if success.</returns>
+        Task<bool> EditAsync(TEntity entity);
+
+        /// <summary>
         /// Get an entity by id.
         /// </summary>
         /// <param name="id">Entity id.</param>
         /// <returns>Return entity. Return null if entity doesn't exists.</returns>
         TEntity GetEntity(Guid id);
+
+        /// <summary>
+        /// Get an entity by id.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns>Return entity. Return null if entity doesn't exists.</returns>
+        Task<TEntity> GetEntityAsync(Guid id);
 
         /// <summary>
         /// Get entity queryable interface.
@@ -115,6 +158,12 @@ namespace System.Data.Entity
         int Count();
 
         /// <summary>
+        /// Get total entity count from database.
+        /// </summary>
+        /// <returns>Return total entity count number.</returns>
+        Task<int> CountAsync();
+
+        /// <summary>
         /// Get an entity is added to database.
         /// </summary>
         /// <param name="entity">Entity.</param>
@@ -124,9 +173,23 @@ namespace System.Data.Entity
         /// <summary>
         /// Get an entity is added to database.
         /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Return true if database contains this entity.</returns>
+        Task<bool> ContainsAsync(TEntity entity);
+
+        /// <summary>
+        /// Get an entity is added to database.
+        /// </summary>
         /// <param name="id">Entity id.</param>
         /// <returns>Return true if database contains this entity.</returns>
         bool Contains(Guid id);
+
+        /// <summary>
+        /// Get an entity is added to database.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns>Return true if database contains this entity.</returns>
+        Task<bool> ContainsAsync(Guid id);
 
         /// <summary>
         /// Sort entity queryable.
@@ -140,5 +203,19 @@ namespace System.Data.Entity
         /// </summary>
         /// <returns>Return entity queryable interface.</returns>
         IOrderedQueryable<TEntity> OrderBy();
+
+        /// <summary>
+        /// Get array from a queryable.
+        /// </summary>
+        /// <param name="queryable">Entity queryable interface.</param>
+        /// <returns>Return array of entity.</returns>
+        Task<TEntity[]> ToArrayAsync(IQueryable<TEntity> queryable);
+
+        /// <summary>
+        /// Get list from a queryable.
+        /// </summary>
+        /// <param name="queryable">Entity queryable interface.</param>
+        /// <returns>Return list of entity.</returns>
+        Task<List<TEntity>> ToListAsync(IQueryable<TEntity> queryable);
     }
 }

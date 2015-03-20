@@ -7,11 +7,22 @@ using System.Threading.Tasks;
 
 namespace System.Web.Routing
 {
+    /// <summary>
+    /// User entity route.
+    /// </summary>
     public class EntityRoute : Route
     {
+        /// <summary>
+        /// Initialize entity route.
+        /// </summary>
+        /// <param name="url">Route url.</param>
+        /// <param name="routeHandler">Route handler.</param>
         public EntityRoute(string url, IRouteHandler routeHandler) : base(url, routeHandler) { }
 
         private Type _UserType;
+        /// <summary>
+        /// Get or set user entity type.
+        /// </summary>
         public Type UserType
         {
             get { return _UserType; }

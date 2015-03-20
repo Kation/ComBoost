@@ -46,10 +46,14 @@ namespace System.Web.Mvc.Converter
         {
             if (context == null)
                 throw new ArgumentNullException("context");
+            if (!(value is string))
+                return null;
+            if ((string)value == "" || value == null)
+                return null;
             Guid id;
             if (!Guid.TryParse((string)value, out id))
                 return null;
-            dynamic queryable = context.GetService(((EntityValueConverterContext)context).Property.Property.PropertyType);
+            dynamic queryable = context.GetService(typeof(IEntityQueryable<>).MakeGenericType(((EntityValueConverterContext)context).Property.Property.PropertyType));
             return queryable.GetEntity(id);
         }
 

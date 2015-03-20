@@ -55,15 +55,22 @@ namespace System.Data.Entity.Metadata
             {
                 Type = customDataType.Type;
                 CustomType = customDataType.Custom;
+                IsFileUpload = customDataType.IsFileUpload;
             }
             else
             {
                 Type type = propertyInfo.PropertyType;
+                ValueFilterAttribute filter = propertyInfo.GetCustomAttribute<ValueFilterAttribute>();
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
                     type = type.GetGenericArguments()[0];
-                if (type == typeof(DateTime))
+                if (filter != null)
+                {
+                    Type = CustomDataType.Other;
+                    CustomType = "ValueFilter";
+                }
+                else if (type == typeof(DateTime))
                     Type = CustomDataType.Date;
-                if (type == typeof(TimeSpan))
+                else if (type == typeof(TimeSpan))
                     Type = CustomDataType.Time;
                 else if (type == typeof(bool))
                     Type = CustomDataType.Boolean;
@@ -74,7 +81,10 @@ namespace System.Data.Entity.Metadata
                 else if (type == typeof(decimal))
                     Type = CustomDataType.Currency;
                 else if (type == typeof(byte[]))
+                {
                     Type = CustomDataType.File;
+                    IsFileUpload = true;
+                }
                 else if (type.IsEnum)
                 {
                     Type = CustomDataType.Other;
@@ -102,6 +112,8 @@ namespace System.Data.Entity.Metadata
             }
 
             IsDistinct = propertyInfo.GetCustomAttribute<DistinctAttribute>() != null;
+
+            IsExpended = propertyInfo.GetCustomAttribute<ExpendEntityAttribute>() != null || propertyInfo.PropertyType.GetCustomAttribute<ExpendEntityAttribute>() != null;
         }
 
         /// <summary>
@@ -130,6 +142,11 @@ namespace System.Data.Entity.Metadata
         public bool IsDistinct { get; private set; }
 
         /// <summary>
+        /// Get the property is expended.
+        /// </summary>
+        public bool IsExpended { get; private set; }
+
+        /// <summary>
         /// Get the type of property.
         /// </summary>
         public CustomDataType Type { get; private set; }
@@ -138,6 +155,11 @@ namespace System.Data.Entity.Metadata
         /// Get the custom data type of property.
         /// </summary>
         public string CustomType { get; private set; }
+
+        /// <summary>
+        /// Get the property is base on upload file.
+        /// </summary>
+        public bool IsFileUpload { get; private set; }
 
         /// <summary>
         /// Get is the property must has data.
@@ -210,5 +232,14 @@ namespace System.Data.Entity.Metadata
         /// Get is the property search able.
         /// </summary>
         public bool Searchable { get; private set; }
+
+        /// <summary>
+        /// Get property display name.
+        /// </summary>
+        /// <returns>Default return name of display + "-" + name of property.</returns>
+        public override string ToString()
+        {
+            return Name + "-" + Property.Name;
+        }
     }
 }

@@ -1,0 +1,65 @@
+﻿@using System.ComponentModel.DataAnnotations;
+@using System.Reflection;
+@model MvcEditorModel
+@{
+    ValueFilterAttribute attribute = Model.Metadata.Property.GetCustomAttribute<ValueFilterAttribute>(true);
+}
+<select id="@Model.Metadata.Property.Name" name="@Model.Metadata.Property.Name" class="form-control" style="padding-right: 12px;"></select>
+@if (attribute.DependencyProperty != null)
+{
+    <script type="text/javascript">
+        $(function () {
+            var parent = $('#@attribute.DependencyProperty');
+            var dependencyValue = parent.val();
+            if (dependencyValue != null && dependencyValue != '') {
+                $.ajax({
+                    url: '@Url.Action("ValueFilter")',
+                    data: {
+                        property: '@Model.Metadata.Property.Name',
+                        value: dependencyValue,
+                        selected: '@Model.Value'
+                    },
+                    type: 'POST',
+                    success: function (result) {
+                        $('#@Model.Metadata.Property.Name').html(result);
+                    }
+                })
+            }
+            parent.change(function () {
+                var value = parent.val();
+                if (value == '')
+                    $('#@Model.Metadata.Property.Name').empty();
+                else
+                    $.ajax({
+                        url: '@Url.Action("ValueFilter")',
+                        data: {
+                            property: '@Model.Metadata.Property.Name',
+                            value: value
+                        },
+                        type: 'POST',
+                        success: function (result) {
+                            $('#@Model.Metadata.Property.Name').html(result);
+                        }
+                    })
+            });
+        });
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                url: '@Url.Action("ValueFilter")',
+                data: {
+                    property: '@Model.Metadata.Property.Name',
+                    selected: '@Model.Value'
+                },
+                type: 'POST',
+                success: function (result) {
+                    $('#@Model.Metadata.Property.Name').html(result);
+                }
+            });
+        });
+    </script>
+}

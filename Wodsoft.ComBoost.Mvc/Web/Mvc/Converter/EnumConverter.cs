@@ -47,15 +47,43 @@ namespace System.Web.Mvc.Converter
         public override object ConvertTo(ITypeDescriptorContext context, Globalization.CultureInfo culture, object value, Type destinationType)
         {
             Type type = value.GetType();
-            string name = Enum.GetName(type, value);
-            FieldInfo field = type.GetField(name, Reflection.BindingFlags.Public | Reflection.BindingFlags.Static);
-            DescriptionAttribute description = field.GetCustomAttribute<DescriptionAttribute>();
-            if (description != null)
-                return description.Description;
-            DisplayAttribute display = field.GetCustomAttribute<DisplayAttribute>();
-            if (display != null)
-                return display.Name;
-            return name;
+            if (type.GetCustomAttribute<FlagsAttribute>() != null)
+            {
+                Enum v = (Enum)value;
+                Array values = Enum.GetValues(type);
+                List<string> target = new List<string>();
+                foreach (Enum item in values)
+                {
+                    if (!v.HasFlag(item))
+                        continue;
+                    string name = Enum.GetName(type, item);
+                    FieldInfo field = type.GetField(name, Reflection.BindingFlags.Public | Reflection.BindingFlags.Static);
+                    DescriptionAttribute description = field.GetCustomAttribute<DescriptionAttribute>();
+                    if (description != null)
+                    {
+                        target.Add(description.Description);
+                        continue;
+                    }
+                    DisplayAttribute display = field.GetCustomAttribute<DisplayAttribute>();
+                    if (display != null)
+                        target.Add(display.Name);
+                    else
+                        target.Add(name);
+                }
+                return string.Join(", ", target);
+            }
+            else
+            {
+                string name = Enum.GetName(type, value);
+                FieldInfo field = type.GetField(name, Reflection.BindingFlags.Public | Reflection.BindingFlags.Static);
+                DescriptionAttribute description = field.GetCustomAttribute<DescriptionAttribute>();
+                if (description != null)
+                    return description.Description;
+                DisplayAttribute display = field.GetCustomAttribute<DisplayAttribute>();
+                if (display != null)
+                    return display.Name;
+                return name;
+            }
         }
 
         /// <summary>

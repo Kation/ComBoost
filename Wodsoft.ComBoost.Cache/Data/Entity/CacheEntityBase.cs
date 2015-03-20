@@ -18,11 +18,11 @@ namespace System.Data.Entity
         [Required]
         [Hide]
         [Column(TypeName = "datetime2")]
-        public virtual DateTime UpdateTime { get { return (DateTime)GetValue("UpdateTime"); } set { SetValue("UpdateTime", value); } }
+        public virtual DateTime UpdateTime { get { return (DateTime)GetValue(); } set { SetValue(value); } }
 
         [Hide]
         [NotMapped]
-        public virtual CacheEntityState EntityState { get { return (CacheEntityState)GetValue("EntityState"); } set { SetValue("EntityState", value); } }
+        public virtual CacheEntityState EntityState { get { return (CacheEntityState)GetValue(); } set { SetValue(value); } }
 
         public override void OnEditCompleted()
         {

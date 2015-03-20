@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Metadata;
 using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace System.Data.Entity
 {
@@ -16,22 +17,26 @@ namespace System.Data.Entity
     public abstract class EntityBase : NotifyBase, IEntity
     {
         private EntityMetadata _Metadata;
-
         /// <summary>
-        /// Initialize entity.
+        /// Get the metadata of entity.
         /// </summary>
-        public EntityBase()
+        protected EntityMetadata Metadata
         {
-            _Metadata = EntityAnalyzer.GetMetadata(this.GetType());
+            get
+            {
+                if (_Metadata == null)
+                    _Metadata = EntityAnalyzer.GetMetadata(GetType());
+                return _Metadata;
+            }
         }
-
+        
         /// <summary>
         /// Get or set the id of entity.
         /// </summary>
         [Key]
         [Required]
         [Hide]
-        public virtual Guid Index { get { return (Guid)GetValue("Index"); } set { SetValue("Index", value); } }
+        public virtual Guid Index { get { return (Guid)GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the create date of entity.
@@ -39,7 +44,7 @@ namespace System.Data.Entity
         [Required]
         [Hide]
         [Column(TypeName = "Datetime2")]
-        public virtual DateTime CreateDate { get { return (DateTime)GetValue("CreateDate"); } set { SetValue("CreateDate", value); } }
+        public virtual DateTime CreateDate { get { return (DateTime)GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Call when entity created.
@@ -61,6 +66,8 @@ namespace System.Data.Entity
         /// Get is the entity can remove.
         /// </summary>
         /// <returns></returns>
+        [Hide]
+        [NotMapped]
         public virtual bool IsRemoveAllowed
         {
             get { return true; }
@@ -70,6 +77,8 @@ namespace System.Data.Entity
         /// Get is the entity can edit.
         /// </summary>
         /// <returns></returns>
+        [Hide]
+        [NotMapped]
         public virtual bool IsEditAllowed
         {
             get { return true; }
@@ -81,12 +90,12 @@ namespace System.Data.Entity
         /// <returns></returns>
         public override string ToString()
         {
-            if (_Metadata.DisplayProperty == null)
+            if (Metadata.DisplayProperty == null)
                 return base.ToString();
-            return _Metadata.DisplayProperty.Property.GetValue(this, null).ToString();
+            return Metadata.DisplayProperty.Property.GetValue(this, null).ToString();
         }
 
-        private ReadOnlyCollection<ValidationResult> _NoError = new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>());
+        //private ReadOnlyCollection<ValidationResult> _NoError = new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>());
         /// <summary>
         /// Ensure that entity is valid.
         /// </summary>
@@ -94,7 +103,20 @@ namespace System.Data.Entity
         /// <returns>Collection that include error messages.</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            return _NoError;
+            var result = new List<ValidationResult>();
+            foreach (var property in Metadata.Properties)
+            {
+                validationContext.MemberName = property.Property.Name;
+                validationContext.DisplayName = property.Name;
+                var list = property.Property.GetCustomAttributes<ValidationAttribute>(true);
+                foreach (var item in list)
+                {
+                    var r = item.GetValidationResult(property.Property.GetValue(this), validationContext);
+                    if (r != null && r != ValidationResult.Success)
+                        result.Add(r);
+                }
+            }
+            return result;
         }
     }
 }

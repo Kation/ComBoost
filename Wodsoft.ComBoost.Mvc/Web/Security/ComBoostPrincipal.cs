@@ -9,54 +9,108 @@ using System.Web.Routing;
 
 namespace System.Web.Security
 {
+    /// <summary>
+    /// ComBoost principal wrapper.
+    /// </summary>
     public class ComBoostPrincipal : IPrincipal
     {
+        /// <summary>
+        /// Initialize comboost principal.
+        /// </summary>
+        /// <param name="user">Principal to wrapper.</param>
         public ComBoostPrincipal(IPrincipal user)
         {
             if (user == null)
                 throw new ArgumentNullException("user");
-            OriginPrincipal = user;
-            Identity = new ComBoostIdentity(this);
+            CurrentRoute = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
+            if (ComBoostAuthentication.IsEnabled)
+            {
+                Identity = new ComBoostIdentity(this);
+                OriginPrincipal = this;
+            }
+            else
+            {
+                Identity = user.Identity;
+                OriginPrincipal = user;
+            }
         }
 
+        /// <summary>
+        /// Get the origin principal.
+        /// </summary>
         public IPrincipal OriginPrincipal { get; private set; }
 
+        /// <summary>
+        /// Get the identity.
+        /// </summary>
         public IIdentity Identity { get; private set; }
 
+        /// <summary>
+        /// Get or set the role entity resolve delegate.
+        /// Must set this manual or comboost authentication will be failure.
+        /// </summary>
         public static RoleEntityResolveDelegate Resolve { get; set; }
 
-        public IRoleEntity RoleEntity { get; private set; }
+        /// <summary>
+        /// Get the current route data.
+        /// </summary>
+        public RouteData CurrentRoute { get; private set; }
+
+        private IRoleEntity _RoleEntity;
+        /// <summary>
+        /// Get the current user role entity.
+        /// </summary>
+        public IRoleEntity RoleEntity
+        {
+            get
+            {
+                if (_IsFailure)
+                    return null;
+                if (_RoleEntity == null)
+                {
+                    if (!Identity.IsAuthenticated)
+                    {
+                        _IsFailure = true;
+                        return null;
+                    }
+                    if (CurrentRoute == null)
+                    {
+                        _IsFailure = true;
+                        return null;
+                    }
+                    EntityRoute route = CurrentRoute.Route as EntityRoute;
+                    if (route == null)
+                    {
+                        _IsFailure = true;
+                        return null;
+                    }
+                    _RoleEntity = Resolve(route.UserType, Identity.Name);
+                    if (_RoleEntity == null)
+                    {
+                        _IsFailure = true;
+                        return null;
+                    }
+                }
+                return _RoleEntity;
+            }
+        }
         private bool _IsFailure;
 
-        internal bool InitRoleEntity()
-        {
-            if (_IsFailure)
-                return false;
-            if (RoleEntity != null)
-                return true;
-            RouteData routeData = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
-            EntityRoute route = routeData.Route as EntityRoute;
-            if (route == null)
-            {
-                _IsFailure = true;
-                return false;
-            }
-            RoleEntity = Resolve(route.UserType, Identity.Name);
-            if (RoleEntity == null)
-            {
-                _IsFailure = true;
-                return false;
-            }
-            return true;
-        }
-
+        /// <summary>
+        /// Determines whether the current principal belongs to the specified role.
+        /// </summary>
+        /// <param name="role">Role.</param>
+        /// <returns></returns>
         public bool IsInRole(string role)
         {
             if (!OriginPrincipal.Identity.IsAuthenticated)
                 return false;
             if (Resolve == null)
-                return OriginPrincipal.IsInRole(role);
-            if (!InitRoleEntity())
+                if (OriginPrincipal == this)
+                    return false;
+                else
+                    return OriginPrincipal.IsInRole(role);
+            if (RoleEntity == null)
                 return false;
             return RoleEntity.IsInRole(role);
         }

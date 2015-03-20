@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Web.Routing;
 
 namespace System.Web.Mvc
 {
@@ -122,24 +123,30 @@ namespace System.Web.Mvc
         /// <param name="requestContext">The context of the HTTP request, which includes the HTTP context and route data.</param>
         /// <param name="controllerName">The name of the controller.</param>
         /// <returns>The controller type.</returns>
-        protected override Type GetControllerType(Routing.RequestContext requestContext, string controllerName)
+        protected override Type GetControllerType(RequestContext requestContext, string controllerName)
         {
             Type type = null;
             string areaString = requestContext.RouteData.DataTokens["Area"] as string;
-            ControllerItem[] items;
-            items = _Items.Where(t => t.Controller == controllerName.ToLower()).ToArray();
-            if (items.Length > 1 && areaString != null)
-                items = items.Where(t => t.Area == areaString.ToLower()).ToArray();
-            if (items.Length > 0)
-                type = typeof(EntityController<>).MakeGenericType(items[0].EntityType);
-            if (type != null &&
-                ((areaString != null && items[0].Area == null) ||
-                (areaString != null && items[0].Area != areaString.ToLower()) ||
-                (areaString == null && items[0].Area != null)))
-                type = null;
+            ControllerItem item;
+            if (areaString == null)
+                item = _Items.SingleOrDefault(t => t.Controller == controllerName.ToLower() && t.Area == null);
+            else
+                item = _Items.SingleOrDefault(t => t.Controller == controllerName.ToLower() && t.Area == areaString.ToLower());
+            if (item != null)
+                type = GetEntityControllerType(item.EntityType);
             if (type == null)
                 type = base.GetControllerType(requestContext, controllerName);
             return type;
+        }
+
+        /// <summary>
+        /// Get entity controller.
+        /// </summary>
+        /// <param name="entityType">Entity type.</param>
+        /// <returns>Entity Controller Type.</returns>
+        protected virtual Type GetEntityControllerType(Type entityType)
+        {
+            return typeof(EntityController<>).MakeGenericType(entityType);
         }
 
         private class ControllerItem

@@ -15,6 +15,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,39 +38,48 @@
     <DocumentationFile>bin\Release\Wodsoft.ComBoost.Mvc.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.0\lib\net45\System.Web.Helpers.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll</HintPath>
+    <Reference Include="System.Web.Mvc, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.0\lib\net45\System.Web.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll</HintPath>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.0\lib\net45\System.Web.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Routing" />
-    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll</HintPath>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.0\lib\net45\System.Web.WebPages.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.0\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.0\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -82,9 +93,6 @@
     <Compile Include="ComponentModel\MvcViewButton.cs" />
     <Compile Include="Web\Mvc\Converter\CollectionConverter.cs" />
     <Compile Include="Web\Mvc\Converter\DateTimeConverter.cs" />
-    <Compile Include="Web\Mvc\Converter\DateConverter.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Web\Mvc\Converter\EntityConverter.cs" />
     <Compile Include="Web\Mvc\Converter\EnumConverter.cs" />
     <Compile Include="Web\Mvc\Converter\SexConverter.cs" />
@@ -99,16 +107,65 @@
     <Compile Include="Web\Mvc\EntityValueConverterContext.cs" />
     <Compile Include="Web\Mvc\EntityExtension.cs" />
     <Compile Include="Web\Mvc\EntityValueConverter.cs" />
+    <Compile Include="Web\Mvc\IEntityMetadata.cs" />
     <Compile Include="Web\Mvc\IFileController.cs" />
     <Compile Include="Web\Mvc\IImageController.cs" />
     <Compile Include="Web\Routing\EntityRoute.cs" />
+    <Compile Include="Web\Security\ComBoostAuthentication.cs" />
     <Compile Include="Web\Security\ComBoostAuthenticationModule.cs" />
+    <Compile Include="Web\Security\ComBoostCookiesToken.cs" />
     <Compile Include="Web\Security\ComBoostIdentity.cs" />
     <Compile Include="Web\Security\ComBoostPrincipal.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Bootstrap\Views\Shared\Detail.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ValueFilter.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ValueFilterEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\_DialogLayout.cshtml" />
+    <None Include="MetroUICss\App_Start\MetroUICSSBundleConfig.cs.pp" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.eot" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.json" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.ttf" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.woff" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\metroSysIcons.ttf" />
+    <None Include="MetroUICss\Content\metro-ui\fonts\metroSysIcons.woff" />
+    <None Include="MetroUICss\Views\Shared\BooleanEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\CollectionEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\CurrencyEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\DateEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\DateTimeEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\DefaultEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\Detail.cshtml" />
+    <None Include="MetroUICss\Views\Shared\Edit.cshtml" />
+    <None Include="MetroUICss\Views\Shared\EmailAddressEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\EntityEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\EnumEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\FileEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\HtmlEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\ImageEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\ImageUrlEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\Index.cshtml" />
+    <None Include="MetroUICss\Views\Shared\IntegerEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\MultilineTextEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\MultipleSelector.cshtml" />
+    <None Include="MetroUICss\Views\Shared\NumberEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\ParentView.cshtml" />
+    <None Include="MetroUICss\Views\Shared\PasswordEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\PhoneNumberEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\Search.cshtml" />
+    <None Include="MetroUICss\Views\Shared\SearchItem.cshtml" />
+    <None Include="MetroUICss\Views\Shared\Selector.cshtml" />
+    <None Include="MetroUICss\Views\Shared\SexEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\TextEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\TimeEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\UrlEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\ValueFilter.cshtml" />
+    <None Include="MetroUICss\Views\Shared\ValueFilterEditor.cshtml" />
+    <None Include="MetroUICss\Views\Shared\_Layout.cshtml" />
+    <None Include="MetroUICss\Views\Shared\_Pagination.cshtml" />
+    <None Include="MetroUICss\Views\Shared\_PaginationButton.cshtml" />
+    <None Include="MetroUICss\Views\Web.config.transform" />
     <None Include="packages.config" />
     <None Include="Bootstrap\Views\Shared\BooleanEditor.cshtml" />
     <None Include="Bootstrap\Views\Shared\CollectionEditor.cshtml" />
@@ -157,6 +214,17 @@
     <Content Include="Bootstrap\Content\themes\default\throbber.gif" />
     <Content Include="Bootstrap\Scripts\jstree.js" />
     <Content Include="Bootstrap\Scripts\jstree.min.js" />
+    <Content Include="MetroUICss\Content\metro-ui\css\iconFont.min.css" />
+    <Content Include="MetroUICss\Content\metro-ui\css\metro-bootstrap-responsive.css" />
+    <Content Include="MetroUICss\Content\metro-ui\css\metro-bootstrap-responsive.min.css" />
+    <Content Include="MetroUICss\Content\metro-ui\css\metro-bootstrap.css" />
+    <Content Include="MetroUICss\Content\metro-ui\css\metro-bootstrap.min.css" />
+    <Content Include="MetroUICss\Content\metro-ui\fonts\iconFont.dev.svg" />
+    <Content Include="MetroUICss\Content\metro-ui\fonts\iconFont.svg" />
+    <Content Include="MetroUICss\Content\metro-ui\fonts\metroSysIcons.svg" />
+    <Content Include="MetroUICss\Scripts\metro-ui\jquery.ui.widget.js" />
+    <Content Include="MetroUICss\Scripts\metro-ui\metro-dialog.js" />
+    <Content Include="MetroUICss\Scripts\metro-ui\metro.min.js" />
     <None Include="Bootstrap\Views\Web.config.transform" />
   </ItemGroup>
   <ItemGroup />
@@ -167,6 +235,13 @@ copy "$(TargetPath)" "$(SolutionDir)Bin"
 copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)Bin"
 copy "$(TargetDir)$(TargetName).xml" "$(SolutionDir)Bin"</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。启用“NuGet 程序包还原”可下载这些程序包。有关详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

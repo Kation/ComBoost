@@ -33,7 +33,7 @@ public YourController(IEntityContextBuilder builder) : base(builder)
 }
 </pre>
             <div class="alert alert-info">由于构造函数需要参数，建议您使用依赖注入。ComBoost已经为您实现了基于Unity的依赖注入，<a href="@Url.Action("MvcUnity")">点击查看</a>。</div>
-        
+
             <h2 id="controller-builder">EntityBuilder属性</h2>
             <p>继承<code>EntityBuilder</code>后您可以通过<code>EntityBuilder</code>属性获取实体上下文构造器。</p>
             <p>获取实体上下文后就可以使用它访问数据库。</p>
@@ -413,7 +413,7 @@ public override ActionResult Index(int page = 1, int size = 20, string parentpat
                 <h1>控制器接口</h1>
             </div>
             <h3 id="interface-file">保存文件</h3>
-            <p>如果您的属性设置了<code>CustomDataType</code>为<code>File</code>，那么您必须继承该接口。</p>
+            <p>如果您的属性设置了<code>CustomDataType</code>为<code>File</code>，那么您必须继承<code>IFileController</code>接口。</p>
             <p>该接口需要实现<code>SaveFileToProperty</code>方法。</p>
             <p>实体控制器在<code>Update</code>方法里会调用该方法，传入要修改的实体与属性，并且提供用户上传的<code>HttpPostedFileBase</code>。</p>
             <p>您需要做的就是把该文件保存到您需要的地方并且给该属性赋值。</p>
@@ -430,7 +430,7 @@ public void SaveFileToProperty(TEntity entity, PropertyMetadata metadata, HttpPo
 </pre>
 
             <h3 id="interface-image">显示图片</h3>
-            <p>如果您的属性设置了<code>CustomDataType</code>为<code>Image</code>，那么您必须继承该接口。</p>
+            <p>如果您的属性设置了<code>CustomDataType</code>为<code>Image</code>，那么您必须继承<code>IImageController</code>接口。</p>
             <p>该接口需要实现<code>ImageToProperty</code>方法。</p>
             <p>视图会在<code>&lt;img&gt;</code>标签的<code>src</code>属性使用实体控制器的<code>ImageToProperty</code>方法来显示图片。</p>
             <p>方法传入实体的Id与要显示的图片的属性名称。</p>
@@ -513,10 +513,150 @@ DefaultEditor.cshtml
     });
 &lt;/script&gt;
 </pre>
+            <p>在服务器启动时，需要为该自定义类型添加转换器。</p>
+            <p>我们将该自定义类型设置为<code>byte</code>类型时，需要添加<code>ByteConverter</code>。</p>
+<pre>
+EntityValueConverter.AddConverter("Rate", new ByteConverter());
+</pre>
             <div class="bs-example">
                 <img src="~/Content/Images/RateEditor.png" />
             </div>
             <div class="alert alert-info">编辑器需要提交到服务器的<code>&lt;input&gt;</code>的<code>name</code>属性必须为该属性的名称。</div>
+        </div>
+
+        <div class="bs-docs-section">
+            <div class="page-header" id="authentication">
+                <h1>权限系统</h1>
+            </div>
+            <p>您需要在<code>web.config</code>里以下节点配置ComBoost权限模块。</p>
+<pre>
+&lt;configuration&gt;
+    &lt;system.webServer&gt;
+        &lt;modules&gt;
+            &lt;remove name="FormsAuthentication" /&gt;
+            &lt;add name="ComBoostAuthentication" type="System.Web.Security.ComBoostAuthenticationModule"/&gt;
+        &lt;/modules&gt;
+    &lt;/system.webServer&gt;
+&lt;/configuration&gt;
+</pre>
+            <div class="alert alert-info">移除<code>FormsAuthentication</code>模块以确保<code>ComBoostAuthentication</code>的正确运行。</div>
+
+            <h3 id="authentication-entity">权限实体</h3>
+            <p>在使用权限系统前，您需要定义一个带权限判断的实体。</p>
+            <p>该实体继承<code>IRoleEntity</code>接口。</p>
+            <p>该接口要求您的实体需要实现一个权限判断功能，传入一个<code>string</code>类型的权限，返回该实体是否具有权限。</p>
+<pre>
+public bool IsInRole(string role)
+{
+    return true;
+}
+</pre>
+            <div class="alert alert-info">ComBoost提供的<code>UserBase</code>实体基类已经继承<code>IRoleEntity</code>接口，并且永远返回<code>true</code>。</div>
+
+            <h3 id="authentication-resolve">实体解释器</h3>
+            <p>现在您需要实现一个实体解释委托。</p>
+            <p>一般情况下，在安装<code>ComBoost.Mvc.Unity</code>NuGet程序包后，在<code>App_Start</code>文件夹里修改<code>UnityControllerFactory.cs</code>。</p>
+            <p>并在该类里添加如下方法。</p>
+<pre>
+private IRoleEntity EntityResolve(Type entityType, string username)
+{
+    IEntityContextBuilder builder = _container.Resolve&lt;IEntityContextBuilder&gt;();
+    dynamic context = builder.GetContext(entityType);
+    return context.GetEntity(new Guid(username));
+}
+</pre>
+            <p>然后在构造函数里添加以下代码。</p>
+<pre>
+System.Web.Security.ComBoostPrincipal.Resolve = EntityResolve;
+</pre>
+            <p>这样就把权限系统获取权限实体的委托实现了。</p>
+
+            <h3 id="authentication-route">修改路由</h3>
+            <p>现在您需要修改一下路由代码。</p>
+            <p>一般情况下，在<code>App_Start</code>里的<code>RouteConfig.cs</code>里直接修改路由代码。</p>
+            <p>您只需要给您的路由代码<code>MapRoute</code>方法加上泛型参数即可指定该路由下的权限判断由某权限实体决定。</p>
+            <p>该泛型必须继承<code>IRoleEntity</code>接口。</p>
+<pre>
+routes.MapRoute&lt;TRoleEntity&gt;(
+    name: "Default",
+    url: "{controller}/{action}/{id}",
+    defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+);
+</pre>
+            <p>如果是区域的路由，那么修改您的区域AreaRegistration代码。</p>
+            <p>默认Admin区域代码。</p>
+<pre>
+public override void RegisterArea(AreaRegistrationContext context) 
+{
+    context.MapRoute(
+        "Admin_default",
+        "Admin/{controller}/{action}/{id}",
+        new { action = "Index", id = UrlParameter.Optional }
+    );
+}
+</pre>
+            <p>修改后。</p>
+<pre>
+public override void RegisterArea(AreaRegistrationContext context) 
+{
+    context.Routes.MapRoute&lt;TRoleEntity&gt;(
+        "Admin_default",
+        "Admin/{controller}/{action}/{id}",
+        new { action = "Index", id = UrlParameter.Optional }
+    ).DataTokens["area"] = AreaName;
+}
+</pre>
+            <p>注意映射后要手动设置<code>DataTokens</code>的<code>area</code>值为区域名称。</p>
+            
+            <h3 id="authentication-use">权限的使用</h3>
+            <p>在以上工作都完成后，您还需要自己编写用户登录。</p>
+            <p>一般在您的登录方法使用<code>FormsAuthentication.SetAuthCookie</code>方法设置权限实体Index。</p>
+<pre>
+[HttpPost]
+public ActionResult Login(string username, string password)
+{
+    if (string.IsNullOrEmpty(username))
+    {
+        Response.StatusCode = 400;
+        return Content("用户名不能为空！");
+    }
+    if (string.IsNullOrEmpty(password))
+    {
+        Response.StatusCode = 400;
+        return Content("密码不能为空！");
+    }
+    var context = EntityBuilder.GetContext&lt;User&gt;();
+    User user = context.Query().SingleOrDefault(c => c.Name == username);
+    if (user == null)
+    {
+        Response.StatusCode = 400;
+        return Content("该用户不存在！");
+    }
+    if (!user.VerifyPassword(password))
+    {
+        Response.StatusCode = 400;
+        return Content("密码错误！");
+    }
+    FormsAuthentication.SetAuthCookie(user.Index.ToString(), false);
+    return new HttpStatusCodeResult(200);
+}
+</pre>
+            <div class="alert alert-info"><code>ComBoostAuthentication.SignIn</code>方法设置的用户名会被传入<code>System.Web.Security.ComBoostPrincipal.Resolve</code>委托，一般情况下使用实体Index作为用户名。</div>
+            <p>登录后，所有的<code>User.IsInRole</code>权限判断方法将由该<code>User</code>实体进行判断。</p>
+
+            <h3 id="authentication-sign">登录与登出</h3>
+            <p>如果您使用Forms验证，那么使用<code>ComBoostAuthentication.SignIn</code>方法设置用户登录Cookie。</p>
+            <p>使用<code>ComBoostAuthentication.SignOut</code>方法注销用户登录。</p>
+            <p>为您注册的路由<code>Route</code>添加Token数据可以区分用户登录区域。</p>
+<pre>
+Route myRoute = routes.MapRoute(
+    name: "Default",
+    url: "{controller}/{action}/{id}",
+    defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+);
+myRoute.DataTokens.Add("authArea","LoginArea");
+</pre>
+            <p>不同的authArea将不能互相登录。</p>
         </div>
     </div>
     <div class="col-md-2">
@@ -556,6 +696,16 @@ DefaultEditor.cshtml
                     <ul class="nav">
                         <li><a href="#editor-default">默认</a></li>
                         <li><a href="#editor-custom">自定义编辑器</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#authentication">权限系统</a>
+                    <ul class="nav">
+                        <li><a href="#authentication-entity">权限实体</a></li>
+                        <li><a href="#authentication-resolve">实体解释器</a></li>
+                        <li><a href="#authentication-route">修改路由</a></li>
+                        <li><a href="#authentication-use">权限的使用</a></li>
+                        <li><a href="#authentication-sign">登录与登出</a></li>
                     </ul>
                 </li>
             </ul>

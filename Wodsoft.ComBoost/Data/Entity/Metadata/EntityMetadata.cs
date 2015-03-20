@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -27,17 +28,21 @@ namespace System.Data.Entity.Metadata
             Type = type;
             KeyType = type.GetProperty("Index").PropertyType;
 
-            PropertyInfo[] properties = type.GetProperties().Where(t => t.GetGetMethod() != null && t.GetSetMethod() != null).ToArray();
+            PropertyInfo[] properties = type.GetProperties().Where(t=>t.GetCustomAttribute<NotMappedAttribute>() == null).ToArray();
             Properties = properties.Select(t => new PropertyMetadata(t)).OrderBy(t => t.Order).ToArray();
 
             ViewProperties = Properties.Where(t => !t.IsHiddenOnView).ToArray();
-            EditProperties = Properties.Where(t => !t.IsHiddenOnEdit).ToArray();
+            EditProperties = Properties.Where(t => !t.IsHiddenOnEdit && t.Property.GetSetMethod() != null).ToArray();
             SearchProperties = Properties.Where(t => t.Searchable).ToArray();
             DetailProperties = Properties.Where(t => !t.IsHiddenOnDetail).ToArray();
 
             _Properties = new Dictionary<string, PropertyMetadata>();
             for (int i = 0; i < Properties.Length; i++)
+            {
+                if (_Properties.ContainsKey(Properties[i].Property.Name))
+                    continue;
                 _Properties.Add(Properties[i].Property.Name, Properties[i]);
+            }
 
             EntityAuthenticationAttribute authenticate = type.GetCustomAttribute<EntityAuthenticationAttribute>();
             if (authenticate == null)
@@ -142,7 +147,7 @@ namespace System.Data.Entity.Metadata
         /// Get the properties of entity while search.
         /// </summary>
         public PropertyMetadata[] SearchProperties { get; private set; }
-        
+
         /// <summary>
         /// Get the properties of entity in detail.
         /// </summary>
