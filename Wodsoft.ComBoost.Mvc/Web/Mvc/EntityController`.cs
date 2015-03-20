@@ -225,16 +225,19 @@ namespace System.Web.Mvc
         /// <param name="page">Current page.</param>
         /// <param name="size">Current page size.</param>
         /// <returns>View model of TEntity.</returns>
-        protected virtual async Task<EntityViewModel<TEntity>> GetIndexModel(IQueryable<TEntity> queryable, int page, int size)
+        protected virtual Task<EntityViewModel<TEntity>> GetIndexModel(IQueryable<TEntity> queryable, int page, int size)
         {
-            var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, size);
-            //if (Metadata.ParentProperty != null && !search)
-            //    model.Parent = GetParentModel(parentid, Metadata.ParentLevel);
-            //model.SearchItem = searchItems;
-            model.Headers = Metadata.ViewProperties;
-            model.PageSizeOption = PageSize;
-            //model.UpdateItems();
-            return model;
+            return new Task<EntityViewModel<TEntity>>(() =>
+            {
+                var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, size);
+                //if (Metadata.ParentProperty != null && !search)
+                //    model.Parent = GetParentModel(parentid, Metadata.ParentLevel);
+                //model.SearchItem = searchItems;
+                model.Headers = Metadata.ViewProperties;
+                model.PageSizeOption = PageSize;
+                //model.UpdateItems();
+                return model;
+            });
         }
 
         /// <summary>
@@ -742,7 +745,7 @@ namespace System.Web.Mvc
                 ValueFilterAttribute filterAttribute = p.Property.GetCustomAttribute<ValueFilterAttribute>(true);
                 if (filterAttribute == null)
                     return new HttpStatusCodeResult(400);
-                ValueFilter filter = (ValueFilter)Activator.CreateInstance(filterAttribute.ValueFilter);
+                IValueFilter filter = (IValueFilter)Resolver.GetService(filterAttribute.ValueFilter);
                 ViewBag.Selected = selected;
                 ViewBag.IsRequired = p.IsRequired;
                 var collection = filter.GetValues(filterAttribute.DependencyProperty, value);

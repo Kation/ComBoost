@@ -117,74 +117,6 @@ namespace System.Web.Mvc
                 _Items.Remove(item);
         }
 
-
-        /// <summary>
-        /// Register entity API controller.
-        /// </summary>
-        /// <typeparam name="TEntity">Type of entity.</typeparam>
-        /// <param name="controller">Controller name for entity.</param>
-        /// <param name="area">Area name for entity.</param>
-        public void RegisterAPI<TEntity>(string controller, string area = null) where TEntity : class, IEntity, new()
-        {
-            Type type = typeof(TEntity);
-            if (controller == null)
-                throw new ArgumentNullException("controller");
-            RegisterAPI(type, controller, area);
-        }
-
-        /// <summary>
-        /// Register entity API controller.
-        /// </summary>
-        /// <param name="type">Type of entity.</param>
-        /// <param name="controller">Controller name for entity.</param>
-        /// <param name="area">Area name for entity.</param>
-        public void RegisterAPI(Type type, string controller, string area = null)
-        {
-            if (type == null)
-                throw new ArgumentNullException("type");
-            if (controller == null)
-                throw new ArgumentNullException("controller");
-            if (area != null)
-            {
-                if (_Items.Count(t => t.Area == area.ToLower() && t.Controller == controller.ToLower()) > 0)
-                    throw new ArgumentException("Detected the same route of entity.");
-            }
-            else
-            {
-                if (_Items.Count(t => t.Controller == controller.ToLower()) > 0)
-                    throw new ArgumentException("Detected the same route of entity.");
-            }
-            ControllerItem item = new ControllerItem();
-            item.EntityType = type;
-            item.Controller = controller.ToLower();
-            item.IsAPI = true;
-            if (area != null)
-                item.Area = area.ToLower();
-            _Items.Add(item);
-        }
-
-        /// <summary>
-        /// Unregister entity controller.
-        /// </summary>
-        /// <typeparam name="TEntity">Type of entity.</typeparam>
-        public void UnregisterAPI<TEntity>() where TEntity : class, IEntity, new()
-        {
-            UnregisterAPI(typeof(TEntity));
-        }
-
-        /// <summary>
-        /// Unregister entity API controller.
-        /// </summary>
-        /// <param name="type">Type of entity.</param>
-        public void UnregisterAPI(Type type)
-        {
-            if (type == null)
-                throw new ArgumentNullException("type");
-            ControllerItem item = _Items.SingleOrDefault(t => t.EntityType == type && t.IsAPI);
-            if (item != null)
-                _Items.Remove(item);
-        }
-
         /// <summary>
         /// Retrieves the controller type for the specified name and request context.
         /// </summary>
@@ -201,23 +133,10 @@ namespace System.Web.Mvc
             else
                 item = _Items.SingleOrDefault(t => t.Controller == controllerName.ToLower() && t.Area == areaString.ToLower());
             if (item != null)
-                if (item.IsAPI)
-                    type = GetAPIControllerType(item.EntityType);
-                else
-                    type = GetEntityControllerType(item.EntityType);
+                type = GetEntityControllerType(item.EntityType);
             if (type == null)
                 type = base.GetControllerType(requestContext, controllerName);
             return type;
-        }
-
-        /// <summary>
-        /// Get api controller.
-        /// </summary>
-        /// <param name="entityType">Entity type.</param>
-        /// <returns>API Controller Type.</returns>
-        protected virtual Type GetAPIControllerType(Type entityType)
-        {
-            return typeof(EntityAPIController<>).MakeGenericType(entityType);
         }
 
         /// <summary>
@@ -237,8 +156,6 @@ namespace System.Web.Mvc
             public string Controller { get; set; }
 
             public Type EntityType { get; set; }
-
-            public bool IsAPI { get; set; }
         }
     }
 }
