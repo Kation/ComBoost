@@ -46,7 +46,9 @@ namespace System.Web.Mvc.Converter
         {
             if (context == null)
                 throw new ArgumentNullException("context");
-            if (value == "" || value == null)
+            if (!(value is string))
+                return null;
+            if ((string)value == "" || value == null)
                 return null;
             Guid id;
             if (!Guid.TryParse((string)value, out id))

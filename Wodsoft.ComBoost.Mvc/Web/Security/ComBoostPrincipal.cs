@@ -9,8 +9,15 @@ using System.Web.Routing;
 
 namespace System.Web.Security
 {
+    /// <summary>
+    /// ComBoost principal wrapper.
+    /// </summary>
     public class ComBoostPrincipal : IPrincipal
     {
+        /// <summary>
+        /// Initialize comboost principal.
+        /// </summary>
+        /// <param name="user">Principal to wrapper.</param>
         public ComBoostPrincipal(IPrincipal user)
         {
             if (user == null)
@@ -28,15 +35,31 @@ namespace System.Web.Security
             }
         }
 
+        /// <summary>
+        /// Get the origin principal.
+        /// </summary>
         public IPrincipal OriginPrincipal { get; private set; }
 
+        /// <summary>
+        /// Get the identity.
+        /// </summary>
         public IIdentity Identity { get; private set; }
 
+        /// <summary>
+        /// Get or set the role entity resolve delegate.
+        /// Must set this manual or comboost authentication will be failure.
+        /// </summary>
         public static RoleEntityResolveDelegate Resolve { get; set; }
 
+        /// <summary>
+        /// Get the current route data.
+        /// </summary>
         public RouteData CurrentRoute { get; private set; }
 
         private IRoleEntity _RoleEntity;
+        /// <summary>
+        /// Get the current user role entity.
+        /// </summary>
         public IRoleEntity RoleEntity
         {
             get
@@ -73,6 +96,11 @@ namespace System.Web.Security
         }
         private bool _IsFailure;
 
+        /// <summary>
+        /// Determines whether the current principal belongs to the specified role.
+        /// </summary>
+        /// <param name="role">Role.</param>
+        /// <returns></returns>
         public bool IsInRole(string role)
         {
             if (!OriginPrincipal.Identity.IsAuthenticated)

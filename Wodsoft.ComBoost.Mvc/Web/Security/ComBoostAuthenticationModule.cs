@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace System.Web.Security
 {
     /// <summary>
-    /// Comboost authentication http module.
+    /// ComBoost authentication http module.
     /// </summary>
     public class ComBoostAuthenticationModule : IHttpModule
     {

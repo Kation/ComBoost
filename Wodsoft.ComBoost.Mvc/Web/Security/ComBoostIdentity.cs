@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace System.Web.Security
 {
+    /// <summary>
+    /// ComBoost identity.
+    /// </summary>
     public class ComBoostIdentity : IIdentity
     {
         internal ComBoostIdentity(ComBoostPrincipal principal)
@@ -18,12 +21,18 @@ namespace System.Web.Security
 
         private ComBoostPrincipal _Principal;
 
+        /// <summary>
+        /// Gets the type of authentication used.
+        /// </summary>
         public string AuthenticationType
         {
             get { return "Forms"; }
         }
 
         private bool? _IsAuthenticated;
+        /// <summary>
+        /// Gets a value that indicates whether the user has been authenticated.
+        /// </summary>
         public bool IsAuthenticated
         {
             get
@@ -68,6 +77,9 @@ namespace System.Web.Security
         }
 
         private string _Name;
+        /// <summary>
+        /// Gets the name of the current user.
+        /// </summary>
         public string Name
         {
             get

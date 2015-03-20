@@ -11,6 +11,9 @@ using System.Web.Routing;
 
 namespace System.Web.Security
 {
+    /// <summary>
+    /// ComBoost authentication.
+    /// </summary>
     public sealed class ComBoostAuthentication
     {
         private static System.Configuration.Configuration _Config;
@@ -41,18 +44,39 @@ namespace System.Web.Security
             Timeout = system.Authentication.Forms.Timeout;
         }
 
+        /// <summary>
+        /// Get the login url.
+        /// </summary>
         public static string LoginUrl { get; private set; }
 
+        /// <summary>
+        /// Get the cookie domain.
+        /// </summary>
         public static string CookieDomain { get; private set; }
 
+        /// <summary>
+        /// Get the cookie name.
+        /// </summary>
         public static string CookieName { get; private set; }
 
+        /// <summary>
+        /// Get the cookie path.
+        /// </summary>
         public static string CookiePath { get; private set; }
 
+        /// <summary>
+        /// Get the ComBoost authentication enabled.
+        /// </summary>
         public static bool IsEnabled { get; private set; }
 
+        /// <summary>
+        /// Get the cookie enable timespan.
+        /// </summary>
         public static TimeSpan Timeout { get; private set; }
 
+        /// <summary>
+        /// Refresh authentication security key. 
+        /// </summary>
         public static void RefreshSecurityKey()
         {
             _Key = Guid.NewGuid().ToByteArray();
@@ -60,11 +84,24 @@ namespace System.Web.Security
             _Config.Save();
         }
 
+        /// <summary>
+        /// Create cookies.
+        /// </summary>
+        /// <param name="username">Username.</param>
+        /// <param name="authArea">Authenticate area.</param>
+        /// <returns></returns>
         public static string CreateCookies(string username, string authArea)
         {
             return CreateCookies(username, authArea, Timeout);
         }
 
+        /// <summary>
+        /// Create cookies.
+        /// </summary>
+        /// <param name="username">Username.</param>
+        /// <param name="authArea">Authenticate area.</param>
+        /// <param name="timeout">Enable timespan.</param>
+        /// <returns></returns>
         public static string CreateCookies(string username, string authArea, TimeSpan timeout)
         {
             ComBoostCookiesToken token = new ComBoostCookiesToken();
@@ -86,6 +123,14 @@ namespace System.Web.Security
 
         }
 
+        /// <summary>
+        /// Verify cookie.
+        /// </summary>
+        /// <param name="cookieValue">Cookie value.</param>
+        /// <param name="authArea">Authenticate area.</param>
+        /// <param name="username">Username.</param>
+        /// <param name="expiredDate">Expired date.</param>
+        /// <returns></returns>
         public static bool VerifyCookie(string cookieValue, string authArea, out string username, out DateTime expiredDate)
         {
             username = null;
@@ -125,6 +170,11 @@ namespace System.Web.Security
             }
         }
 
+        /// <summary>
+        /// Sign in.
+        /// </summary>
+        /// <param name="username">Username.</param>
+        /// <param name="forever">Sign in forever that will not timeout.</param>
         public static void SignIn(string username, bool forever)
         {
             if (forever)
@@ -133,6 +183,11 @@ namespace System.Web.Security
                 SignIn(username, Timeout);
         }
 
+        /// <summary>
+        /// Sign in.
+        /// </summary>
+        /// <param name="username">Username.</param>
+        /// <param name="timeout">Timeout.</param>
         public static void SignIn(string username, TimeSpan timeout)
         {
             RouteData route = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
@@ -160,6 +215,9 @@ namespace System.Web.Security
             HttpContext.Current.Response.Cookies.Add(cookie);
         }
 
+        /// <summary>
+        /// Sign out.
+        /// </summary>
         public static void SignOut()
         {
             RouteData route = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));

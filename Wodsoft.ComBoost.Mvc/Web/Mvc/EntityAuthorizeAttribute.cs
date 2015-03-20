@@ -15,14 +15,24 @@ namespace System.Web.Mvc
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class EntityAuthorizeAttribute : FilterAttribute, IAuthorizationFilter
     {
+        /// <summary>
+        /// Initialize entity authorize attribute.
+        /// </summary>
         public EntityAuthorizeAttribute()
             : this(EntityAuthorizeAction.None) { }
 
+        /// <summary>
+        /// Initialize entity authorize attribute.
+        /// </summary>
+        /// <param name="action">Action of entity authorize.</param>
         public EntityAuthorizeAttribute(EntityAuthorizeAction action)
         {
             Action = action;
         }
 
+        /// <summary>
+        /// Get the action of entity authorize.
+        /// </summary>
         public EntityAuthorizeAction Action { get; private set; }
 
         /// <summary>
@@ -107,12 +117,30 @@ namespace System.Web.Mvc
         }
     }
 
+    /// <summary>
+    /// Entity authorize action
+    /// </summary>
     public enum EntityAuthorizeAction
     {
+        /// <summary>
+        /// None.
+        /// </summary>
         None = 0,
+        /// <summary>
+        /// View.
+        /// </summary>
         View = 1,
+        /// <summary>
+        /// Create.
+        /// </summary>
         Create = 2,
+        /// <summary>
+        /// Edit.
+        /// </summary>
         Edit = 3,
+        /// <summary>
+        /// Remove
+        /// </summary>
         Remove = 4
     }
 }
