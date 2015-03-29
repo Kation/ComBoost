@@ -225,9 +225,9 @@ namespace System.Web.Mvc
         /// <param name="page">Current page.</param>
         /// <param name="size">Current page size.</param>
         /// <returns>View model of TEntity.</returns>
-        protected virtual Task<EntityViewModel<TEntity>> GetIndexModel(IQueryable<TEntity> queryable, int page, int size)
+        protected virtual async Task<EntityViewModel<TEntity>> GetIndexModel(IQueryable<TEntity> queryable, int page, int size)
         {
-            return new Task<EntityViewModel<TEntity>>(() =>
+            return await Task.Run<EntityViewModel<TEntity>>(() =>
             {
                 var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, size);
                 //if (Metadata.ParentProperty != null && !search)
