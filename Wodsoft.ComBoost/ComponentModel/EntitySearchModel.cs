@@ -16,12 +16,12 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the properties able to search.
         /// </summary>
-        public PropertyMetadata[] Properties { get; set; }
+        public IEnumerable<IPropertyMetadata> Properties { get; set; }
 
         /// <summary>
         /// Get or set the metadata of entity.
         /// </summary>
-        public EntityMetadata Metadata { get; set; }
+        public IEntityMetadata Metadata { get; set; }
     }
 
     /// <summary>

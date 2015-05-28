@@ -18,6 +18,7 @@ namespace System.ComponentModel.DataAnnotations
         {
             IsHiddenOnEdit = true;
             IsHiddenOnView = true;
+            IsHiddenOnCreate = true;
         }
 
         /// <summary>
@@ -31,6 +32,12 @@ namespace System.ComponentModel.DataAnnotations
         /// Default is true.
         /// </summary>
         public bool IsHiddenOnEdit { get; set; }
+
+        /// <summary>
+        /// Get or set is property hidden while creating.
+        /// Default is true.
+        /// </summary>
+        public bool IsHiddenOnCreate { get; set; }
 
         private bool? _IsHiddenOnDetail;
         /// <summary>

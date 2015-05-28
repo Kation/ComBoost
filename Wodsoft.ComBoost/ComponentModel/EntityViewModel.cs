@@ -11,26 +11,59 @@ namespace System.ComponentModel
     /// <summary>
     /// Entity view model.
     /// </summary>
-    public abstract class EntityViewModel : NotifyBase, IPagination
+    /// <typeparam name="TEntity">Type of entity.</typeparam>
+    public class EntityViewModel<TEntity> : NotifyBase, IEntityViewModel<TEntity>, IEntityViewModel, IPagination where TEntity : IEntity
     {
+        private IQueryable<TEntity> _Queryable;
         /// <summary>
-        /// Initialize entity view model.
+        /// Get the queryable of entity.
         /// </summary>
-        protected EntityViewModel()
+        public IQueryable<TEntity> Queryable
         {
-            Buttons = new EntityViewButton[0];
+            get
+            {
+                return _Queryable;
+            }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+                _Queryable = value;
+                UpdateTotalPage();
+                CurrentPage = 1;
+            }
         }
 
         /// <summary>
-        /// Default number of items per page options.
+        /// Initialize entity view model.
         /// </summary>
-        public static int[] DefaultPageSizeOption = new int[] { 10, 20, 30, 50 };
+        /// <param name="queryable">Queryable of entity.</param>
+        public EntityViewModel(IQueryable<TEntity> queryable) : this(queryable, 1, Pagination.DefaultPageSize) { }
 
         /// <summary>
-        /// Default number of items per page.
+        /// Initialize entity view model.
         /// </summary>
-        public static int DefaultPageSize = 20;
-
+        /// <param name="queryable">Queryable of entity.</param>
+        /// <param name="page">Current page.</param>
+        /// <param name="size">Current page size.</param>
+        public EntityViewModel(IQueryable<TEntity> queryable, int page, int size)
+        {
+            if (queryable == null)
+                throw new ArgumentNullException("queryable");
+            if (page < 1)
+                throw new ArgumentException("Can not less than 1.", "page");
+            if (size < 1)
+                throw new ArgumentException("Can not less than 1.", "size");
+            ViewButtons = new IViewButton[0];
+            ItemButtons = new IEntityViewButton[0];
+            CurrentSize = size;
+            PageSizeOption = Pagination.DefaultPageSizeOption;
+            Metadata = EntityAnalyzer.GetMetadata<TEntity>();
+            Queryable = queryable;
+            UpdateTotalPage();
+            SetPage(page);
+        }
+        
         /// <summary>
         /// Get or set the items per page options.
         /// </summary>
@@ -52,24 +85,24 @@ namespace System.ComponentModel
         public int CurrentPage { get { return (int)GetValue(); } set { SetValue(value); } }
 
         /// <summary>
-        /// Get or set the items of current page.
-        /// </summary>
-        public IEntity[] Items { get { return (IEntity[])GetValue(); } set { SetValue(value); } }
-
-        /// <summary>
         /// Get or set the metadata of entity.
         /// </summary>
-        public EntityMetadata Metadata { get; set; }
+        public IEntityMetadata Metadata { get; set; }
 
         /// <summary>
         /// Get or set the viewlist headers.
         /// </summary>
-        public PropertyMetadata[] Headers { get; set; }
+        public IEnumerable<IPropertyMetadata> Headers { get; set; }
 
         /// <summary>
-        /// Get or set the viewlist buttons.
+        /// Get or set the view buttons.
         /// </summary>
-        public EntityViewButton[] Buttons { get; set; }
+        public IViewButton[] ViewButtons { get; set; }
+
+        /// <summary>
+        /// Get or set the item buttons.
+        /// </summary>
+        public IEntityViewButton[] ItemButtons { get; set; }
 
         /// <summary>
         /// Get or set the parent models.
@@ -80,6 +113,13 @@ namespace System.ComponentModel
         /// Get or set the search items.
         /// </summary>
         public EntitySearchItem[] SearchItem { get; set; }
+
+        /// <summary>
+        /// Get or set the items of current page.
+        /// </summary>
+        public TEntity[] Items { get { return (TEntity[])GetValue(); } set { SetValue(value); } }
+
+        IEntity[] IEntityViewModel.Items { get { return Items.Cast<IEntity>().ToArray(); } }
 
         /// <summary>
         /// Set the current page.
@@ -111,86 +151,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Update total page.
         /// </summary>
-        public abstract void UpdateTotalPage();
-
-        /// <summary>
-        /// Update items of current page.
-        /// </summary>
-        public abstract void UpdateItems();
-    }
-
-    /// <summary>
-    /// Entity view model.
-    /// </summary>
-    /// <typeparam name="TEntity">Type of entity.</typeparam>
-    public class EntityViewModel<TEntity> : EntityViewModel where TEntity : IEntity
-    {
-        private IQueryable<TEntity> _Queryable;
-        /// <summary>
-        /// Get the queryable of entity.
-        /// </summary>
-        public IQueryable<TEntity> Queryable
-        {
-            get
-            {
-                return _Queryable;
-            }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-                _Queryable = value;
-                UpdateTotalPage();
-                CurrentPage = 1;
-            }
-        }
-
-        /// <summary>
-        /// Initialize entity view model.
-        /// </summary>
-        /// <param name="queryable">Queryable of entity.</param>
-        public EntityViewModel(IQueryable<TEntity> queryable) : this(queryable, 1, DefaultPageSize) { }
-
-        /// <summary>
-        /// Initialize entity view model.
-        /// </summary>
-        /// <param name="queryable">Queryable of entity.</param>
-        /// <param name="page">Current page.</param>
-        /// <param name="size">Current page size.</param>
-        public EntityViewModel(IQueryable<TEntity> queryable, int page, int size)
-        {
-            if (queryable == null)
-                throw new ArgumentNullException("queryable");
-            if (page < 1)
-                throw new ArgumentException("Can not less than 1.", "page");
-            if (size < 1)
-                throw new ArgumentException("Can not less than 1.", "size");
-            CurrentSize = size;
-            PageSizeOption = DefaultPageSizeOption;
-            Metadata = EntityAnalyzer.GetMetadata<TEntity>();
-            Queryable = queryable;
-            UpdateTotalPage();
-            SetPage(page);
-        }
-
-        /// <summary>
-        /// Get or set the items of current page.
-        /// </summary>
-        public new TEntity[] Items
-        {
-            get
-            {
-                if (base.Items == null)
-                    return null;
-                return base.Items.Cast<TEntity>().ToArray();
-            }
-            set { base.Items = value.Cast<IEntity>().ToArray(); }
-        }
-
-        /// <summary>
-        /// Update total page.
-        /// </summary>
-        public override void UpdateTotalPage()
+        public virtual void UpdateTotalPage()
         {
             int total = Queryable.Count();
             TotalPage = (int)Math.Ceiling(total / (double)CurrentSize);
@@ -201,7 +162,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Update items of current page.
         /// </summary>
-        public override void UpdateItems()
+        public virtual void UpdateItems()
         {
             Items = Queryable.Skip((CurrentPage - 1) * CurrentSize).Take(CurrentSize).ToArray();
         }

@@ -11,13 +11,20 @@ namespace System.Data.Entity.Metadata
     /// <summary>
     /// Entity analyzer.
     /// </summary>
-    public static class EntityAnalyzer
+    public class EntityAnalyzer : IEntityAnalyzer
     {
-        private static Dictionary<Type, EntityMetadata> _Metadata;
+        private static IEntityAnalyzer _Analyzer;
 
         static EntityAnalyzer()
         {
-            _Metadata = new Dictionary<Type, EntityMetadata>();
+            _Analyzer = new EntityAnalyzer();
+        }
+
+        public static void OverrideAnalyzer(IEntityAnalyzer analyzer)
+        {
+            if (analyzer == null)
+                throw new ArgumentNullException("analyzer");
+            _Analyzer = analyzer;
         }
 
         /// <summary>
@@ -25,14 +32,9 @@ namespace System.Data.Entity.Metadata
         /// </summary>
         /// <param name="type">Type of entity.</param>
         /// <returns>Return entity metadata. If find any error when analyze will return null.</returns>
-        public static EntityMetadata GetMetadata(Type type)
+        public static IEntityMetadata GetMetadata(Type type)
         {
-            while (type.Assembly.IsDynamic)
-                type = type.BaseType;
-            lock (_Metadata)
-                if (!_Metadata.ContainsKey(type))
-                    _Metadata.Add(type, BuildMetadata(type));
-            return _Metadata[type];
+            return _Analyzer.GetMetadata(type);
         }
 
         /// <summary>
@@ -40,15 +42,32 @@ namespace System.Data.Entity.Metadata
         /// </summary>
         /// <typeparam name="TEntity">Type of entity.</typeparam>
         /// <returns>Return entity metadata. If find any error when analyze will return null.</returns>
-        public static EntityMetadata GetMetadata<TEntity>()
+        public static IEntityMetadata GetMetadata<TEntity>()
         {
             return GetMetadata(typeof(TEntity));
         }
 
-        private static EntityMetadata BuildMetadata(Type type)
+        private Dictionary<Type, IEntityMetadata> _Metadata;
+
+        public EntityAnalyzer()
         {
-            EntityMetadata metadata = new EntityMetadata(type);
-            return metadata;
+            _Metadata = new Dictionary<Type, IEntityMetadata>();
+        }
+
+        IEntityMetadata IEntityAnalyzer.GetMetadata(Type type)
+        {
+            while (type.Assembly.IsDynamic)
+                type = type.BaseType;
+            lock (_Metadata)
+                if (!_Metadata.ContainsKey(type))
+                {
+                    var metadataField = type.GetField("Metadata", BindingFlags.Static | BindingFlags.Public);
+                    if (metadataField != null)
+                        _Metadata.Add(type, (IEntityMetadata)metadataField.GetValue(null));
+                    else
+                        _Metadata.Add(type, new EntityMetadata(type));
+                }
+            return _Metadata[type];
         }
     }
 }

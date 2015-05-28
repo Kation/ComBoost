@@ -20,16 +20,6 @@ namespace System.ComponentModel
         public NotifyBase()
         {
             data = new Dictionary<string, object>();
-            //foreach (var property in this.GetType().GetProperties())
-            //{
-            //    if (data.ContainsKey(property.Name))
-            //        continue;
-            //    if (property.GetGetMethod() != null && property.GetSetMethod() != null)
-            //        if (property.PropertyType.IsValueType)
-            //            data.Add(property.Name, Activator.CreateInstance(property.PropertyType));
-            //        else
-            //            data.Add(property.Name, null);
-            //}
         }
 
         /// <summary>

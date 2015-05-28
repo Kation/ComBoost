@@ -12,11 +12,21 @@ namespace System.ComponentModel
     public class Pagination : IPagination
     {
         /// <summary>
+        /// Default number of items per page options.
+        /// </summary>
+        public static int[] DefaultPageSizeOption = new int[] { 10, 20, 30, 50 };
+
+        /// <summary>
+        /// Default number of items per page.
+        /// </summary>
+        public static int DefaultPageSize = 20;
+
+        /// <summary>
         /// Initialize pagination.
         /// </summary>
         public Pagination()
         {
-            PageSizeOption = EntityViewModel.DefaultPageSizeOption;
+            PageSizeOption = DefaultPageSizeOption;
         }
 
         /// <summary>
@@ -39,7 +49,7 @@ namespace System.ComponentModel
         /// <param name="page">Page.</param>
         /// <param name="count">Number of total items.</param>
         public Pagination(int page, int count)
-            : this(page, count, EntityViewModel.DefaultPageSize) { }
+            : this(page, count, DefaultPageSize) { }
 
         /// <summary>
         /// Get or set the page size options.

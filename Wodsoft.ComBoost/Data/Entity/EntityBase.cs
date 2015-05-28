@@ -16,11 +16,11 @@ namespace System.Data.Entity
     /// </summary>
     public abstract class EntityBase : NotifyBase, IEntity
     {
-        private EntityMetadata _Metadata;
+        private IEntityMetadata _Metadata;
         /// <summary>
         /// Get the metadata of entity.
         /// </summary>
-        protected EntityMetadata Metadata
+        protected IEntityMetadata Metadata
         {
             get
             {
@@ -29,7 +29,7 @@ namespace System.Data.Entity
                 return _Metadata;
             }
         }
-        
+
         /// <summary>
         /// Get or set the id of entity.
         /// </summary>
@@ -92,7 +92,11 @@ namespace System.Data.Entity
         {
             if (Metadata.DisplayProperty == null)
                 return base.ToString();
-            return Metadata.DisplayProperty.Property.GetValue(this, null).ToString();
+            object value = Metadata.DisplayProperty.GetValue(this);
+            if (value == null)
+                return "";
+            else
+                return value.ToString();
         }
 
         //private ReadOnlyCollection<ValidationResult> _NoError = new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>());
@@ -106,12 +110,12 @@ namespace System.Data.Entity
             var result = new List<ValidationResult>();
             foreach (var property in Metadata.Properties)
             {
-                validationContext.MemberName = property.Property.Name;
+                validationContext.MemberName = property.ClrName;
                 validationContext.DisplayName = property.Name;
-                var list = property.Property.GetCustomAttributes<ValidationAttribute>(true);
+                var list = property.GetAttributes<ValidationAttribute>();
                 foreach (var item in list)
                 {
-                    var r = item.GetValidationResult(property.Property.GetValue(this), validationContext);
+                    var r = item.GetValidationResult(property.GetValue(this), validationContext);
                     if (r != null && r != ValidationResult.Success)
                         result.Add(r);
                 }
