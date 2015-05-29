@@ -20,6 +20,6 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the property metadata.
         /// </summary>
-        public PropertyMetadata Metadata { get; set; }
+        public IPropertyMetadata Metadata { get; set; }
     }
 }

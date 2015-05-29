@@ -1,13 +1,13 @@
 ﻿@model MvcEditorModel
-<div id="@Model.Metadata.Property.Name">
+<div id="@Model.Metadata.ClrName">
     <div class="radio-inline">
         <label>
-            <input type="radio" name="@Model.Metadata.Property.Name" value="true"@Html.Raw((bool)Model.Value ? " checked=\"checked\"" : "")/>Yes
+            <input type="radio" name="@Model.Metadata.ClrName" value="true"@Html.Raw((bool)Model.Value ? " checked=\"checked\"" : "")/>Yes
         </label>
     </div>
     <div class="radio-inline">
         <label>
-            <input type="radio" name="@Model.Metadata.Property.Name" value="false"@Html.Raw((bool)Model.Value ? "" : "checked=\"checked\"")/>No
+            <input type="radio" name="@Model.Metadata.ClrName" value="false"@Html.Raw((bool)Model.Value ? "" : "checked=\"checked\"")/>No
         </label>
     </div>
 </div>

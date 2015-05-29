@@ -104,11 +104,11 @@ namespace System.Web.Mvc
         /// </summary>
         /// <param name="helper">A htmlhelper.</param>
         /// <param name="model">Entity view model.</param>
-        public static void Pagination(this HtmlHelper helper, EntityViewModel model)
+        public static MvcHtmlString Pagination(this HtmlHelper helper, IEntityViewModel model)
         {
             if (model == null)
                 throw new ArgumentNullException("model");
-            helper.RenderPartial("_Pagination", model);
+            return helper.Partial("_Pagination", model);
         }
 
         /// <summary>
@@ -116,11 +116,11 @@ namespace System.Web.Mvc
         /// </summary>
         /// <param name="helper">A htmlhelper.</param>
         /// <param name="model">Entity view model.</param>
-        public static void PaginationButton(this HtmlHelper helper, EntityViewModel model)
+        public static MvcHtmlString PaginationButton(this HtmlHelper helper, IEntityViewModel model)
         {
             if (model == null)
                 throw new ArgumentNullException("model");
-            helper.RenderPartial("_PaginationButton", model);
+            return helper.Partial("_PaginationButton", model);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace System.Web.Mvc
         /// <param name="helper">A htmlhelper.</param>
         /// <param name="property">Property metadata.</param>
         /// <param name="value">Property value.</param>
-        public static void Editor(this HtmlHelper helper, PropertyMetadata property, object value)
+        public static MvcHtmlString Editor(this HtmlHelper helper, IPropertyMetadata property, object value)
         {
             if (helper == null)
                 throw new ArgumentNullException("helper");
@@ -139,9 +139,9 @@ namespace System.Web.Mvc
             model.Metadata = property;
             model.Value = value;
             if (property.Type == CustomDataType.Other)
-                System.Web.Mvc.Html.RenderPartialExtensions.RenderPartial(helper, property.CustomType + "Editor", model);
+                return helper.Partial(property.CustomType + "Editor", model);
             else
-                System.Web.Mvc.Html.RenderPartialExtensions.RenderPartial(helper, property.Type.ToString() + "Editor", model);
+                return helper.Partial(property.Type.ToString() + "Editor", model);
         }
 
         /// <summary>
@@ -193,6 +193,51 @@ namespace System.Web.Mvc
                 _EnumCache.Add(type, list);
             }
             return _EnumCache[type];
+        }
+
+        /// <summary>
+        /// Get service provider from web view page.
+        /// </summary>
+        /// <param name="viewPage">Current view page.</param>
+        /// <returns></returns>
+        public static IServiceProvider GetServiceProvider(this WebViewPage viewPage)
+        {
+            Controller controller = viewPage.ViewContext.Controller as Controller;
+            if (controller == null)
+                return null;
+            return GetServiceProvider(controller);
+        }
+
+        /// <summary>
+        /// Get service provider from service provider.
+        /// </summary>
+        /// <param name="controller">Current controller.</param>
+        /// <returns></returns>
+        public static IServiceProvider GetServiceProvider(this Controller controller)
+        {
+            if (controller == null)
+                throw new ArgumentNullException("controller");
+            if (!controller.ViewData.ContainsKey("DependencyServiceProvider"))
+                controller.ViewData.Add("DependencyServiceProvider", new DependencyServiceProvider(controller.Resolver));
+            return (DependencyServiceProvider)controller.ViewData["DependencyServiceProvider"];
+        }
+
+        /// <summary>
+        /// IServiceProvider wrapper of IDependencyResolver.
+        /// </summary>
+        public class DependencyServiceProvider : IServiceProvider
+        {
+            public DependencyServiceProvider(IDependencyResolver resolver)
+            {
+                Resolver = resolver;
+            }
+
+            public IDependencyResolver Resolver { get; private set; }
+
+            public object GetService(Type serviceType)
+            {
+                return Resolver.GetService(serviceType);
+            }
         }
 
         /// <summary>

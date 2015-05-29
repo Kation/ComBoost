@@ -2,9 +2,9 @@
 @using System.Reflection;
 @model MvcEditorModel
 @{
-    ValueFilterAttribute attribute = Model.Metadata.Property.GetCustomAttribute<ValueFilterAttribute>(true);
+    ValueFilterAttribute attribute = Model.Metadata.GetAttribute<ValueFilterAttribute>();
 }
-<select id="@Model.Metadata.Property.Name" name="@Model.Metadata.Property.Name" class="form-control" style="padding-right: 12px;"></select>
+<select id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" class="form-control" style="padding-right: 12px;"></select>
 @if (attribute.DependencyProperty != null)
 {
     <script type="text/javascript">
@@ -15,30 +15,30 @@
                 $.ajax({
                     url: '@Url.Action("ValueFilter")',
                     data: {
-                        property: '@Model.Metadata.Property.Name',
+                        property: '@Model.Metadata.ClrName',
                         value: dependencyValue,
                         selected: '@Model.Value'
                     },
                     type: 'POST',
                     success: function (result) {
-                        $('#@Model.Metadata.Property.Name').html(result);
+                        $('#@Model.Metadata.ClrName').html(result);
                     }
                 })
             }
             parent.change(function () {
                 var value = parent.val();
                 if (value == '')
-                    $('#@Model.Metadata.Property.Name').empty();
+                    $('#@Model.Metadata.ClrName').empty();
                 else
                     $.ajax({
                         url: '@Url.Action("ValueFilter")',
                         data: {
-                            property: '@Model.Metadata.Property.Name',
+                            property: '@Model.Metadata.ClrName',
                             value: value
                         },
                         type: 'POST',
                         success: function (result) {
-                            $('#@Model.Metadata.Property.Name').html(result);
+                            $('#@Model.Metadata.ClrName').html(result);
                         }
                     })
             });
@@ -52,12 +52,12 @@ else
             $.ajax({
                 url: '@Url.Action("ValueFilter")',
                 data: {
-                    property: '@Model.Metadata.Property.Name',
+                    property: '@Model.Metadata.ClrName',
                     selected: '@Model.Value'
                 },
                 type: 'POST',
                 success: function (result) {
-                    $('#@Model.Metadata.Property.Name').html(result);
+                    $('#@Model.Metadata.ClrName').html(result);
                 }
             });
         });

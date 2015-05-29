@@ -1,4 +1,4 @@
-﻿@model EntityEditModel
+﻿@model IEntityEditModel
 @{
     ViewBag.Title = (Model.Item.Index == Guid.Empty ? "Create " : "Edit ") + Model.Metadata.Name;
     object area = ViewContext.RouteData.DataTokens["Area"];
@@ -34,7 +34,7 @@
                             <label>@Model.Properties[i].Name</label>
                         </div>
                         <div class="span8">                            
-                            @{Html.Editor(Model.Properties[i], Model.Properties[i].Property.GetValue(Model.Item));}
+                            @{Html.Editor(Model.Properties[i], Model.Properties[i].GetValue(Model.Item));}
                         </div>
                     </div>
                 }

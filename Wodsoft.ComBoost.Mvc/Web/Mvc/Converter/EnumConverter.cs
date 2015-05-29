@@ -95,7 +95,7 @@ namespace System.Web.Mvc.Converter
         /// <returns>An System.Object that represents the converted value.</returns>
         public override object ConvertFrom(ITypeDescriptorContext context, Globalization.CultureInfo culture, object value)
         {
-            Type type = ((EntityValueConverterContext)context).Property.Property.PropertyType;
+            Type type = ((EntityValueConverterContext)context).Property.ClrType;
             if (value is int)
                 return Enum.ToObject(type, (int)value);
             return Enum.Parse(type, (string)value);

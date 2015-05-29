@@ -1,4 +1,4 @@
-﻿@model EntityViewModel
+﻿@model IEntityViewModel
 @{
     ViewBag.Title = Model.Metadata.Name + " List";
     object area = ViewContext.RouteData.DataTokens["Area"];
@@ -10,6 +10,7 @@
     {
         Layout = "~/Areas/" + area.ToString() + "/Views/Shared/_Layout.cshtml";
     }
+    var provider = this.GetServiceProvider();
 }
 <ol class="breadcrumb">
     <li><a href="@Url.Action("Index","Home")">Home</a></li>
@@ -39,7 +40,7 @@
                         <li class="jstree-open">
                             <a data-nav="true" href="@Html.Raw(Url.Action("Index"))">All</a>
                             <ul>
-                                @{Html.RenderPartial("ParentView", Model.Parent);}
+                                @Html.Partial("ParentView", Model.Parent)
                             </ul>
                         </li>
                     </ul>
@@ -65,43 +66,40 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            @for (int i = 0; i < Model.Headers.Length; i++)
+                            @foreach (var header in Model.Headers)
                             {
-                                <td title="@Model.Headers[i].Description">@(Model.Headers[i].ShortName ?? Model.Headers[i].Name)</td>
+                                <td title="@header.Description">@header.Name</td>
                             }
                             <td>Operation</td>
                         </tr>
                     </thead>
                     <tbody>
-                        @for (int i = 0; i < Model.Items.Length; i++)
+                        @foreach (var item in Model.Items)
                         {
                             <tr>
-                                @for (int b = 0; b < Model.Headers.Length; b++)
+                                @foreach (var header in Model.Headers)
                                 {
-                                    <td>@EntityValueConverter.GetConverter(Model.Headers[b]).ConvertToString(Model.Headers[b].Property.GetValue(Model.Items[i]))</td>
+                                    <td>@EntityValueConverter.GetConverter(header).ConvertToString(header.GetValue(item))</td>
                                 }
                                 <td class="text-center" style="width: 64px;">
-                                    <div class="btn-group btn-group-xs text-left">
+                                    <div class="btn-group btn-group-xs">
                                         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
                                             <span class="caret"></span>
                                         </a>
                                         <ul class="dropdown-menu">
-                                            <li><a class="btn" href="@Html.Raw(Url.Action("Detail", new { id = Model.Items[i].Index }))"><i class="glyphicon glyphicon-list-alt"></i>Detail</a></li>
+                                            <li><a class="btn" href="@Html.Raw(Url.Action("Detail", new { id = item.Index }))"><i class="glyphicon glyphicon-list-alt"></i>Detail</a></li>
                                             @if (Model.Metadata.EditRoles.All(t => User.IsInRole(t)))
                                             {
-                                                <li><a class="btn" href="@Html.Raw(Url.Action("Edit", new { id = Model.Items[i].Index }))"><i class="glyphicon glyphicon-edit"></i>Edit</a></li>
+                                                <li><a class="btn" href="@Html.Raw(Url.Action("Edit", new { id = item.Index }))"><i class="glyphicon glyphicon-edit"></i>Edit</a></li>
                                             }
                                             @if (Model.Metadata.RemoveRoles.All(t => User.IsInRole(t)))
                                             {
-                                                <li><a class="btn" href="javascript:remove('@Model.Items[i].Index')"><i class="glyphicon glyphicon-remove"></i>Delete</a></li>
+                                                <li><a class="btn" href="javascript:remove('@item.Index')"><i class="glyphicon glyphicon-remove"></i>Delete</a></li>
                                             }
-                                            @for (int c = 0; c < Model.Buttons.Length; c++)
+                                            @foreach(var button in Model.ItemButtons)
                                             {
-                                                MvcViewButton button = Model.Buttons[c] as MvcViewButton;
-                                                if (button != null && button.GetLink != null)
-                                                {
-                                                    <li><a href="@Html.Raw(button.GetLink(Url, Model.Items[i]))">@Html.Raw(button.Icon)@Html.Raw(button.Name)</a></li>
-                                                }
+                                                button.SetTarget(provider, item);
+                                                <li><a href="@Html.Raw(button.Target)" title="@button.Tooltip">@button.Icon@button.Name</a></li>
                                             }
                                         </ul>
                                     </div>
@@ -120,22 +118,19 @@
                             {
                                 <a href="@Html.Raw(Url.Action("Create"))" class="btn btn-default">Create</a>
                             }
-                            @if (Model.Metadata.SearchProperties.Length > 0)
+                            @if (Model.Metadata.SearchProperties.Count() > 0)
                             {
                                 <a href="@Html.Raw(Url.Action("Search"))" class="btn btn-default">Search</a>
                             }
-                            @for (int i = 0; i < Model.Buttons.Length; i++)
+                            @foreach(var button in Model.ViewButtons)
                             {
-                                MvcViewButton button = Model.Buttons[i] as MvcViewButton;
-                                if (button != null && button.StaticLink != null)
-                                {
-                                    <a href="@Html.Raw(button.StaticLink)" class="btn btn-default">@Html.Raw(button.Icon)@Html.Raw(button.Name)</a>
-                                }
+                                //Model.ViewButtons[i].SetTarget()
+                                <a href="@Html.Raw(button.Target)" class="btn btn-default" title="@button.Tooltip">@button.Icon@button.Name</a>
                             }
                         </div>
                     </div>
                     <div class="col-md-4 text-right">
-                        @{Html.Pagination(Model);}
+                        @Html.Pagination(Model)
                     </div>
                 </div>
             </div>

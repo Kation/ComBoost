@@ -49,7 +49,7 @@ namespace System.Web.Security
         /// Get or set the role entity resolve delegate.
         /// Must set this manual or comboost authentication will be failure.
         /// </summary>
-        public static RoleEntityResolveDelegate Resolve { get; set; }
+        public static RoleEntityResolveDelegate Resolver { get; set; }
 
         /// <summary>
         /// Get the current route data.
@@ -84,7 +84,7 @@ namespace System.Web.Security
                         _IsFailure = true;
                         return null;
                     }
-                    _RoleEntity = Resolve(route.UserType, Identity.Name);
+                    _RoleEntity = Resolver(route.UserType, Identity.Name);
                     if (_RoleEntity == null)
                     {
                         _IsFailure = true;
@@ -105,7 +105,7 @@ namespace System.Web.Security
         {
             if (!OriginPrincipal.Identity.IsAuthenticated)
                 return false;
-            if (Resolve == null)
+            if (Resolver == null)
                 if (OriginPrincipal == this)
                     return false;
                 else

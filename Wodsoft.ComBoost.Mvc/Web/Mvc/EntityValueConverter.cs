@@ -108,7 +108,7 @@ namespace System.Web.Mvc
         /// </summary>
         /// <param name="metadata">Property metadata.</param>
         /// <returns></returns>
-        public static TypeConverter GetConverter(PropertyMetadata metadata)
+        public static TypeConverter GetConverter(IPropertyMetadata metadata)
         {
             if (metadata == null)
                 throw new ArgumentNullException("metadata");
@@ -118,7 +118,7 @@ namespace System.Web.Mvc
             else
                 converter = GetConverter(metadata.Type);
             if (converter == null)
-                converter = TypeDescriptor.GetConverter(metadata.Property.PropertyType);
+                converter = TypeDescriptor.GetConverter(metadata.ClrType);
             return converter;
         }
 

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Data.Entity.Metadata;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -17,12 +18,12 @@ namespace System.Web.Mvc
     /// Entity controller with actions.
     /// </summary>
     [EntityAuthorize]
-    public class EntityController<TEntity> : EntityController, IEntityMetadata where TEntity : class, IEntity, new()
+    public class EntityController<TEntity> : EntityController, IHaveEntityMetadata where TEntity : class, IEntity, new()
     {
         /// <summary>
         /// Metadata of entity.
         /// </summary>
-        public EntityMetadata Metadata { get; private set; }
+        public IEntityMetadata Metadata { get; private set; }
 
         /// <summary>
         /// Get or set default page size for this controller.
@@ -43,7 +44,7 @@ namespace System.Web.Mvc
         {
             EntityQueryable = EntityBuilder.GetContext<TEntity>();
             Metadata = EntityAnalyzer.GetMetadata<TEntity>();
-            PageSize = EntityViewModel.DefaultPageSizeOption;
+            PageSize = Pagination.DefaultPageSizeOption;
         }
 
         /// <summary>
@@ -88,9 +89,15 @@ namespace System.Web.Mvc
             }
             var model = await GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
             if (Metadata.ParentProperty != null && !search)
-                model.Parent = GetParentModel(parentid, Metadata.ParentLevel);
+                model.Parent = await GetParentModel(parentid);
             model.SearchItem = searchItems;
             model.Items = await EntityQueryable.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
+            if (model.ViewButtons.Length > 0)
+            {
+                IServiceProvider serviceProvider = this.GetServiceProvider();
+                foreach (var item in model.ViewButtons)
+                    item.SetTarget(serviceProvider);
+            }
             return View(model);
         }
 
@@ -106,7 +113,7 @@ namespace System.Web.Mvc
             for (int i = 0; i < keys.Length; i++)
             {
                 string propertyName = keys[i].Key;
-                PropertyMetadata property = Metadata.GetProperty(propertyName);
+                IPropertyMetadata property = Metadata.GetProperty(propertyName);
                 if (property == null || !property.Searchable)
                     continue;
                 EntitySearchItem searchItem = new EntitySearchItem();
@@ -124,7 +131,7 @@ namespace System.Web.Mvc
                                     continue;
                                 searchItem.MorethanDate = start;
                                 ParameterExpression parameter = Expression.Parameter(Metadata.Type);
-                                queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.GreaterThanOrEqual(Expression.Property(parameter, property.Property), Expression.Constant(start)), parameter));
+                                queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.GreaterThanOrEqual(Expression.Property(parameter, property.ClrName), Expression.Constant(start)), parameter));
                             }
                             else if (options[a] == ".End")
                             {
@@ -133,7 +140,7 @@ namespace System.Web.Mvc
                                     continue;
                                 searchItem.LessthanDate = end;
                                 ParameterExpression parameter = Expression.Parameter(Metadata.Type);
-                                queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.LessThanOrEqual(Expression.Property(parameter, property.Property), Expression.Constant(end)), parameter));
+                                queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.LessThanOrEqual(Expression.Property(parameter, property.ClrName), Expression.Constant(end)), parameter));
                             }
                         }
                         break;
@@ -146,7 +153,7 @@ namespace System.Web.Mvc
                                 continue;
                             searchItem.Equal = result;
                             ParameterExpression parameter = Expression.Parameter(Metadata.Type);
-                            queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.Equal(Expression.Property(parameter, property.Property), Expression.Constant(result)), parameter));
+                            queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.Equal(Expression.Property(parameter, property.ClrName), Expression.Constant(result)), parameter));
                         }
                         break;
                     case ComponentModel.DataAnnotations.CustomDataType.Currency:
@@ -161,7 +168,7 @@ namespace System.Web.Mvc
                                     continue;
                                 searchItem.Morethan = start;
                                 ParameterExpression parameter = Expression.Parameter(Metadata.Type);
-                                queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.GreaterThanOrEqual(Expression.Property(parameter, property.Property), Expression.Constant(start)), parameter));
+                                queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.GreaterThanOrEqual(Expression.Property(parameter, property.ClrName), Expression.Constant(start)), parameter));
                             }
                             else if (options[a] == ".End")
                             {
@@ -170,7 +177,7 @@ namespace System.Web.Mvc
                                     continue;
                                 searchItem.Lessthan = end;
                                 ParameterExpression parameter = Expression.Parameter(Metadata.Type);
-                                queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.LessThanOrEqual(Expression.Property(parameter, property.Property), Expression.Constant(end)), parameter));
+                                queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.LessThanOrEqual(Expression.Property(parameter, property.ClrName), Expression.Constant(end)), parameter));
                             }
                         }
                         break;
@@ -180,31 +187,31 @@ namespace System.Web.Mvc
                             object result;
                             try
                             {
-                                result = Enum.Parse(property.Property.PropertyType, Request.QueryString["Search." + keys[i].Key]);
+                                result = Enum.Parse(property.ClrType, Request.QueryString["Search." + keys[i].Key]);
                             }
                             catch
                             {
                                 continue;
                             }
-                            searchItem.Enum = new EnumConverter(property.Property.PropertyType).ConvertToString(result);
+                            searchItem.Enum = new EnumConverter(property.ClrType).ConvertToString(result);
                             ParameterExpression parameter = Expression.Parameter(Metadata.Type);
-                            queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.Equal(Expression.Property(parameter, property.Property), Expression.Constant(result)), parameter));
+                            queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.Equal(Expression.Property(parameter, property.ClrName), Expression.Constant(result)), parameter));
                         }
                         else if (property.CustomType == "Entity")
                         {
                             searchItem.Contains = Request.QueryString["Search." + keys[i].Key];
                             ParameterExpression parameter = Expression.Parameter(Metadata.Type);
-                            Expression expression = Expression.Property(Expression.Property(parameter, property.Property), EntityAnalyzer.GetMetadata(property.Property.PropertyType).DisplayProperty.Property);
+                            Expression expression = Expression.Property(Expression.Property(parameter, property.ClrName), EntityAnalyzer.GetMetadata(property.ClrType).DisplayProperty.ClrName);
                             expression = Expression.Call(expression, typeof(string).GetMethod("Contains"), Expression.Constant(searchItem.Contains));
                             queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(expression, parameter));
                         }
                         break;
                     default:
-                        if (property.Property.PropertyType == typeof(string))
+                        if (property.ClrType == typeof(string))
                         {
                             searchItem.Contains = Request.QueryString["Search." + keys[i].Key];
                             ParameterExpression parameter = Expression.Parameter(Metadata.Type);
-                            Expression expression = Expression.Property(parameter, property.Property);
+                            Expression expression = Expression.Property(parameter, property.ClrName);
                             expression = Expression.Call(expression, typeof(string).GetMethod("Contains"), Expression.Constant(searchItem.Contains));
                             queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(expression, parameter));
                         }
@@ -233,7 +240,7 @@ namespace System.Web.Mvc
                 //if (Metadata.ParentProperty != null && !search)
                 //    model.Parent = GetParentModel(parentid, Metadata.ParentLevel);
                 //model.SearchItem = searchItems;
-                model.Headers = Metadata.ViewProperties;
+                model.Headers = Metadata.ViewProperties.Where(t => (t.AllowAnonymous || User.Identity.IsAuthenticated) && !t.ViewRoles.Any(r => !User.IsInRole(r))).ToArray();
                 model.PageSizeOption = PageSize;
                 //model.UpdateItems();
                 return model;
@@ -246,79 +253,103 @@ namespace System.Web.Mvc
         /// <param name="selected">Selected parent id.</param>
         /// <param name="level">Max tree level.</param>
         /// <returns>Parent model.</returns>
-        protected virtual EntityParentModel[] GetParentModel(Guid? selected, int level)
+        protected virtual async Task<EntityParentModel[]> GetParentModel(Guid? selected)
         {
-            EntityMetadata metadata = Metadata;
+            List<EntityParentModel> root = new List<EntityParentModel>();
+            await GetParentModel(root, new Dictionary<Guid, EntityParentModel[]>(), Metadata, selected, Metadata.ParentProperty.ClrName);
+            return root.ToArray();
+        }
 
-            List<EntityParentModel> final = new List<EntityParentModel>();
-            ParameterExpression parameter = Expression.Parameter(Metadata.Type);
-            //获取Parent属性组
-            dynamic fl = GetGrouping(EntityQueryable.Query(), metadata.ParentProperty.Property.PropertyType, metadata.Type, GetLambda(metadata.Type, metadata.ParentProperty.Property.PropertyType, Expression.Property(parameter, Metadata.ParentProperty.Property), parameter));
+        private async Task GetParentModel(List<EntityParentModel> root, Dictionary<Guid, EntityParentModel[]> items, IEntityMetadata metadata, Guid? selected, string path)
+        {
+            IEntityMetadata parentMetadata = EntityAnalyzer.GetMetadata(metadata.ParentProperty.ClrType);
 
-            string path = metadata.ParentProperty.Property.Name;
-            List<EntityParentModel> parents = null;
-            while (parents == null || parents.Count > 0)
+            dynamic context = EntityBuilder.GetContext(parentMetadata.Type);
+            dynamic queryable = context.OrderBy();
+
+            if (parentMetadata.ParentProperty == null)
             {
-                if (parents == null)
-                    parents = new List<EntityParentModel>();
-                List<EntityParentModel> temp = new List<EntityParentModel>();
-                foreach (var f in fl)
+                IEntity[] result = await context.ToArrayAsync(queryable);
+                foreach (var item in result)
                 {
-                    Type ft = f.GetType();
-                    IEntity entity = ft.GetProperty("Key").GetValue(f);
-                    if (entity == null)
-                        continue;
-                    EntityParentModel item = final.SingleOrDefault(t => t.Index == entity.Index);
-                    if (item == null)
-                    {
-                        item = new EntityParentModel();
-                        item.Path = path;
-                        item.Name = entity.ToString();
-                        item.Index = entity.Index;
-                    }
-                    if (selected.HasValue && item.Index == selected)
-                        item.Selected = true;
-                    //ParameterExpression dp = Expression.Parameter(metadata.Type);
-                    //dynamic dChildren = _ESelectMethod.MakeGenericMethod(metadata.Type, typeof(Guid)).Invoke(null, new object[] { f, GetLambda(metadata.Type, typeof(Guid), Expression.Property(dp, typeof(EntityBase).GetProperty("BaseIndex")), dp) });
-                    dynamic dChildren = _ESelectMethod.MakeGenericMethod(metadata.Type, typeof(Guid)).Invoke(null, new object[] { f, new Func<IEntity, Guid>(GetBaseIndex) });
-                    Guid[] children = Linq.Enumerable.ToArray<Guid>(dChildren);
-                    if (item.Items != null)
-                        item.Items = item.Items.Concat(parents.Where(t => children.Contains(t.Index))).ToArray();
+                    EntityParentModel model = new EntityParentModel();
+                    model.Index = item.Index;
+                    model.Name = item.ToString();
+                    model.Path = path;
+                    model.IsSelected = selected == item.Index;
+                    if (items.ContainsKey(model.Index))
+                        model.Items = items[model.Index];
                     else
-                        item.Items = parents.Where(t => children.Contains(t.Index)).ToArray();
-                    if (!item.Selected && item.Items.Count(t => t.Selected) > 0)
-                        item.Opened = true;
-                    parents.RemoveAll(t => children.Contains(t.Index));
-                    temp.Add(item);
+                        model.Items = new EntityParentModel[0];
+                    root.Add(model);
                 }
-                final.AddRange(parents);
-                parents = temp;
-
-                Type groupType = typeof(IGrouping<,>).MakeGenericType(metadata.ParentProperty.Property.PropertyType, metadata.Type);
-
-                metadata = EntityAnalyzer.GetMetadata(metadata.ParentProperty.Property.PropertyType);
-                if (metadata.ParentProperty == null || parents.Count == 0)
-                {
-                    final.AddRange(parents);
-                    break;
-                }
-
-                level--;
-                if (level == 0)
-                {
-                    final.AddRange(parents);
-                    break;
-                }
-
-                path += "." + metadata.ParentProperty.Property.Name;
-                parameter = Expression.Parameter(groupType);
-                var selectKey = GetLambda(groupType, metadata.Type, Expression.Property(parameter, groupType.GetProperty("Key")), parameter);
-                parameter = Expression.Parameter(metadata.Type);
-                fl = _QSelectMethod.MakeGenericMethod(groupType, metadata.Type).Invoke(null, new object[] { fl, selectKey });
-                var groupByKey = GetLambda(metadata.Type, metadata.ParentProperty.Property.PropertyType, Expression.Property(parameter, metadata.ParentProperty.Property), parameter);
-                fl = GetGrouping(fl, metadata.ParentProperty.Property.PropertyType, metadata.Type, groupByKey);
             }
-            return final.ToArray();
+            else
+            {
+                Dictionary<Guid, EntityParentModel[]> newItems = new Dictionary<Guid, EntityParentModel[]>();
+
+                var parameter = Expression.Parameter(parentMetadata.Type);
+                var parent = Expression.Property(parameter, parentMetadata.ParentProperty.ClrName);
+                var expression = Expression.Lambda(parent, parameter);
+                dynamic result = GetGrouping(queryable, parentMetadata.ParentProperty.ClrType, parentMetadata.Type, expression);
+
+                List<EntityParentModel> thisRoot = null;
+                if (parentMetadata.ParentProperty.ClrType == parentMetadata.Type)
+                    thisRoot = new List<EntityParentModel>();
+                Type groupType = typeof(IGrouping<,>).MakeGenericType(parentMetadata.ParentProperty.ClrType, parentMetadata.Type);
+                foreach (dynamic item in result)
+                {
+                    List<EntityParentModel> models = new List<EntityParentModel>();
+                    IEntity key = groupType.GetProperty("Key").GetValue(item) as IEntity;
+                    foreach (IEntity entity in item)
+                    {
+                        EntityParentModel model = new EntityParentModel();
+                        model.Index = entity.Index;
+                        model.Name = entity.ToString();
+                        model.Path = path;
+                        model.IsSelected = selected == entity.Index;
+                        if (items.ContainsKey(model.Index))
+                            model.Items = items[model.Index];
+                        else
+                            model.Items = new EntityParentModel[0];
+                        models.Add(model);
+                    }
+                    if (key == null)
+                    {
+                        root.AddRange(models);
+                        if (parentMetadata.ParentProperty.ClrType == parentMetadata.Type)
+                            thisRoot.AddRange(models);
+                    }
+                    else
+                        newItems.Add(key.Index, models.ToArray());
+                }
+                if (parentMetadata.ParentProperty.ClrType == parentMetadata.Type)
+                {
+                    ExpendTree(thisRoot, newItems);
+                }
+                else
+                {
+                    await GetParentModel(root, newItems, parentMetadata, selected, path + "." + parentMetadata.ParentProperty.ClrName);
+                }
+            }
+        }
+
+        private void ExpendTree(List<EntityParentModel> root, Dictionary<Guid, EntityParentModel[]> items)
+        {
+            while (root.Count > 0)
+            {
+                List<EntityParentModel> newRoot = new List<EntityParentModel>();
+                foreach (var item in root)
+                {
+                    if (items.ContainsKey(item.Index))
+                    {
+                        item.Items = item.Items.Concat(items[item.Index]).ToArray();
+                        newRoot.AddRange(items[item.Index]);
+                        items.Remove(item.Index);
+                    }
+                }
+                root = newRoot;
+            }
         }
 
         private Guid GetBaseIndex(IEntity entity)
@@ -364,12 +395,12 @@ namespace System.Web.Mvc
         {
             var model = new EntityEditModel<TEntity>(EntityQueryable.Create());
             model.Item.Index = Guid.Empty;
-            model.Properties = Metadata.EditProperties;
+            model.Properties = Metadata.CreateProperties.Where(t => (t.AllowAnonymous || User.Identity.IsAuthenticated) && !t.EditRoles.Any(r => !User.IsInRole(r))).ToArray();
             if (parent != null && model.Metadata.ParentProperty != null)
             {
-                dynamic parentContext = EntityBuilder.GetContext(model.Metadata.ParentProperty.Property.PropertyType);
+                dynamic parentContext = EntityBuilder.GetContext(model.Metadata.ParentProperty.ClrType);
                 object parentObj = await parentContext.GetEntityAsync(parent.Value);
-                model.Metadata.ParentProperty.Property.SetValue(model.Item, parentObj);
+                model.Metadata.ParentProperty.SetValue(model.Item, parentObj);
             }
             return model;
         }
@@ -438,7 +469,7 @@ namespace System.Web.Mvc
             if (item == null)
                 return null;
             var model = new EntityEditModel<TEntity>(item);
-            model.Properties = Metadata.EditProperties;
+            model.Properties = Metadata.EditProperties.Where(t => (t.AllowAnonymous || User.Identity.IsAuthenticated) && !t.EditRoles.Any(r => !User.IsInRole(r))).ToArray();
             return model;
         }
 
@@ -557,38 +588,53 @@ namespace System.Web.Mvc
         /// <param name="entity">Entity to update.</param>
         /// <param name="propertyMetadata">Property metadata.</param>
         /// <returns></returns>
-        protected virtual async Task UpdateProperty(TEntity entity, PropertyMetadata propertyMetadata)
+        protected virtual async Task UpdateProperty(TEntity entity, IPropertyMetadata propertyMetadata)
         {
+            if (propertyMetadata.EditRoles.Any(t => !User.IsInRole(t)))
+                return;
             if (propertyMetadata.IsFileUpload)
             {
                 #region File Path Value
-                if (!Request.Files.AllKeys.Contains(propertyMetadata.Property.Name))
+                if (!Request.Files.AllKeys.Contains(propertyMetadata.ClrName))
                     return;
                 if (!(this is IFileController<TEntity>))
-                    throw new NotSupportedException("Controller doesn't support upload file.");
-                await ((IFileController<TEntity>)this).SaveFileToProperty(entity, propertyMetadata, Request.Files[propertyMetadata.Property.Name]);
+                {
+                    if (propertyMetadata.ClrType != typeof(byte[]))
+                        throw new NotSupportedException("Controller doesn't support upload file.");
+                    if (Request.Files.AllKeys.Contains(propertyMetadata.ClrName))
+                    {
+                        var file = Request.Files[propertyMetadata.ClrName];
+                        MemoryStream stream = new MemoryStream();
+                        await file.InputStream.CopyToAsync(stream);
+                        propertyMetadata.SetValue(entity, stream.ToArray());
+                        stream.Close();
+                        stream.Dispose();
+                    }
+                }
+                else
+                    await ((IFileController<TEntity>)this).SaveFileToProperty(entity, propertyMetadata, Request.Files[propertyMetadata.ClrName]);
                 #endregion
             }
             else
             {
-                if (!Request.Form.AllKeys.Contains(propertyMetadata.Property.Name))
+                if (!Request.Form.AllKeys.Contains(propertyMetadata.ClrName))
                     return;
-                string value = Request.Form[propertyMetadata.Property.Name];
+                string value = Request.Form[propertyMetadata.ClrName];
                 TypeConverter converter = EntityValueConverter.GetConverter(propertyMetadata);
                 if (converter == null)
-                    if (propertyMetadata.Property.PropertyType.IsGenericType && propertyMetadata.Property.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>))
+                    if (propertyMetadata.ClrType.IsGenericType && propertyMetadata.ClrType.GetGenericTypeDefinition() == typeof(ICollection<>))
                         converter = new Converter.CollectionConverter();
-                    else if (propertyMetadata.Property.PropertyType.IsEnum)
-                        converter = new EnumConverter(propertyMetadata.Property.PropertyType);
+                    else if (propertyMetadata.ClrType.IsEnum)
+                        converter = new EnumConverter(propertyMetadata.ClrType);
                     else
                     {
-                        converter = TypeDescriptor.GetConverter(propertyMetadata.Property.PropertyType);
+                        converter = TypeDescriptor.GetConverter(propertyMetadata.ClrType);
                         if (converter == null && propertyMetadata.Type != ComponentModel.DataAnnotations.CustomDataType.Password)
-                            throw new NotSupportedException("Type of \"" + propertyMetadata.Property.PropertyType.Name + "\" converter not found.");
+                            throw new NotSupportedException("Type of \"" + propertyMetadata.ClrName + "\" converter not found.");
                     }
                 if (propertyMetadata.Type == ComponentModel.DataAnnotations.CustomDataType.Password && entity is IPassword)
                 {
-                    object v = propertyMetadata.Property.GetValue(entity);
+                    object v = propertyMetadata.GetValue(entity);
                     if (v == null || value != v.ToString())
                         ((IPassword)entity).SetPassword(value);
                 }
@@ -607,7 +653,7 @@ namespace System.Web.Mvc
                     }
                     if (converter.GetType() == typeof(Converter.CollectionConverter))
                     {
-                        object collection = propertyMetadata.Property.GetValue(entity);
+                        object collection = propertyMetadata.GetValue(entity);
                         ((dynamic)collection).Clear();
                         var addMethod = collection.GetType().GetMethod("Add");
                         object[] array = (object[])cvalue;
@@ -616,7 +662,7 @@ namespace System.Web.Mvc
                     }
                     else
                     {
-                        propertyMetadata.Property.SetValue(entity, cvalue);
+                        propertyMetadata.SetValue(entity, cvalue);
                     }
                 }
             }
@@ -637,8 +683,8 @@ namespace System.Web.Mvc
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
                 return new HttpUnauthorizedResult();
-            if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
-                return new HttpUnauthorizedResult();
+            //if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
+            //    return new HttpUnauthorizedResult();
             IQueryable<TEntity> queryable = EntityQueryable.Query();
             EntitySearchItem[] searchItems = null;
             if (search)
@@ -658,7 +704,7 @@ namespace System.Web.Mvc
             }
             var model = await GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
             if (Metadata.ParentProperty != null)
-                model.Parent = GetParentModel(parentid, 3);
+                model.Parent = await GetParentModel(parentid);
             model.Headers = Metadata.ViewProperties;
             model.SearchItem = searchItems;
             model.Items = await EntityQueryable.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
@@ -680,8 +726,8 @@ namespace System.Web.Mvc
         {
             if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
                 return new HttpUnauthorizedResult();
-            if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
-                return new HttpUnauthorizedResult();
+            //if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
+            //    return new HttpUnauthorizedResult();
             IQueryable<TEntity> queryable = EntityQueryable.Query();
             EntitySearchItem[] searchItems = null;
             if (search)
@@ -701,7 +747,7 @@ namespace System.Web.Mvc
             }
             var model = await GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
             if (Metadata.ParentProperty != null)
-                model.Parent = GetParentModel(parentid, 3);
+                model.Parent = await GetParentModel(parentid);
             model.Headers = Metadata.ViewProperties;
             model.SearchItem = searchItems;
             model.Items = await EntityQueryable.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
@@ -739,10 +785,10 @@ namespace System.Web.Mvc
             return Task.Run<ActionResult>(() =>
             {
 
-                PropertyMetadata p = Metadata.GetProperty(property);
+                IPropertyMetadata p = Metadata.GetProperty(property);
                 if (p == null)
                     return new HttpStatusCodeResult(404);
-                ValueFilterAttribute filterAttribute = p.Property.GetCustomAttribute<ValueFilterAttribute>(true);
+                ValueFilterAttribute filterAttribute = p.GetAttribute<ValueFilterAttribute>();
                 if (filterAttribute == null)
                     return new HttpStatusCodeResult(400);
                 IValueFilter filter = (IValueFilter)Resolver.GetService(filterAttribute.ValueFilter);

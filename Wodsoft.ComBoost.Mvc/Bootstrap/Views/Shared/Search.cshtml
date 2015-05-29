@@ -34,32 +34,32 @@
                             case System.ComponentModel.DataAnnotations.CustomDataType.Date:
                             case System.ComponentModel.DataAnnotations.CustomDataType.DateTime:
                                 <div class="input-group col-md-7">
-                                    <input type="date" class="form-control col-md-3" id="Search.@(Model.Properties[i].Property.Name).Start" name="Search.@(Model.Properties[i].Property.Name).Start" />
+                                    <input type="date" class="form-control col-md-3" id="Search.@(Model.Properties[i].ClrName).Start" name="Search.@(Model.Properties[i].ClrName).Start" />
                                     <span class="input-group-addon">To</span>
-                                    <input type="date" class="form-control col-md-3" id="Search.@(Model.Properties[i].Property.Name).End" name="Search.@(Model.Properties[i].Property.Name).End" />
+                                    <input type="date" class="form-control col-md-3" id="Search.@(Model.Properties[i].ClrName).End" name="Search.@(Model.Properties[i].ClrName).End" />
                                 </div>
                                 <script type="text/javascript">
-                                    $('#Search.@(Model.Properties[i].Property.Name).Start').datepicker();
-                                    $('#Search.@(Model.Properties[i].Property.Name).End').datepicker();
+                                    $('#Search.@(Model.Properties[i].ClrName).Start').datepicker();
+                                    $('#Search.@(Model.Properties[i].ClrName).End').datepicker();
                                 </script>
                                 break;
                             case System.ComponentModel.DataAnnotations.CustomDataType.Currency:
                             case System.ComponentModel.DataAnnotations.CustomDataType.Integer:
                             case System.ComponentModel.DataAnnotations.CustomDataType.Number:
                             <div class="input-group col-md-7">
-                                <input type="number" class="form-control col-md-3" id="Search.@(Model.Properties[i].Property.Name).Start" name="Search.@(Model.Properties[i].Property.Name).Start" />
+                                <input type="number" class="form-control col-md-3" id="Search.@(Model.Properties[i].ClrName).Start" name="Search.@(Model.Properties[i].ClrName).Start" />
                                 <span class="input-group-addon">To</span>
-                                <input type="number" class="form-control col-md-3" id="Search.@(Model.Properties[i].Property.Name).End" name="Search.@(Model.Properties[i].Property.Name).End" />
+                                <input type="number" class="form-control col-md-3" id="Search.@(Model.Properties[i].ClrName).End" name="Search.@(Model.Properties[i].ClrName).End" />
                             </div>
                             <script type="text/javascript">
-                                $('#Search.@(Model.Properties[i].Property.Name).Start').change(function () {
+                                $('#Search.@(Model.Properties[i].ClrName).Start').change(function () {
                                     var number = new Number($(this).val());
                                     if (isNaN(number)) {
                                         $(this).val(0);
                                         return;
                                     }
                                 });
-                                $('#Search.@(Model.Properties[i].Property.Name).End').change(function () {
+                                $('#Search.@(Model.Properties[i].ClrName).End').change(function () {
                                     var number = new Number($(this).val());
                                     if (isNaN(number)) {
                                         $(this).val(0);
@@ -72,16 +72,16 @@
                                 if (Model.Properties[i].CustomType == "Enum")
                                 {
                                     EntityExtension.EnumItem[] items;
-                                    if (Model.Properties[i].Property.PropertyType.IsGenericType)
+                                    if (Model.Properties[i].ClrType.IsGenericType)
                                     {
-                                        items = Html.EnumAnalyze(Model.Properties[i].Property.PropertyType.GetGenericArguments()[0]);
+                                        items = Html.EnumAnalyze(Model.Properties[i].ClrType.GetGenericArguments()[0]);
                                     }
                                     else
                                     {
-                                        items = Html.EnumAnalyze(Model.Properties[i].Property.PropertyType);
+                                        items = Html.EnumAnalyze(Model.Properties[i].ClrType);
                                     }
-                                    <select name="Search.@Model.Properties[i].Property.Name" class="form-control">
-                                        @if (Model.Properties[i].Property.PropertyType.IsGenericType)
+                                    <select name="Search.@Model.Properties[i].ClrName" class="form-control">
+                                        @if (Model.Properties[i].ClrType.IsGenericType)
                                         {
                                             <option value="" selected="selected"></option>
                                         }
@@ -93,25 +93,25 @@
                                 }
                                 else
                                 {
-                                    <input type="text" class="form-control" name="Search.@Model.Properties[i].Property.Name" />
+                                    <input type="text" class="form-control" name="Search.@Model.Properties[i].ClrName" />
                                 }
                                 break;
                             case System.ComponentModel.DataAnnotations.CustomDataType.Boolean:
-                            <select class="form-control" name="Search.@Model.Properties[i].Property.Name">
+                            <select class="form-control" name="Search.@Model.Properties[i].ClrName">
                                 <option value="" selected="selected"></option>
                                 <option value="True">Yes</option>
                                 <option value="False">No</option>
                             </select>
                                 break;
                             case System.ComponentModel.DataAnnotations.CustomDataType.Sex:
-                            <select class="form-control" name="Search.@Model.Properties[i].Property.Name">
+                            <select class="form-control" name="Search.@Model.Properties[i].ClrName">
                                 <option value="" selected="selected"></option>
                                 <option value="True">Male</option>
                                 <option value="False">Female</option>
                             </select>
                                 break;
                             default:
-                            <input type="text" class="form-control" name="Search.@Model.Properties[i].Property.Name" />
+                            <input type="text" class="form-control" name="Search.@Model.Properties[i].ClrName" />
                                 break;
                         }
                         }

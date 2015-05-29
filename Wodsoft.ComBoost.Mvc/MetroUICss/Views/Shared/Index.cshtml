@@ -1,4 +1,4 @@
-﻿@model EntityViewModel
+﻿@model IEntityViewModel
 @{
     ViewBag.Title = Model.Metadata.Name + " List";
     object area = ViewContext.RouteData.DataTokens["Area"];
@@ -78,7 +78,7 @@
                                 <tr>
                                     @for (int b = 0; b < Model.Headers.Length; b++)
                                     {
-                                        <td>@EntityValueConverter.GetConverter(Model.Headers[b]).ConvertToString(Model.Headers[b].Property.GetValue(Model.Items[i]))</td>
+                                        <td>@EntityValueConverter.GetConverter(Model.Headers[b]).ConvertToString(Model.Headers[b].GetValue(Model.Items[i]))</td>
                                     }
                                     <td class="text-center" style="width: 64px;">
                                         <div class="button-dropdown">

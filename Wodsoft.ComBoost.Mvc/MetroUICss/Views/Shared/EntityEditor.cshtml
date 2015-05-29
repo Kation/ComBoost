@@ -1,12 +1,12 @@
 ﻿@model MvcEditorModel
 <div class="input-control text size4 place-left">
-    <input type="text" id="@(Model.Metadata.Property.Name)_Name" readonly="readonly" value="@Model.Value">
-    <input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" value="@(Model.Value != null? ((System.Data.Entity.EntityBase)Model.Value).Index.ToString() : "")" />
+    <input type="text" id="@(Model.Metadata.ClrName)_Name" readonly="readonly" value="@Model.Value">
+    <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@(Model.Value != null? ((System.Data.Entity.EntityBase)Model.Value).Index.ToString() : "")" />
 </div>
 <div class="place-left margin5">
     <span class="button-set">
-        <button id="@(Model.Metadata.Property.Name)_Select" type="button">Select</button>
-        <button id="@(Model.Metadata.Property.Name)_Clear" type="button">Clear</button>
+        <button id="@(Model.Metadata.ClrName)_Select" type="button">Select</button>
+        <button id="@(Model.Metadata.ClrName)_Clear" type="button">Clear</button>
     </span>
 </div>
 <script type="text/javascript">
@@ -29,12 +29,12 @@
                 element.removeAttr('href');
             });
         }
-        var name = $('#@(Model.Metadata.Property.Name)_Name');
-        var value = $('#@(Model.Metadata.Property.Name)_Value');
-        $('#@(Model.Metadata.Property.Name)_Select').click(function () {
+        var name = $('#@(Model.Metadata.ClrName)_Name');
+        var value = $('#@(Model.Metadata.ClrName)_Value');
+        $('#@(Model.Metadata.ClrName)_Select').click(function () {
             $.ajax({
                 cache: false,
-                url: '@Url.RouteUrl(new { controller = Model.Metadata.Property.PropertyType.Name, action = "Selector" })',
+                url: '@Url.RouteUrl(new { controller = Model.Metadata.ClrType.Name, action = "Selector" })',
                 error: function (result) {
                     if (result.status == 404)
                         $.Dialog({
@@ -96,7 +96,7 @@
                 }
             });
         });
-        $('#@(Model.Metadata.Property.Name)_Clear').click(function () {
+        $('#@(Model.Metadata.ClrName)_Clear').click(function () {
             name.val('');
             value.val('');
         });

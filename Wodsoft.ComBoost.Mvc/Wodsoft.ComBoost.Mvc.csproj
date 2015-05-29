@@ -88,6 +88,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\MvcEntityViewButton.cs" />
     <Compile Include="ComponentModel\MvcRouteAttribute.cs" />
     <Compile Include="ComponentModel\MvcEditorModel.cs" />
     <Compile Include="ComponentModel\MvcViewButton.cs" />
@@ -107,7 +108,7 @@
     <Compile Include="Web\Mvc\EntityValueConverterContext.cs" />
     <Compile Include="Web\Mvc\EntityExtension.cs" />
     <Compile Include="Web\Mvc\EntityValueConverter.cs" />
-    <Compile Include="Web\Mvc\IEntityMetadata.cs" />
+    <Compile Include="Web\Mvc\IHaveEntityMetadata.cs" />
     <Compile Include="Web\Mvc\IFileController.cs" />
     <Compile Include="Web\Mvc\IImageController.cs" />
     <Compile Include="Web\Routing\EntityRoute.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="Web\Security\ComBoostCookiesToken.cs" />
     <Compile Include="Web\Security\ComBoostIdentity.cs" />
     <Compile Include="Web\Security\ComBoostPrincipal.cs" />
+    <Compile Include="Web\Security\ComBoostPrincipalExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

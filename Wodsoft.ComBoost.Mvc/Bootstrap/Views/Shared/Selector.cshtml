@@ -1,4 +1,4 @@
-﻿@model EntityViewModel
+﻿@model IEntityViewModel
 @{
     object area = ViewContext.RouteData.DataTokens["Area"];
     if (area == null)
@@ -30,22 +30,22 @@
             <thead>
                 <tr>
                     <th width="36"></th>
-                    @for (int i = 0; i < Model.Headers.Length; i++)
+                    @foreach (var header in Model.Headers)
                     {
-                        <th title="@Model.Headers[i].Description">@(Model.Headers[i].ShortName ?? Model.Headers[i].Name)</th>
+                        <th title="@header.Description">@(header.ShortName ?? header.Name)</th>
                     }
                 </tr>
             </thead>
             <tbody>
-                @for (int i = 0; i < Model.Items.Length; i++)
+                @foreach (var item in Model.Items)
                 {
                     <tr>
                         <td class="text-center">
-                            <input type="radio" data-name="@Model.Items[i]" name="value" value="@Model.Items[i].Index" />
+                            <input type="radio" data-name="@item" name="value" value="@item.Index" />
                         </td>
-                        @for (int b = 0; b < Model.Headers.Length; b++)
+                        @foreach (var header in Model.Headers)
                         {
-                            <td>@EntityValueConverter.GetConverter(Model.Headers[b]).ConvertTo(Model.Headers[b].Property.GetValue(Model.Items[i]), typeof(string))</td>
+                            <td>@EntityValueConverter.GetConverter(header).ConvertTo(header.GetValue(item), typeof(string))</td>
                         }
                     </tr>
                 }
@@ -59,7 +59,7 @@
     </div>
     <div class="col-md-4 text-center">
         <div class="btn-group">
-            @if (Model.Metadata.SearchProperties.Length > 0)
+            @if (Model.Metadata.SearchProperties.Count() > 0)
             {
                 <a class="btn btn-default" href="@Url.Action("Search",new {actionName = "MultipleSelector"})">Search</a>
             }

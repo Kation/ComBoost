@@ -1,5 +1,5 @@
 ﻿@model MvcEditorModel
 <div class="input-control text size4" data-role="datepicker" data-locale="en" data-date="@(((DateTime)Model.Value).ToShortDateString())" data-effect="fade" data-format="yyyy/mm/dd">
-    <input type="text" id="@Model.Metadata.Property.Name" name="@Model.Metadata.Property.Name" />
+    <input type="text" id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" />
     <button type="button" class="btn-date"></button>
 </div>

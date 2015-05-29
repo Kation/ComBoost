@@ -48,7 +48,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Get the entity metadata.
         /// </summary>
-        protected EntityMetadata Metadata { get; private set; }
+        protected IEntityMetadata Metadata { get; private set; }
 
         /// <summary>
         /// When overridden, provides an entry point for custom authorization checks.
@@ -101,7 +101,7 @@ namespace System.Web.Mvc
                 return;
             }
             if (filterContext.Controller is IEntityMetadata)
-                Metadata = ((IEntityMetadata)filterContext.Controller).Metadata;
+                Metadata = ((IHaveEntityMetadata)filterContext.Controller).Metadata;
             RouteData = filterContext.RouteData;
 
             if (!Authorize(filterContext))

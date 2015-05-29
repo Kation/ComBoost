@@ -21,7 +21,7 @@ namespace System.Web.Mvc
         /// </summary>
         /// <param name="context">Entity descriptor context.</param>
         /// <param name="property">Property metadata.</param>
-        public EntityValueConverterContext(EntityDescriptorContext context, PropertyMetadata property)
+        public EntityValueConverterContext(EntityDescriptorContext context, IPropertyMetadata property)
         {
             _Context = context;
             Property = property;
@@ -30,7 +30,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Get the property convert to.
         /// </summary>
-        public PropertyMetadata Property { get; private set; }
+        public IPropertyMetadata Property { get; private set; }
 
         /// <summary>
         /// Get the container.
