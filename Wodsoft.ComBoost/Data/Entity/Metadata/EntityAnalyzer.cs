@@ -65,7 +65,7 @@ namespace System.Data.Entity.Metadata
                     if (metadataField != null)
                         _Metadata.Add(type, (IEntityMetadata)metadataField.GetValue(null));
                     else
-                        _Metadata.Add(type, new EntityMetadata(type));
+                        _Metadata.Add(type, new ClrEntityMetadata(type));
                 }
             return _Metadata[type];
         }

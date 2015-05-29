@@ -89,7 +89,7 @@
     <Compile Include="Data\Entity\IEntityQueryable.cs" />
     <Compile Include="Data\Entity\IRoleEntity.cs" />
     <Compile Include="Data\Entity\Metadata\EntityAnalyzer.cs" />
-    <Compile Include="Data\Entity\Metadata\EntityMetadata.cs" />
+    <Compile Include="Data\Entity\Metadata\ClrEntityMetadata.cs" />
     <Compile Include="Data\Entity\Metadata\EntityMetadataBase.cs" />
     <Compile Include="Data\Entity\Metadata\IEntityAnalyzer.cs" />
     <Compile Include="Data\Entity\Metadata\IEntityMetadata.cs" />

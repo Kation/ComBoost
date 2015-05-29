@@ -182,6 +182,8 @@ namespace System.Data.Entity.Metadata
                 throw new ArgumentNullException("display");
             if (display.Name == null)
                 Name = ClrName;
+            else
+                Name = display.Name;
             ShortName = display.ShortName == null ? Name : display.ShortName;
             Description = display.Description;
             Order = display.GetOrder().HasValue ? display.Order : 0;

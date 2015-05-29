@@ -13,13 +13,13 @@ namespace System.Data.Entity.Metadata
     /// <summary>
     /// Entity metadata.
     /// </summary>
-    public class EntityMetadata : EntityMetadataBase
+    public class ClrEntityMetadata : EntityMetadataBase
     {
         /// <summary>
         /// Initialize entity metadata.
         /// </summary>
         /// <param name="type"></param>
-        public EntityMetadata(Type type)
+        public ClrEntityMetadata(Type type)
             : base(type)
         {
             if (type == null)
