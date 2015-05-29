@@ -34,13 +34,15 @@ namespace Company.Entity
         [Required]
         public virtual bool Sex { get; set; }
 
-        [Display(Name = "创建日期", Order = 20)]
+        [Display(Name = "创建日期", Order = 30)]
         [Hide(IsHiddenOnView = false)]
         public override DateTime CreateDate { get { return base.CreateDate; } set { base.CreateDate = value; } }
 
-        [ValueFilter(typeof(LocationProvider), null)]
+        [Display(Name = "省份", Order = 40)]
+        [ValueFilter(typeof(LocationProvider), "")]
         public virtual string Province { get; set; }
 
+        [Display(Name = "城市", Order = 50)]
         [ValueFilter(typeof(LocationProvider), "Province")]
         public virtual string City { get; set; }
 

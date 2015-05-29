@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Company.Entity
 {
-    public class LocationProvider : ValueFilter
+    public class LocationProvider : IValueFilter
     {
-        public override NameValueCollection GetValues(string dependencyProperty, string dependencyValue)
+        public NameValueCollection GetValues(string dependencyProperty, string dependencyValue)
         {
             NameValueCollection collection = new NameValueCollection();
             switch (dependencyProperty)
             {
-                case null:
+                case "":
                     collection.Add("北京", "北京");
                     collection.Add("广东", "广东");
                     collection.Add("广西", "广西");

@@ -13,7 +13,7 @@ namespace System.ServiceModel
     public class ServiceEntityQueryable<TEntity> : IEntityQueryable<TEntity> where TEntity : class, IEntity, new()
     {
         private IEntityService<TEntity> _Service;
-        private EntityMetadata Metadata;
+        private ClrEntityMetadata Metadata;
 
         public ServiceEntityQueryable(IEntityService<TEntity> service)
         {

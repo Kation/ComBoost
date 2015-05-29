@@ -24,7 +24,7 @@ namespace Wodsoft.ComBoost.Wpf
         {
             IEntityQueryable<TEntity> context = EntityBuilder.GetContext<TEntity>();
 
-            EntityMetadata metadata = EntityAnalyzer.GetMetadata<TEntity>();
+            ClrEntityMetadata metadata = EntityAnalyzer.GetMetadata<TEntity>();
 
             EntityViewModel<TEntity> model = new EntityViewModel<TEntity>(context.OrderBy());
             model.Headers = metadata.ViewProperties;
@@ -39,14 +39,14 @@ namespace Wodsoft.ComBoost.Wpf
             {
                 viewer.NavigationService.Navigate(GetEditor<TEntity>(context.Create()));
             }));
-            model.Buttons = new EntityViewButton[] { createButton };
+            model.Buttons = new IEntityViewButton[] { createButton };
 
             return viewer;
         }
 
         public virtual EntityEditor GetEditor<TEntity>(TEntity entity) where TEntity : class, IEntity, new()
         {
-            EntityMetadata metadata = EntityAnalyzer.GetMetadata<TEntity>();
+            ClrEntityMetadata metadata = EntityAnalyzer.GetMetadata<TEntity>();
 
             EntityEditModel<TEntity> model = new EntityEditModel<TEntity>(entity);
             model.Properties = metadata.EditProperties;

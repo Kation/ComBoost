@@ -33,8 +33,8 @@ namespace Wodsoft.ComBoost.Wpf
                 editor.IsChanged = true;
         }
 
-        public System.Data.Entity.Metadata.PropertyMetadata Metadata { get { return (System.Data.Entity.Metadata.PropertyMetadata)GetValue(MetadataProperty); } set { SetValue(MetadataProperty, value); } }
-        public static readonly DependencyProperty MetadataProperty = DependencyProperty.Register("Metadata", typeof(System.Data.Entity.Metadata.PropertyMetadata), typeof(EditorBase));
+        public System.Data.Entity.Metadata.ClrPropertyMetadata Metadata { get { return (System.Data.Entity.Metadata.ClrPropertyMetadata)GetValue(MetadataProperty); } set { SetValue(MetadataProperty, value); } }
+        public static readonly DependencyProperty MetadataProperty = DependencyProperty.Register("Metadata", typeof(System.Data.Entity.Metadata.ClrPropertyMetadata), typeof(EditorBase));
 
         public bool IsChanged { get { return (bool)GetValue(IsChangedProperty); } protected set { SetValue(IsChangedPropertyKey, value); } }
         protected static readonly DependencyPropertyKey IsChangedPropertyKey = DependencyProperty.RegisterReadOnly("IsChanged", typeof(bool), typeof(EditorBase), new PropertyMetadata(false));

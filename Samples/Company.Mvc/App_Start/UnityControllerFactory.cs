@@ -26,8 +26,8 @@ namespace Company.Mvc.App_Start
 
             //Change EntityContextBuilder to your class that inherit IEntityContextBuilder interface.
             //If your entity context builder has constructor with arguments, continue register types that you need.
-            container.RegisterType<DbContext,DataContext>(new MvcLifetimeManager());
-            container.RegisterType<IEntityContextBuilder, EntityContextBuilder>(new MvcLifetimeManager());
+            container.RegisterType<DbContext, DataContext>(new PerRequestLifetimeManager());
+            container.RegisterType<IEntityContextBuilder, EntityContextBuilder>(new PerRequestLifetimeManager());
 
             //Register your entity here:
             //RegisterController<EntityType>();
@@ -35,7 +35,7 @@ namespace Company.Mvc.App_Start
             RegisterController<Employee>();
             RegisterController<EmployeeGroup>();
 
-            System.Web.Security.ComBoostPrincipal.Resolve = EntityResolve;
+            System.Web.Security.ComBoostPrincipal.Resolver = EntityResolve;
         }
 
         private IRoleEntity EntityResolve(Type entityType, string username)
@@ -52,27 +52,6 @@ namespace Company.Mvc.App_Start
                 throw new HttpException(404, "Controller Not Found.");
             }
             return _container.Resolve(controllerType) as IController;
-        }
-    }
-
-    public class MvcLifetimeManager : LifetimeManager
-    {
-        private readonly Guid _Key = Guid.NewGuid();
-
-        public override object GetValue()
-        {
-            return HttpContext.Current.Items[_Key];
-        }
-
-        public override void SetValue(object newValue)
-        {
-            HttpContext.Current.Items[_Key] = newValue;
-        }
-
-        public override void RemoveValue()
-        {
-            var obj = GetValue();
-            HttpContext.Current.Items.Remove(obj);
         }
     }
 }
