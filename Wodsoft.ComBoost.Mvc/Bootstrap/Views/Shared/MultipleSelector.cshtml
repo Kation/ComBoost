@@ -19,7 +19,7 @@
                 <li class="jstree-open">
                     <a href="@Html.Raw(Url.ClearQueryPath("page"))">All</a>
                     <ul>
-                        @{Html.RenderPartial("ParentView", Model.Parent);}
+                        @Html.Partial("ParentView", Model.Parent)
                     </ul>
                 </li>
             </ul>
@@ -55,7 +55,7 @@
 </div>
 <div class="row">
     <div class="col-md-4">
-        @{Html.PaginationButton(Model);}
+        @Html.PaginationButton(Model)
     </div>
     <div class="col-md-4 text-center">
         <div class="btn-group">
@@ -67,7 +67,7 @@
         </div>
     </div>
     <div class="col-md-4 text-right">
-        @{Html.Pagination(Model);}
+        @Html.Pagination(Model)
     </div>
 </div>
 <script type="text/javascript">
@@ -87,6 +87,8 @@
         window.returnValue = result;
         if (window.opener) {
             window.opener.returnValue = window.returnValue;
+            if (window.opener.selectCompleted != undefined)
+                window.opener.selectCompleted(window.returnValue);
         }
         window.close();
     }

@@ -23,7 +23,7 @@
         <p><h4>Search content</h4></p>
         @for (int i = 0; i < Model.SearchItem.Length; i++)
         {
-            Html.RenderPartial("SearchItem", Model.SearchItem[i]);
+            @Html.Partial("SearchItem", Model.SearchItem[i])
         }
     </div>
 }
@@ -110,7 +110,7 @@
                 </table>
                 <div class="row">
                     <div class="col-md-4">
-                        @{Html.PaginationButton(Model);}
+                        @Html.PaginationButton(Model)
                     </div>
                     <div class="col-md-4 text-center">
                         <div class="btn-group">
