@@ -88,6 +88,8 @@ namespace System.Web.Mvc
                 }
             }
             var model = await GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
+            if (model == null)
+                return new HttpStatusCodeResult(404);
             if (Metadata.ParentProperty != null && !search)
                 model.Parent = await GetParentModel(parentid);
             model.SearchItem = searchItems;
@@ -352,21 +354,12 @@ namespace System.Web.Mvc
             }
         }
 
-        private Guid GetBaseIndex(IEntity entity)
-        {
-            return entity.Index;
-        }
-
         private static MethodInfo _ESelectMethod = typeof(Linq.Enumerable).GetMethods().Where(t => t.Name == "Select" && t.GetParameters().Length == 2).First();
         private static MethodInfo _QSelectMethod = typeof(Linq.Queryable).GetMethods().Where(t => t.Name == "Select" && t.GetParameters().Length == 2).First();
         private static MethodInfo _GroupByMethod = typeof(Linq.Queryable).GetMethods().Where(t => t.Name == "GroupBy" && t.GetParameters().Length == 2).First();
         private object GetGrouping(object queryable, Type tkey, Type tsource, Expression expression)
         {
             return _GroupByMethod.MakeGenericMethod(tsource, tkey).Invoke(null, new object[] { queryable, expression });
-        }
-        private Expression GetLambda(Type source, Type element, Expression expression, ParameterExpression parameter)
-        {
-            return Expression.Lambda(typeof(Func<,>).MakeGenericType(source, element), expression, parameter);
         }
 
         /// <summary>
@@ -383,6 +376,8 @@ namespace System.Web.Mvc
             //if (!Metadata.AddRoles.All(t => User.IsInRole(t)))
             //    return new HttpUnauthorizedResult();
             var model = await GetCreateModel(parent);
+            if (model == null)
+                return new HttpStatusCodeResult(404);
             return View("Edit", model);
         }
 
@@ -703,6 +698,8 @@ namespace System.Web.Mvc
                 }
             }
             var model = await GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
+            if (model == null)
+                return new HttpStatusCodeResult(404);
             if (Metadata.ParentProperty != null)
                 model.Parent = await GetParentModel(parentid);
             model.Headers = Metadata.ViewProperties;
@@ -746,6 +743,8 @@ namespace System.Web.Mvc
                 }
             }
             var model = await GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
+            if (model == null)
+                return new HttpStatusCodeResult(404);
             if (Metadata.ParentProperty != null)
                 model.Parent = await GetParentModel(parentid);
             model.Headers = Metadata.ViewProperties;
