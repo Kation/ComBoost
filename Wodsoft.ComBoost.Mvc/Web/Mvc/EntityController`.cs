@@ -87,7 +87,7 @@ namespace System.Web.Mvc
                     }
                 }
             }
-            var model = await GetIndexModel(EntityQueryable.OrderBy(queryable), page, size);
+            var model = await GetIndexModel(queryable, page, size);
             if (model == null)
                 return new HttpStatusCodeResult(404);
             if (Metadata.ParentProperty != null && !search)
