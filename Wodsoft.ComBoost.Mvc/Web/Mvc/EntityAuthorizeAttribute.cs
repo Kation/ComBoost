@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Routing;
+using System.Web.Security;
 
 namespace System.Web.Mvc
 {
@@ -97,7 +98,11 @@ namespace System.Web.Mvc
             else
             {
                 if (!filterContext.HttpContext.User.Identity.IsAuthenticated)
-                    filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl);
+
+                    if (filterContext.RouteData.DataTokens["loginUrl"] == null)
+                        filterContext.Result = new RedirectResult(ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
+                    else
+                        filterContext.Result = new RedirectResult(filterContext.RouteData.DataTokens["loginUrl"].ToString() + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
                 return;
             }
             if (filterContext.Controller is IEntityMetadata)
@@ -110,7 +115,7 @@ namespace System.Web.Mvc
                     filterContext.Result = new HttpUnauthorizedResult();
                 else
                     if (filterContext.RouteData.DataTokens["loginUrl"] == null)
-                        filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
+                        filterContext.Result = new RedirectResult(ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
                     else
                         filterContext.Result = new RedirectResult(filterContext.RouteData.DataTokens["loginUrl"].ToString() + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
             }
