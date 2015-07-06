@@ -676,8 +676,8 @@ namespace System.Web.Mvc
         [EntityAuthorize(EntityAuthorizeAction.View)]
         public virtual async Task<ActionResult> Selector(int page = 1, int size = 10, string parentpath = null, Guid? parentid = null, bool search = false)
         {
-            if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
-                return new HttpUnauthorizedResult();
+            //if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
+            //    return new HttpUnauthorizedResult();
             //if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
             //    return new HttpUnauthorizedResult();
             IQueryable<TEntity> queryable = EntityQueryable.Query();
@@ -721,8 +721,8 @@ namespace System.Web.Mvc
         [EntityAuthorize(EntityAuthorizeAction.View)]
         public virtual async Task<ActionResult> MultipleSelector(int page = 1, int size = 10, string parentpath = null, Guid? parentid = null, bool search = false)
         {
-            if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
-                return new HttpUnauthorizedResult();
+            //if (!User.Identity.IsAuthenticated && !Metadata.AllowAnonymous)
+            //    return new HttpUnauthorizedResult();
             //if (!Metadata.ViewRoles.All(t => User.IsInRole(t)))
             //    return new HttpUnauthorizedResult();
             IQueryable<TEntity> queryable = EntityQueryable.Query();
