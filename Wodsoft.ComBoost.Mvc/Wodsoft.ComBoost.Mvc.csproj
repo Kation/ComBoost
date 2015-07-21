@@ -98,11 +98,14 @@
     <Compile Include="Web\Mvc\Converter\EnumConverter.cs" />
     <Compile Include="Web\Mvc\Converter\SexConverter.cs" />
     <Compile Include="Web\Mvc\EntityAuthorizeAttribute.cs" />
+    <Compile Include="Web\Mvc\EntityControllerUnitils.cs" />
+    <Compile Include="Web\Mvc\EntityController`.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Web\Mvc\EntityRouteCollectionExtensions.cs" />
     <Compile Include="Web\Mvc\EntityController.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Web\Mvc\EntityController`.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Web\Mvc\EntityControllerFactory.cs" />
     <Compile Include="Web\Mvc\EntityValueConverterContext.cs" />

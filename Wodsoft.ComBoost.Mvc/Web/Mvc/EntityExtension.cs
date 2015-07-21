@@ -227,13 +227,25 @@ namespace System.Web.Mvc
         /// </summary>
         public class DependencyServiceProvider : IServiceProvider
         {
+            /// <summary>
+            /// Initialize dependency service provider.
+            /// </summary>
+            /// <param name="resolver"></param>
             public DependencyServiceProvider(IDependencyResolver resolver)
             {
                 Resolver = resolver;
             }
 
+            /// <summary>
+            /// Get the dependency resolver.
+            /// </summary>
             public IDependencyResolver Resolver { get; private set; }
 
+            /// <summary>
+            /// Get the service from dependency resolver.
+            /// </summary>
+            /// <param name="serviceType"></param>
+            /// <returns></returns>
             public object GetService(Type serviceType)
             {
                 return Resolver.GetService(serviceType);
