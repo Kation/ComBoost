@@ -20,6 +20,10 @@ namespace System.Data.Entity.Metadata
             _Analyzer = new EntityAnalyzer();
         }
 
+        /// <summary>
+        /// Override a global entity analyzer.
+        /// </summary>
+        /// <param name="analyzer"></param>
         public static void OverrideAnalyzer(IEntityAnalyzer analyzer)
         {
             if (analyzer == null)
@@ -49,6 +53,9 @@ namespace System.Data.Entity.Metadata
 
         private Dictionary<Type, IEntityMetadata> _Metadata;
 
+        /// <summary>
+        /// Initialize entity analyzer.
+        /// </summary>
         public EntityAnalyzer()
         {
             _Metadata = new Dictionary<Type, IEntityMetadata>();

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace System.ComponentModel
 {
+    /// <summary>
+    /// Entity edit model interface.
+    /// </summary>
     public interface IEntityEditModel
     {
         /// <summary>
@@ -26,12 +29,16 @@ namespace System.ComponentModel
         IEntityMetadata Metadata { get; }
     }
 
+    /// <summary>
+    /// Entity edit model interface.
+    /// </summary>
+    /// <typeparam name="TEntity">Type of entity.</typeparam>
     public interface IEntityEditModel<TEntity> : IEntityEditModel where TEntity : IEntity
     {
 
         /// <summary>
         /// Get or set the properties to edit.
         /// </summary>
-        TEntity Item { get; }
+        new TEntity Item { get; }
     }
 }

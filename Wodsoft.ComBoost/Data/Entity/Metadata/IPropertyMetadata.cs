@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace System.Data.Entity.Metadata
 {
+    /// <summary>
+    /// Property metadata interface.
+    /// </summary>
     public interface IPropertyMetadata
     {
         /// <summary>

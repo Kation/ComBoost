@@ -188,11 +188,11 @@ namespace System.Data.Entity.Metadata
         /// Set the metadata of parent.
         /// </summary>
         /// <param name="parent">Parent attribute.</param>
-        protected virtual void SetParent(ParentAttribute display)
+        protected virtual void SetParent(ParentAttribute parent)
         {
-            if (display == null)
+            if (parent == null)
                 throw new ArgumentNullException("display");
-            ParentProperty = GetProperty(display.PropertyName);
+            ParentProperty = GetProperty(parent.PropertyName);
         }
 
         /// <summary>

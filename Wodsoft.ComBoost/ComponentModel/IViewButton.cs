@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace System.ComponentModel
 {
+    /// <summary>
+    /// View button interface.
+    /// </summary>
     public interface IViewButton
     {
         /// <summary>

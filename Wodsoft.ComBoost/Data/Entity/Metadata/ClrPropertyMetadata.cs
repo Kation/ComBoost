@@ -63,17 +63,32 @@ namespace System.Data.Entity.Metadata
             return Name + "-" + Property.Name;
         }
 
+        /// <summary>
+        /// Get attribute from metadata.
+        /// </summary>
+        /// <typeparam name="T">Attribute type.</typeparam>
+        /// <returns></returns>
         public override T GetAttribute<T>()
         {
             return Property.GetCustomAttribute<T>(true);
         }
 
+        /// <summary>
+        /// Get attributes from metadata.
+        /// </summary>
+        /// <typeparam name="T">Attribute type.</typeparam>
+        /// <returns></returns>
         public override T[] GetAttributes<T>()
         {
             return Property.GetCustomAttributes<T>(true).ToArray();
         }
 
         private Func<object, object> _GetValue;
+        /// <summary>
+        /// Get property value from an entity.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns></returns>
         public override object GetValue(object entity)
         {
             if (!CanGet)
@@ -82,6 +97,11 @@ namespace System.Data.Entity.Metadata
         }
 
         private Action<object, object> _SetValue;
+        /// <summary>
+        /// Set property value to an entity.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <param name="value">Value.</param>
         public override void SetValue(object entity, object value)
         {
             if (!CanSet)
@@ -89,6 +109,10 @@ namespace System.Data.Entity.Metadata
             _SetValue(entity, value);
         }
 
+        /// <summary>
+        /// Try get PropertyInfo from metadata.
+        /// </summary>
+        /// <returns>Return value if there can be a PropertyInfo.</returns>
         public override PropertyInfo TryGetPropertyInfo()
         {
             return Property;
