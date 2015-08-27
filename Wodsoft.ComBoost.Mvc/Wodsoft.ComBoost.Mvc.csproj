@@ -98,6 +98,7 @@
     <Compile Include="Web\Mvc\Converter\EnumConverter.cs" />
     <Compile Include="Web\Mvc\Converter\SexConverter.cs" />
     <Compile Include="Web\Mvc\EntityAuthorizeAttribute.cs" />
+    <Compile Include="Web\Mvc\ControllerExtensions.cs" />
     <Compile Include="Web\Mvc\EntityControllerUnitils.cs" />
     <Compile Include="Web\Mvc\EntityController`.cs">
       <SubType>Code</SubType>

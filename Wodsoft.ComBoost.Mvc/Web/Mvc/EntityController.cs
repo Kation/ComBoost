@@ -32,6 +32,12 @@ namespace System.Web.Mvc
             EntityBuilder = builder;
         }
 
+        public EntityControllerUnitils<T> GetUnitils<T>()
+            where T : class, IEntity, new()
+        {
+            return new EntityControllerUnitils<T>(this, EntityBuilder);
+        }
+
         /// <summary>
         /// Called when authorization occurs.
         /// </summary>
