@@ -103,24 +103,24 @@ namespace System.Web.Mvc
         /// Get a html string of pagination.
         /// </summary>
         /// <param name="helper">A htmlhelper.</param>
-        /// <param name="model">Entity view model.</param>
-        public static MvcHtmlString Pagination(this HtmlHelper helper, IEntityViewModel model)
+        /// <param name="pagination">Entity view model.</param>
+        public static MvcHtmlString Pagination(this HtmlHelper helper, IPagination pagination)
         {
-            if (model == null)
+            if (pagination == null)
                 throw new ArgumentNullException("model");
-            return helper.Partial("_Pagination", model);
+            return helper.Partial("_Pagination", pagination);
         }
 
         /// <summary>
         /// Get a html string of pagination size button.
         /// </summary>
         /// <param name="helper">A htmlhelper.</param>
-        /// <param name="model">Entity view model.</param>
-        public static MvcHtmlString PaginationButton(this HtmlHelper helper, IEntityViewModel model)
+        /// <param name="pagination">Entity view model.</param>
+        public static MvcHtmlString PaginationButton(this HtmlHelper helper, IPagination pagination)
         {
-            if (model == null)
+            if (pagination == null)
                 throw new ArgumentNullException("model");
-            return helper.Partial("_PaginationButton", model);
+            return helper.Partial("_PaginationButton", pagination);
         }
 
         /// <summary>
