@@ -11,7 +11,7 @@ namespace System.ComponentModel
     /// <summary>
     /// Entity view model interface.
     /// </summary>
-    public interface IEntityViewModel
+    public interface IEntityViewModel : IPagination
     {
         /// <summary>
         /// Get the items per page options.
