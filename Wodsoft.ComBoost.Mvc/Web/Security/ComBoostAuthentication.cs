@@ -37,8 +37,7 @@ namespace System.Web.Security
                 _Key = Convert.FromBase64String(_Config.AppSettings.Settings["ComBoostAuthenticationKey"].Value);
             }
             CookieDomain = system.Authentication.Forms.Domain;
-            CookieName = "comboostauth";
-            CookieName = system.Authentication.Forms.Name;
+            CookieName = system.Authentication.Forms.Name ?? "comboostauth";
             CookiePath = system.Authentication.Forms.Path;
             LoginUrl = system.Authentication.Forms.LoginUrl;
             Timeout = system.Authentication.Forms.Timeout;
@@ -124,6 +123,63 @@ namespace System.Web.Security
         }
 
         /// <summary>
+        /// Get token signature data.
+        /// </summary>
+        /// <param name="data">Token data.</param>
+        /// <returns></returns>
+        public static byte[] GetTokenSignature(byte[] data)
+        {
+            data = data.Concat(_Key).ToArray();
+            byte[] signature;
+            using (SHA1 sha1 = SHA1.Create())
+                signature = sha1.ComputeHash(data);
+            return signature;
+        }
+
+        /// <summary>
+        /// Write token signature data.
+        /// </summary>
+        /// <param name="token">Token.</param>
+        public static void WriteTokenSignature(ComBoostToken token)
+        {
+            byte[] data = token.GetTokenData();
+            token.Signature = GetTokenSignature(data);
+        }
+        
+        /// <summary>
+        /// Verify a token.
+        /// </summary>
+        /// <param name="data">Token data.</param>
+        /// <param name="signature">Token signature.</param>
+        /// <returns></returns>
+        public static bool VerifyToken(byte[] data, byte[] signature)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (signature == null)
+                throw new ArgumentNullException("signature");
+            data = data.Concat(_Key).ToArray();
+            using (SHA1 sha1 = SHA1.Create())
+                data = sha1.ComputeHash(data);
+            for (int i = 0; i < 20; i++)
+                if (data[i] != signature[i])
+                    return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Verify a token.
+        /// </summary>
+        /// <param name="token">Token.</param>
+        /// <returns></returns>
+        public static bool VerifyToken(ComBoostToken token)
+        {
+            if (token == null)
+                throw new ArgumentNullException("token");
+            return VerifyToken(token.GetTokenData(), token.Signature);
+        }
+
+        /// <summary>
         /// Verify cookie.
         /// </summary>
         /// <param name="cookieValue">Cookie value.</param>
@@ -151,15 +207,13 @@ namespace System.Web.Security
                 if (token.Username == null)
                     return false;
                 if (authArea == null)
-                    data = Encoding.UTF8.GetBytes(token.Username).Concat(BitConverter.GetBytes(token.ExpiredDate.ToBinary())).Concat(_Key).ToArray();
+                    data = token.GetTokenData();
                 else
-                    data = Encoding.UTF8.GetBytes(token.Username).Concat(BitConverter.GetBytes(token.ExpiredDate.ToBinary())).Concat(Encoding.UTF8.GetBytes(authArea)).Concat(_Key).ToArray();
+                    data = token.GetTokenData().Concat(Encoding.UTF8.GetBytes(authArea)).ToArray();
 
-                using (SHA1 sha1 = SHA1.Create())
-                    data = sha1.ComputeHash(data);
-                for (int i = 0; i < 20; i++)
-                    if (data[i] != token.Signature[i])
-                        return false;
+                if (!VerifyToken(data, token.Signature))
+                    return false;
+
                 username = token.Username;
                 expiredDate = token.ExpiredDate;
                 return true;

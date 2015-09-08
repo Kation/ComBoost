@@ -122,6 +122,7 @@
     <Compile Include="Web\Security\ComBoostIdentity.cs" />
     <Compile Include="Web\Security\ComBoostPrincipal.cs" />
     <Compile Include="Web\Security\ComBoostPrincipalExtensions.cs" />
+    <Compile Include="Web\Security\ComBoostToken.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
