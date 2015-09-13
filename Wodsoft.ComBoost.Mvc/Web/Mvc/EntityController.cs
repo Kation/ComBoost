@@ -32,6 +32,11 @@ namespace System.Web.Mvc
             EntityBuilder = builder;
         }
 
+        /// <summary>
+        /// Initialize entity controller.
+        /// </summary>
+        /// <typeparam name="T">Type of entity.</typeparam>
+        /// <returns></returns>
         public EntityControllerUnitils<T> GetUnitils<T>()
             where T : class, IEntity, new()
         {

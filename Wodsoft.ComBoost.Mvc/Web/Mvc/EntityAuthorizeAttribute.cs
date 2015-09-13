@@ -58,7 +58,7 @@ namespace System.Web.Mvc
         /// <returns>true if the user is authorized; otherwise, false.</returns>
         protected virtual bool AuthorizeCore(HttpContextBase httpContext)
         {
-            return true;
+            return httpContext.User.Identity.IsAuthenticated;
         }
 
         private bool Authorize(AuthorizationContext filterContext)
