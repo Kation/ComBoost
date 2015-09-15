@@ -105,7 +105,7 @@ namespace System.Web.Mvc
                         filterContext.Result = new RedirectResult(filterContext.RouteData.DataTokens["loginUrl"].ToString() + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
                 return;
             }
-            if (filterContext.Controller is IEntityMetadata)
+            if (filterContext.Controller is IHaveEntityMetadata)
                 Metadata = ((IHaveEntityMetadata)filterContext.Controller).Metadata;
             RouteData = filterContext.RouteData;
 
