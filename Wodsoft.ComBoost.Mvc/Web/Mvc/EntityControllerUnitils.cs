@@ -561,7 +561,7 @@ namespace System.Web.Mvc
                 #region File Path Value
                 if (!Controller.Request.Files.AllKeys.Contains(propertyMetadata.ClrName))
                     return;
-                if (!(this is IFileController<TEntity>))
+                if (!(Controller is IFileController<TEntity>))
                 {
                     if (propertyMetadata.ClrType != typeof(byte[]))
                         throw new NotSupportedException("Controller doesn't support upload file.");
@@ -576,7 +576,7 @@ namespace System.Web.Mvc
                     }
                 }
                 else
-                    await ((IFileController<TEntity>)this).SaveFileToProperty(entity, propertyMetadata, Controller.Request.Files[propertyMetadata.ClrName]);
+                    await ((IFileController<TEntity>)Controller).SaveFileToProperty(entity, propertyMetadata, Controller.Request.Files[propertyMetadata.ClrName]);
                 #endregion
             }
             else
