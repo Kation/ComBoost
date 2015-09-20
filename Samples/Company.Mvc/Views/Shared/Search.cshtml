@@ -34,9 +34,9 @@
                             case System.ComponentModel.DataAnnotations.CustomDataType.Date:
                             case System.ComponentModel.DataAnnotations.CustomDataType.DateTime:
                                 <div class="input-group col-md-7">
-                                    <input type="date" class="form-control col-md-3" id="Search.@(property.ClrName).Start" name="Search.@(Model.Properties[i].ClrName).Start" />
+                                    <input type="date" class="form-control col-md-3" id="Search.@(property.ClrName).Start" name="Search.@(property.ClrName).Start" />
                                     <span class="input-group-addon">To</span>
-                                    <input type="date" class="form-control col-md-3" id="Search.@(property.ClrName).End" name="Search.@(Model.Properties[i].ClrName).End" />
+                                    <input type="date" class="form-control col-md-3" id="Search.@(property.ClrName).End" name="Search.@(property.ClrName).End" />
                                 </div>
                                 <script type="text/javascript">
                                     $('#Search.@(property.ClrName).Start').datepicker();
@@ -69,16 +69,16 @@
                             </script>
                                 break;
                             case System.ComponentModel.DataAnnotations.CustomDataType.Other:
-                                if (Model.Properties[i].CustomType == "Enum")
+                                if (property.CustomType == "Enum")
                                 {
                                     EntityExtension.EnumItem[] items;
-                                    if (Model.Properties[i].ClrType.IsGenericType)
+                                    if (property.ClrType.IsGenericType)
                                     {
-                                        items = Html.EnumAnalyze(Model.Properties[i].ClrType.GetGenericArguments()[0]);
+                                        items = Html.EnumAnalyze(property.ClrType.GetGenericArguments()[0]);
                                     }
                                     else
                                     {
-                                        items = Html.EnumAnalyze(Model.Properties[i].ClrType);
+                                        items = Html.EnumAnalyze(property.ClrType);
                                     }
                                     <select name="Search.@property.ClrName" class="form-control">
                                         @if (property.ClrType.IsGenericType)
