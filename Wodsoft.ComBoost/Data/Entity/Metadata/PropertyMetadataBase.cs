@@ -258,7 +258,7 @@ namespace System.Data.Entity.Metadata
             if (dataType != null)
                 SetDataType(dataType);
 
-            IsRequired = GetAttribute<RequiredAttribute>() != null;
+            IsRequired = GetAttribute<RequiredAttribute>() != null || (ClrType.IsValueType && !ClrType.IsGenericType);
             Searchable = GetAttribute<SearchableAttribute>() != null;
             IsDistinct = GetAttribute<DistinctAttribute>() != null;
             IsExpended = GetAttribute<ExpendEntityAttribute>() != null || ClrType.GetCustomAttribute<ExpendEntityAttribute>() != null;
