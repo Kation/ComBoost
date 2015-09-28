@@ -23,7 +23,7 @@
         <strong class="font-size20">Search @(Model.Metadata.Name)</strong>
     </div>
     <div class="panel-body">
-        <form id="form" class="form-horizontal" role="form" action="@Url.Action("Index")" method="get">
+        <form id="form" class="form-horizontal" role="form" action="@Url.Action(ViewBag.Action)" method="get">
             @foreach (var property in Model.Properties)
             {
                 <div class="form-group has-feedback">
