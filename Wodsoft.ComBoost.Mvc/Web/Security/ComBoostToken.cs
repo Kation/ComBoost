@@ -19,8 +19,23 @@ namespace System.Web.Security
         public abstract byte[] GetTokenData();
 
         /// <summary>
+        /// Get or set the salt data.
+        /// </summary>
+        public byte[] Salt { get; set; }
+
+        /// <summary>
         /// Get or set the signature data.
         /// </summary>
         public byte[] Signature { get; set; }
+
+        /// <summary>
+        /// New a salt data.
+        /// </summary>
+        public virtual void NewSalt()
+        {
+            Salt = new byte[6];
+            Random rnd = new Random();
+            rnd.NextBytes(Salt);
+        }
     }
 }

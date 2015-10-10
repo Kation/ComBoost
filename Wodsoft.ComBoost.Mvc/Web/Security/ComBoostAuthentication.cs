@@ -108,11 +108,11 @@ namespace System.Web.Security
             token.ExpiredDate = DateTime.Now.Add(timeout);
             byte[] data;
             if (authArea == null)
-                data = Encoding.UTF8.GetBytes(token.Username).Concat(BitConverter.GetBytes(token.ExpiredDate.ToBinary())).Concat(_Key).ToArray();
+                data = Encoding.UTF8.GetBytes(token.Username).Concat(BitConverter.GetBytes(token.ExpiredDate.ToBinary())).ToArray();
             else
-                data = Encoding.UTF8.GetBytes(token.Username).Concat(BitConverter.GetBytes(token.ExpiredDate.ToBinary())).Concat(Encoding.UTF8.GetBytes(authArea)).Concat(_Key).ToArray();
-            using (SHA1 sha1 = SHA1.Create())
-                token.Signature = sha1.ComputeHash(data);
+                data = Encoding.UTF8.GetBytes(token.Username).Concat(BitConverter.GetBytes(token.ExpiredDate.ToBinary())).Concat(Encoding.UTF8.GetBytes(authArea)).ToArray();
+            token.NewSalt();
+            token.Signature = GetTokenSignature(data, token.Salt);
             BinaryFormatter formatter = new BinaryFormatter();
             MemoryStream stream = new MemoryStream();
             formatter.Serialize(stream, token);
@@ -126,13 +126,17 @@ namespace System.Web.Security
         /// Get token signature data.
         /// </summary>
         /// <param name="data">Token data.</param>
+        /// <param name="salt">Salt data.</param>
         /// <returns></returns>
-        public static byte[] GetTokenSignature(byte[] data)
+        public static byte[] GetTokenSignature(byte[] data, byte[] salt)
         {
             data = data.Concat(_Key).ToArray();
             byte[] signature;
             using (SHA1 sha1 = SHA1.Create())
+            {
                 signature = sha1.ComputeHash(data);
+                signature = sha1.ComputeHash(signature.Concat(salt).ToArray());
+            }
             return signature;
         }
 
@@ -143,16 +147,18 @@ namespace System.Web.Security
         public static void WriteTokenSignature(ComBoostToken token)
         {
             byte[] data = token.GetTokenData();
-            token.Signature = GetTokenSignature(data);
+            token.NewSalt();
+            token.Signature = GetTokenSignature(data, token.Salt);
         }
-        
+
         /// <summary>
         /// Verify a token.
         /// </summary>
         /// <param name="data">Token data.</param>
+        /// <param name="salt">Salt data.</param>
         /// <param name="signature">Token signature.</param>
         /// <returns></returns>
-        public static bool VerifyToken(byte[] data, byte[] signature)
+        public static bool VerifyToken(byte[] data, byte[] salt, byte[] signature)
         {
             if (data == null)
                 throw new ArgumentNullException("data");
@@ -160,7 +166,10 @@ namespace System.Web.Security
                 throw new ArgumentNullException("signature");
             data = data.Concat(_Key).ToArray();
             using (SHA1 sha1 = SHA1.Create())
+            {
                 data = sha1.ComputeHash(data);
+                data = sha1.ComputeHash(data.Concat(salt).ToArray());
+            }
             for (int i = 0; i < 20; i++)
                 if (data[i] != signature[i])
                     return false;
@@ -176,7 +185,7 @@ namespace System.Web.Security
         {
             if (token == null)
                 throw new ArgumentNullException("token");
-            return VerifyToken(token.GetTokenData(), token.Signature);
+            return VerifyToken(token.GetTokenData(), token.Salt, token.Signature);
         }
 
         /// <summary>
@@ -211,7 +220,7 @@ namespace System.Web.Security
                 else
                     data = token.GetTokenData().Concat(Encoding.UTF8.GetBytes(authArea)).ToArray();
 
-                if (!VerifyToken(data, token.Signature))
+                if (!VerifyToken(data, token.Salt, token.Signature))
                     return false;
 
                 username = token.Username;

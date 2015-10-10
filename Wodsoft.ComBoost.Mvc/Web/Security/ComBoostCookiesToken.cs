@@ -23,11 +23,6 @@ namespace System.Web.Security
         public DateTime ExpiredDate { get; set; }
 
         /// <summary>
-        /// Get or set the signature data.
-        /// </summary>
-        public byte[] Signature { get; set; }
-
-        /// <summary>
         /// Get token byte data without signature.
         /// </summary>
         /// <returns></returns>
