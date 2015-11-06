@@ -164,6 +164,7 @@ namespace System.Web.Mvc
         }
 
         private static Dictionary<Type, EnumItem[]> _EnumCache;
+        private static TypeConverter _IntConverter = TypeDescriptor.GetConverter(typeof(int));
         /// <summary>
         /// Analyze a enum type.
         /// </summary>
@@ -187,7 +188,7 @@ namespace System.Web.Mvc
                         item.Name = field.Name;
                     else
                         item.Name = display.Name;
-                    item.Value = (int)field.GetValue(null);
+                    item.Value = (int)_IntConverter.ConvertFrom(field.GetValue(null));
                     list[i] = item;
                 }
                 _EnumCache.Add(type, list);
