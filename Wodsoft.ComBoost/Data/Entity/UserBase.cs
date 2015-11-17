@@ -32,7 +32,7 @@ namespace System.Data.Entity
         /// Set a new password.
         /// </summary>
         /// <param name="password">New password.</param>
-        public void SetPassword(string password)
+        public virtual void SetPassword(string password)
         {
             Random rnd = new Random();
             Salt = new byte[6];
@@ -48,7 +48,7 @@ namespace System.Data.Entity
         /// </summary>
         /// <param name="password">Password to verify.</param>
         /// <returns>Return true if equal.</returns>
-        public bool VerifyPassword(string password)
+        public virtual bool VerifyPassword(string password)
         {
             using (var sha = System.Security.Cryptography.SHA1.Create())
             {
