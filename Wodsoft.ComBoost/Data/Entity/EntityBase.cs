@@ -14,29 +14,15 @@ namespace System.Data.Entity
     /// <summary>
     /// Entity base object.
     /// </summary>
-    public abstract class EntityBase : NotifyBase, IEntity
+    public abstract class EntityBase : IEntity
     {
-        private IEntityMetadata _Metadata;
-        /// <summary>
-        /// Get the metadata of entity.
-        /// </summary>
-        protected IEntityMetadata Metadata
-        {
-            get
-            {
-                if (_Metadata == null)
-                    _Metadata = EntityAnalyzer.GetMetadata(GetType());
-                return _Metadata;
-            }
-        }
-
         /// <summary>
         /// Get or set the id of entity.
         /// </summary>
         [Key]
         [Required]
         [Hide]
-        public virtual Guid Index { get { return (Guid)GetValue(); } set { SetValue(value); } }
+        public virtual Guid Index { get; set; }
 
         /// <summary>
         /// Get or set the create date of entity.
@@ -44,7 +30,7 @@ namespace System.Data.Entity
         [Required]
         [Hide]
         [Column(TypeName = "Datetime2")]
-        public virtual DateTime CreateDate { get { return (DateTime)GetValue(); } set { SetValue(value); } }
+        public virtual DateTime CreateDate { get; set; }
 
         /// <summary>
         /// Call when entity created.
@@ -90,9 +76,10 @@ namespace System.Data.Entity
         /// <returns></returns>
         public override string ToString()
         {
-            if (Metadata.DisplayProperty == null)
+            var metadata = EntityAnalyzer.GetMetadata(GetType());
+            if (metadata.DisplayProperty == null)
                 return base.ToString();
-            object value = Metadata.DisplayProperty.GetValue(this);
+            object value = metadata.DisplayProperty.GetValue(this);
             if (value == null)
                 return "";
             else
@@ -107,8 +94,9 @@ namespace System.Data.Entity
         /// <returns>Collection that include error messages.</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            var metadata = EntityAnalyzer.GetMetadata(GetType());
             var result = new List<ValidationResult>();
-            foreach (var property in Metadata.Properties)
+            foreach (var property in metadata.Properties)
             {
                 validationContext.MemberName = property.ClrName;
                 validationContext.DisplayName = property.Name;
