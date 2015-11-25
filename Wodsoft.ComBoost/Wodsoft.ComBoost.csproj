@@ -98,6 +98,7 @@
     <Compile Include="Data\Entity\Metadata\ClrPropertyMetadata.cs" />
     <Compile Include="Data\Entity\IPassword.cs" />
     <Compile Include="Data\Entity\Metadata\PropertyMetadataBase.cs" />
+    <Compile Include="Data\Entity\NotifyEntityBase.cs" />
     <Compile Include="Data\Entity\UserBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\Serialization\ComBoostSerializer.cs" />
