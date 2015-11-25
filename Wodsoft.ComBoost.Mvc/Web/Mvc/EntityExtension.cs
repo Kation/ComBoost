@@ -218,9 +218,13 @@ namespace System.Web.Mvc
         {
             if (controller == null)
                 throw new ArgumentNullException("controller");
-            if (!controller.ViewData.ContainsKey("DependencyServiceProvider"))
-                controller.ViewData.Add("DependencyServiceProvider", new DependencyServiceProvider(controller.Resolver));
-            return (DependencyServiceProvider)controller.ViewData["DependencyServiceProvider"];
+            object provider;
+            if (!controller.ViewData.TryGetValue("DependencyServiceProvider", out provider))
+            {
+                provider = new DependencyServiceProvider(controller);
+                controller.ViewData.Add("DependencyServiceProvider", provider);
+            }
+            return (DependencyServiceProvider)provider;
         }
 
         /// <summary>
@@ -228,13 +232,18 @@ namespace System.Web.Mvc
         /// </summary>
         public class DependencyServiceProvider : IServiceProvider
         {
+            private Controller _Controller;
+
             /// <summary>
             /// Initialize dependency service provider.
             /// </summary>
-            /// <param name="resolver"></param>
-            public DependencyServiceProvider(IDependencyResolver resolver)
+            /// <param name="controller"></param>
+            public DependencyServiceProvider(Controller controller)
             {
-                Resolver = resolver;
+                if (controller == null)
+                    throw new ArgumentNullException("controller");
+                _Controller = controller;
+                Resolver = controller.Resolver;
             }
 
             /// <summary>
@@ -249,6 +258,14 @@ namespace System.Web.Mvc
             /// <returns></returns>
             public object GetService(Type serviceType)
             {
+                if (typeof(Controller).IsAssignableFrom(serviceType))
+                    return _Controller;
+                else if (typeof(HttpRequestBase).IsAssignableFrom(serviceType))
+                    return _Controller.Request;
+                else if (typeof(HttpResponseBase).IsAssignableFrom(serviceType))
+                    return _Controller.Response;
+                else if (typeof(HttpServerUtilityBase).IsAssignableFrom(serviceType))
+                    return _Controller.Server;
                 return Resolver.GetService(serviceType);
             }
         }
