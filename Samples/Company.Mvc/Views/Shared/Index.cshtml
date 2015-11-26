@@ -13,7 +13,7 @@
     var provider = this.GetServiceProvider();
 }
 <ol class="breadcrumb">
-    <li><a href="@Url.Action("Index","Home")">Home</a></li>
+    <li><a href="@Html.Raw(Url.Action("Index","Home"))">Home</a></li>
     <li class="active">@Model.Metadata.Name</li>
 </ol>
 @if (Model.SearchItem.Length > 0)
@@ -124,7 +124,7 @@
                             }
                             @foreach(var button in Model.ViewButtons)
                             {
-                                //Model.ViewButtons[i].SetTarget()
+                                Model.ViewButtons[i].SetTarget()
                                 <a href="@Html.Raw(button.Target)" class="btn btn-default" title="@button.Tooltip">@button.Icon@button.Name</a>
                             }
                         </div>

@@ -13,7 +13,7 @@
 }
 <ol class="breadcrumb">
     <li><a href="#">Home</a></li>
-    <li><a href="@Url.Action("Index")">@Model.Metadata.Name</a></li>
+    <li><a href="@Html.Raw(Url.Action("Index"))">@Model.Metadata.Name</a></li>
     <li class="active">Search</li>
 </ol>
 <br />
@@ -121,7 +121,7 @@
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
                     <input type="submit" class="btn btn-primary" value="Search" />
-                    <a href="@Url.Action("Index")" class="btn btn-default">Back</a>
+                    <a href="@Html.Raw(Url.Action("Index"))" class="btn btn-default">Back</a>
                     <input type="hidden" name="search" value="True" />
                 </div>
             </div>
