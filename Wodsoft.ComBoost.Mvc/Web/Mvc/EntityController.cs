@@ -33,6 +33,17 @@ namespace System.Web.Mvc
         }
 
         /// <summary>
+        /// Initialize entity controller.
+        /// </summary>
+        /// <typeparam name="T">Type of entity.</typeparam>
+        /// <returns></returns>
+        public EntityControllerUnitils<T> GetUnitils<T>()
+            where T : class, IEntity, new()
+        {
+            return new EntityControllerUnitils<T>(this, EntityBuilder);
+        }
+
+        /// <summary>
         /// Called when authorization occurs.
         /// </summary>
         /// <param name="filterContext">Information about the current request and action.</param>

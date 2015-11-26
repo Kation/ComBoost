@@ -1,12 +1,12 @@
 ﻿@model MvcEditorModel
-<div class="input-group col-md-4" id="@Model.Metadata.Property.Name">
-    <input type="number" id="@(Model.Metadata.Property.Name)_Hour" min="0" step="1" class="form-control text-center" value="@(((TimeSpan)Model.Value).TotalHours)">
+<div class="input-group col-md-4" id="@Model.Metadata.ClrName">
+    <input type="number" id="@(Model.Metadata.ClrName)_Hour" min="0" step="1" class="form-control text-center" value="@(((TimeSpan)Model.Value).TotalHours)">
     <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
-    <input type="number" id="@(Model.Metadata.Property.Name)_Minute" min="0" max="59" step="1" class="form-control text-center" value="@(((TimeSpan)Model.Value).Minutes)">
+    <input type="number" id="@(Model.Metadata.ClrName)_Minute" min="0" max="59" step="1" class="form-control text-center" value="@(((TimeSpan)Model.Value).Minutes)">
     <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
-    <input type="number" id="@(Model.Metadata.Property.Name)_Seconds" min="0" max="59" step="1" class="form-control text-center" value="@(((TimeSpan)Model.Value).Seconds)">
+    <input type="number" id="@(Model.Metadata.ClrName)_Seconds" min="0" max="59" step="1" class="form-control text-center" value="@(((TimeSpan)Model.Value).Seconds)">
 </div>
-<input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" value="@Model.Value" />
+<input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@Model.Value" />
 <script type="text/javascript">
     $(function () {
         function checkNumber() {
@@ -31,14 +31,14 @@
                 number = 0;
             $(this).val(number);
         }
-        $('#@(Model.Metadata.Property.Name)_Hour').change(checkHour);
-        $('#@(Model.Metadata.Property.Name)_Minute').change(checkNumber);
-        $('#@(Model.Metadata.Property.Name)_Seconds').change(checkNumber);
-        $('#@Model.Metadata.Property.Name').children('input').change(function () {
-            var hidden = $('#@(Model.Metadata.Property.Name)_Value');
-            var hour = $('#@(Model.Metadata.Property.Name)_Hour').val();
-            var minute = $('#@(Model.Metadata.Property.Name)_Minute').val();
-            var second = $('#@(Model.Metadata.Property.Name)_Seconds').val();
+        $('#@(Model.Metadata.ClrName)_Hour').change(checkHour);
+        $('#@(Model.Metadata.ClrName)_Minute').change(checkNumber);
+        $('#@(Model.Metadata.ClrName)_Seconds').change(checkNumber);
+        $('#@Model.Metadata.ClrName').children('input').change(function () {
+            var hidden = $('#@(Model.Metadata.ClrName)_Value');
+            var hour = $('#@(Model.Metadata.ClrName)_Hour').val();
+            var minute = $('#@(Model.Metadata.ClrName)_Minute').val();
+            var second = $('#@(Model.Metadata.ClrName)_Seconds').val();
             hidden.val(hour + ":" + minute + ":" + second);
         });
     });

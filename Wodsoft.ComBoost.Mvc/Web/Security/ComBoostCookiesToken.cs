@@ -10,7 +10,7 @@ namespace System.Web.Security
     /// ComBoost cookies token.
     /// </summary>
     [Serializable]
-    public sealed class ComBoostCookiesToken
+    public sealed class ComBoostCookiesToken : ComBoostToken
     {
         /// <summary>
         /// Get or set the username.
@@ -23,8 +23,12 @@ namespace System.Web.Security
         public DateTime ExpiredDate { get; set; }
 
         /// <summary>
-        /// Get or set the signature data.
+        /// Get token byte data without signature.
         /// </summary>
-        public byte[] Signature { get; set; }
+        /// <returns></returns>
+        public override byte[] GetTokenData()
+        {
+            return Encoding.UTF8.GetBytes(Username).Concat(BitConverter.GetBytes(ExpiredDate.ToBinary())).ToArray();
+        }
     }
 }

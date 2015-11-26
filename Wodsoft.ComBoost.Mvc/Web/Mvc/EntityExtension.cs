@@ -103,24 +103,24 @@ namespace System.Web.Mvc
         /// Get a html string of pagination.
         /// </summary>
         /// <param name="helper">A htmlhelper.</param>
-        /// <param name="model">Entity view model.</param>
-        public static void Pagination(this HtmlHelper helper, EntityViewModel model)
+        /// <param name="pagination">Entity view model.</param>
+        public static MvcHtmlString Pagination(this HtmlHelper helper, IPagination pagination)
         {
-            if (model == null)
+            if (pagination == null)
                 throw new ArgumentNullException("model");
-            helper.RenderPartial("_Pagination", model);
+            return helper.Partial("_Pagination", pagination);
         }
 
         /// <summary>
         /// Get a html string of pagination size button.
         /// </summary>
         /// <param name="helper">A htmlhelper.</param>
-        /// <param name="model">Entity view model.</param>
-        public static void PaginationButton(this HtmlHelper helper, EntityViewModel model)
+        /// <param name="pagination">Entity view model.</param>
+        public static MvcHtmlString PaginationButton(this HtmlHelper helper, IPagination pagination)
         {
-            if (model == null)
+            if (pagination == null)
                 throw new ArgumentNullException("model");
-            helper.RenderPartial("_PaginationButton", model);
+            return helper.Partial("_PaginationButton", pagination);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace System.Web.Mvc
         /// <param name="helper">A htmlhelper.</param>
         /// <param name="property">Property metadata.</param>
         /// <param name="value">Property value.</param>
-        public static void Editor(this HtmlHelper helper, PropertyMetadata property, object value)
+        public static MvcHtmlString Editor(this HtmlHelper helper, IPropertyMetadata property, object value)
         {
             if (helper == null)
                 throw new ArgumentNullException("helper");
@@ -139,9 +139,9 @@ namespace System.Web.Mvc
             model.Metadata = property;
             model.Value = value;
             if (property.Type == CustomDataType.Other)
-                System.Web.Mvc.Html.RenderPartialExtensions.RenderPartial(helper, property.CustomType + "Editor", model);
+                return helper.Partial(property.CustomType + "Editor", model);
             else
-                System.Web.Mvc.Html.RenderPartialExtensions.RenderPartial(helper, property.Type.ToString() + "Editor", model);
+                return helper.Partial(property.Type.ToString() + "Editor", model);
         }
 
         /// <summary>
@@ -178,6 +178,7 @@ namespace System.Web.Mvc
             {
                 var fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);
                 EnumItem[] list = new EnumItem[fields.Length];
+                Type enumType = Enum.GetUnderlyingType(type);
                 for (int i = 0; i < fields.Length; i++)
                 {
                     var field = fields[i];
@@ -187,12 +188,86 @@ namespace System.Web.Mvc
                         item.Name = field.Name;
                     else
                         item.Name = display.Name;
-                    item.Value = (int)field.GetValue(null);
+                    item.Value = Convert.ChangeType(field.GetValue(null), enumType);
                     list[i] = item;
                 }
                 _EnumCache.Add(type, list);
             }
             return _EnumCache[type];
+        }
+
+        /// <summary>
+        /// Get service provider from web view page.
+        /// </summary>
+        /// <param name="viewPage">Current view page.</param>
+        /// <returns></returns>
+        public static IServiceProvider GetServiceProvider(this WebViewPage viewPage)
+        {
+            Controller controller = viewPage.ViewContext.Controller as Controller;
+            if (controller == null)
+                return null;
+            return GetServiceProvider(controller);
+        }
+
+        /// <summary>
+        /// Get service provider from service provider.
+        /// </summary>
+        /// <param name="controller">Current controller.</param>
+        /// <returns></returns>
+        public static IServiceProvider GetServiceProvider(this Controller controller)
+        {
+            if (controller == null)
+                throw new ArgumentNullException("controller");
+            object provider;
+            if (!controller.ViewData.TryGetValue("DependencyServiceProvider", out provider))
+            {
+                provider = new DependencyServiceProvider(controller);
+                controller.ViewData.Add("DependencyServiceProvider", provider);
+            }
+            return (DependencyServiceProvider)provider;
+        }
+
+        /// <summary>
+        /// IServiceProvider wrapper of IDependencyResolver.
+        /// </summary>
+        public class DependencyServiceProvider : IServiceProvider
+        {
+            private Controller _Controller;
+
+            /// <summary>
+            /// Initialize dependency service provider.
+            /// </summary>
+            /// <param name="controller"></param>
+            public DependencyServiceProvider(Controller controller)
+            {
+                if (controller == null)
+                    throw new ArgumentNullException("controller");
+                _Controller = controller;
+                Resolver = controller.Resolver;
+            }
+
+            /// <summary>
+            /// Get the dependency resolver.
+            /// </summary>
+            public IDependencyResolver Resolver { get; private set; }
+
+            /// <summary>
+            /// Get the service from dependency resolver.
+            /// </summary>
+            /// <param name="serviceType"></param>
+            /// <returns></returns>
+            public object GetService(Type serviceType)
+            {
+                if (typeof(Controller).IsAssignableFrom(serviceType))
+                    return _Controller;
+                else if (typeof(HttpRequestBase).IsAssignableFrom(serviceType))
+                    return _Controller.Request;
+                else if (typeof(HttpResponseBase).IsAssignableFrom(serviceType))
+                    return _Controller.Response;
+                else if (typeof(HttpServerUtilityBase).IsAssignableFrom(serviceType))
+                    return _Controller.Server;
+                return Resolver.GetService(serviceType);
+            }
         }
 
         /// <summary>
@@ -208,7 +283,7 @@ namespace System.Web.Mvc
             /// <summary>
             /// Get or set the item value.
             /// </summary>
-            public int Value { get; set; }
+            public object Value { get; set; }
         }
     }
 }

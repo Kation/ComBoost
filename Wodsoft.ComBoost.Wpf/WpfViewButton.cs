@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace System.ComponentModel
 {
-    public class WpfViewButton : EntityViewButton
+    public class WpfViewButton : IEntityViewButton
     {
         public ICommand Command { get; set; }
     }

@@ -12,8 +12,8 @@ namespace Wodsoft.ComBoost.Wpf
 {
     public class EditorPresenter : ContentControl
     {
-        public System.Data.Entity.Metadata.PropertyMetadata Metadata { get { return (System.Data.Entity.Metadata.PropertyMetadata)GetValue(MetadataProperty); } set { SetValue(MetadataProperty, value); } }
-        public static readonly DependencyProperty MetadataProperty = DependencyProperty.Register("Metadata", typeof(System.Data.Entity.Metadata.PropertyMetadata), typeof(EditorPresenter));
+        public System.Data.Entity.Metadata.ClrPropertyMetadata Metadata { get { return (System.Data.Entity.Metadata.ClrPropertyMetadata)GetValue(MetadataProperty); } set { SetValue(MetadataProperty, value); } }
+        public static readonly DependencyProperty MetadataProperty = DependencyProperty.Register("Metadata", typeof(System.Data.Entity.Metadata.ClrPropertyMetadata), typeof(EditorPresenter));
 
         public IEntity Entity { get { return (IEntity)GetValue(EntityProperty); } set { SetValue(EntityProperty, value); } }
         public static readonly DependencyProperty EntityProperty = DependencyProperty.Register("Entity", typeof(IEntity), typeof(EditorPresenter));

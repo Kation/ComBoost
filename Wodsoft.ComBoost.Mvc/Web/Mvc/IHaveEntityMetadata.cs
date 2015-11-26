@@ -10,11 +10,11 @@ namespace System.Web.Mvc
     /// <summary>
     /// Entity metadata interface.
     /// </summary>
-    public interface IEntityMetadata
+    public interface IHaveEntityMetadata
     {
         /// <summary>
         /// Get the metadata of entity.
         /// </summary>
-        EntityMetadata Metadata { get; }
+        IEntityMetadata Metadata { get; }
     }
 }

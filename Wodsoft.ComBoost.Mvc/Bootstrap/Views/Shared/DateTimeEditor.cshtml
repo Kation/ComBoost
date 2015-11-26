@@ -1,22 +1,22 @@
 ﻿@model MvcEditorModel
 <div class="input-group col-md-4" style="float:left">
-    <input type="date" class="form-control col-md-6" id="@(Model.Metadata.Property.Name)_Date" value="@(((DateTime)Model.Value).ToShortDateString())" />
+    <input type="date" class="form-control col-md-6" id="@(Model.Metadata.ClrName)_Date" value="@(((DateTime)Model.Value).ToShortDateString())" />
 </div>
-<div class="input-group col-md-4" style="float:left" id="@Model.Metadata.Property.Name">
-    <input type="number" id="@(Model.Metadata.Property.Name)_Hour" min="0" max="23" step="1" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Hours)">
+<div class="input-group col-md-4" style="float:left" id="@Model.Metadata.ClrName">
+    <input type="number" id="@(Model.Metadata.ClrName)_Hour" min="0" max="23" step="1" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Hours)">
     <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
-    <input type="number" id="@(Model.Metadata.Property.Name)_Minute" min="0" max="59" step="1" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Minutes)">
+    <input type="number" id="@(Model.Metadata.ClrName)_Minute" min="0" max="59" step="1" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Minutes)">
     <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
-    <input type="number" id="@(Model.Metadata.Property.Name)_Seconds" min="0" max="59" step="1" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Seconds)">
+    <input type="number" id="@(Model.Metadata.ClrName)_Seconds" min="0" max="59" step="1" class="form-control text-center" value="@(((DateTime)Model.Value).TimeOfDay.Seconds)">
 </div>
-<input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" value="@Model.Value" />
+<input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@Model.Value" />
 <script type="text/javascript">
     $(function () {
-        var date = $('#@(Model.Metadata.Property.Name)_Date');
-        var hour = $('#@(Model.Metadata.Property.Name)_Hour');
-        var minute = $('#@(Model.Metadata.Property.Name)_Minute');
-        var second = $('#@(Model.Metadata.Property.Name)_Seconds');
-        var hidden = $('#@(Model.Metadata.Property.Name)_Value');
+        var date = $('#@(Model.Metadata.ClrName)_Date');
+        var hour = $('#@(Model.Metadata.ClrName)_Hour');
+        var minute = $('#@(Model.Metadata.ClrName)_Minute');
+        var second = $('#@(Model.Metadata.ClrName)_Seconds');
+        var hidden = $('#@(Model.Metadata.ClrName)_Value');
         function checkNumber() {
             var number = new Number($(this).val());
             if (isNaN(number)) {
@@ -47,7 +47,7 @@
         hour.change(checkHour);
         minute.change(checkNumber);
         second.change(checkNumber);
-        $('#@Model.Metadata.Property.Name').children('input').change(change);
+        $('#@Model.Metadata.ClrName').children('input').change(change);
         date.change(change);
         date.datepicker();
     })

@@ -14,29 +14,15 @@ namespace System.Data.Entity
     /// <summary>
     /// Entity base object.
     /// </summary>
-    public abstract class EntityBase : NotifyBase, IEntity
+    public abstract class EntityBase : IEntity
     {
-        private EntityMetadata _Metadata;
-        /// <summary>
-        /// Get the metadata of entity.
-        /// </summary>
-        protected EntityMetadata Metadata
-        {
-            get
-            {
-                if (_Metadata == null)
-                    _Metadata = EntityAnalyzer.GetMetadata(GetType());
-                return _Metadata;
-            }
-        }
-        
         /// <summary>
         /// Get or set the id of entity.
         /// </summary>
         [Key]
         [Required]
         [Hide]
-        public virtual Guid Index { get { return (Guid)GetValue(); } set { SetValue(value); } }
+        public virtual Guid Index { get; set; }
 
         /// <summary>
         /// Get or set the create date of entity.
@@ -44,7 +30,7 @@ namespace System.Data.Entity
         [Required]
         [Hide]
         [Column(TypeName = "Datetime2")]
-        public virtual DateTime CreateDate { get { return (DateTime)GetValue(); } set { SetValue(value); } }
+        public virtual DateTime CreateDate { get; set; }
 
         /// <summary>
         /// Call when entity created.
@@ -90,9 +76,14 @@ namespace System.Data.Entity
         /// <returns></returns>
         public override string ToString()
         {
-            if (Metadata.DisplayProperty == null)
+            var metadata = EntityAnalyzer.GetMetadata(GetType());
+            if (metadata.DisplayProperty == null)
                 return base.ToString();
-            return Metadata.DisplayProperty.Property.GetValue(this, null).ToString();
+            object value = metadata.DisplayProperty.GetValue(this);
+            if (value == null)
+                return "";
+            else
+                return value.ToString();
         }
 
         //private ReadOnlyCollection<ValidationResult> _NoError = new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>());
@@ -103,15 +94,16 @@ namespace System.Data.Entity
         /// <returns>Collection that include error messages.</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            var metadata = EntityAnalyzer.GetMetadata(GetType());
             var result = new List<ValidationResult>();
-            foreach (var property in Metadata.Properties)
+            foreach (var property in metadata.Properties)
             {
-                validationContext.MemberName = property.Property.Name;
+                validationContext.MemberName = property.ClrName;
                 validationContext.DisplayName = property.Name;
-                var list = property.Property.GetCustomAttributes<ValidationAttribute>(true);
+                var list = property.GetAttributes<ValidationAttribute>();
                 foreach (var item in list)
                 {
-                    var r = item.GetValidationResult(property.Property.GetValue(this), validationContext);
+                    var r = item.GetValidationResult(property.GetValue(this), validationContext);
                     if (r != null && r != ValidationResult.Success)
                         result.Add(r);
                 }

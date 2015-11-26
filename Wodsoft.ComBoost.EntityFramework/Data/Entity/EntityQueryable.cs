@@ -29,7 +29,7 @@ namespace System.Data.Entity
         /// <summary>
         /// Get the metadata of entity.
         /// </summary>
-        protected EntityMetadata Metadata { get; private set; }
+        protected IEntityMetadata Metadata { get; private set; }
 
         /// <summary>
         /// Initialize entity queryable context.
@@ -356,7 +356,7 @@ namespace System.Data.Entity
             Expression equal = null;
             foreach (object parent in parents)
             {
-                var item = Expression.Equal(Expression.Property(Expression.Property(parameter, Metadata.ParentProperty.Property), typeof(TEntity).GetProperty("Index")), Expression.Constant(parent));
+                var item = Expression.Equal(Expression.Property(Expression.Property(parameter, Metadata.ParentProperty.ClrName), typeof(TEntity).GetProperty("Index")), Expression.Constant(parent));
                 if (equal == null)
                     equal = item;
                 else
@@ -487,15 +487,15 @@ namespace System.Data.Entity
             if (Metadata.SortProperty == null)
                 return queryable.OrderByDescending(t => t.CreateDate);
             var parameter = Expression.Parameter(typeof(TEntity), "t");
-            var express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(TEntity), Metadata.SortProperty.Property.PropertyType), Expression.Property(parameter, Metadata.SortProperty.Property), parameter);
+            var express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(TEntity), Metadata.SortProperty.ClrType), Expression.Property(parameter, Metadata.SortProperty.ClrName), parameter);
             if (Metadata.SortDescending)
             {
-                var method = typeof(Queryable).GetMethods().Where(t => t.Name == "OrderByDescending").ElementAt(0).MakeGenericMethod(typeof(TEntity), Metadata.SortProperty.Property.PropertyType);
+                var method = typeof(Queryable).GetMethods().Where(t => t.Name == "OrderByDescending").ElementAt(0).MakeGenericMethod(typeof(TEntity), Metadata.SortProperty.ClrType);
                 return (IOrderedQueryable<TEntity>)method.Invoke(null, new object[] { queryable, express });
             }
             else
             {
-                var method = typeof(Queryable).GetMethods().Where(t => t.Name == "OrderBy").ElementAt(0).MakeGenericMethod(typeof(TEntity), Metadata.SortProperty.Property.PropertyType);
+                var method = typeof(Queryable).GetMethods().Where(t => t.Name == "OrderBy").ElementAt(0).MakeGenericMethod(typeof(TEntity), Metadata.SortProperty.ClrType);
                 return (IOrderedQueryable<TEntity>)method.Invoke(null, new object[] { queryable, express });
             }
         }

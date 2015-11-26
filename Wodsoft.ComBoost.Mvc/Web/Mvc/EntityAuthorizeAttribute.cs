@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Routing;
+using System.Web.Security;
 
 namespace System.Web.Mvc
 {
@@ -48,7 +49,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Get the entity metadata.
         /// </summary>
-        protected EntityMetadata Metadata { get; private set; }
+        protected IEntityMetadata Metadata { get; private set; }
 
         /// <summary>
         /// When overridden, provides an entry point for custom authorization checks.
@@ -57,7 +58,7 @@ namespace System.Web.Mvc
         /// <returns>true if the user is authorized; otherwise, false.</returns>
         protected virtual bool AuthorizeCore(HttpContextBase httpContext)
         {
-            return true;
+            return httpContext.User.Identity.IsAuthenticated;
         }
 
         private bool Authorize(AuthorizationContext filterContext)
@@ -97,11 +98,15 @@ namespace System.Web.Mvc
             else
             {
                 if (!filterContext.HttpContext.User.Identity.IsAuthenticated)
-                    filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl);
+
+                    if (filterContext.RouteData.DataTokens["loginUrl"] == null)
+                        filterContext.Result = new RedirectResult(ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
+                    else
+                        filterContext.Result = new RedirectResult(filterContext.RouteData.DataTokens["loginUrl"].ToString() + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
                 return;
             }
-            if (filterContext.Controller is IEntityMetadata)
-                Metadata = ((IEntityMetadata)filterContext.Controller).Metadata;
+            if (filterContext.Controller is IHaveEntityMetadata)
+                Metadata = ((IHaveEntityMetadata)filterContext.Controller).Metadata;
             RouteData = filterContext.RouteData;
 
             if (!Authorize(filterContext))
@@ -110,7 +115,7 @@ namespace System.Web.Mvc
                     filterContext.Result = new HttpUnauthorizedResult();
                 else
                     if (filterContext.RouteData.DataTokens["loginUrl"] == null)
-                        filterContext.Result = new RedirectResult(System.Web.Security.ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
+                        filterContext.Result = new RedirectResult(ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
                     else
                         filterContext.Result = new RedirectResult(filterContext.RouteData.DataTokens["loginUrl"].ToString() + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
             }

@@ -29,12 +29,12 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the parent selected.
         /// </summary>
-        public bool Selected { get; set; }
+        public bool IsSelected { get; set; }
 
         /// <summary>
         /// Get or set the parent tree opened.
         /// </summary>
-        public bool Opened { get; set; }
+        public bool IsOpened { get; set; }
 
         /// <summary>
         /// Get or set the subtree of parent models.

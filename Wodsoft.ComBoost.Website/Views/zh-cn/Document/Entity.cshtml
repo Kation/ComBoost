@@ -113,6 +113,7 @@ public virtual string Phone { get; set; }
             <h3 id="property-HideAttribute">HideAttribute<small>隐藏字段</small></h3>
             <p>该特性用于隐藏属性不被显示。</p>
             <p><code>IsHiddenOnView</code>该属性为<code>true</code>时，属性将不被显示于列表，默认为<code>true</code>。</p>
+            <p><code>IsHiddenOnCreate</code>该属性为<code>true</code>时，属性在编辑时将不被显示，默认为<code>true</code>。</p>
             <p><code>IsHiddenOnEdit</code>该属性为<code>true</code>时，属性在编辑时将不被显示，默认为<code>true</code>。</p>
             <p><code>IsHiddenOnDetail</code>该属性为<code>true</code>时，属性在详情页将不被显示，默认为<code>IsHiddenOnView</code>与<code>IsHiddenOnEdit</code>的与运算。</p>
 <pre>
@@ -147,7 +148,13 @@ public virtual string Name { get; set; }
 </pre>
             <p>该特性不会影响数据库字段。</p>
             <h3 id="property-PropertyAuthenticationAttribute">PropertyAuthenticationAttribute<small>权限</small></h3>
-            Todo
+            <p>该特性用于设置实体访问权限。</p>
+<pre>
+[PropertyAuthentication(AllowAnonymous = false, 
+                        ViewRolesRequired = new string[]{ "Admin" }),
+                        EditRolesRequired = new string[]{ "Admin" }))]
+public virtual string Name { get; set; }
+</pre>
             <h3 id="property-RangeAttribute">RangeAttribute<small>范围</small></h3>
             <p>该特性用于设定属性值的范围，一般用于数字类型属性。</p>
 <pre>

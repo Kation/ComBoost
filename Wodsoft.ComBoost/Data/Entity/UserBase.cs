@@ -14,11 +14,11 @@ namespace System.Data.Entity
         /// <summary>
         /// Get or set the sha1 hashed password.
         /// </summary>
-        [Hide(IsHiddenOnEdit = false, IsHiddenOnDetail = true)]
+        [Hide(IsHiddenOnEdit = false, IsHiddenOnCreate = false, IsHiddenOnDetail = true)]
         [Required]
         [CustomDataType(CustomDataType.Password)]
         [MaxLength(20)]
-        public virtual byte[] Password { get { return (byte[])GetValue(); } set { SetValue(value); } }
+        public virtual byte[] Password { get; set; }
 
         /// <summary>
         /// Get or set the salt data for password.
@@ -26,13 +26,13 @@ namespace System.Data.Entity
         [MaxLength(6)]
         [Hide]
         [Required]
-        public virtual byte[] Salt { get { return (byte[])GetValue(); } set { SetValue(value); } }
+        public virtual byte[] Salt { get; set; }
 
         /// <summary>
         /// Set a new password.
         /// </summary>
         /// <param name="password">New password.</param>
-        public void SetPassword(string password)
+        public virtual void SetPassword(string password)
         {
             Random rnd = new Random();
             Salt = new byte[6];
@@ -48,7 +48,7 @@ namespace System.Data.Entity
         /// </summary>
         /// <param name="password">Password to verify.</param>
         /// <returns>Return true if equal.</returns>
-        public bool VerifyPassword(string password)
+        public virtual bool VerifyPassword(string password)
         {
             using (var sha = System.Security.Cryptography.SHA1.Create())
             {

@@ -1,4 +1,4 @@
-﻿@model EntityEditModel
+﻿@model IEntityEditModel
 @{
     ViewBag.Title = Model.Metadata.Name + " Detail";
     object area = ViewContext.RouteData.DataTokens["Area"];
@@ -30,7 +30,7 @@
                     {
                         <div class="row">
                             <label class="span2 text-right">@Model.Properties[i].Name</label>
-                            <label class="span10">@EntityValueConverter.GetConverter(Model.Properties[i]).ConvertToString(Model.Properties[i].Property.GetValue(Model.Item))</label>
+                            <label class="span10">@EntityValueConverter.GetConverter(Model.Properties[i]).ConvertToString(Model.Properties[i].GetValue(Model.Item))</label>
                         </div>
                     }
                     <div class="row text-center">

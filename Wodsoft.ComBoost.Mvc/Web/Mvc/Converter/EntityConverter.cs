@@ -53,7 +53,7 @@ namespace System.Web.Mvc.Converter
             Guid id;
             if (!Guid.TryParse((string)value, out id))
                 return null;
-            dynamic queryable = context.GetService(typeof(IEntityQueryable<>).MakeGenericType(((EntityValueConverterContext)context).Property.Property.PropertyType));
+            dynamic queryable = context.GetService(typeof(IEntityQueryable<>).MakeGenericType(((EntityValueConverterContext)context).Property.ClrType));
             return queryable.GetEntity(id);
         }
 

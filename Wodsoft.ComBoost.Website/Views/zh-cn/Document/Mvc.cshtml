@@ -86,7 +86,7 @@ public ActionResult Index()
             <p>当<code>search</code>为<code>true</code>时，控制器会获取以<code>Search.</code>开头的客户端Query参数。</p>
             <p>获取后进行处理得到搜索结果。</p>
             <h4>视图模型</h4>
-            <p>该方法返回的视图模型为<code>EntityViewModel&lt;TEntity&gt;</code>，页面视图一般不需要知道泛型类型，只需要使用<code>EntityViewModel</code>类型模型即可。</p>
+            <p>该方法返回的视图模型为<code>IEntityViewModel&lt;TEntity&gt;</code>，页面视图一般不需要知道泛型类型，只需要使用<code>IEntityViewModel</code>类型模型即可。</p>
             <p>该视图模型包含属性：</p>
             <ul>
                 <li>
@@ -127,7 +127,7 @@ public ActionResult Index()
                 </li>
             </ul>
             <h4>重写</h4>
-            <p>您可以从基类获得<code>ActionResult</code>，并从<code>Model</code>属性获取<code>EntityViewModel&lt;TEntity&gt;</code>视图模型。</p>
+            <p>您可以从基类获得<code>ActionResult</code>，并从<code>Model</code>属性获取<code>IEntityViewModel&lt;TEntity&gt;</code>视图模型。</p>
             <p>获取视图模型后您可以修改该模型达到您想要的功能。</p>
 <pre>
 public override ActionResult Index(int page = 1, int size = 20, string parentpath = null, Guid? parentid = null, bool search = false)

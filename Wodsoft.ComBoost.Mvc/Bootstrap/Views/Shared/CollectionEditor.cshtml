@@ -1,27 +1,27 @@
 ﻿@model MvcEditorModel
 <div class="input-group col-md-6" style="float: left">
-    <select id="@Model.Metadata.Property.Name" multiple="multiple" class="form-control" style="height: 88px; padding-right: 12px;">
+    <select id="@Model.Metadata.ClrName" multiple="multiple" class="form-control" style="height: 88px; padding-right: 12px;">
         @foreach (System.Data.Entity.EntityBase v in (System.Collections.IEnumerable)Model.Value)
         {
             <option value="@v.Index">@v</option>
         }
     </select>
-    <input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" value="@(string.Join(",",((System.Collections.IEnumerable)Model.Value).Cast<System.Data.Entity.IEntity>().Select(t=>t. Index).ToArray()))" />
+    <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@(string.Join(",",((System.Collections.IEnumerable)Model.Value).Cast<System.Data.Entity.IEntity>().Select(t=>t. Index).ToArray()))" />
 </div>
 <div class="col-md-2">
     <div class="btn-group-vertical">
-        <button id="@(Model.Metadata.Property.Name)_Add" type="button" class="btn btn-default btn-sm">Add</button>
-        <button id="@(Model.Metadata.Property.Name)_Remove" disabled="disabled" type="button" class="btn btn-default btn-sm">Remove</button>
-        <button id="@(Model.Metadata.Property.Name)_Clear" type="button" class="btn btn-default btn-sm">Clear</button>
+        <button id="@(Model.Metadata.ClrName)_Add" type="button" class="btn btn-default btn-sm">Add</button>
+        <button id="@(Model.Metadata.ClrName)_Remove" disabled="disabled" type="button" class="btn btn-default btn-sm">Remove</button>
+        <button id="@(Model.Metadata.ClrName)_Clear" type="button" class="btn btn-default btn-sm">Clear</button>
     </div>
 </div>
 <script type="text/javascript">
     $(function () {
-        var select = $('#@Model.Metadata.Property.Name');
-        var add = $('#@(Model.Metadata.Property.Name)_Add');
-        var remove = $('#@(Model.Metadata.Property.Name)_Remove');
-        var clear = $('#@(Model.Metadata.Property.Name)_Clear');
-        var value = $('#@(Model.Metadata.Property.Name)_Value');
+        var select = $('#@Model.Metadata.ClrName');
+        var add = $('#@(Model.Metadata.ClrName)_Add');
+        var remove = $('#@(Model.Metadata.ClrName)_Remove');
+        var clear = $('#@(Model.Metadata.ClrName)_Clear');
+        var value = $('#@(Model.Metadata.ClrName)_Value');
         select.change(function () {
             if (select.val() != '')
                 remove.removeAttr('disabled');
@@ -39,20 +39,36 @@
             value.val('');
         });
         add.click(function () {
-            var result = window.showModalDialog('@Url.RouteUrl(new { controller = Model.Metadata.Property.PropertyType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
-                null,
-                'dialogHeight:720px;dialogWidth:1024px');
-            if (result == undefined)
-                result = window.returnValue;
-            if (result == null)
-                return;
-            for (var x in result) {
-                var item = $(result[x]);
-                if (select.children('[value=' + item.val() + ']').length > 0)
+            if (window.showModalDialog != undefined) {
+                var result = window.showModalDialog('@Url.RouteUrl(new { controller = Model.Metadata.ClrType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
+                    null,
+                    'dialogHeight:720px;dialogWidth:1024px');
+                if (result == undefined)
+                    result = window.returnValue;
+                if (result == null)
                     return;
-                select.append(item);
+                for (var x in result) {
+                    var item = $(result[x]);
+                    if (select.children('[value=' + item.val() + ']').length > 0)
+                        return;
+                    select.append(item);
+                }
+                update();
             }
-            update();
+            else {
+                window.open('@Url.RouteUrl(new { controller = Model.Metadata.ClrType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
+                            null,
+                            'dialog=1,modal=1,location=0,menubar=0,resizable=0,scrollbars=0,status=0,toolbar=0,height=720,width=1024')
+            }
+            window.selectCompleted = function (result) {
+                for (var x in result) {
+                    var item = $(result[x]);
+                    if (select.children('[value=' + item.val() + ']').length > 0)
+                        return;
+                    select.append(item);
+                }
+                update();
+            }
         });
         function update() {
             var val = '';

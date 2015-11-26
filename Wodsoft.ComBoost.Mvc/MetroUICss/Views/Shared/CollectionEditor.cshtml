@@ -1,25 +1,25 @@
 ﻿@model MvcEditorModel
 <div class="input-control select size4 place-left">
-    <select id="@Model.Metadata.Property.Name" multiple="multiple" style="height: 78px">
+    <select id="@Model.Metadata.ClrName" multiple="multiple" style="height: 78px">
         @foreach (System.Data.Entity.EntityBase v in (System.Collections.IEnumerable)Model.Value)
         {
             <option value="@v.Index">@v</option>
         }
     </select>
-    <input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" value="@(string.Join(",",((System.Collections.IEnumerable)Model.Value).Cast<System.Data.Entity.IEntity>().Select(t=>t. Index).ToArray()))" />
+    <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@(string.Join(",",((System.Collections.IEnumerable)Model.Value).Cast<System.Data.Entity.IEntity>().Select(t=>t. Index).ToArray()))" />
 </div>
 <div class="pos-rel inline-block size2">    
-    <button id="@(Model.Metadata.Property.Name)_Add" type="button" class="size2 place-left">Add</button>
-    <button id="@(Model.Metadata.Property.Name)_Remove" disabled="disabled" type="button" class="size2 place-left">Remove</button>
-    <button id="@(Model.Metadata.Property.Name)_Clear" type="button" class="size2 place-left">Clear</button>
+    <button id="@(Model.Metadata.ClrName)_Add" type="button" class="size2 place-left">Add</button>
+    <button id="@(Model.Metadata.ClrName)_Remove" disabled="disabled" type="button" class="size2 place-left">Remove</button>
+    <button id="@(Model.Metadata.ClrName)_Clear" type="button" class="size2 place-left">Clear</button>
 </div>
 <script type="text/javascript">
     $(function () {
-        var select = $('#@Model.Metadata.Property.Name');
-        var add = $('#@(Model.Metadata.Property.Name)_Add');
-        var remove = $('#@(Model.Metadata.Property.Name)_Remove');
-        var clear = $('#@(Model.Metadata.Property.Name)_Clear');
-        var value = $('#@(Model.Metadata.Property.Name)_Value');
+        var select = $('#@Model.Metadata.ClrName');
+        var add = $('#@(Model.Metadata.ClrName)_Add');
+        var remove = $('#@(Model.Metadata.ClrName)_Remove');
+        var clear = $('#@(Model.Metadata.ClrName)_Clear');
+        var value = $('#@(Model.Metadata.ClrName)_Value');
         select.change(function () {
             if (select.val() != '')
                 remove.removeAttr('disabled');
@@ -64,7 +64,7 @@
         add.click(function () {
             $.ajax({
                 cache: false,
-                url: '@Url.RouteUrl(new { controller = Model.Metadata.Property.PropertyType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
+                url: '@Url.RouteUrl(new { controller = Model.Metadata.ClrType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
                 error: function (result) {
                     if (result.status == 404)
                         $.Dialog({

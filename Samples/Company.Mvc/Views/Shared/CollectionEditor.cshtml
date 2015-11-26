@@ -1,27 +1,27 @@
 ﻿@model MvcEditorModel
 <div class="input-group col-md-6" style="float: left">
-    <select id="@Model.Metadata.Property.Name" multiple="multiple" class="form-control" style="height: 88px; padding-right: 12px;">
+    <select id="@Model.Metadata.ClrName" multiple="multiple" class="form-control" style="height: 88px; padding-right: 12px;">
         @foreach (System.Data.Entity.EntityBase v in (System.Collections.IEnumerable)Model.Value)
         {
             <option value="@v.Index">@v</option>
         }
     </select>
-    <input type="hidden" id="@(Model.Metadata.Property.Name)_Value" name="@Model.Metadata.Property.Name" />
+    <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@(string.Join(",",((System.Collections.IEnumerable)Model.Value).Cast<System.Data.Entity.IEntity>().Select(t=>t. Index).ToArray()))" />
 </div>
 <div class="col-md-2">
     <div class="btn-group-vertical">
-        <button id="@(Model.Metadata.Property.Name)_Add" type="button" class="btn btn-default btn-sm">Add</button>
-        <button id="@(Model.Metadata.Property.Name)_Remove" disabled="disabled" type="button" class="btn btn-default btn-sm">Remove</button>
-        <button id="@(Model.Metadata.Property.Name)_Clear" type="button" class="btn btn-default btn-sm">Clear</button>
+        <button id="@(Model.Metadata.ClrName)_Add" type="button" class="btn btn-default btn-sm">Add</button>
+        <button id="@(Model.Metadata.ClrName)_Remove" disabled="disabled" type="button" class="btn btn-default btn-sm">Remove</button>
+        <button id="@(Model.Metadata.ClrName)_Clear" type="button" class="btn btn-default btn-sm">Clear</button>
     </div>
 </div>
 <script type="text/javascript">
     $(function () {
-        var select = $('#@Model.Metadata.Property.Name');
-        var add = $('#@(Model.Metadata.Property.Name)_Add');
-        var remove = $('#@(Model.Metadata.Property.Name)_Remove');
-        var clear = $('#@(Model.Metadata.Property.Name)_Clear');
-        var value = $('#@(Model.Metadata.Property.Name)_Value');
+        var select = $('#@Model.Metadata.ClrName');
+        var add = $('#@(Model.Metadata.ClrName)_Add');
+        var remove = $('#@(Model.Metadata.ClrName)_Remove');
+        var clear = $('#@(Model.Metadata.ClrName)_Clear');
+        var value = $('#@(Model.Metadata.ClrName)_Value');
         select.change(function () {
             if (select.val() != '')
                 remove.removeAttr('disabled');
@@ -38,86 +38,37 @@
             select.empty();
             value.val('');
         });
-        function initSelector(result) {
-            //result = $(result);
-            result.find('[data-nav=true]').each(function (index, element) {
-                element = $(element);
-                element.attr('data-href', element.attr('href'));
-                element.click(function () {
-                    $.ajax({
-                        cache: false,
-                        url: $(this).attr('data-href'),
-                        success: function (result) {
-                            result = $(result);
-                            initSelector(result);
-                            $('#dialogContent').html(result);
-                        }
-                    });
-                });
-                element.removeAttr('href');
-            });
-            var tree = result.find('#selectorparentview');
-            tree.find('[data-nav=true]').each(function (index, element) {
-                element = $(element);
-                element.attr('href', element.attr('data-href'));
-                element.removeAttr('data-href');
-            });
-            if (tree.length > 0) {
-                $(tree[0]).bind('select_node.jstree', function (node, selected) {
-                    $.ajax({
-                        cache: false,
-                        url: selected.node.a_attr.href,
-                        success: function (result) {
-                            result = $(result);
-                            initSelector(result);
-                            $('#dialogContent').html(result);
-                        }
-                    });
-                });
-                $(tree[0]).jstree();
-            }
-            result.find('#checkAll').click(function () {
-                var r = this.checked;
-                result.find(':checkbox[value]').each(function (index, element) {
-                    element.checked = r;
-                });
-
-            });
-        }
         add.click(function () {
-            $.ajax({
-                cache: false,
-                url: '@Url.RouteUrl(new { controller = Model.Metadata.Property.PropertyType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
-                error: function (result) {
-                    if (result.status == 404)
-                        dialog('There is some errors', '<p>Can not found the selector.</p>', function () { $('#dialog').modal('hide'); });
-                    else
-                        dialog('There is some errors', '<p>Site throw unexpected errors.</p>', function () { $('#dialog').modal('hide'); });
-                },
-                success: function (result) {
-                    result = $(result);
-                    initSelector(result);
-                    dialog('@(Model.Metadata.Name) multiple selector dialog', result, function () {
-                        var radios = $('#dialog').find(':checked[value]');
-                        if (radios.length == 0) {
-                            alert('Please select at least one.');
-                            return;
-                        }
-                        radios.each(function (index, element) {
-                            element = $(element);
-                            var id = element.val();
-                            if (select.children('[value=' + id + ']').length > 0)
-                                return;
-                            var name = element.attr('data-name');
-                            var option = $('<option></option>');
-                            option.html(name);
-                            option.val(id);
-                            select.append(option);
-                        });
-                        $('#dialog').modal('hide');
-                    });
+            if (window.showModalDialog != undefined) {
+                var result = window.showModalDialog('@Url.RouteUrl(new { controller = Model.Metadata.ClrType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
+                    null,
+                    'dialogHeight:720px;dialogWidth:1024px');
+                if (result == undefined)
+                    result = window.returnValue;
+                if (result == null)
+                    return;
+                for (var x in result) {
+                    var item = $(result[x]);
+                    if (select.children('[value=' + item.val() + ']').length > 0)
+                        return;
+                    select.append(item);
                 }
-            })
+                update();
+            }
+            else {
+                window.open('@Url.RouteUrl(new { controller = Model.Metadata.ClrType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
+                            null,
+                            'dialog=1,modal=1,location=0,menubar=0,resizable=0,scrollbars=0,status=0,toolbar=0,height=720,width=1024')
+            }
+            window.selectCompleted = function (result) {
+                for (var x in result) {
+                    var item = $(result[x]);
+                    if (select.children('[value=' + item.val() + ']').length > 0)
+                        return;
+                    select.append(item);
+                }
+                update();
+            }
         });
         function update() {
             var val = '';

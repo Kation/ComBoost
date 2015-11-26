@@ -11,6 +11,7 @@ namespace Company.Entity
 {
     [DisplayName("员工组")]
     [DisplayColumn("Name")]
+    [Parent(typeof(EmployeeGroup), "Parent")]
     [EntityAuthentication(AllowAnonymous = false, ViewRolesRequired = new string[] { "Admin" })]
     public class EmployeeGroup : EntityBase
     {
@@ -21,6 +22,9 @@ namespace Company.Entity
         [Display(Name = "员工组权限", Order = 10)]
         [Required]
         public virtual EmployeePower Power { get; set; }
+
+        [Display(Name = "上级组", Order = 20)]
+        public virtual EmployeeGroup Parent { get; set; }
 
         [Hide]
         public virtual ICollection<Employee> Employees { get; set; }

@@ -1,4 +1,4 @@
-﻿@model EntityEditModel
+﻿@model IEntityEditModel
 @{
     ViewBag.Title = (Model.Item.Index == Guid.Empty ? "Create " : "Edit ") + Model.Metadata.Name;
     object area = ViewContext.RouteData.DataTokens["Area"];
@@ -44,12 +44,12 @@
     </div>
     <div class="panel-body">
         <form id="form" class="form-horizontal" role="form" action="@Url.Action("Update")" method="post">
-            @for (int i = 0; i < Model.Properties.Length; i++)
+            @foreach(var property in Model.Properties)
             {
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">@Model.Properties[i].Name</label>
+                    <label class="col-sm-2 control-label">@property.Name</label>
                     <div class="col-sm-8">
-                        @{Html.Editor(Model.Properties[i], Model.Properties[i].Property.GetValue(Model.Item));}
+                        @Html.Editor(property, property.GetValue(Model.Item))
                     </div>
                 </div>
             }

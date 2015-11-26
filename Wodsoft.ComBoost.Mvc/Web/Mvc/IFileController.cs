@@ -20,6 +20,6 @@ namespace System.Web.Mvc
         /// <param name="entity">Entity object.</param>
         /// <param name="metadata">Property metadata.</param>
         /// <param name="file">File base.</param>
-        Task SaveFileToProperty(TEntity entity, PropertyMetadata metadata, HttpPostedFileBase file);
+        Task SaveFileToProperty(TEntity entity, IPropertyMetadata metadata, HttpPostedFileBase file);
     }
 }

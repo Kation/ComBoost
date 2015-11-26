@@ -17,6 +17,8 @@ namespace System.ComponentModel.DataAnnotations
         public PropertyAuthenticationAttribute()
         {
             AllowAnonymous = true;
+            EditRolesRequired = new string[0];
+            ViewRolesRequired = new string[0];
         }
 
         /// <summary>

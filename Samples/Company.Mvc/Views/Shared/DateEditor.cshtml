@@ -1,7 +1,10 @@
 ﻿@model MvcEditorModel
+@{
+    DateTime? value = Model.Value as DateTime?;
+}
 <div class="input-group col-md-4">
-    <input type="date" class="form-control" id="@Model.Metadata.Property.Name" name="@Model.Metadata.Property.Name" value="@(((DateTime)Model.Value).ToShortDateString())" />
+    <input type="date" class="form-control" id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" value="@(value.HasValue ? value.Value.ToLongDateString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")/>
 </div>
 <script type="text/javascript">
-    $('#@Model.Metadata.Property.Name').datepicker();
+    $('#@Model.Metadata.ClrName').datepicker();
 </script>
