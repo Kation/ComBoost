@@ -67,6 +67,28 @@ namespace System.ComponentModel
         /// Get the search items.
         /// </summary>
         EntitySearchItem[] SearchItem { get; }
+
+        /// <summary>
+        /// Set the current page.
+        /// </summary>
+        /// <param name="page">Page to navigate.</param>
+        void SetPage(int page);
+        
+        /// <summary>
+        /// Set the items per page.
+        /// </summary>
+        /// <param name="size">A number that how many items show on page.</param>
+        void SetSize(int size);
+
+        /// <summary>
+        /// Update total page.
+        /// </summary>
+        void UpdateTotalPage();
+
+        /// <summary>
+        /// Update items of current page.
+        /// </summary>
+        void UpdateItems();
     }
 
     /// <summary>
