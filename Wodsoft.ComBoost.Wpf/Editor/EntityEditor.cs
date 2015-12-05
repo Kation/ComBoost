@@ -38,10 +38,16 @@ namespace Wodsoft.ComBoost.Wpf.Editor
             TextBox.SetBinding(TextBox.TextProperty, new Binding { Source = this, Path = new PropertyPath(CurrentValueProperty), Mode = BindingMode.OneWay });
         }
 
-        private void SelectEntity(IEntity entity)
+        private async void SelectEntity(IEntity entity)
         {
-            //Editor.Controller
+            dynamic controller = EntityRouter.Routers.GetController(Metadata.ClrType);
+            EntitySelector selector = await controller.GetSelector();
+            if (selector.ShowDialog() == true)
+            {
+                CurrentValue = selector.SelectedEntity;
+            }
         }
+
         private void ClearEntity(IEntity entity)
         {
             CurrentValue = null;
