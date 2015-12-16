@@ -61,7 +61,7 @@ namespace Wodsoft.ComBoost.Wpf
                         });
                         if (result == true)
                         {
-                            await EntityQueryable.AddAsync(item);
+                            await Update(item);
                             model.UpdateTotalPage();
                             model.Items = model.Items.Concat(new TEntity[] { item }).ToArray();
                         }
@@ -89,7 +89,7 @@ namespace Wodsoft.ComBoost.Wpf
                         });
                         if (result == true)
                         {
-                            await EntityQueryable.EditAsync(item);
+                            await Update(item);
                         }
                         viewer.Dispatcher.Invoke(() =>
                         {
@@ -149,6 +149,14 @@ namespace Wodsoft.ComBoost.Wpf
                 model.Properties = Metadata.EditProperties;
                 return model;
             });
+        }
+
+        public virtual async Task<bool> Update(TEntity entity)
+        {
+            if (entity.Index == Guid.Empty)
+                return await EntityQueryable.AddAsync(entity);
+            else
+                return await EntityQueryable.EditAsync(entity);
         }
 
         public virtual async Task<EntitySelector> GetSelector()
