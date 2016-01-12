@@ -65,7 +65,7 @@ namespace System.Data.Entity
         /// </summary>
         /// <param name="role">Role name.</param>
         /// <returns>true if user is member of this role.</returns>
-        public virtual bool IsInRole(string role)
+        public virtual bool IsInRole(object role)
         {
             return true;
         }

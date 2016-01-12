@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -84,22 +85,27 @@ namespace System.Data.Entity.Metadata
         /// <summary>
         /// Get the roles to view entity.
         /// </summary>
-        IEnumerable<string> ViewRoles { get; }
+        IEnumerable<object> ViewRoles { get; }
 
         /// <summary>
         /// Get the roles to add entity.
         /// </summary>
-        IEnumerable<string> AddRoles { get; }
+        IEnumerable<object> AddRoles { get; }
 
         /// <summary>
         /// Get the roles to edit entity.
         /// </summary>
-        IEnumerable<string> EditRoles { get; }
+        IEnumerable<object> EditRoles { get; }
 
         /// <summary>
         /// Get the roles to remove entity.
         /// </summary>
-        IEnumerable<string> RemoveRoles { get; }
+        IEnumerable<object> RemoveRoles { get; }
+
+        /// <summary>
+        /// Get the authentication required mode.
+        /// </summary>
+        AuthenticationRequiredMode AuthenticationRequiredMode { get; }
 
         /// <summary>
         /// Get the property of entity.

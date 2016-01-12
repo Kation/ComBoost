@@ -40,6 +40,15 @@ namespace System.Data.Entity
         /// <returns>Return enumerable data.</returns>
         IEnumerable<T> Query<T>(string sql, params object[] parameters);
 
+        ///// <summary>
+        ///// Get data by sql query.
+        ///// </summary>
+        ///// <typeparam name="T">Type of result.</typeparam>
+        ///// <param name="sql">Sql query.</param>
+        ///// <param name="parameters">Query parameters.</param>
+        ///// <returns>Return enumerable data.</returns>
+        //T Execute<T>(string sql, params object[] parameters);
+
         /// <summary>
         /// Get support entity types array.
         /// </summary>

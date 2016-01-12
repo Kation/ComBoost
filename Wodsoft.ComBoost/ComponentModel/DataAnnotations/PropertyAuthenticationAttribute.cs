@@ -19,7 +19,13 @@ namespace System.ComponentModel.DataAnnotations
             AllowAnonymous = true;
             EditRolesRequired = new string[0];
             ViewRolesRequired = new string[0];
+            Mode = AuthenticationRequiredMode.All;
         }
+
+        /// <summary>
+        /// Get or set the authentication required mode.
+        /// </summary>
+        public AuthenticationRequiredMode Mode { get; set; }
 
         /// <summary>
         /// Get or set the property allow anonymous view.
@@ -29,11 +35,11 @@ namespace System.ComponentModel.DataAnnotations
         /// <summary>
         /// Get or set the roles to edit.
         /// </summary>
-        public string[] EditRolesRequired { get; set; }
+        public object[] EditRolesRequired { get; set; }
 
         /// <summary>
         /// Get or set the roles to view.
         /// </summary>
-        public string[] ViewRolesRequired { get; set; }
+        public object[] ViewRolesRequired { get; set; }
     }
 }

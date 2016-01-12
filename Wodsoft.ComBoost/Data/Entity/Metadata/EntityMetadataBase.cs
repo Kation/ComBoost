@@ -120,22 +120,27 @@ namespace System.Data.Entity.Metadata
         /// <summary>
         /// Get roles to view entity.
         /// </summary>
-        public IEnumerable<string> ViewRoles { get; protected set; }
+        public IEnumerable<object> ViewRoles { get; protected set; }
 
         /// <summary>
         /// Get roles to add entity.
         /// </summary>
-        public IEnumerable<string> AddRoles { get; protected set; }
+        public IEnumerable<object> AddRoles { get; protected set; }
 
         /// <summary>
         /// Get roles to edit entity.
         /// </summary>
-        public IEnumerable<string> EditRoles { get; protected set; }
+        public IEnumerable<object> EditRoles { get; protected set; }
 
         /// <summary>
         /// Get roles to remove entity.
         /// </summary>
-        public IEnumerable<string> RemoveRoles { get; protected set; }
+        public IEnumerable<object> RemoveRoles { get; protected set; }
+
+        /// <summary>
+        /// Get the authentication required mode.
+        /// </summary>
+        public AuthenticationRequiredMode AuthenticationRequiredMode { get; protected set; }
 
         /// <summary>
         /// Get the cache of properties.
@@ -224,10 +229,11 @@ namespace System.Data.Entity.Metadata
             if (authentication == null)
                 throw new ArgumentNullException("authentication");
             AllowAnonymous = authentication.AllowAnonymous;
-            AddRoles = new ReadOnlyCollection<string>(authentication.AddRolesRequired);
-            EditRoles = new ReadOnlyCollection<string>(authentication.EditRolesRequired);
-            ViewRoles = new ReadOnlyCollection<string>(authentication.ViewRolesRequired);
-            RemoveRoles = new ReadOnlyCollection<string>(authentication.RemoveRolesRequired);
+            AddRoles = new ReadOnlyCollection<object>(authentication.AddRolesRequired);
+            EditRoles = new ReadOnlyCollection<object>(authentication.EditRolesRequired);
+            ViewRoles = new ReadOnlyCollection<object>(authentication.ViewRolesRequired);
+            RemoveRoles = new ReadOnlyCollection<object>(authentication.RemoveRolesRequired);
+            AuthenticationRequiredMode = authentication.Mode;
         }
 
         /// <summary>

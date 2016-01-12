@@ -16,6 +16,6 @@ namespace System.Data.Entity
         /// </summary>
         /// <param name="role">Role name.</param>
         /// <returns>true if user is member of this role.</returns>
-        bool IsInRole(string role);
+        bool IsInRole(object role);
     }
 }
