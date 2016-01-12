@@ -114,6 +114,22 @@ namespace System.Web.Security
                 return false;
             return RoleEntity.IsInRole(role);
         }
+
+        /// <summary>
+        /// Determines whether the current principal belongs to the specified role.
+        /// </summary>
+        /// <param name="role">Role.</param>
+        /// <returns></returns>
+        public bool IsInRole(object role)
+        {
+            if (!OriginPrincipal.Identity.IsAuthenticated)
+                return false;
+            if (Resolver == null)
+                throw new NotSupportedException("Resolver is null.");
+            if (RoleEntity == null)
+                return false;
+            return RoleEntity.IsInRole(role);
+        }
     }
 
     /// <summary>

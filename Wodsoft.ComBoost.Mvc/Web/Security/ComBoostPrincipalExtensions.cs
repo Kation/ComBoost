@@ -40,5 +40,19 @@ namespace System.Web.Security
             TUser roleEntity = principal.RoleEntity as TUser;
             return roleEntity;
         }
+
+        /// <summary>
+        /// Determines whether the current principal belongs to the specified role.
+        /// </summary>
+        /// <param name="principal">Comboost principal.</param>
+        /// <param name="role">Role.</param>
+        /// <returns></returns>
+        public static bool IsInRole(this IPrincipal principal, object role)
+        {
+            ComBoostPrincipal item = principal as ComBoostPrincipal;
+            if (item == null)
+                throw new NotSupportedException("Only support with comboost principal.");
+            return item.IsInRole(role);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Data.Entity.Metadata;
 using System.Linq;
@@ -25,11 +26,33 @@ namespace System.Web.Mvc
         /// <summary>
         /// Initialize entity authorize attribute.
         /// </summary>
+        /// <param name="mode">Custom authorize mode.</param>
+        /// <param name="roles">Custom authorize roles.</param>
+        public EntityAuthorizeAttribute(AuthenticationRequiredMode mode, params object[] roles)
+            : this(EntityAuthorizeAction.None)
+        {
+            CustomRolesRequiredMode = mode;
+            CustomRoles = roles;
+        }
+
+        /// <summary>
+        /// Initialize entity authorize attribute.
+        /// </summary>
         /// <param name="action">Action of entity authorize.</param>
         public EntityAuthorizeAttribute(EntityAuthorizeAction action)
         {
             Action = action;
         }
+
+        /// <summary>
+        /// Get the custom authorize mode.
+        /// </summary>
+        public AuthenticationRequiredMode CustomRolesRequiredMode { get; private set; }
+
+        /// <summary>
+        /// Get the custom authorize roles.
+        /// </summary>
+        public object[] CustomRoles { get; private set; }
 
         /// <summary>
         /// Get the action of entity authorize.
@@ -58,33 +81,43 @@ namespace System.Web.Mvc
         /// <returns>true if the user is authorized; otherwise, false.</returns>
         protected virtual bool AuthorizeCore(HttpContextBase httpContext)
         {
-            return httpContext.User.Identity.IsAuthenticated;
-        }
-
-        private bool Authorize(AuthorizationContext filterContext)
-        {
             if (Metadata != null)
             {
-                if (!Metadata.AllowAnonymous && !filterContext.RequestContext.HttpContext.User.Identity.IsAuthenticated)
+                if (!Metadata.AllowAnonymous && !httpContext.User.Identity.IsAuthenticated)
                     return false;
                 switch (Action)
                 {
                     case EntityAuthorizeAction.Create:
-                        return Metadata.AddRoles.All(t => filterContext.RequestContext.HttpContext.User.IsInRole(t));
+                        return Metadata.AddRoles.Count() == 0 ||
+                            Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ? 
+                            Metadata.AddRoles.All(t => httpContext.User.IsInRole(t)) :
+                            Metadata.AddRoles.Any(t => httpContext.User.IsInRole(t));
                     case EntityAuthorizeAction.Edit:
-                        return Metadata.EditRoles.All(t => filterContext.RequestContext.HttpContext.User.IsInRole(t));
+                        return Metadata.EditRoles.Count() == 0 ||
+                            Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
+                            Metadata.EditRoles.All(t => httpContext.User.IsInRole(t)) :
+                            Metadata.EditRoles.Any(t => httpContext.User.IsInRole(t));
                     case EntityAuthorizeAction.Remove:
-                        return Metadata.RemoveRoles.All(t => filterContext.RequestContext.HttpContext.User.IsInRole(t));
+                        return Metadata.RemoveRoles.Count() == 0 ||
+                            Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
+                            Metadata.RemoveRoles.All(t => httpContext.User.IsInRole(t)) :
+                            Metadata.RemoveRoles.Any(t => httpContext.User.IsInRole(t));
                     case EntityAuthorizeAction.View:
-                        return Metadata.ViewRoles.All(t => filterContext.RequestContext.HttpContext.User.IsInRole(t));
+                        return Metadata.ViewRoles.Count() == 0 ||
+                            Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
+                            Metadata.ViewRoles.All(t => httpContext.User.IsInRole(t)) :
+                            Metadata.ViewRoles.Any(t => httpContext.User.IsInRole(t));
                     case EntityAuthorizeAction.None:
-                        return true;
+                        return CustomRoles == null || 
+                            CustomRolesRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
+                            CustomRoles.All(t => httpContext.User.IsInRole(t)) :
+                            CustomRoles.Any(t => httpContext.User.IsInRole(t));;
                     default:
                         return false;
                 }
             }
             else
-                return AuthorizeCore(filterContext.RequestContext.HttpContext);
+                return httpContext.User.Identity.IsAuthenticated;
         }
 
         /// <summary>
@@ -109,9 +142,9 @@ namespace System.Web.Mvc
                 Metadata = ((IHaveEntityMetadata)filterContext.Controller).Metadata;
             RouteData = filterContext.RouteData;
 
-            if (!Authorize(filterContext))
+            if (!AuthorizeCore(filterContext.RequestContext.HttpContext))
             {
-                if (filterContext.HttpContext.User.Identity.IsAuthenticated)
+                if (Action != EntityAuthorizeAction.None && filterContext.HttpContext.User.Identity.IsAuthenticated)
                     filterContext.Result = new HttpUnauthorizedResult();
                 else
                     if (filterContext.RouteData.DataTokens["loginUrl"] == null)
