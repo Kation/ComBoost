@@ -10,11 +10,21 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Security;
 
 namespace System.Web.Mvc
 {
+    /// <summary>
+    /// Unitils of entity controller.
+    /// </summary>
+    /// <typeparam name="TEntity">Type of entity.</typeparam>
     public class EntityControllerUnitils<TEntity> where TEntity : class, IEntity, new()
     {
+        /// <summary>
+        /// Initialize unitils.
+        /// </summary>
+        /// <param name="controller">Controller.</param>
+        /// <param name="builder">Entity context builder.</param>
         public EntityControllerUnitils(Controller controller, IEntityContextBuilder builder)
         {
             if (controller == null)
@@ -27,18 +37,45 @@ namespace System.Web.Mvc
             Metadata = EntityAnalyzer.GetMetadata<TEntity>();
         }
 
+        /// <summary>
+        /// Get the mvc controller.
+        /// </summary>
         public Controller Controller { get; private set; }
 
+        /// <summary>
+        /// Get the entity context builder.
+        /// </summary>
         public IEntityContextBuilder EntityBuilder { get; private set; }
 
+        /// <summary>
+        /// Get the entity context.
+        /// </summary>
         public IEntityQueryable<TEntity> EntityQueryable { get; private set; }
 
+        /// <summary>
+        /// Get the entity metadata.
+        /// </summary>
         public IEntityMetadata Metadata { get; private set; }
 
+        /// <summary>
+        /// Get or set the page size options.
+        /// </summary>
         public int[] PageSize { get; set; }
 
         #region Index
 
+        /// <summary>
+        /// Get the action result of index page.
+        /// </summary>
+        /// <param name="modelDelegate">Get index model delegate.</param>
+        /// <param name="searchDelegate">Get search item delegate.</param>
+        /// <param name="parentDelegate">Get parent model delegate.</param>
+        /// <param name="page">Number of current page.</param>
+        /// <param name="size">Number of entities per page.</param>
+        /// <param name="parentpath">Path of parent for entity.</param>
+        /// <param name="parentid">Parent id.</param>
+        /// <param name="search">Is a search result.</param>
+        /// <returns></returns>
         public async Task<ActionResult> GetIndexAction(GetIndexModelDelegate modelDelegate, GetSearchItemDelegate searchDelegate, GetParentModelDelegate parentDelegate, int page = 1, int size = 20, string parentpath = null, Guid? parentid = null, bool search = false)
         {
             if (page < 1)
@@ -82,17 +119,35 @@ namespace System.Web.Mvc
             return GetView(model);
         }
 
+        /// <summary>
+        /// Get the index model.
+        /// </summary>
+        /// <param name="queryable">Queryable of TEntity.</param>
+        /// <param name="page">Number of current page.</param>
+        /// <param name="size">Number of entities per page.</param>
+        /// <returns></returns>
         public async Task<EntityViewModel<TEntity>> GetIndexModel(IQueryable<TEntity> queryable, int page, int size)
         {
             return await Task.Run<EntityViewModel<TEntity>>(() =>
             {
                 var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, size);
-                model.Headers = Metadata.ViewProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) && !t.ViewRoles.Any(r => !Controller.User.IsInRole(r))).ToArray();
+                model.Headers = Metadata.ViewProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) &&
+                    (t.ViewRoles.Count() == 0 ||
+                    (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                    t.ViewRoles.All(r => Controller.User.IsInRole(r)) :
+                    t.ViewRoles.Any(r => Controller.User.IsInRole(r))))).ToArray();
                 model.PageSizeOption = PageSize;
                 return model;
             });
         }
 
+        /// <summary>
+        /// Get index model delegate.
+        /// </summary>
+        /// <param name="queryable">Entity queryable data.</param>
+        /// <param name="page">Number of current page.</param>
+        /// <param name="size">Number of entities per page.</param>
+        /// <returns></returns>
         public delegate Task<EntityViewModel<TEntity>> GetIndexModelDelegate(IQueryable<TEntity> queryable, int page, int size);
 
         /// <summary>
@@ -219,6 +274,11 @@ namespace System.Web.Mvc
             return searchItems.ToArray();
         }
 
+        /// <summary>
+        /// Get search item delegate.
+        /// </summary>
+        /// <param name="queryable">Queryable of TEntity.</param>
+        /// <returns></returns>
         public delegate EntitySearchItem[] GetSearchItemDelegate(ref IQueryable<TEntity> queryable);
 
         /// <summary>
@@ -233,6 +293,11 @@ namespace System.Web.Mvc
             return root.ToArray();
         }
 
+        /// <summary>
+        /// Get parent model delegate.
+        /// </summary>
+        /// <param name="selected">Selected parent id.</param>
+        /// <returns>Parent model.</returns>
         public delegate Task<EntityParentModel[]> GetParentModelDelegate(Guid? selected);
 
         private async Task GetParentModel(List<EntityParentModel> root, Dictionary<Guid, EntityParentModel[]> items, IEntityMetadata metadata, Guid? selected, string path)
@@ -341,6 +406,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Create entity page.
         /// </summary>
+        /// <param name="modelDelegate">Get create model delegate.</param>
         /// <param name="parent">Parent id.</param>
         /// <returns></returns>
         public async Task<ActionResult> GetCreateAction(GetCreateModelDelegate modelDelegate, Guid? parent = null)
@@ -362,7 +428,11 @@ namespace System.Web.Mvc
         {
             var model = new EntityEditModel<TEntity>(EntityQueryable.Create());
             model.Item.Index = Guid.Empty;
-            model.Properties = Metadata.CreateProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) && !t.EditRoles.Any(r => !Controller.User.IsInRole(r))).ToArray();
+            model.Properties = Metadata.CreateProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) &&
+                    (t.EditRoles.Count() == 0 ||
+                    (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                    t.EditRoles.All(r => Controller.User.IsInRole(r)) :
+                    t.EditRoles.Any(r => Controller.User.IsInRole(r))))).ToArray();
             if (parent != null && model.Metadata.ParentProperty != null)
             {
                 dynamic parentContext = EntityBuilder.GetContext(model.Metadata.ParentProperty.ClrType);
@@ -372,6 +442,11 @@ namespace System.Web.Mvc
             return model;
         }
 
+        /// <summary>
+        /// Get create action model delegate.
+        /// </summary>
+        /// <param name="parent">Parent id.</param>
+        /// <returns>Edit model with new entity item of TEntity.</returns>
         public delegate Task<EntityEditModel<TEntity>> GetCreateModelDelegate(Guid? parent = null);
 
         #endregion
@@ -381,6 +456,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Entity detail page.
         /// </summary>
+        /// <param name="modelDelegate">Get detail model delegate.</param>
         /// <param name="id">Entity id.</param>
         /// <returns></returns>
         public async Task<ActionResult> GetDetailAction(GetDetailModelDelegate modelDelegate, Guid id)
@@ -402,10 +478,19 @@ namespace System.Web.Mvc
             if (item == null)
                 return null;
             var model = new EntityEditModel<TEntity>(item);
-            model.Properties = Metadata.DetailProperties;
+            model.Properties = Metadata.DetailProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) &&
+                    (t.ViewRoles.Count() == 0 ||
+                    (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                    t.ViewRoles.All(r => Controller.User.IsInRole(r)) :
+                    t.ViewRoles.Any(r => Controller.User.IsInRole(r))))).ToArray();
             return model;
         }
 
+        /// <summary>
+        /// Get detail action model delegate.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns>Edit model with detail properties of TEntity.</returns>
         public delegate Task<EntityEditModel<TEntity>> GetDetailModelDelegate(Guid id);
 
         #endregion
@@ -415,6 +500,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Edit entity page.
         /// </summary>
+        /// <param name="modelDelegate">Get edit model delegate.</param>
         /// <param name="id">Entity id.</param>
         /// <returns></returns>
         public async Task<ActionResult> GetEditAction(GetEditModelDelegate modelDelegate, Guid id)
@@ -438,10 +524,19 @@ namespace System.Web.Mvc
             if (item == null)
                 return null;
             var model = new EntityEditModel<TEntity>(item);
-            model.Properties = Metadata.EditProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) && !t.EditRoles.Any(r => !Controller.User.IsInRole(r))).ToArray();
+            model.Properties = Metadata.EditProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) &&
+                    (t.EditRoles.Count() == 0 ||
+                    (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                    t.EditRoles.All(r => Controller.User.IsInRole(r)) :
+                    t.EditRoles.Any(r => Controller.User.IsInRole(r))))).ToArray();
             return model;
         }
 
+        /// <summary>
+        /// Get edit action model delegate.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns>Edit model of TEntity.</returns>
         public delegate Task<EntityEditModel<TEntity>> GetEditModelDelegate(Guid id);
 
         #endregion
@@ -451,6 +546,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Remove entity.
         /// </summary>
+        /// <param name="coreDelegate">Get remove core delegate.</param>
         /// <param name="id">Entity id.</param>
         /// <returns></returns>
         public async Task<ActionResult> GetRemoveAction(RemoveCoreDelegate coreDelegate, Guid id)
@@ -475,13 +571,25 @@ namespace System.Web.Mvc
             else
                 return false;
         }
-
+        
+        /// <summary>
+        /// Remoce action core delegate.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <returns>True if success, otherwise is false.</returns>
         public delegate Task<bool> RemoveCoreDelegate(Guid id);
 
         #endregion
 
         #region Update
 
+        /// <summary>
+        /// Get update action result.
+        /// </summary>
+        /// <param name="coreDelegate">Get update core delegate.</param>
+        /// <param name="propertyDelegate">Get property delegate.</param>
+        /// <param name="id">Entity id.</param>
+        /// <returns></returns>
         public async Task<ActionResult> GetUpdateAction(UpdateCoreDelegate coreDelegate, UpdatePropertyDelegate propertyDelegate, Guid id)
         {
             TEntity entity;
@@ -489,7 +597,10 @@ namespace System.Web.Mvc
             {
                 if (!EntityQueryable.Addable())
                     return new HttpUnauthorizedResult();
-                if (!Metadata.AddRoles.All(t => Controller.User.IsInRole(t)))
+                if (Metadata.AddRoles.Count() > 0 &&
+                    (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                    Metadata.AddRoles.All(r => Controller.User.IsInRole(r)) :
+                    Metadata.AddRoles.Any(r => Controller.User.IsInRole(r))))
                     return new HttpUnauthorizedResult();
                 entity = EntityQueryable.Create();
             }
@@ -497,7 +608,10 @@ namespace System.Web.Mvc
             {
                 if (!EntityQueryable.Editable())
                     return new HttpUnauthorizedResult();
-                if (!Metadata.EditRoles.All(t => Controller.User.IsInRole(t)))
+                if (Metadata.EditRoles.Count() > 0 &&
+                    (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                    Metadata.EditRoles.All(r => Controller.User.IsInRole(r)) :
+                    Metadata.EditRoles.Any(r => Controller.User.IsInRole(r))))
                     return new HttpUnauthorizedResult();
                 entity = EntityQueryable.GetEntity(id);
                 if (entity == null)
@@ -520,6 +634,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Update action core method.
         /// </summary>
+        /// <param name="propertyDelegate">Get property delegate.</param>
         /// <param name="entity">Entity to edit or create.</param>
         /// <returns>True if success, otherwise is false.</returns>
         public async Task<bool> UpdateCore(UpdatePropertyDelegate propertyDelegate, TEntity entity)
@@ -554,7 +669,10 @@ namespace System.Web.Mvc
         /// <returns></returns>
         public async Task UpdateProperty(TEntity entity, IPropertyMetadata propertyMetadata)
         {
-            if (propertyMetadata.EditRoles.Any(t => !Controller.User.IsInRole(t)))
+            if (propertyMetadata.EditRoles.Count() > 0 &&
+                    (propertyMetadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                    propertyMetadata.EditRoles.All(r => Controller.User.IsInRole(r)) :
+                    propertyMetadata.EditRoles.Any(r => Controller.User.IsInRole(r))))
                 return;
             if (propertyMetadata.IsFileUpload)
             {
@@ -632,8 +750,20 @@ namespace System.Web.Mvc
             }
         }
 
+        /// <summary>
+        /// Update action core delegate.
+        /// </summary>
+        /// <param name="propertyDelegate">Get property delegate.</param>
+        /// <param name="entity">Entity to edit or create.</param>
+        /// <returns>True if success, otherwise is false.</returns>
         public delegate Task<bool> UpdateCoreDelegate(UpdatePropertyDelegate propertyDelegate, TEntity entity);
 
+        /// <summary>
+        /// Update property for entity delegate.
+        /// </summary>
+        /// <param name="entity">Entity to update.</param>
+        /// <param name="propertyMetadata">Property metadata.</param>
+        /// <returns></returns>
         public delegate Task UpdatePropertyDelegate(TEntity entity, IPropertyMetadata propertyMetadata);
 
         #endregion
@@ -643,6 +773,9 @@ namespace System.Web.Mvc
         /// <summary>
         /// Selector page.
         /// </summary>
+        /// <param name="modelDelegate">Get index model delegate.</param>
+        /// <param name="searchDelegate">Get search item delegate.</param>
+        /// <param name="parentDelegate">Get parent model delegate.</param>
         /// <param name="page">Number of current page.</param>
         /// <param name="size">Number of entities per page.</param>
         /// <param name="parentpath">Path of parent for entity.</param>
@@ -682,6 +815,9 @@ namespace System.Web.Mvc
         /// <summary>
         /// Multiple selector page.
         /// </summary>
+        /// <param name="modelDelegate">Get index model delegate.</param>
+        /// <param name="searchDelegate">Get search item delegate.</param>
+        /// <param name="parentDelegate">Get parent model delegate.</param>
         /// <param name="page">Number of current page.</param>
         /// <param name="size">Number of entities per page.</param>
         /// <param name="parentpath">Path of parent for entity.</param>
@@ -721,6 +857,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Search page.
         /// </summary>
+        /// <param name="actionName">Action name that jump to after search.</param>
         /// <returns></returns>
         public virtual Task<ActionResult> GetSearchAction(string actionName = "Index")
         {
