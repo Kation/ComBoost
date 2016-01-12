@@ -14,26 +14,6 @@ namespace System.ComponentModel
     public interface IEntityViewModel : IPagination
     {
         /// <summary>
-        /// Get the items per page options.
-        /// </summary>
-        int[] PageSizeOption { get; }
-
-        /// <summary>
-        /// Get the total page.
-        /// </summary>
-        int TotalPage { get; }
-
-        /// <summary>
-        /// Get the items per page.
-        /// </summary>
-        int CurrentSize { get; }
-
-        /// <summary>
-        /// Get the current page.
-        /// </summary>
-        int CurrentPage { get; }
-
-        /// <summary>
         /// Get the items of current page.
         /// </summary>
         IEntity[] Items { get; }
