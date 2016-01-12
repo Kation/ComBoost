@@ -123,6 +123,8 @@ namespace System.Data.Entity
         /// <returns>A System.Data.Entity.Infrastructure.DbRawSqlQuery object that will execute the query when it is enumerated.</returns>
         public IEnumerable<T> Query<T>(string sql, params object[] parameters)
         {
+            if (disposed)
+                throw new ObjectDisposedException("EntityContextBuilder");
             return DbContext.Database.SqlQuery<T>(sql, parameters);
         }
     }
