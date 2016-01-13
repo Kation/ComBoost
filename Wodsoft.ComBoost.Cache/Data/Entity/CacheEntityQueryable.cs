@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace System.Data.Entity
 {
@@ -23,7 +24,7 @@ namespace System.Data.Entity
             throw new NotImplementedException();
         }
 
-        public async void UpdateCacheAsync()
+        public Task UpdateCacheAsync()
         {
             throw new NotImplementedException();
         }
@@ -125,57 +126,57 @@ namespace System.Data.Entity
         }
 
 
-        public Threading.Tasks.Task<bool> AddAsync(TEntity entity)
+        public Task<bool> AddAsync(TEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Threading.Tasks.Task<bool> AddRangeAsync(IEnumerable<TEntity> entities)
+        public Task<bool> AddRangeAsync(IEnumerable<TEntity> entities)
         {
             throw new NotImplementedException();
         }
 
-        public Threading.Tasks.Task<bool> RemoveAsync(Guid id)
+        public Task<bool> RemoveAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Threading.Tasks.Task<bool> RemoveRangeAsync(IEnumerable<Guid> ids)
+        public Task<bool> RemoveRangeAsync(IEnumerable<Guid> ids)
         {
             throw new NotImplementedException();
         }
 
-        public Threading.Tasks.Task<bool> EditAsync(TEntity entity)
+        public Task<bool> EditAsync(TEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Threading.Tasks.Task<TEntity> GetEntityAsync(Guid id)
+        public Task<TEntity> GetEntityAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Threading.Tasks.Task<int> CountAsync()
+        public Task<int> CountAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Threading.Tasks.Task<bool> ContainsAsync(TEntity entity)
+        public Task<bool> ContainsAsync(TEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Threading.Tasks.Task<bool> ContainsAsync(Guid id)
+        public Task<bool> ContainsAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Threading.Tasks.Task<TEntity[]> ToArrayAsync(IQueryable<TEntity> queryable)
+        public Task<TEntity[]> ToArrayAsync(IQueryable<TEntity> queryable)
         {
             throw new NotImplementedException();
         }
 
-        public Threading.Tasks.Task<List<TEntity>> ToListAsync(IQueryable<TEntity> queryable)
+        public Task<List<TEntity>> ToListAsync(IQueryable<TEntity> queryable)
         {
             throw new NotImplementedException();
         }
