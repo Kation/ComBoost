@@ -598,7 +598,7 @@ namespace System.Web.Mvc
                 if (!EntityQueryable.Addable())
                     return new HttpUnauthorizedResult();
                 if (Metadata.AddRoles.Count() > 0 &&
-                    (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                    !(Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
                     Metadata.AddRoles.All(r => Controller.User.IsInRole(r)) :
                     Metadata.AddRoles.Any(r => Controller.User.IsInRole(r))))
                     return new HttpUnauthorizedResult();
@@ -609,7 +609,7 @@ namespace System.Web.Mvc
                 if (!EntityQueryable.Editable())
                     return new HttpUnauthorizedResult();
                 if (Metadata.EditRoles.Count() > 0 &&
-                    (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                    !(Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
                     Metadata.EditRoles.All(r => Controller.User.IsInRole(r)) :
                     Metadata.EditRoles.Any(r => Controller.User.IsInRole(r))))
                     return new HttpUnauthorizedResult();
@@ -670,7 +670,7 @@ namespace System.Web.Mvc
         public async Task UpdateProperty(TEntity entity, IPropertyMetadata propertyMetadata)
         {
             if (propertyMetadata.EditRoles.Count() > 0 &&
-                    (propertyMetadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                    !(propertyMetadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
                     propertyMetadata.EditRoles.All(r => Controller.User.IsInRole(r)) :
                     propertyMetadata.EditRoles.Any(r => Controller.User.IsInRole(r))))
                 return;
