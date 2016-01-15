@@ -89,29 +89,29 @@ namespace System.Web.Mvc
                 {
                     case EntityAuthorizeAction.Create:
                         return Metadata.AddRoles.Count() == 0 ||
-                            Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ? 
+                            (Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ? 
                             Metadata.AddRoles.All(t => httpContext.User.IsInRole(t)) :
-                            Metadata.AddRoles.Any(t => httpContext.User.IsInRole(t));
+                            Metadata.AddRoles.Any(t => httpContext.User.IsInRole(t)));
                     case EntityAuthorizeAction.Edit:
                         return Metadata.EditRoles.Count() == 0 ||
-                            Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
+                            (Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
                             Metadata.EditRoles.All(t => httpContext.User.IsInRole(t)) :
-                            Metadata.EditRoles.Any(t => httpContext.User.IsInRole(t));
+                            Metadata.EditRoles.Any(t => httpContext.User.IsInRole(t)));
                     case EntityAuthorizeAction.Remove:
                         return Metadata.RemoveRoles.Count() == 0 ||
-                            Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
+                            (Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
                             Metadata.RemoveRoles.All(t => httpContext.User.IsInRole(t)) :
-                            Metadata.RemoveRoles.Any(t => httpContext.User.IsInRole(t));
+                            Metadata.RemoveRoles.Any(t => httpContext.User.IsInRole(t)));
                     case EntityAuthorizeAction.View:
                         return Metadata.ViewRoles.Count() == 0 ||
-                            Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
+                            (Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
                             Metadata.ViewRoles.All(t => httpContext.User.IsInRole(t)) :
-                            Metadata.ViewRoles.Any(t => httpContext.User.IsInRole(t));
+                            Metadata.ViewRoles.Any(t => httpContext.User.IsInRole(t)));
                     case EntityAuthorizeAction.None:
                         return CustomRoles == null || 
-                            CustomRolesRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
+                            (CustomRolesRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
                             CustomRoles.All(t => httpContext.User.IsInRole(t)) :
-                            CustomRoles.Any(t => httpContext.User.IsInRole(t));;
+                            CustomRoles.Any(t => httpContext.User.IsInRole(t)));
                     default:
                         return false;
                 }
