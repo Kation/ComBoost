@@ -124,7 +124,7 @@
                             }
                             @foreach(var button in Model.ViewButtons)
                             {
-                                Model.ViewButtons[i].SetTarget()
+                                button.SetTarget(provider);
                                 <a href="@Html.Raw(button.Target)" class="btn btn-default" title="@button.Tooltip">@button.Icon@button.Name</a>
                             }
                         </div>
