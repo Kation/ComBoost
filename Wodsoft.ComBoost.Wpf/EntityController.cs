@@ -15,7 +15,7 @@ namespace Wodsoft.ComBoost.Wpf
     {
         public IEntityContextBuilder EntityBuilder { get; private set; }
 
-        public IEntityQueryable<TEntity> EntityQueryable { get; private set; }
+        public IEntityContext<TEntity> EntityQueryable { get; private set; }
 
         public IEntityMetadata Metadata { get; private set; }
 

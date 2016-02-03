@@ -33,8 +33,11 @@ namespace System.Web.Mvc
         /// <summary>
         /// Get the queryable of entity.
         /// </summary>
-        public IEntityQueryable<TEntity> EntityQueryable { get; private set; }
+        public IEntityContext<TEntity> EntityQueryable { get; private set; }
 
+        /// <summary>
+        /// Get the untils of entity controller.
+        /// </summary>
         public EntityControllerUnitils<TEntity> Untils { get; private set; }
 
         /// <summary>

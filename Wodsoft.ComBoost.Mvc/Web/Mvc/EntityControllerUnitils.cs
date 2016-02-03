@@ -50,7 +50,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Get the entity context.
         /// </summary>
-        public IEntityQueryable<TEntity> EntityQueryable { get; private set; }
+        public IEntityContext<TEntity> EntityQueryable { get; private set; }
 
         /// <summary>
         /// Get the entity metadata.
