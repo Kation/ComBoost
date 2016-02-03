@@ -16,7 +16,7 @@ namespace System.Data.Entity
         /// <typeparam name="TEntity">Type of entity.</typeparam>
         /// <returns>Return entity context.</returns>
         /// <exception cref="ArgumentException">Type of entity doesn't support.</exception>
-        IEntityQueryable<TEntity> GetContext<TEntity>() where TEntity : class, IEntity, new();
+        IEntityContext<TEntity> GetContext<TEntity>() where TEntity : class, IEntity, new();
 
         /// <summary>
         /// Get entity context.

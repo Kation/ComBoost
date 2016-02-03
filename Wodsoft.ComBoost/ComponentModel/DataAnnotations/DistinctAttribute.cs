@@ -40,7 +40,7 @@ namespace System.ComponentModel.DataAnnotations
             Type type = validationContext.ObjectType;
             while (type.Assembly.IsDynamic)
                 type = type.BaseType;
-            entityContext = validationContext.GetService(typeof(IEntityQueryable<>).MakeGenericType(type));
+            entityContext = validationContext.GetService(typeof(IEntityContext<>).MakeGenericType(type));
             if (entityContext == null)
                 return null;
             if (value is string && IsCaseSensitive)

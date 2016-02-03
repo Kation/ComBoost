@@ -66,7 +66,7 @@ namespace System.Data.Entity
         /// </summary>
         /// <typeparam name="TEntity">Type of entity.</typeparam>
         /// <param name="context">Entity context.</param>
-        public void MapContext<TEntity>(IEntityQueryable<TEntity> context)
+        public void MapContext<TEntity>(IEntityContext<TEntity> context)
             where TEntity : class, IEntity, new()
         {
             if (context == null)
@@ -109,20 +109,20 @@ namespace System.Data.Entity
         /// <typeparam name="TEntity">Type of entity.</typeparam>
         /// <returns>Return entity context.</returns>
         /// <exception cref="ArgumentException">Type of entity doesn't support.</exception>
-        public IEntityQueryable<TEntity> GetContext<TEntity>() where TEntity : class, IEntity, new()
+        public IEntityContext<TEntity> GetContext<TEntity>() where TEntity : class, IEntity, new()
         {
             Type type = typeof(TEntity);
             if (_Types.Contains(type))
                 throw new NotSupportedException(type.Name + " doesn't belong to this context.");
             if (_Context.ContainsKey(type))
-                return (IEntityQueryable<TEntity>)_Map[type];
+                return (IEntityContext<TEntity>)_Map[type];
             object context;
             if (_Map.ContainsKey(type))
                 context = _Map[type].GetContext(type);
             else
                 context = MainBuilder.GetContext(type);
             _Context.Add(type, context);
-            return (IEntityQueryable<TEntity>)context;
+            return (IEntityContext<TEntity>)context;
         }
 
         /// <summary>

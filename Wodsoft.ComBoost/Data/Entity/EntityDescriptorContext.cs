@@ -76,7 +76,7 @@ namespace System.Data.Entity
             if (serviceType.IsGenericType)
             {
                 Type definition = serviceType.GetGenericTypeDefinition();
-                if (definition == typeof(IEntityQueryable<>))
+                if (definition == typeof(IEntityContext<>) || definition == typeof(IEntityQueryable<>))
                     return _Builder.GetContext(serviceType.GetGenericArguments()[0]);
                 else
                     return null;
