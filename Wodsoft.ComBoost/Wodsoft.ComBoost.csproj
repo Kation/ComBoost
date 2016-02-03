@@ -83,6 +83,7 @@
     <Compile Include="Data\Entity\EntityBase.cs" />
     <Compile Include="Data\Entity\EntityDescriptorContext.cs" />
     <Compile Include="Data\Entity\IEntity.cs" />
+    <Compile Include="Data\Entity\IEntityContext.cs" />
     <Compile Include="Data\Entity\IEntityContextBuilder.cs" />
     <Compile Include="Data\Entity\IEntityQueryable.cs" />
     <Compile Include="Data\Entity\IRoleEntity.cs" />
