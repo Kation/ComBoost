@@ -53,7 +53,7 @@ namespace System.Data.Entity
         /// <typeparam name="TEntity">Type of entity.</typeparam>
         /// <returns>Return entity context.</returns>
         /// <exception cref="ArgumentException">Type of entity doesn't support.</exception>
-        public IEntityQueryable<TEntity> GetContext<TEntity>() where TEntity : class, IEntity, new()
+        public IEntityContext<TEntity> GetContext<TEntity>() where TEntity : class, IEntity, new()
         {
             if (disposed)
                 throw new ObjectDisposedException("EntityContextBuilder");
@@ -62,11 +62,11 @@ namespace System.Data.Entity
             Type type = typeof(TEntity);
             if (!cache.ContainsKey(type))
             {
-                IEntityQueryable<TEntity> result = new EntityQueryable<TEntity>(DbContext);
+                IEntityContext<TEntity> result = new EntityContext<TEntity>(DbContext);
                 cache.Add(type, result);
                 return result;
             }
-            return (IEntityQueryable<TEntity>)cache[type];
+            return (IEntityContext<TEntity>)cache[type];
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace System.Data.Entity
                 throw new ArgumentException(entityType.Name + " doesn't belong to this context.");
             if (!cache.ContainsKey(entityType))
             {
-                object result = Activator.CreateInstance(typeof(EntityQueryable<>).MakeGenericType(entityType), DbContext);
+                object result = Activator.CreateInstance(typeof(EntityContext<>).MakeGenericType(entityType), DbContext);
                 cache.Add(entityType, result);
                 return result;
             }
