@@ -31,8 +31,14 @@ namespace System.Web.Mvc
         public int[] PageSize { get; protected set; }
 
         /// <summary>
-        /// Get the queryable of entity.
+        /// Get the context of entity.
         /// </summary>
+        public IEntityContext<TEntity> EntityContext { get; private set; }
+
+        /// <summary>
+        /// Get the context of entity.
+        /// </summary>
+        [Obsolete("Please use EntityContext to replace EntityQueryable. EntityQueryable will be removed in next major version.")]
         public IEntityContext<TEntity> EntityQueryable { get; private set; }
 
         /// <summary>
@@ -47,7 +53,7 @@ namespace System.Web.Mvc
         public EntityController(IEntityContextBuilder builder)
             : base(builder)
         {
-            EntityQueryable = EntityBuilder.GetContext<TEntity>();
+            EntityQueryable = EntityContext = EntityBuilder.GetContext<TEntity>();
             Metadata = EntityAnalyzer.GetMetadata<TEntity>();
             PageSize = Pagination.DefaultPageSizeOption;
             Untils = new EntityControllerUnitils<TEntity>(this, builder);

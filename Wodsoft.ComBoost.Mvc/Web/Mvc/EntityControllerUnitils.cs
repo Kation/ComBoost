@@ -33,7 +33,7 @@ namespace System.Web.Mvc
                 throw new ArgumentNullException("builder");
             Controller = controller;
             EntityBuilder = builder;
-            EntityQueryable = builder.GetContext<TEntity>();
+            EntityQueryable = EntityContext = builder.GetContext<TEntity>();
             Metadata = EntityAnalyzer.GetMetadata<TEntity>();
         }
 
@@ -50,6 +50,12 @@ namespace System.Web.Mvc
         /// <summary>
         /// Get the entity context.
         /// </summary>
+        public IEntityContext<TEntity> EntityContext { get; private set; }
+
+        /// <summary>
+        /// Get the context of entity.
+        /// </summary>
+        [Obsolete("Please use EntityContext to replace EntityQueryable. EntityQueryable will be removed in next major version.")]
         public IEntityContext<TEntity> EntityQueryable { get; private set; }
 
         /// <summary>
@@ -82,7 +88,7 @@ namespace System.Web.Mvc
                 return new HttpStatusCodeResult(400);
             if (size < 1)
                 return new HttpStatusCodeResult(400);
-            IQueryable<TEntity> queryable = EntityQueryable.Query();
+            IQueryable<TEntity> queryable = EntityContext.Query();
             EntitySearchItem[] searchItems;
             if (search)
             {
@@ -95,7 +101,7 @@ namespace System.Web.Mvc
                 {
                     try
                     {
-                        queryable = EntityQueryable.InParent(queryable, parentpath, parentid.Value);
+                        queryable = EntityContext.InParent(queryable, parentpath, parentid.Value);
                     }
                     catch
                     {
@@ -109,7 +115,7 @@ namespace System.Web.Mvc
             if (Metadata.ParentProperty != null && !search)
                 model.Parent = await parentDelegate(parentid);
             model.SearchItem = searchItems;
-            model.Items = await EntityQueryable.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
+            model.Items = await EntityContext.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
             if (model.ViewButtons.Length > 0)
             {
                 IServiceProvider serviceProvider = Controller.GetServiceProvider();
@@ -130,7 +136,7 @@ namespace System.Web.Mvc
         {
             return await Task.Run<EntityViewModel<TEntity>>(() =>
             {
-                var model = new EntityViewModel<TEntity>(EntityQueryable.OrderBy(queryable), page, size);
+                var model = new EntityViewModel<TEntity>(EntityContext.OrderBy(queryable), page, size);
                 model.Headers = Metadata.ViewProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) &&
                     (t.ViewRoles.Count() == 0 ||
                     (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
@@ -411,7 +417,7 @@ namespace System.Web.Mvc
         /// <returns></returns>
         public async Task<ActionResult> GetCreateAction(GetCreateModelDelegate modelDelegate, Guid? parent = null)
         {
-            if (!EntityQueryable.Addable())
+            if (!EntityContext.Addable())
                 return new HttpStatusCodeResult(403);
             var model = await modelDelegate(parent);
             if (model == null)
@@ -426,7 +432,7 @@ namespace System.Web.Mvc
         /// <returns>Edit model with new entity item of TEntity.</returns>
         public async Task<EntityEditModel<TEntity>> GetCreateModel(Guid? parent = null)
         {
-            var model = new EntityEditModel<TEntity>(EntityQueryable.Create());
+            var model = new EntityEditModel<TEntity>(EntityContext.Create());
             model.Item.Index = Guid.Empty;
             model.Properties = Metadata.CreateProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) &&
                     (t.EditRoles.Count() == 0 ||
@@ -474,7 +480,7 @@ namespace System.Web.Mvc
         /// <returns>Edit model with detail properties of TEntity.</returns>
         public async Task<EntityEditModel<TEntity>> GetDetailModel(Guid id)
         {
-            TEntity item = await EntityQueryable.GetEntityAsync(id);
+            TEntity item = await EntityContext.GetEntityAsync(id);
             if (item == null)
                 return null;
             var model = new EntityEditModel<TEntity>(item);
@@ -505,7 +511,7 @@ namespace System.Web.Mvc
         /// <returns></returns>
         public async Task<ActionResult> GetEditAction(GetEditModelDelegate modelDelegate, Guid id)
         {
-            if (!EntityQueryable.Editable())
+            if (!EntityContext.Editable())
                 return new HttpStatusCodeResult(403);
             var model = await modelDelegate(id);
             if (model == null)
@@ -520,7 +526,7 @@ namespace System.Web.Mvc
         /// <returns>Edit model of TEntity.</returns>
         public async Task<EntityEditModel<TEntity>> GetEditModel(Guid id)
         {
-            TEntity item = await EntityQueryable.GetEntityAsync(id);
+            TEntity item = await EntityContext.GetEntityAsync(id);
             if (item == null)
                 return null;
             var model = new EntityEditModel<TEntity>(item);
@@ -551,7 +557,7 @@ namespace System.Web.Mvc
         /// <returns></returns>
         public async Task<ActionResult> GetRemoveAction(RemoveCoreDelegate coreDelegate, Guid id)
         {
-            if (!EntityQueryable.Removeable())
+            if (!EntityContext.Removeable())
                 return new HttpStatusCodeResult(403);
             if (await coreDelegate(id))
                 return new HttpStatusCodeResult(200);
@@ -566,12 +572,12 @@ namespace System.Web.Mvc
         /// <returns>True if success, otherwise is false.</returns>
         public async Task<bool> RemoveCore(Guid id)
         {
-            if (await EntityQueryable.RemoveAsync(id))
+            if (await EntityContext.RemoveAsync(id))
                 return true;
             else
                 return false;
         }
-        
+
         /// <summary>
         /// Remoce action core delegate.
         /// </summary>
@@ -595,25 +601,25 @@ namespace System.Web.Mvc
             TEntity entity;
             if (id == Guid.Empty)
             {
-                if (!EntityQueryable.Addable())
+                if (!EntityContext.Addable())
                     return new HttpUnauthorizedResult();
                 if (Metadata.AddRoles.Count() > 0 &&
                     !(Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
                     Metadata.AddRoles.All(r => Controller.User.IsInRole(r)) :
                     Metadata.AddRoles.Any(r => Controller.User.IsInRole(r))))
                     return new HttpUnauthorizedResult();
-                entity = EntityQueryable.Create();
+                entity = EntityContext.Create();
             }
             else
             {
-                if (!EntityQueryable.Editable())
+                if (!EntityContext.Editable())
                     return new HttpUnauthorizedResult();
                 if (Metadata.EditRoles.Count() > 0 &&
                     !(Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
                     Metadata.EditRoles.All(r => Controller.User.IsInRole(r)) :
                     Metadata.EditRoles.Any(r => Controller.User.IsInRole(r))))
                     return new HttpUnauthorizedResult();
-                entity = EntityQueryable.GetEntity(id);
+                entity = EntityContext.GetEntity(id);
                 if (entity == null)
                     return new HttpStatusCodeResult(404);
             }
@@ -655,9 +661,9 @@ namespace System.Web.Mvc
             }
             bool result;
             if (entity.Index == Guid.Empty)
-                result = await EntityQueryable.AddAsync(entity);
+                result = await EntityContext.AddAsync(entity);
             else
-                result = await EntityQueryable.EditAsync(entity);
+                result = await EntityContext.EditAsync(entity);
             return result;
         }
 
@@ -784,7 +790,7 @@ namespace System.Web.Mvc
         /// <returns></returns>
         public async Task<ActionResult> GetSelectorAction(GetIndexModelDelegate modelDelegate, GetSearchItemDelegate searchDelegate, GetParentModelDelegate parentDelegate, int page = 1, int size = 10, string parentpath = null, Guid? parentid = null, bool search = false)
         {
-            IQueryable<TEntity> queryable = EntityQueryable.Query();
+            IQueryable<TEntity> queryable = EntityContext.Query();
             EntitySearchItem[] searchItems = null;
             if (search)
             {
@@ -794,21 +800,21 @@ namespace System.Web.Mvc
             {
                 try
                 {
-                    queryable = EntityQueryable.InParent(queryable, parentpath, parentid.Value);
+                    queryable = EntityContext.InParent(queryable, parentpath, parentid.Value);
                 }
                 catch
                 {
                     return new HttpStatusCodeResult(400);
                 }
             }
-            var model = await modelDelegate(EntityQueryable.OrderBy(queryable), page, size);
+            var model = await modelDelegate(EntityContext.OrderBy(queryable), page, size);
             if (model == null)
                 return new HttpStatusCodeResult(404);
             if (Metadata.ParentProperty != null)
                 model.Parent = await parentDelegate(parentid);
             model.Headers = Metadata.ViewProperties;
             model.SearchItem = searchItems;
-            model.Items = await EntityQueryable.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
+            model.Items = await EntityContext.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
             return GetView(model);
         }
 
@@ -826,7 +832,7 @@ namespace System.Web.Mvc
         /// <returns></returns>
         public async Task<ActionResult> GetMultipleSelectorAction(GetIndexModelDelegate modelDelegate, GetSearchItemDelegate searchDelegate, GetParentModelDelegate parentDelegate, int page = 1, int size = 10, string parentpath = null, Guid? parentid = null, bool search = false)
         {
-            IQueryable<TEntity> queryable = EntityQueryable.Query();
+            IQueryable<TEntity> queryable = EntityContext.Query();
             EntitySearchItem[] searchItems = null;
             if (search)
             {
@@ -836,21 +842,21 @@ namespace System.Web.Mvc
             {
                 try
                 {
-                    queryable = EntityQueryable.InParent(queryable, parentpath, parentid.Value);
+                    queryable = EntityContext.InParent(queryable, parentpath, parentid.Value);
                 }
                 catch
                 {
                     return new HttpStatusCodeResult(400);
                 }
             }
-            var model = await modelDelegate(EntityQueryable.OrderBy(queryable), page, size);
+            var model = await modelDelegate(EntityContext.OrderBy(queryable), page, size);
             if (model == null)
                 return new HttpStatusCodeResult(404);
             if (Metadata.ParentProperty != null)
                 model.Parent = await parentDelegate(parentid);
             model.Headers = Metadata.ViewProperties;
             model.SearchItem = searchItems;
-            model.Items = await EntityQueryable.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
+            model.Items = await EntityContext.ToArrayAsync(model.Queryable.Skip((model.CurrentPage - 1) * model.CurrentSize).Take(model.CurrentSize));
             return GetView(model);
         }
 
