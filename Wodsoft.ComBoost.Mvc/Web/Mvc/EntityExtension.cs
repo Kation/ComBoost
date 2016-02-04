@@ -145,6 +145,27 @@ namespace System.Web.Mvc
         }
 
         /// <summary>
+        /// Render a property viewer.
+        /// </summary>
+        /// <param name="helper">A htmlhelper.</param>
+        /// <param name="property">Property metadata.</param>
+        /// <param name="value">Property value.</param>
+        public static MvcHtmlString Viewer(this HtmlHelper helper, IPropertyMetadata property, object value)
+        {
+            if (helper == null)
+                throw new ArgumentNullException("helper");
+            if (property == null)
+                throw new ArgumentNullException("property");
+            MvcEditorModel model = new MvcEditorModel();
+            model.Metadata = property;
+            model.Value = value;
+            if (property.Type == CustomDataType.Other)
+                return helper.Partial(property.CustomType + "Viewer", model);
+            else
+                return helper.Partial(property.Type.ToString() + "Viewer", model);
+        }
+
+        /// <summary>
         /// Generates a fully qualified URL for the entity.
         /// </summary>
         /// <param name="helper">A urlhelper.</param>
