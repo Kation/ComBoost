@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Metadata;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,11 @@ namespace System.ComponentModel
         /// Get or set the value.
         /// </summary>
         public object Value { get; set; }
+
+        /// <summary>
+        /// Get or set the entity.
+        /// </summary>
+        public IEntity Entity { get; set; }
 
         /// <summary>
         /// Get or set the property metadata.
