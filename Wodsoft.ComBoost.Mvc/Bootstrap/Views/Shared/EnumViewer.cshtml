@@ -1,0 +1,5 @@
+﻿@model MvcEditorModel
+@{
+    System.Web.Mvc.Converter.EnumConverter converter = new EnumConverter(Model.Metadata.ClrType);
+    @converter.ConvertToString(Model.Value)
+}

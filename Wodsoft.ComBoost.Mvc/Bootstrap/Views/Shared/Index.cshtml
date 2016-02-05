@@ -13,7 +13,7 @@
     var provider = this.GetServiceProvider();
 }
 <ol class="breadcrumb">
-    <li><a href="@Url.Action("Index","Home")">Home</a></li>
+    <li><a href="@Html.Raw(Url.Action("Index","Home"))">Home</a></li>
     <li class="active">@Model.Metadata.Name</li>
 </ol>
 @if (Model.SearchItem.Length > 0)
@@ -79,14 +79,16 @@
                             <tr>
                                 @foreach (var header in Model.Headers)
                                 {
-                                    <td>@EntityValueConverter.GetConverter(header).ConvertToString(header.GetValue(item))</td>
+                                    <td>
+                                        @Html.Viewer(Model.Item, property, property.GetValue(Model.Item))
+                                    </td>
                                 }
                                 <td class="text-center" style="width: 64px;">
                                     <div class="btn-group btn-group-xs">
                                         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
                                             <span class="caret"></span>
                                         </a>
-                                        <ul class="dropdown-menu">
+                                        <ul class="dropdown-menu dropdown-menu-right">
                                             <li><a class="btn" href="@Html.Raw(Url.Action("Detail", new { id = item.Index }))"><i class="glyphicon glyphicon-list-alt"></i>Detail</a></li>
                                             @if (Model.Metadata.EditRoles.All(t => User.IsInRole(t)))
                                             {
@@ -96,7 +98,7 @@
                                             {
                                                 <li><a class="btn" href="javascript:remove('@item.Index')"><i class="glyphicon glyphicon-remove"></i>Delete</a></li>
                                             }
-                                            @foreach(var button in Model.ItemButtons)
+                                            @foreach (var button in Model.ItemButtons)
                                             {
                                                 button.SetTarget(provider, item);
                                                 <li><a href="@Html.Raw(button.Target)" title="@button.Tooltip">@button.Icon@button.Name</a></li>
@@ -124,7 +126,7 @@
                             }
                             @foreach(var button in Model.ViewButtons)
                             {
-                                //Model.ViewButtons[i].SetTarget()
+                                button.SetTarget(provider);
                                 <a href="@Html.Raw(button.Target)" class="btn btn-default" title="@button.Tooltip">@button.Icon@button.Name</a>
                             }
                         </div>

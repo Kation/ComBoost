@@ -126,7 +126,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Bootstrap\Views\Shared\BooleanViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\CollectionViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\CurrencyViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\DateViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\EntityViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\EmailAddressViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\DefaultViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\Detail.cshtml" />
+    <None Include="Bootstrap\Views\Shared\EnumViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\FileViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\HtmlViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ImageUrlViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ImageViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\IntegerViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\MultilineTextViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\ValueFilter.cshtml" />
     <None Include="Bootstrap\Views\Shared\ValueFilterEditor.cshtml" />
     <None Include="Bootstrap\Views\Shared\_DialogLayout.cshtml" />
