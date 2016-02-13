@@ -126,9 +126,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Bootstrap\Views\Shared\SexViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\BooleanViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\CollectionViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\CurrencyViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\DateTimeViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\DateViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\EntityViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\EmailAddressViewer.cshtml" />
@@ -139,6 +141,12 @@
     <None Include="Bootstrap\Views\Shared\HtmlViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\ImageUrlViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\ImageViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\UrlViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\TimeViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\TextViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\PhoneNumberrViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\PasswordViewer.cshtml" />
+    <None Include="Bootstrap\Views\Shared\NumberViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\IntegerViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\MultilineTextViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\ValueFilter.cshtml" />

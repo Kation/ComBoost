@@ -12,7 +12,7 @@ namespace Company.Entity
     [DisplayName("员工组")]
     [DisplayColumn("Name")]
     [Parent(typeof(EmployeeGroup), "Parent")]
-    [EntityAuthentication(AllowAnonymous = false, ViewRolesRequired = new string[] { "Admin" })]
+    [EntityAuthentication(AllowAnonymous = false, ViewRolesRequired = new object[] { "Admin" })]
     public class EmployeeGroup : EntityBase
     {
         [Display(Name = "员工组名称", Order = 0)]

@@ -333,6 +333,30 @@
     <Content Include="Views\Shared\Detail.cshtml" />
     <Content Include="Views\Shared\ValueFilterEditor.cshtml" />
     <Content Include="Views\Shared\ValueFilter.cshtml" />
+    <Content Include="Views\Shared\BooleanViewer.cshtml" />
+    <Content Include="Views\Shared\CollectionViewer.cshtml" />
+    <Content Include="Views\Shared\CurrencyViewer.cshtml" />
+    <Content Include="Views\Shared\DateTimeViewer.cshtml" />
+    <Content Include="Views\Shared\DateViewer.cshtml" />
+    <Content Include="Views\Shared\DefaultViewer.cshtml" />
+    <Content Include="Views\Shared\EmailAddressViewer.cshtml" />
+    <Content Include="Views\Shared\EntityViewer.cshtml" />
+    <Content Include="Views\Shared\EnumViewer.cshtml" />
+    <Content Include="Views\Shared\FileViewer.cshtml" />
+    <Content Include="Views\Shared\HtmlViewer.cshtml" />
+    <Content Include="Views\Shared\ImageUrlViewer.cshtml" />
+    <Content Include="Views\Shared\ImageViewer.cshtml" />
+    <Content Include="Views\Shared\IntegerViewer.cshtml" />
+    <Content Include="Views\Shared\MultilineTextViewer.cshtml" />
+    <Content Include="Views\Shared\NumberViewer.cshtml" />
+    <Content Include="Views\Shared\PasswordViewer.cshtml" />
+    <Content Include="Views\Shared\PhoneNumberrViewer.cshtml" />
+    <Content Include="Views\Shared\SexViewer.cshtml" />
+    <Content Include="Views\Shared\TextViewer.cshtml" />
+    <Content Include="Views\Shared\TimeViewer.cshtml" />
+    <Content Include="Views\Shared\UrlViewer.cshtml" />
+    <Content Include="Views\Shared\_DialogLayout.cshtml" />
+    <Content Include="Views\Shared\ValueFilterViewer.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
