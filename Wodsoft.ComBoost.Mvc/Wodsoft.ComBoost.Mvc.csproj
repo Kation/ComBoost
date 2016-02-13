@@ -151,6 +151,7 @@
     <None Include="Bootstrap\Views\Shared\MultilineTextViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\ValueFilter.cshtml" />
     <None Include="Bootstrap\Views\Shared\ValueFilterEditor.cshtml" />
+    <None Include="Bootstrap\Views\Shared\ValueFilterViewer.cshtml" />
     <None Include="Bootstrap\Views\Shared\_DialogLayout.cshtml" />
     <None Include="MetroUICss\App_Start\MetroUICSSBundleConfig.cs.pp" />
     <None Include="MetroUICss\Content\metro-ui\fonts\iconFont.eot" />

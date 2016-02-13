@@ -80,7 +80,7 @@
                                 @foreach (var header in Model.Headers)
                                 {
                                     <td>
-                                        @Html.Viewer(Model.Item, property, property.GetValue(Model.Item))
+                                        @Html.Viewer(item, header, header.GetValue(item))
                                     </td>
                                 }
                                 <td class="text-center" style="width: 64px;">
