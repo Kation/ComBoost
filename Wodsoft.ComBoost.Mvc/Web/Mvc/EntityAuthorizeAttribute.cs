@@ -89,7 +89,7 @@ namespace System.Web.Mvc
                 {
                     case EntityAuthorizeAction.Create:
                         return Metadata.AddRoles.Count() == 0 ||
-                            (Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ? 
+                            (Metadata.AuthenticationRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
                             Metadata.AddRoles.All(t => httpContext.User.IsInRole(t)) :
                             Metadata.AddRoles.Any(t => httpContext.User.IsInRole(t)));
                     case EntityAuthorizeAction.Edit:
@@ -108,7 +108,7 @@ namespace System.Web.Mvc
                             Metadata.ViewRoles.All(t => httpContext.User.IsInRole(t)) :
                             Metadata.ViewRoles.Any(t => httpContext.User.IsInRole(t)));
                     case EntityAuthorizeAction.None:
-                        return CustomRoles == null || 
+                        return CustomRoles == null ||
                             (CustomRolesRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
                             CustomRoles.All(t => httpContext.User.IsInRole(t)) :
                             CustomRoles.Any(t => httpContext.User.IsInRole(t)));
@@ -117,7 +117,12 @@ namespace System.Web.Mvc
                 }
             }
             else
-                return httpContext.User.Identity.IsAuthenticated;
+                if (Action == EntityAuthorizeAction.None && CustomRoles != null)
+                    return (CustomRolesRequiredMode == ComponentModel.DataAnnotations.AuthenticationRequiredMode.All ?
+                            CustomRoles.All(t => httpContext.User.IsInRole(t)) :
+                            CustomRoles.Any(t => httpContext.User.IsInRole(t)));
+                else
+                    return httpContext.User.Identity.IsAuthenticated;
         }
 
         /// <summary>
