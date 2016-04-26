@@ -18,15 +18,26 @@ namespace System.ComponentModel.DataAnnotations
         /// <param name="valueFilter">Type of value filter.</param>
         /// <param name="dependencyProperty">The dependency property name.</param>
         public ValueFilterAttribute(Type valueFilter, string dependencyProperty)
+            : this(valueFilter)
+        {
+            if (dependencyProperty == null)
+                throw new ArgumentNullException("dependencyProperty");
+            DependencyProperty = dependencyProperty;
+        }
+
+
+        /// <summary>
+        /// Initialize attribute.
+        /// </summary>
+        /// <param name="valueFilter">Type of value filter.</param>
+        /// <param name="dependencyProperty">The dependency property name.</param>
+        public ValueFilterAttribute(Type valueFilter)
         {
             if (valueFilter == null)
                 throw new ArgumentNullException("valueFilter");
-            if (dependencyProperty == null)
-                throw new ArgumentNullException("dependencyProperty");
             if (!typeof(IValueFilter).IsAssignableFrom(valueFilter))
                 throw new ArgumentException("Type of \"" + valueFilter.Name + "\" is not implement IValueFilter.");
             ValueFilter = valueFilter;
-            DependencyProperty = dependencyProperty;
         }
 
         /// <summary>

@@ -44,7 +44,6 @@ namespace Company.Mvc.Controllers
                 return Content("密码错误！");
             }
             ComBoostAuthentication.SignIn(employee.Index.ToString(), false);
-            //FormsAuthentication.SetAuthCookie(employee.Index.ToString(), false);
             return new HttpStatusCodeResult(200);
         }
 

@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\Entity\EntityContext.cs" />
     <Compile Include="Data\Entity\EntityContextBuilder.cs" />
     <Compile Include="Data\Entity\EntityExtensions.cs" />
     <Compile Include="Data\Entity\EntityQueryable.cs" />

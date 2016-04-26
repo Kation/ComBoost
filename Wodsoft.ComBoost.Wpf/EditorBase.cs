@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Entity.Metadata;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace Wodsoft.ComBoost.Wpf
         public static readonly DependencyProperty OriginValueProperty = OriginValuePropertyKey.DependencyProperty;
 
         public object CurrentValue { get { return GetValue(CurrentValueProperty); } set { SetValue(CurrentValueProperty, value); } }
-        protected static readonly DependencyProperty CurrentValueProperty = DependencyProperty.Register("CurrentValue", typeof(object), typeof(EditorBase), new PropertyMetadata(CurrentValueChanged));
+        public static readonly DependencyProperty CurrentValueProperty = DependencyProperty.Register("CurrentValue", typeof(object), typeof(EditorBase), new PropertyMetadata(CurrentValueChanged));
         private static void CurrentValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             EditorBase editor = (EditorBase)d;
@@ -33,8 +34,8 @@ namespace Wodsoft.ComBoost.Wpf
                 editor.IsChanged = true;
         }
 
-        public System.Data.Entity.Metadata.ClrPropertyMetadata Metadata { get { return (System.Data.Entity.Metadata.ClrPropertyMetadata)GetValue(MetadataProperty); } set { SetValue(MetadataProperty, value); } }
-        public static readonly DependencyProperty MetadataProperty = DependencyProperty.Register("Metadata", typeof(System.Data.Entity.Metadata.ClrPropertyMetadata), typeof(EditorBase));
+        public IPropertyMetadata Metadata { get { return (IPropertyMetadata)GetValue(MetadataProperty); } set { SetValue(MetadataProperty, value); } }
+        public static readonly DependencyProperty MetadataProperty = DependencyProperty.Register("Metadata", typeof(IPropertyMetadata), typeof(EditorBase));
 
         public bool IsChanged { get { return (bool)GetValue(IsChangedProperty); } protected set { SetValue(IsChangedPropertyKey, value); } }
         protected static readonly DependencyPropertyKey IsChangedPropertyKey = DependencyProperty.RegisterReadOnly("IsChanged", typeof(bool), typeof(EditorBase), new PropertyMetadata(false));
@@ -76,7 +77,7 @@ namespace Wodsoft.ComBoost.Wpf
         private void Editor_Saving(object sender, RoutedEventArgs e)
         {
             if (IsChanged)
-                Metadata.Property.SetValue(Editor.Model.Item, CurrentValue);
+                Metadata.SetValue(Editor.Model.Item, CurrentValue);
         }
 
         private void Editor_PreviewSave(object sender, RoutedEventArgs e)
@@ -87,7 +88,7 @@ namespace Wodsoft.ComBoost.Wpf
 
         protected virtual bool ValidateCore()
         {
-            foreach (var att in Metadata.Property.GetCustomAttributes(true).OfType<ValidationAttribute>())
+            foreach (var att in Metadata.GetAttributes<ValidationAttribute>())
             {
                 try
                 {

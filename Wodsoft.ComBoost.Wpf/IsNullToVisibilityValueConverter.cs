@@ -13,17 +13,17 @@ namespace Wodsoft.ComBoost.Wpf
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (parameter == null)
-                return value == null ? Visibility.Visible : Visibility.Hidden;
+                return value == null ? Visibility.Visible : Visibility.Collapsed;
             if (parameter is bool)
                 if ((bool)parameter)
-                    return value == null ? Visibility.Visible : Visibility.Hidden;
+                    return value == null ? Visibility.Visible : Visibility.Collapsed;
                 else
-                    return value != null ? Visibility.Visible : Visibility.Hidden;
+                    return value != null ? Visibility.Visible : Visibility.Collapsed;
             else if (parameter is string)
                 if ((string)parameter == "true")
-                    return value == null ? Visibility.Visible : Visibility.Hidden;
+                    return value == null ? Visibility.Visible : Visibility.Collapsed;
                 else if ((string)parameter == "false")
-                    return value != null ? Visibility.Visible : Visibility.Hidden;
+                    return value != null ? Visibility.Visible : Visibility.Collapsed;
             throw new NotSupportedException();
         }
 

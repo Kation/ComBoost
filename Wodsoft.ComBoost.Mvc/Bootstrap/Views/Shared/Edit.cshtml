@@ -34,7 +34,7 @@
 </div>
 <ol class="breadcrumb">
     <li><a href="#">Home</a></li>
-    <li><a href="@Url.Action("Index")">@Model.Metadata.Name</a></li>
+    <li><a href="@Html.Raw(Url.Action("Index"))">@Model.Metadata.Name</a></li>
     <li class="active">@(Model.Item.Index == Guid.Empty ? "Create" : "Edit")</li>
 </ol>
 <div class="panel panel-default">
@@ -49,14 +49,14 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">@property.Name</label>
                     <div class="col-sm-8">
-                        @Html.Editor(property, property.GetValue(Model.Item))
+                        @Html.Editor(Model.Item, property, property.GetValue(Model.Item))
                     </div>
                 </div>
             }
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
                     <input type="submit" class="btn btn-primary" value="Save" />
-                    <a href="@Url.Action("Index")" class="btn btn-default">Back</a>
+                    <a href="@Html.Raw(Url.Action("Index"))" class="btn btn-default">Back</a>
                     <input name="id" type="hidden" value="@Model.Item.Index" />
                 </div>
             </div>

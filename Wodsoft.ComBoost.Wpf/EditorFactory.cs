@@ -38,7 +38,7 @@ namespace Wodsoft.ComBoost.Wpf
             AddEditor<TimeEditor>(CustomDataType.Time);
             AddEditor<UrlEditor>(CustomDataType.Url);
 
-            AddEditor<DefaultEditor>("Collection");
+            AddEditor<CollectionEditor>("Collection");
             AddEditor<Editor.EntityEditor>("Entity");
             AddEditor<DefaultEditor>("Enum");
         }

@@ -16,6 +16,7 @@ namespace Company.Entity
             switch (dependencyProperty)
             {
                 case "":
+                case null:
                     collection.Add("北京", "北京");
                     collection.Add("广东", "广东");
                     collection.Add("广西", "广西");

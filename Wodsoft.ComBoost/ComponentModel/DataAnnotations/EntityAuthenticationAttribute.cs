@@ -21,7 +21,13 @@ namespace System.ComponentModel.DataAnnotations
             AddRolesRequired = new string[0];
             EditRolesRequired = new string[0];
             RemoveRolesRequired = new string[0];
+            Mode = AuthenticationRequiredMode.All;
         }
+
+        /// <summary>
+        /// Get or set the authentication required mode.
+        /// </summary>
+        public AuthenticationRequiredMode Mode { get; set; }
 
         /// <summary>
         /// Get or set is entity allow anonymous operate.
@@ -31,22 +37,22 @@ namespace System.ComponentModel.DataAnnotations
         /// <summary>
         /// Get or set the roles to view entity.
         /// </summary>
-        public string[] ViewRolesRequired { get; set; }
+        public object[] ViewRolesRequired { get; set; }
 
         /// <summary>
         /// Get or set the roles to add entity.
         /// </summary>
-        public string[] AddRolesRequired { get; set; }
+        public object[] AddRolesRequired { get; set; }
 
         /// <summary>
         /// Get or set the roles to edit entity.
         /// </summary>
-        public string[] EditRolesRequired { get; set; }
+        public object[] EditRolesRequired { get; set; }
 
         /// <summary>
         /// Get or set the roles to remove entity.
         /// </summary>
-        public string[] RemoveRolesRequired { get; set; }
+        public object[] RemoveRolesRequired { get; set; }
 
     }
 }

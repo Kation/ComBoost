@@ -19,16 +19,17 @@ namespace Wodsoft.ComBoost.Wpf
 {
     [TemplatePart(Name = "PART_Save", Type = typeof(Button))]
     [TemplatePart(Name = "PART_Cancel", Type = typeof(Button))]
-    public class EntityEditor : EntityPage
+    public class EntityEditor : EntityWindow
     {
         static EntityEditor()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(EntityEditor), new FrameworkPropertyMetadata(typeof(EntityEditor)));
         }
 
-        public EntityEditor(EntityController controller)
-            : base(controller)
+        public EntityEditor()
         {
+            WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+
             Loaded += EntityEditor_Loaded;
             Unloaded += EntityEditor_Unloaded;
         }
@@ -40,12 +41,10 @@ namespace Wodsoft.ComBoost.Wpf
 
         private void EntityEditor_Loaded(object sender, RoutedEventArgs e)
         {
-            if (NavigationService == null)
-                throw new NotSupportedException("EntityEditor must place in a navigator.");
-            if (Model.Item.Index == default(Guid))
-                Title = "创建" + Model.Metadata.Name;
+            if (Model.Item.Index == Guid.Empty)
+                Title = "Create " + Model.Metadata.Name;
             else
-                Title = "编辑" + Model.Metadata.Name;
+                Title = "Edit " + Model.Metadata.Name;
         }
 
         public override void OnApplyTemplate()
@@ -68,8 +67,8 @@ namespace Wodsoft.ComBoost.Wpf
             Save();
         }
 
-        public EntityEditModel Model { get { return (EntityEditModel)GetValue(ModelProperty); } set { SetValue(ModelProperty, value); } }
-        public static readonly DependencyProperty ModelProperty = DependencyProperty.Register("Model", typeof(EntityEditModel), typeof(EntityEditor));
+        public IEntityEditModel Model { get { return (IEntityEditModel)GetValue(ModelProperty); } set { SetValue(ModelProperty, value); } }
+        public static readonly DependencyProperty ModelProperty = DependencyProperty.Register("Model", typeof(IEntityEditModel), typeof(EntityEditor));
 
         public event RoutedEventHandler PreviewSave { add { AddHandler(PreviewSaveEvent, value); } remove { RemoveHandler(PreviewSaveEvent, value); } }
         public static readonly RoutedEvent PreviewSaveEvent = EventManager.RegisterRoutedEvent("PreviewSave", RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(EntityEditor));
@@ -83,7 +82,7 @@ namespace Wodsoft.ComBoost.Wpf
         public event RoutedEventHandler Canceled { add { AddHandler(CanceledEvent, value); } remove { RemoveHandler(CanceledEvent, value); } }
         public static readonly RoutedEvent CanceledEvent = EventManager.RegisterRoutedEvent("Canceled", RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(EntityEditor));
 
-        public void Save()
+        public virtual void Save()
         {
             RoutedEventArgs pe = new RoutedEventArgs(PreviewSaveEvent, this);
             RaiseEvent(pe);
@@ -93,13 +92,14 @@ namespace Wodsoft.ComBoost.Wpf
             RaiseEvent(ie);
             RoutedEventArgs de = new RoutedEventArgs(SavedEvent, this);
             RaiseEvent(de);
+            DialogResult = true;
         }
 
-        public void Cancel()
+        public virtual void Cancel()
         {
             RoutedEventArgs e = new RoutedEventArgs(CanceledEvent, this);
             RaiseEvent(e);
-            NavigationService.GoBack();
+            DialogResult = false;
         }
     }
 }

@@ -5,7 +5,7 @@
     ValueFilterAttribute attribute = Model.Metadata.GetAttribute<ValueFilterAttribute>();
 }
 <select id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" class="form-control" style="padding-right: 12px;"></select>
-@if (attribute.DependencyProperty != null)
+@if (!string.IsNullOrEmpty(attribute.DependencyProperty))
 {
     <script type="text/javascript">
         $(function () {

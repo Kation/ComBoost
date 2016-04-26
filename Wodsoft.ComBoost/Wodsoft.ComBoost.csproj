@@ -49,11 +49,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Wodsoft.DynamicAssembly">
-      <HintPath>..\..\Wodsoft.DynamicAssembly\Wodsoft.DynamicAssembly\bin\Debug\Wodsoft.DynamicAssembly.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\DataAnnotations\AuthenticationRequiredMode.cs" />
     <Compile Include="ComponentModel\DataAnnotations\CustomDataType.cs" />
     <Compile Include="ComponentModel\DataAnnotations\CustomDataTypeAttribute.cs" />
     <Compile Include="ComponentModel\DataAnnotations\DistinctAttribute.cs">
@@ -85,6 +83,7 @@
     <Compile Include="Data\Entity\EntityBase.cs" />
     <Compile Include="Data\Entity\EntityDescriptorContext.cs" />
     <Compile Include="Data\Entity\IEntity.cs" />
+    <Compile Include="Data\Entity\IEntityContext.cs" />
     <Compile Include="Data\Entity\IEntityContextBuilder.cs" />
     <Compile Include="Data\Entity\IEntityQueryable.cs" />
     <Compile Include="Data\Entity\IRoleEntity.cs" />
@@ -98,6 +97,7 @@
     <Compile Include="Data\Entity\Metadata\ClrPropertyMetadata.cs" />
     <Compile Include="Data\Entity\IPassword.cs" />
     <Compile Include="Data\Entity\Metadata\PropertyMetadataBase.cs" />
+    <Compile Include="Data\Entity\MixedEntityContextBuilder.cs" />
     <Compile Include="Data\Entity\NotifyEntityBase.cs" />
     <Compile Include="Data\Entity\UserBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

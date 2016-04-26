@@ -65,6 +65,9 @@
     <Compile Include="BooleanReverseValueConverter.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BooleanToVisibilityValueConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DateToTimespanValueConverter.cs" />
     <Compile Include="Editor\BooleanEditor.cs">
       <SubType>Code</SubType>
@@ -97,12 +100,35 @@
     <Compile Include="EditorBase.cs" />
     <Compile Include="EditorFactory.cs" />
     <Compile Include="EditorPresenter.cs" />
-    <Compile Include="EntityFrame.cs" />
     <Compile Include="EntityEditor.cs" />
-    <Compile Include="EntityPage.cs" />
     <Compile Include="EntityController.cs" />
-    <Compile Include="WpfViewButton.cs" />
+    <Compile Include="EntityItemButton.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EntityMultipleSelector.cs" />
+    <Compile Include="EntityResolver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EntityRouter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EntitySelector.cs" />
+    <Compile Include="EntityViewButton.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="EntityViewer.cs" />
+    <Compile Include="EntityViewer`.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EntityWindow.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ExtendServiceProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IEntityController.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="IntAddValueConverter.cs" />
     <Compile Include="IsNullToBooleanValueConverter.cs" />
     <Compile Include="IsNullToVisibilityValueConverter.cs" />

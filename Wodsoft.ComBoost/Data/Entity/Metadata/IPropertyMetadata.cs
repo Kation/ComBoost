@@ -106,12 +106,17 @@ namespace System.Data.Entity.Metadata
         /// <summary>
         /// Get the roles to view property.
         /// </summary>
-        string[] ViewRoles { get; }
+        IEnumerable<object> ViewRoles { get; }
 
         /// <summary>
         /// Get the roles to edit property.
         /// </summary>
-        string[] EditRoles { get; }
+        IEnumerable<object> EditRoles { get; }
+        
+        /// <summary>
+        /// Get the authentication required mode.
+        /// </summary>
+        AuthenticationRequiredMode AuthenticationRequiredMode { get; }
 
         /// <summary>
         /// Get is the property can get value.

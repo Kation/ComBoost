@@ -26,7 +26,7 @@
     </div>
     <div class="radio-inline">
         <label>
-            <input type="radio" name="@Model.Metadata.ClrName" value="false" @Html.Raw(value.HasValue && !value.Value ? "" : "checked=\"checked\"") />No
+            <input type="radio" name="@Model.Metadata.ClrName" value="false" @Html.Raw(value.HasValue && value.Value ? "" : "checked=\"checked\"") />No
         </label>
     </div>
     @if (Model.Value == null || Model.Value is bool?)

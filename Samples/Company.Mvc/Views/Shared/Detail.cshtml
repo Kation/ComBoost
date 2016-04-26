@@ -28,7 +28,7 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">@property.Name</label>
                     <div class="col-sm-8">
-                        <p class="form-control-static">@EntityValueConverter.GetConverter(property).ConvertToString(property.GetValue(Model.Item))</p>
+                        <p class="form-control-static">@Html.Viewer(Model.Item, property, property.GetValue(Model.Item))</p>
                     </div>
                 </div>
             }

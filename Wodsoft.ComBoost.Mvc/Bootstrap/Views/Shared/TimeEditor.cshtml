@@ -1,10 +1,13 @@
 ﻿@model MvcEditorModel
+@{
+    TimeSpan? value = Model.Value as TimeSpan?;
+}
 <div class="input-group col-md-4" id="@Model.Metadata.ClrName">
-    <input type="number" id="@(Model.Metadata.ClrName)_Hour" min="0" step="1" class="form-control text-center" value="@(((TimeSpan)Model.Value).TotalHours)">
+    <input type="number" id="@(Model.Metadata.ClrName)_Hour" min="0" class="form-control text-center" value="@(value.HasValue ? value.Value.TotalHours.ToString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"") />
     <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
-    <input type="number" id="@(Model.Metadata.ClrName)_Minute" min="0" max="59" step="1" class="form-control text-center" value="@(((TimeSpan)Model.Value).Minutes)">
+    <input type="number" id="@(Model.Metadata.ClrName)_Minute" min="0" max="59" class="form-control text-center" value="@(value.HasValue ? value.Value.Minutes.ToString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"") />
     <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
-    <input type="number" id="@(Model.Metadata.ClrName)_Seconds" min="0" max="59" step="1" class="form-control text-center" value="@(((TimeSpan)Model.Value).Seconds)">
+    <input type="number" id="@(Model.Metadata.ClrName)_Seconds" min="0" max="59" class="form-control text-center" value="@(value.HasValue ? value.Value.Seconds.ToString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"") />
 </div>
 <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@Model.Value" />
 <script type="text/javascript">

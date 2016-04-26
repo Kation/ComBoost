@@ -79,7 +79,9 @@
                             <tr>
                                 @foreach (var header in Model.Headers)
                                 {
-                                    <td>@EntityValueConverter.GetConverter(header).ConvertToString(header.GetValue(item))</td>
+                                    <td>
+                                        @Html.Viewer(item, header, header.GetValue(item))
+                                    </td>
                                 }
                                 <td class="text-center" style="width: 64px;">
                                     <div class="btn-group btn-group-xs">
@@ -124,7 +126,7 @@
                             }
                             @foreach(var button in Model.ViewButtons)
                             {
-                                Model.ViewButtons[i].SetTarget()
+                                button.SetTarget(provider);
                                 <a href="@Html.Raw(button.Target)" class="btn btn-default" title="@button.Tooltip">@button.Icon@button.Name</a>
                             }
                         </div>

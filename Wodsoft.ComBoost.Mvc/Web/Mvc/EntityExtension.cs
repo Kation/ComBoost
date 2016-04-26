@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Entity;
 using System.Data.Entity.Metadata;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -102,7 +104,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Get a html string of pagination.
         /// </summary>
-        /// <param name="helper">A htmlhelper.</param>
+        /// <param name="helper">A html helper.</param>
         /// <param name="pagination">Entity view model.</param>
         public static MvcHtmlString Pagination(this HtmlHelper helper, IPagination pagination)
         {
@@ -114,7 +116,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Get a html string of pagination size button.
         /// </summary>
-        /// <param name="helper">A htmlhelper.</param>
+        /// <param name="helper">A html helper.</param>
         /// <param name="pagination">Entity view model.</param>
         public static MvcHtmlString PaginationButton(this HtmlHelper helper, IPagination pagination)
         {
@@ -126,22 +128,129 @@ namespace System.Web.Mvc
         /// <summary>
         /// Render a property editor.
         /// </summary>
-        /// <param name="helper">A htmlhelper.</param>
+        /// <typeparam name="TEntity">Type of entity.</typeparam>
+        /// <param name="helper">A html helper.</param>
+        /// <param name="model">Entity model.</param>
+        /// <param name="expression">Expression for property to entity.</param>
+        /// <returns></returns>
+        public static MvcHtmlString Editor<TEntity>(this HtmlHelper helper, IEntityEditModel<TEntity> model, Expression<Func<TEntity, object>> expression)
+            where TEntity : class, IEntity, new()
+        {
+            if (!(expression.Body is MemberExpression))
+                throw new NotSupportedException();
+            MemberExpression memberExpression = (MemberExpression)expression.Body;
+            if (!(memberExpression.Expression is ParameterExpression))
+                throw new NotSupportedException();
+            var value = expression.Compile()(model.Item);
+            var property = model.Metadata.GetProperty(memberExpression.Member.Name);
+            return Editor(helper, model.Item, property, value);
+        }
+
+        /// <summary>
+        /// Render a property editor.
+        /// </summary>
+        /// <param name="helper">A html helper.</param>
+        /// <param name="entity">Entity object.</param>
         /// <param name="property">Property metadata.</param>
-        /// <param name="value">Property value.</param>
-        public static MvcHtmlString Editor(this HtmlHelper helper, IPropertyMetadata property, object value)
+        /// <returns></returns>
+        public static MvcHtmlString Editor(this HtmlHelper helper, IEntity entity, IPropertyMetadata property)
         {
             if (helper == null)
                 throw new ArgumentNullException("helper");
+            if (entity == null)
+                throw new ArgumentNullException("entity");
+            if (property == null)
+                throw new ArgumentNullException("property");
+            return Editor(helper, entity, property, property.GetValue(entity));
+        }
+
+        /// <summary>
+        /// Render a property editor.
+        /// </summary>
+        /// <param name="helper">A html helper.</param>
+        /// <param name="entity">Entity object.</param>
+        /// <param name="property">Property metadata.</param>
+        /// <param name="value">Property value.</param>
+        public static MvcHtmlString Editor(this HtmlHelper helper, IEntity entity, IPropertyMetadata property, object value)
+        {
+            if (helper == null)
+                throw new ArgumentNullException("helper");
+            if (entity == null)
+                throw new ArgumentNullException("entity");
             if (property == null)
                 throw new ArgumentNullException("property");
             MvcEditorModel model = new MvcEditorModel();
             model.Metadata = property;
             model.Value = value;
+            model.Entity = entity;
             if (property.Type == CustomDataType.Other)
                 return helper.Partial(property.CustomType + "Editor", model);
             else
                 return helper.Partial(property.Type.ToString() + "Editor", model);
+        }
+        
+        /// <summary>
+        /// Render a property viewer.
+        /// </summary>
+        /// <typeparam name="TEntity">Type of entity.</typeparam>
+        /// <param name="helper">A html helper.</param>
+        /// <param name="model">Entity model.</param>
+        /// <param name="expression">Expression for property to entity.</param>
+        /// <returns></returns>
+        public static MvcHtmlString Viewer<TEntity>(this HtmlHelper helper, IEntityEditModel<TEntity> model, Expression<Func<TEntity, object>> expression)
+            where TEntity : class, IEntity, new()
+        {
+            if (!(expression.Body is MemberExpression))
+                throw new NotSupportedException();
+            MemberExpression memberExpression = (MemberExpression)expression.Body;
+            if (!(memberExpression.Expression is ParameterExpression))
+                throw new NotSupportedException();
+            var value = expression.Compile()(model.Item);
+            var property = model.Metadata.GetProperty(memberExpression.Member.Name);
+            return Viewer(helper, model.Item, property, value);
+        }
+
+        /// <summary>
+        /// Render a property viewer.
+        /// </summary>
+        /// <param name="helper">A html helper.</param>
+        /// <param name="entity">Entity object.</param>
+        /// <param name="property">Property metadata.</param>
+        /// <returns></returns>
+        public static MvcHtmlString Viewer(this HtmlHelper helper, IEntity entity, IPropertyMetadata property)
+        {
+            if (helper == null)
+                throw new ArgumentNullException("helper");
+            if (entity == null)
+                throw new ArgumentNullException("entity");
+            if (property == null)
+                throw new ArgumentNullException("property");
+            return Viewer(helper, entity, property, property.GetValue(entity));
+        }
+
+        /// <summary>
+        /// Render a property viewer.
+        /// </summary>
+        /// <param name="helper">A html helper.</param>
+        /// <param name="entity">Entity object.</param>
+        /// <param name="property">Property metadata.</param>
+        /// <param name="value">Property value.</param>
+        public static MvcHtmlString Viewer(this HtmlHelper helper, IEntity entity, IPropertyMetadata property, object value)
+        {
+            if (helper == null)
+                throw new ArgumentNullException("helper");
+            if (entity == null)
+                throw new ArgumentNullException("entity");
+            if (property == null)
+                throw new ArgumentNullException("property");
+            MvcEditorModel model = new MvcEditorModel();
+            model.Metadata = property;
+            model.Value = value;
+            model.Entity = entity;
+            if (property.Type == CustomDataType.Other)
+                return helper.Partial(property.CustomType + "Viewer", model);
+            else
+                return helper.Partial(property.Type.ToString() + "Viewer", model);
         }
 
         /// <summary>
@@ -167,7 +276,7 @@ namespace System.Web.Mvc
         /// <summary>
         /// Analyze a enum type.
         /// </summary>
-        /// <param name="helper">A htmlhelper.</param>
+        /// <param name="helper">A html helper.</param>
         /// <param name="type">Type of enum.</param>
         /// <returns></returns>
         public static EnumItem[] EnumAnalyze(this HtmlHelper helper, Type type)

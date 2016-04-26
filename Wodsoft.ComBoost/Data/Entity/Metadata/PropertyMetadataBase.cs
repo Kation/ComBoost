@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Collections.ObjectModel;
 
 namespace System.Data.Entity.Metadata
 {
@@ -121,12 +122,17 @@ namespace System.Data.Entity.Metadata
         /// <summary>
         /// Get the roles to view property.
         /// </summary>
-        public string[] ViewRoles { get; protected set; }
+        public IEnumerable<object> ViewRoles { get; protected set; }
 
         /// <summary>
         /// Get the roles to edit property.
         /// </summary>
-        public string[] EditRoles { get; protected set; }
+        public IEnumerable<object> EditRoles { get; protected set; }
+
+        /// <summary>
+        /// Get the authentication required mode.
+        /// </summary>
+        public AuthenticationRequiredMode AuthenticationRequiredMode { get; protected set; }
 
         /// <summary>
         /// Get is the property can get value.
@@ -212,8 +218,9 @@ namespace System.Data.Entity.Metadata
             if (authentication == null)
                 throw new ArgumentNullException("authentication");
             AllowAnonymous = authentication.AllowAnonymous;
-            EditRoles = authentication.EditRolesRequired;
-            ViewRoles = authentication.ViewRolesRequired;
+            EditRoles = new ReadOnlyCollection<object>(authentication.EditRolesRequired);
+            ViewRoles = new ReadOnlyCollection<object>(authentication.ViewRolesRequired);
+            AuthenticationRequiredMode = authentication.Mode;
         }
 
         /// <summary>

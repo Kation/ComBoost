@@ -16,7 +16,7 @@ namespace System.Data.Entity
         [Required]
         [CustomDataType(CustomDataType.Password)]
         [MaxLength(20)]
-        public virtual byte[] Password { get { return (byte[])GetValue(); } set { SetValue(value); } }
+        public virtual byte[] Password { get; set; }
 
         /// <summary>
         /// Get or set the salt data for password.
@@ -24,7 +24,7 @@ namespace System.Data.Entity
         [MaxLength(6)]
         [Hide]
         [Required]
-        public virtual byte[] Salt { get { return (byte[])GetValue(); } set { SetValue(value); } }
+        public virtual byte[] Salt { get; set; }
 
         /// <summary>
         /// Set a new password.
@@ -58,7 +58,7 @@ namespace System.Data.Entity
             }
         }
 
-        public virtual bool IsInRole(string role)
+        public virtual bool IsInRole(object role)
         {
             return true;
         }

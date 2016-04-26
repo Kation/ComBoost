@@ -12,8 +12,8 @@
     }
 }
 <ol class="breadcrumb">
-    <li><a href="@Url.Action("Index","Home")">Home</a></li>
-    <li><a href="@Url.Action("Index")">@Model.Metadata.Name</a></li>
+    <li><a href="@Html.Raw(Url.Action("Index","Home"))">Home</a></li>
+    <li><a href="@Html.Raw(Url.Action("Index"))">@Model.Metadata.Name</a></li>
     <li class="active">Detail</li>
 </ol>
 <div class="panel panel-default">
@@ -28,13 +28,13 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">@property.Name</label>
                     <div class="col-sm-8">
-                        <p class="form-control-static">@EntityValueConverter.GetConverter(property).ConvertToString(property.GetValue(Model.Item))</p>
+                        <p class="form-control-static">@Html.Viewer(Model.Item, property, property.GetValue(Model.Item))</p>
                     </div>
                 </div>
             }
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <a href="@Url.Action("Index")" class="btn btn-default">Back</a>
+                    <a href="@Html.Raw(Url.Action("Index"))" class="btn btn-default">Back</a>
                 </div>
             </div>
         </form>

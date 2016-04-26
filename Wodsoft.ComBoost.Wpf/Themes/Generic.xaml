@@ -4,14 +4,18 @@
     xmlns:local="clr-namespace:Wodsoft.ComBoost.Wpf"
     xmlns:editor="clr-namespace:Wodsoft.ComBoost.Wpf.Editor"
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity">
+    <local:IsNullToBooleanValueConverter x:Key="IsNullToBooleanValueConverter1"/>
+    <local:BooleanToVisibilityValueConverter x:Key="BooleanToVisibilityValueConverter"/>
+    <local:IsNullToBooleanValueConverter x:Key="IsNullToBooleanValueConverter"/>
     <local:IntAddValueConverter x:Key="IntAddValueConverter"/>
     <local:IsNullToVisibilityValueConverter x:Key="IsNullToVisibilityValueConverter"/>
     <Style TargetType="{x:Type local:EntityViewer}">
-        <Setter Property="KeepAlive" Value="True"/>
+        <Setter Property="Width" Value="800"/>
+        <Setter Property="Height" Value="480"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:EntityViewer}">
-                    <Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+                    <Grid Name="Layout" Background="White" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition />
@@ -29,16 +33,16 @@
                                 </TreeViewItem.ItemTemplate>
                             </TreeViewItem>
                         </TreeView>
-                        <ListView Name="EntityItems" Grid.Column="1" ItemsSource="{Binding Path=Model.Items}">
+                        <ListView Name="PART_ItemsView" Grid.Column="1" ItemsSource="{Binding Path=Model.Items}" SelectionMode="Single">
                             <ListView.View>
                                 <GridView x:Name="PART_GridView">
 
                                 </GridView>
                             </ListView.View>
                         </ListView>
-                        <StackPanel Margin="10" Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
+                        <StackPanel Margin="10" Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                             <Label Content="Items pre page" />
-                            <ComboBox Name="size" ItemsSource="{Binding Path=Model.PageSizeOption}" SelectedItem="{Binding Path=Model.CurrentSize}" HorizontalContentAlignment="Center" MinWidth="48" IsReadOnly="True">
+                            <ComboBox Name="size" ItemsSource="{Binding Path=Model.PageSizeOption}" SelectedItem="{Binding Path=Model.CurrentSize}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" MinWidth="48" IsReadOnly="True">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="SelectionChanged">
                                         <i:InvokeCommandAction Command="{Binding ChangePageSizeCommand}" CommandParameter="{Binding SelectedItem ,ElementName=size}"/>
@@ -46,24 +50,43 @@
                                 </i:Interaction.Triggers>
                             </ComboBox>
                         </StackPanel>
-                        <ItemsControl Margin="10" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" ItemsSource="{Binding Model.Buttons}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Command="{Binding Command}" CommandParameter="{Binding SelectedItem, ElementName=EntityItems}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <ContentControl Content="{Binding Icon}"/>
-                                            <Label Content="{Binding Name}" />
-                                        </StackPanel>
-                                    </Button>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <StackPanel Margin="10" Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" Grid.Column="1" Grid.Row="1">
+                            <ItemsControl ItemsSource="{Binding Model.ViewButtons}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Command="{Binding Path=DataContext.EntityViewCommand, ElementName=Layout}" Width="64" CommandParameter="{Binding}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ContentControl Content="{Binding Icon}"/>
+                                                <Label Content="{Binding Name}" />
+                                            </StackPanel>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <ItemsControl ItemsSource="{Binding Model.ItemButtons}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Command="{Binding Path=DataContext.EntityItemCommand, ElementName=Layout}" Width="64" CommandParameter="{Binding}" IsEnabled="{Binding SelectedItem, ElementName=PART_ItemsView, ConverterParameter=false, Converter={StaticResource IsNullToBooleanValueConverter}}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ContentControl Content="{Binding Icon}"/>
+                                                <Label Content="{Binding Name}" />
+                                            </StackPanel>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                        <StackPanel Margin="10" Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <Label Content="{Binding Path=Model.CurrentPage}"/>
                             <Label Content="/"/>
                             <Label Content="{Binding Path=Model.TotalPage}"/>
@@ -72,6 +95,9 @@
                             <Button Width="32" Content=">" Command="{Binding NavigatePageCommand}" CommandParameter="{Binding Model.CurrentPage, ConverterParameter=1, Converter={StaticResource IntAddValueConverter}}" />
                             <Button Width="32" Content=">>" Command="{Binding NavigatePageCommand}" CommandParameter="{Binding Model.TotalPage}" />
                         </StackPanel>
+                        <Grid Name="PART_Loading" Grid.ColumnSpan="2" Grid.RowSpan="2" Background="#88000000" Visibility="{TemplateBinding IsLoading, ConverterParameter=true, Converter={StaticResource BooleanToVisibilityValueConverter}}">
+                            <ProgressBar Height="32" VerticalAlignment="Center" Margin="12" IsIndeterminate="True"/>
+                        </Grid>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -79,11 +105,10 @@
     </Style>
 
     <Style TargetType="{x:Type local:EntityEditor}">
-        <Setter Property="KeepAlive" Value="False"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:EntityEditor}">
-                    <Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" Name="layout">
+                    <Grid Background="White" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" Name="layout">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition Height="auto"/>
@@ -113,103 +138,10 @@
                             <Button Name="PART_Save" Content="Save" Margin="10" Width="64" Height="24"/>
                             <Button Name="PART_Cancel" Content="Cancel" Margin="10" Width="64" Height="24"/>
                         </StackPanel>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style TargetType="{x:Type local:EntityFrame}">
-        <Setter Property="NavigationUIVisibility" Value="Visible"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:EntityFrame}">
-                    <ControlTemplate.Resources>
-                        <SolidColorBrush x:Key="LoadingBrush" Color="White" />
-                    </ControlTemplate.Resources>
-                    <Border BorderThickness="{TemplateBinding Border.BorderThickness}" BorderBrush="{TemplateBinding Border.BorderBrush}" Background="{TemplateBinding Panel.Background}">
-                        <Grid>
-                            <ContentPresenter Content="{TemplateBinding ContentControl.Content}" ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}" ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}" Name="PART_FrameCP" ClipToBounds="True" />
-                            <Grid Name="PART_LoadingPanel" Background="#7F000000" Visibility="Hidden">
-                                <Canvas Width="72" Height="72">
-                                    <Canvas.Triggers>
-                                        <EventTrigger RoutedEvent="Canvas.Loaded">
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball1" Storyboard.TargetProperty="(Canvas.Left)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:0.5" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball1" Storyboard.TargetProperty="(Canvas.Top)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:0.2" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball2" Storyboard.TargetProperty="(Canvas.Left)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:0.7" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball2" Storyboard.TargetProperty="(Canvas.Top)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:0.4" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball3" Storyboard.TargetProperty="(Canvas.Left)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:0.9" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball3" Storyboard.TargetProperty="(Canvas.Top)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:0.6" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball4" Storyboard.TargetProperty="(Canvas.Left)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:1.1" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball4" Storyboard.TargetProperty="(Canvas.Top)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:0.8" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball5" Storyboard.TargetProperty="(Canvas.Left)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:1.3" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball5" Storyboard.TargetProperty="(Canvas.Top)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:1" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball6" Storyboard.TargetProperty="(Canvas.Left)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation BeginTime="0:0:1.5" RepeatBehavior="Forever" AutoReverse="True" From="0" To="64" Duration="0:0:1" Storyboard.TargetName="Ball6" Storyboard.TargetProperty="(Canvas.Top)">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <SineEase EasingMode="EaseInOut" />
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                    </Canvas.Triggers>
-                                    <Rectangle Name="Ball1" Width="8" Height="8" RadiusX="4" RadiusY="4" Fill="{StaticResource LoadingBrush}" />
-                                    <Rectangle Name="Ball2" Width="8" Height="8" RadiusX="4" RadiusY="4" Fill="{StaticResource LoadingBrush}" />
-                                    <Rectangle Name="Ball3" Width="8" Height="8" RadiusX="4" RadiusY="4" Fill="{StaticResource LoadingBrush}" />
-                                    <Rectangle Name="Ball4" Width="8" Height="8" RadiusX="4" RadiusY="4" Fill="{StaticResource LoadingBrush}" />
-                                    <Rectangle Name="Ball5" Width="8" Height="8" RadiusX="4" RadiusY="4" Fill="{StaticResource LoadingBrush}" />
-                                    <Rectangle Name="Ball6" Width="8" Height="8" RadiusX="4" RadiusY="4" Fill="{StaticResource LoadingBrush}" />
-                                </Canvas>
-                            </Grid>
+                        <Grid Name="PART_Loading" Grid.RowSpan="2" Background="#88000000" Visibility="{TemplateBinding IsLoading, ConverterParameter=true, Converter={StaticResource BooleanToVisibilityValueConverter}}">
+                            <ProgressBar VerticalAlignment="Center" Margin="12" IsIndeterminate="True"/>
                         </Grid>
-                    </Border>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -305,7 +237,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style TargetType="{x:Type editor:EmailAddressEditor}">
         <Style.Triggers>
             <Trigger Property="HasError" Value="True">
@@ -391,7 +323,7 @@
         </Style.Triggers>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type editor:HtmlEditor}">
+                <ControlTemplate TargetType="{x:Type editor:MultilineTextEditor}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition MinHeight="80" />
@@ -417,7 +349,7 @@
         </Style.Triggers>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type editor:DefaultEditor}">
+                <ControlTemplate TargetType="{x:Type editor:CurrencyEditor}">
                     <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
                              VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}">
                         <TextBox.InputScope>
@@ -444,7 +376,7 @@
         </Style.Triggers>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type editor:DefaultEditor}">
+                <ControlTemplate TargetType="{x:Type editor:IntegerEditor}">
                     <TextBox Name="PART_TextBox" Background="{TemplateBinding Background}"
                              VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}">
                         <TextBox.InputScope>
@@ -655,6 +587,39 @@
                              VerticalContentAlignment="Center" ToolTip="{TemplateBinding ErrorMessage}"/>
                         <Button Grid.Column="1" Content="Select" Command="{TemplateBinding SelectCommand}" />
                         <Button Grid.Column="2" Content="Clear" Command="{TemplateBinding ClearCommand}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type editor:CollectionEditor}">
+        <Style.Triggers>
+            <Trigger Property="HasError" Value="True">
+                <Setter Property="Background" Value="#FFBBBB" />
+            </Trigger>
+            <Trigger Property="HasError" Value="False">
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Height" Value="144"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type editor:CollectionEditor}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="64"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <ListBox Name="PART_Selector" SelectionMode="Multiple" ItemsSource="{TemplateBinding CurrentValue}" Grid.RowSpan="3" Background="{TemplateBinding Background}" ToolTip="{TemplateBinding ErrorMessage}"/>
+                        <Button Name="PART_Add" Grid.Column="1" Content="Add" />
+                        <Button Name="PART_Remove" Grid.Column="1" Grid.Row="2" Content="Remove" />
+                        <Button Name="PART_Clear" Grid.Column="1" Grid.Row="3" Content="Clear" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
