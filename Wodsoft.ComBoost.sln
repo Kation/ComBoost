@@ -1,0 +1,105 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{42E2F6CA-200F-471D-B92A-4D0961AB35E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D2D0E3C7-C38F-4A99-AA22-03D925C266D5}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost", "src\Wodsoft.ComBoost\Wodsoft.ComBoost.xproj", "{05D4B0A9-B451-47B1-9654-5C0244966F14}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Security", "src\Wodsoft.ComBoost.Security\Wodsoft.ComBoost.Security.xproj", "{5C37BAF1-EEB0-4A1E-878D-AA1CF641F8BC}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Mvc", "src\Wodsoft.ComBoost.Mvc\Wodsoft.ComBoost.Mvc.xproj", "{4D03067A-1315-4163-887E-AB63FDBF835D}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Core", "src\Wodsoft.ComBoost.Core\Wodsoft.ComBoost.Core.xproj", "{BE0F297A-C084-4959-AE4D-68709C415AA1}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.EntityFramework", "src\Wodsoft.ComBoost.EntityFramework\Wodsoft.ComBoost.EntityFramework.xproj", "{833CD0DC-15C1-4D0B-BD97-6E05B51A37CB}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Data", "src\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.xproj", "{CEA8BB99-9E86-4594-99E2-9D0B43036EAF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{1494E8D3-905F-4A33-A4CA-4C320A9282F7}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Forum", "Wodsoft.ComBoost.Forum\Wodsoft.ComBoost.Forum.xproj", "{BB497D73-682B-47C4-AFC3-9DF5D8A52D23}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Forum.Entity", "Wodsoft.ComBoost.Forum.Entity\Wodsoft.ComBoost.Forum.Entity.xproj", "{E0C37A45-B7FD-4603-B0D1-931F42AFA553}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Forum.Domain", "Wodsoft.ComBoost.Forum.Domain\Wodsoft.ComBoost.Forum.Domain.xproj", "{81494F46-BE40-4F43-BF97-B856A1D1AA87}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Forum.Core", "Wodsoft.ComBoost.Forum.Core\Wodsoft.ComBoost.Forum.Core.xproj", "{9B101234-5EFA-4BEF-B58E-EA08CAD81159}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Mvc.Data", "src\Wodsoft.ComBoost.Mvc.Data\Wodsoft.ComBoost.Mvc.Data.xproj", "{B9B987C5-66F6-4DC9-A628-00E2A836A1A7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05D4B0A9-B451-47B1-9654-5C0244966F14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05D4B0A9-B451-47B1-9654-5C0244966F14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05D4B0A9-B451-47B1-9654-5C0244966F14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05D4B0A9-B451-47B1-9654-5C0244966F14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C37BAF1-EEB0-4A1E-878D-AA1CF641F8BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C37BAF1-EEB0-4A1E-878D-AA1CF641F8BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C37BAF1-EEB0-4A1E-878D-AA1CF641F8BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C37BAF1-EEB0-4A1E-878D-AA1CF641F8BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D03067A-1315-4163-887E-AB63FDBF835D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D03067A-1315-4163-887E-AB63FDBF835D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D03067A-1315-4163-887E-AB63FDBF835D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D03067A-1315-4163-887E-AB63FDBF835D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE0F297A-C084-4959-AE4D-68709C415AA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE0F297A-C084-4959-AE4D-68709C415AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE0F297A-C084-4959-AE4D-68709C415AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE0F297A-C084-4959-AE4D-68709C415AA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{833CD0DC-15C1-4D0B-BD97-6E05B51A37CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{833CD0DC-15C1-4D0B-BD97-6E05B51A37CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{833CD0DC-15C1-4D0B-BD97-6E05B51A37CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{833CD0DC-15C1-4D0B-BD97-6E05B51A37CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEA8BB99-9E86-4594-99E2-9D0B43036EAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEA8BB99-9E86-4594-99E2-9D0B43036EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEA8BB99-9E86-4594-99E2-9D0B43036EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEA8BB99-9E86-4594-99E2-9D0B43036EAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB497D73-682B-47C4-AFC3-9DF5D8A52D23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB497D73-682B-47C4-AFC3-9DF5D8A52D23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB497D73-682B-47C4-AFC3-9DF5D8A52D23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB497D73-682B-47C4-AFC3-9DF5D8A52D23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0C37A45-B7FD-4603-B0D1-931F42AFA553}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0C37A45-B7FD-4603-B0D1-931F42AFA553}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0C37A45-B7FD-4603-B0D1-931F42AFA553}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0C37A45-B7FD-4603-B0D1-931F42AFA553}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81494F46-BE40-4F43-BF97-B856A1D1AA87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81494F46-BE40-4F43-BF97-B856A1D1AA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81494F46-BE40-4F43-BF97-B856A1D1AA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81494F46-BE40-4F43-BF97-B856A1D1AA87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B101234-5EFA-4BEF-B58E-EA08CAD81159}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B101234-5EFA-4BEF-B58E-EA08CAD81159}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B101234-5EFA-4BEF-B58E-EA08CAD81159}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B101234-5EFA-4BEF-B58E-EA08CAD81159}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9B987C5-66F6-4DC9-A628-00E2A836A1A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9B987C5-66F6-4DC9-A628-00E2A836A1A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9B987C5-66F6-4DC9-A628-00E2A836A1A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9B987C5-66F6-4DC9-A628-00E2A836A1A7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{05D4B0A9-B451-47B1-9654-5C0244966F14} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{5C37BAF1-EEB0-4A1E-878D-AA1CF641F8BC} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{4D03067A-1315-4163-887E-AB63FDBF835D} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{BE0F297A-C084-4959-AE4D-68709C415AA1} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{833CD0DC-15C1-4D0B-BD97-6E05B51A37CB} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{CEA8BB99-9E86-4594-99E2-9D0B43036EAF} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{1494E8D3-905F-4A33-A4CA-4C320A9282F7} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{BB497D73-682B-47C4-AFC3-9DF5D8A52D23} = {1494E8D3-905F-4A33-A4CA-4C320A9282F7}
+		{E0C37A45-B7FD-4603-B0D1-931F42AFA553} = {1494E8D3-905F-4A33-A4CA-4C320A9282F7}
+		{81494F46-BE40-4F43-BF97-B856A1D1AA87} = {1494E8D3-905F-4A33-A4CA-4C320A9282F7}
+		{9B101234-5EFA-4BEF-B58E-EA08CAD81159} = {1494E8D3-905F-4A33-A4CA-4C320A9282F7}
+		{B9B987C5-66F6-4DC9-A628-00E2A836A1A7} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+	EndGlobalSection
+EndGlobal
