@@ -269,13 +269,7 @@ namespace System.Data.Entity.Metadata
                 RemoveRoles = new string[0];
             }
             else
-            {
-                AllowAnonymous = authenticate.AllowAnonymous;
-                AddRoles = authenticate.AddRolesRequired;
-                EditRoles = authenticate.EditRolesRequired;
-                ViewRoles = authenticate.ViewRolesRequired;
-                RemoveRoles = authenticate.RemoveRolesRequired;
-            }
+                SetAuthentication(authenticate);
         }
     }
 }
