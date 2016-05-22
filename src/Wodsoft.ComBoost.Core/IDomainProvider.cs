@@ -12,6 +12,8 @@ namespace Wodsoft.ComBoost
     {
         TService GetService<TService>() where TService : IDomainService;
 
-        void RegisterExtension<TExtension>() where TExtension : class, IDomainExtension, new();
+        void RegisterExtension(Type serviceType, Type extensionType);
+
+        void UnregisterExtension(Type serviceType, Type extensionType);
     }
 }
