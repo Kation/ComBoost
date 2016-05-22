@@ -9,11 +9,15 @@ namespace Wodsoft.ComBoost
     public class DomainContext : IDomainContext
     {
         private IServiceProvider _ServiceProvider;
+        private IDomainService _DomainService;
 
-        public DomainContext(IServiceProvider serviceProvider)
+        public DomainContext(IDomainService domainService, IServiceProvider serviceProvider)
         {
+            if (domainService == null)
+                throw new ArgumentNullException(nameof(domainService));
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
+            _DomainService = domainService;
             _ServiceProvider = serviceProvider;
         }
 
@@ -29,6 +33,14 @@ namespace Wodsoft.ComBoost
         }
 
         public virtual object Result { get; set; }
+        
+        public IDomainService Domain
+        {
+            get
+            {
+                return _DomainService;
+            }
+        }
 
         public virtual object GetService(Type serviceType)
         {

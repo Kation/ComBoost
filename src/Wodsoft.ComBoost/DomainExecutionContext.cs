@@ -1,0 +1,55 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+
+namespace Wodsoft.ComBoost
+{
+    public class DomainExecutionContext : IDomainExecutionContext
+    {
+        public DomainExecutionContext(IDomainContext domainContext, MethodInfo method)
+        {
+            if (domainContext == null)
+                throw new ArgumentNullException(nameof(domainContext));
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
+            _Context = domainContext;
+            _Method = method;
+            _Parameters = _Method.GetParameters();
+            _ParameterValues = GetParameters();
+        }
+
+        private IDomainContext _Context;
+        public IDomainContext DomainContext { get { return _Context; } }
+
+        private MethodInfo _Method;
+        public MethodInfo DomainMethod { get { return _Method; } }
+
+        private object[] _ParameterValues;
+        public object[] ParameterValues { get { return _ParameterValues; } }
+
+        private ParameterInfo[] _Parameters;
+        public object GetParameterValue(ParameterInfo parameter)
+        {
+            int index = Array.IndexOf(_Parameters, parameter);
+            if (index == -1)
+                throw new ArgumentException("该参数不数据当前执行上下文。", nameof(parameter));
+            return _ParameterValues[index];
+        }
+
+        private object[] GetParameters()
+        {
+            return _Parameters.Select(t =>
+            {
+                var from = t.GetCustomAttribute<FromAttribute>();
+                if (from == null)
+                    throw new NotSupportedException(string.Format("不能解析的参数，{0}的{1}。", _Method.DeclaringType.FullName, _Method.Name));
+                var value = from.GetValue(_Context, t);
+                if (value == null && t.HasDefaultValue)
+                    value = t.DefaultValue;
+                return value;
+            }).ToArray();
+        }
+    }
+}
