@@ -10,8 +10,6 @@ namespace Wodsoft.ComBoost.Mvc
         where T : class, new()
     {
         public EntityController()
-        {
-            AddDomain(new EntityDomain<T>());
-        }
+        { }
     }
 }

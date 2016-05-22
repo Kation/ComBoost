@@ -22,5 +22,15 @@ namespace Wodsoft.ComBoost.Mvc
         {
             return Collection[name];
         }
+
+        public T GetValue<T>(string name)
+        {
+            if (typeof(T) == typeof(string))
+                return (T)(object)string.Join(",", Collection[name].ToArray());
+            else if (typeof(T) == typeof(string[]))
+                return (T)(object)Collection[name].ToArray();
+            else
+                throw new NotSupportedException("该值提供器仅支持字符串类型结果值。");
+        }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -46,11 +46,12 @@ namespace Wodsoft.ComBoost.Mvc
         {
             if (domainService == null)
                 throw new ArgumentNullException(nameof(domainService));
+            return null;
         }
 
         protected virtual Task OnDomainServiceExecutingAsync(IDomainService domainService, DomainContext domainContext)
         {
-
+            return null;
         }
 
         #endregion
