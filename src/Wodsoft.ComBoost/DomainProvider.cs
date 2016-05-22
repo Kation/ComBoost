@@ -43,9 +43,9 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(serviceType));
             if (extensionType == null)
                 throw new ArgumentNullException(nameof(extensionType));
-            if (serviceType.IsAssignableFrom(typeof(IDomainService)))
+            if (!typeof(IDomainService).IsAssignableFrom(serviceType))
                 throw new ArgumentException("服务类型没有实现领域服务接口IDomainService。");
-            if (extensionType.IsAssignableFrom(typeof(IDomainExtension)))
+            if (!typeof(IDomainService).IsAssignableFrom(extensionType))
                 throw new ArgumentException("扩展类型没有实现领域扩展接口IDomainExtension。");
             if (!_Extensions.ContainsKey(serviceType))
                 _Extensions.Add(serviceType, new List<Type>());
