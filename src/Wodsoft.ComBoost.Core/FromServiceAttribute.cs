@@ -17,7 +17,10 @@ namespace Wodsoft.ComBoost
 
         public override object GetValue(IDomainContext domainContext, ParameterInfo parameter)
         {
-            return domainContext.GetService(parameter.ParameterType);
+            var service = domainContext.GetService(parameter.ParameterType);
+            if (IsRequired && service == null)
+                throw new ArgumentNullException("获取" + parameter.Name + "参数的值为空。");
+            return service;
         }
     }
 }

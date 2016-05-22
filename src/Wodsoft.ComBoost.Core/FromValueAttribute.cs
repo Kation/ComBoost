@@ -30,7 +30,7 @@ namespace Wodsoft.ComBoost
                     value = converter.ConvertFrom(value);
                 }
             }
-            if (value == null)
+            if (IsRequired && value == null)
                 throw new ArgumentNullException("获取" + parameter.Name + "参数的值为空。");
             return value;
         }
