@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
 {
-    public interface IValueProvider
+    public interface IPageProvider
     {
-        object GetValue(string name);
+        int Page { get; }
 
-        T GetValue<T>(string name);
+        int Size { get; }
     }
 }

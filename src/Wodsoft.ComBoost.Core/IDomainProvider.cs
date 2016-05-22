@@ -10,11 +10,8 @@ namespace Wodsoft.ComBoost
     /// </summary>
     public interface IDomainProvider
     {
-        /// <summary>
-        /// 获取领域服务。
-        /// </summary>
-        /// <param name="name">服务名。</param>
-        /// <returns>返回领域服务。</returns>
-        IDomainService GetService(string name);
+        TService GetService<TService>() where TService : IDomainService;
+
+        void RegisterExtension<TExtension>() where TExtension : class, IDomainExtension, new();
     }
 }

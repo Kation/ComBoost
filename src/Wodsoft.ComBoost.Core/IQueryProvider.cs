@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
 {
-    public interface IValueProvider
+    public interface IQueryProvider
     {
-        object GetValue(string name);
+        bool HasQuery { get; }
 
-        T GetValue<T>(string name);
+        IQueryable<T> Query<T>(IQueryable<T> queryable);
     }
 }
