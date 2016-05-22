@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 namespace Wodsoft.ComBoost.Data.Entity
 {
     public interface IEntityContext<T>
+        where T : class, new()
     {
         IDatabaseContext Database { get; }
         void Add(T item);
@@ -22,5 +23,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         IQueryable<T> InParent(IQueryable<T> query, object[] parentIds);
         Task<T[]> ToArrayAsync(IQueryable<T> query);
         Task<List<T>> ToListAsync(IQueryable<T> query);
+        bool IsNew(T item);
     }
 }

@@ -4,49 +4,48 @@ using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
 using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel;
 
 namespace Wodsoft.ComBoost.Data
 {
-    public class EntityDomain<T>
+    public class EntityDomainService<T> : DomainService
+        where T : class, new()
     {
-        public virtual Task Create(IDomainContext serviceContext)
+        public virtual Task Create([FromService] IDatabaseContext database)
         {
-            var database = serviceContext.GetService<IDatabaseContext>();
             var context = database.GetContext<T>();
-            serviceContext.Result = context.Create();
+            EntityEditModel<T> model = new EntityEditModel<T>(context.Create());
+            ExecutionContext.DomainContext.Result = model;
             return Task.FromResult(0);
         }
 
-        public virtual async Task Update(IDomainContext serviceContext)
+        public virtual async Task Update([FromService] IDatabaseContext database, [FromService] IValueProvider valueProvider)
         {
-            IValueProvider valueProvider = serviceContext.GetService<IValueProvider>();
-            if (valueProvider == null)
-                throw new NotSupportedException("Could not get value provider from service context.");
-
-            var database = serviceContext.GetService<IDatabaseContext>();
             var context = database.GetContext<T>();
 
-            serviceContext.Result = await database.SaveAsync();
+            ExecutionContext.DomainContext.Result = await database.SaveAsync();
         }
 
         protected virtual Task UpdateCore(IDomainContext serviceContext, T entity)
         {
-
+            return null;
         }
 
         protected virtual Task UpdateProperty(IDomainContext serviceContext, T entity)
         {
+            return null;
 
         }
 
         public virtual Task Remove(IDomainContext serviceContext)
         {
+            return null;
 
         }
 
         public virtual Task Detail(IDomainContext serviceContext)
         {
-
+            return null;
         }
     }
 }
