@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
 {
-    public interface IValueCollectionProvider
+    public interface IIsInRole
     {
-        IValueProvider GetValueProvider(string name);
+        bool IsInRole(object role);
     }
 }

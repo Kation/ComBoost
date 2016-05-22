@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Security
 {
-    public interface IAuthentication
+    public interface IAuthentication : System.Security.Principal.IPrincipal
     {
-        
+        bool IsInRole(object role);
+
+        T GetUser<T>();
     }
 }
