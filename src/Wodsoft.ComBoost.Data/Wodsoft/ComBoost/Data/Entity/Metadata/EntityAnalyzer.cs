@@ -65,6 +65,10 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             while (type.GetTypeInfo().Assembly.IsDynamic)
                 type = type.GetTypeInfo().BaseType;
+            if (type.GetTypeInfo().IsInterface)
+                throw new NotSupportedException("不支持接口类型," + type.FullName + "。");
+            if (type.GetTypeInfo().IsAbstract)
+                throw new NotSupportedException("不支持抽象类型," + type.FullName + "。");
             lock (_Metadata)
                 if (!_Metadata.ContainsKey(type))
                 {
