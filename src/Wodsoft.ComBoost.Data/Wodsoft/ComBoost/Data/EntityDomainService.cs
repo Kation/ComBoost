@@ -6,6 +6,7 @@ using Wodsoft.ComBoost.Data.Entity;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
+using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.Data
 {
@@ -19,8 +20,17 @@ namespace Wodsoft.ComBoost.Data
             Metadata = EntityAnalyzer.GetMetadata<T>();
         }
 
-        public virtual Task Create([FromService] IDatabaseContext database)
+        public virtual Task Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
         {
+            if (!Metadata.AllowAnonymous)
+            {
+                var auth = authenticationProvider.GetAuthentication();
+                if (auth == null)
+                    throw new NotSupportedException("不能从当前权限提供器获取权限。");
+                if (Metadata.AuthenticationRequiredMode == System.ComponentModel.DataAnnotations.AuthenticationRequiredMode.All)
+                    if (Metadata.AddRoles.Any(t => !auth.IsInRole(t)))
+                        throw new UnauthorizedAccessException("创建权限不足。");
+            }
             var context = database.GetContext<T>();
             EntityEditModel<T> model = new EntityEditModel<T>(context.Create());
             ExecutionContext.DomainContext.Result = model;
