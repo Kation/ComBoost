@@ -10,7 +10,7 @@ namespace System.ComponentModel
     /// Entity edit model.
     /// </summary>
     /// <typeparam name="TEntity">Type of Entity.</typeparam>
-    public class EntityEditModel<TEntity> : IEntityEditModel<TEntity>, IEntityEditModel
+    public class EntityEditModel<TEntity> : NotifyBase, IEntityEditModel<TEntity>, IEntityEditModel
     {
         /// <summary>
         /// Initialize entity edit model.
@@ -37,7 +37,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the properties to edit.
         /// </summary>
-        public TEntity Item { get; set; }
+        public TEntity Item { get { return (TEntity)GetValue(); } set { SetValue(value); } }
 
         /// <summary>
         /// Get or set the item to edit.

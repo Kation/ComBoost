@@ -18,8 +18,12 @@ namespace System.ComponentModel.DataAnnotations
         /// <param name="propertyName">Property of parent.</param>
         public ParentAttribute(Type parent, string propertyName)
         {
-            if (!typeof(IEntity).IsAssignableFrom(parent))
-                throw new NotSupportedException("Type of parent must inherit IEntity.");
+            if (parent == null)
+                throw new ArgumentNullException(nameof(parent));
+            if (propertyName == null)
+                throw new ArgumentNullException(nameof(propertyName));
+            //if (!typeof(IEntity).IsAssignableFrom(parent))
+            //    throw new NotSupportedException("Type of parent must inherit IEntity.");
             Parent = parent;
             PropertyName = propertyName;
         }
