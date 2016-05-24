@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
 {
-    public interface IIsInRole
+    public interface IPermission
     {
         bool IsInRole(object role);
     }
