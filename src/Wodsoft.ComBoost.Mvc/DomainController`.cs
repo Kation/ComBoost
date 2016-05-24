@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Http.Authentication;
 
 namespace Wodsoft.ComBoost.Mvc
 {
@@ -12,7 +13,9 @@ namespace Wodsoft.ComBoost.Mvc
     {
         public DomainController()
         {
-            AddDomain(new TService());
+            //UserManager
+            //HttpContext.Authentication
+            AddDomain(new TService()); // Microsoft.AspNetCore.Http.Authentication.AuthenticationManager
         }
     }
 }

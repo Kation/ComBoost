@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,6 @@ namespace Wodsoft.ComBoost.Mvc
     public class MvcDomainContext : DomainContext
     {
         public MvcDomainContext(Controller controller)
-            : base(controller.Resolver)
         {
             if (controller == null)
                 throw new ArgumentNullException(nameof(controller));
