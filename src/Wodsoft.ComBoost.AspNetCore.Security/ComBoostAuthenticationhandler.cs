@@ -11,7 +11,6 @@ namespace Wodsoft.ComBoost.Security
     {
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            System.Security.Principal.WindowsPrincipal
             return Task.FromResult(AuthenticateResult.Skip());
         }
     }
