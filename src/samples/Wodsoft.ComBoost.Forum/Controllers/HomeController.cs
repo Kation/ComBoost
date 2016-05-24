@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 
 namespace Wodsoft.ComBoost.Forum.Controllers
 {
@@ -10,6 +11,8 @@ namespace Wodsoft.ComBoost.Forum.Controllers
     {
         public IActionResult Index()
         {
+            var user = User;
+            bool isAuth = user.Identity.IsAuthenticated;
             return View();
         }
 
