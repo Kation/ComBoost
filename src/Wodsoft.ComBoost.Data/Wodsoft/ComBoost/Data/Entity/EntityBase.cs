@@ -25,6 +25,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public virtual void OnPreCreate()
         {
+            Index = Guid.NewGuid();
             CreateDate = DateTime.Now;
         }
 
