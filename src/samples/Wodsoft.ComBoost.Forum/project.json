@@ -23,7 +23,6 @@
     "Microsoft.EntityFrameworkCore": "1.0.0-rc2-final",
     "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0-rc2-final",
     "System.ComponentModel.Annotations": "4.1.0-rc2-24027",
-    "Microsoft.AspNetCore.Identity": "1.0.0-rc2-final",
     "Wodsoft.ComBoost.AspNetCore.Security": "1.0.0-*"
   },
 
