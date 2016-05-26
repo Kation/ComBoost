@@ -11,11 +11,11 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         DateTime CreateDate { get; set; }
 
-        void OnPreCreate();
+        void OnCreating();
 
         void OnCreateCompleted();
 
-        void OnPreEdit();
+        void OnEditing();
 
         void OnEditCompleted();
 

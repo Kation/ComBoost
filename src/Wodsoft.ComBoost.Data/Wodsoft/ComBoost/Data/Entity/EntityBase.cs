@@ -23,12 +23,12 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public virtual void OnEditCompleted() { }
 
-        public virtual void OnPreCreate()
+        public virtual void OnCreating()
         {
             Index = Guid.NewGuid();
             CreateDate = DateTime.Now;
         }
 
-        public virtual void OnPreEdit() { }
+        public virtual void OnEditing() { }
     }
 }
