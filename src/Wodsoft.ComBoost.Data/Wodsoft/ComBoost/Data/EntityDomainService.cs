@@ -11,7 +11,7 @@ using Wodsoft.ComBoost.Security;
 namespace Wodsoft.ComBoost.Data
 {
     public class EntityDomainService<T> : DomainService
-        where T : class, new()
+        where T : class, IEntity, new()
     {
         public IEntityMetadata Metadata { get; private set; }
 
@@ -28,8 +28,15 @@ namespace Wodsoft.ComBoost.Data
                 if (auth == null)
                     throw new NotSupportedException("不能从当前权限提供器获取权限。");
                 if (Metadata.AuthenticationRequiredMode == System.ComponentModel.DataAnnotations.AuthenticationRequiredMode.All)
+                {
                     if (Metadata.AddRoles.Any(t => !auth.IsInRole(t)))
                         throw new UnauthorizedAccessException("创建权限不足。");
+                }
+                else
+                {
+                    if (Metadata.AddRoles.All(t => !auth.IsInRole(t)))
+                        throw new UnauthorizedAccessException("创建权限不足。");
+                }
             }
             var context = database.GetContext<T>();
             EntityEditModel<T> model = new EntityEditModel<T>(context.Create());
@@ -37,7 +44,7 @@ namespace Wodsoft.ComBoost.Data
             return Task.FromResult(0);
         }
 
-        public virtual async Task Update([FromService] IDatabaseContext database, [FromService] IValueProvider valueProvider)
+        public virtual async Task Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
         {
             var context = database.GetContext<T>();
             object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName);
@@ -46,16 +53,62 @@ namespace Wodsoft.ComBoost.Data
                 var converter = TypeDescriptor.GetConverter(Metadata.KeyProperty.ClrType);
                 index = converter.ConvertFrom(index);
             }
-            var entity = await context.GetAsync(index);
-            if (entity == null)
-                return;
-            await UpdateCore(valueProvider, entity);
+            bool isNew = index == Activator.CreateInstance(Metadata.KeyProperty.ClrType);
+            if (!Metadata.AllowAnonymous)
+            {
+                var auth = authenticationProvider.GetAuthentication();
+                if (auth == null)
+                    throw new NotSupportedException("不能从当前权限提供器获取权限。");
+                if (Metadata.AuthenticationRequiredMode == System.ComponentModel.DataAnnotations.AuthenticationRequiredMode.All)
+                {
+                    if (isNew)
+                    {
+                        if (Metadata.AddRoles.Any(t => !auth.IsInRole(t)))
+                            throw new UnauthorizedAccessException("创建权限不足。");
+                    }
+                    else
+                    {
+                        if (Metadata.EditRoles.Any(t => !auth.IsInRole(t)))
+                            throw new UnauthorizedAccessException("创建权限不足。");
+                    }
+                }
+                else
+                {
+                    if (isNew)
+                    {
+                        if (Metadata.AddRoles.All(t => !auth.IsInRole(t)))
+                            throw new UnauthorizedAccessException("创建权限不足。");
+                    }
+                    else
+                    {
+                        if (Metadata.EditRoles.All(t => !auth.IsInRole(t)))
+                            throw new UnauthorizedAccessException("创建权限不足。");
+                    }
+                }
+            }
+            T entity;
+            if (isNew)
+            {
+                entity = context.Create();
+                entity.OnCreating();
+            }
+            else
+            {
+                entity = await context.GetAsync(index);
+                if (entity == null)
+                    throw new EntityNotFoundException(typeof(T), index);
+            }
+            await UpdateCore(valueProvider, entity, isNew);
             //ExecutionContext.DomainContext.Result = await database.SaveAsync();
         }
 
-        protected virtual Task UpdateCore(IValueProvider valueProvider, T entity)
+        protected virtual Task UpdateCore(IValueProvider valueProvider, T entity, bool isNew)
         {
-            //Metadata.
+            var properties = isNew ? Metadata.CreateProperties : Metadata.EditProperties;
+            foreach(var property in properties)
+            {
+                
+            }
             return null;
         }
 
