@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace Wodsoft.ComBoost.Data.Entity.Metadata
 {
@@ -73,6 +74,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// Get the custom data type of property.
         /// </summary>
         public string CustomType { get; protected set; }
+
+        /// <summary>
+        /// 获取或设置类型转换器。
+        /// </summary>
+        public TypeConverter Converter { get; protected set; }
 
         /// <summary>
         /// Get the property is base on upload file.

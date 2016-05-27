@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
@@ -38,7 +39,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             Type = propertyInfo.GetCustomDataType(out customType, out isFileUpload);
             CustomType = customType;
             IsFileUpload = isFileUpload;
-
+            Converter = TypeDescriptor.GetConverter(ClrType);
             if (Type != CustomDataType.Image && Type != CustomDataType.Password && Type != CustomDataType.Time)
             {
                 if (CustomType == null || CustomType == "Entity" || CustomType == "Enum")

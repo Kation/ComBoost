@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
@@ -52,6 +53,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// Get the type of property.
         /// </summary>
         CustomDataType Type { get; }
+
+        /// <summary>
+        /// 获取类型转换器。
+        /// </summary>
+        TypeConverter Converter { get; }
 
         /// <summary>
         /// Get the custom data type of property.
