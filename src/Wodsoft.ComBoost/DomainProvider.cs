@@ -11,6 +11,7 @@ namespace Wodsoft.ComBoost
     {
         private IServiceProvider _ServiceProvider;
         private Dictionary<Type, List<Type>> _Extensions;
+        private Dictionary<Type, Type> _Overrides;
 
         public DomainProvider(IServiceProvider serviceProvider)
         {
@@ -18,12 +19,31 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(serviceProvider));
             _ServiceProvider = serviceProvider;
             _Extensions = new Dictionary<Type, List<Type>>();
+            _Overrides = new Dictionary<Type, Type>();
         }
 
         public TService GetService<TService>() where TService : IDomainService
         {
-            var service = ActivatorUtilities.CreateInstance<TService>(_ServiceProvider);
             Type type = typeof(TService);
+            TService service;
+            if (type.IsConstructedGenericType)
+            {
+                var definitionType = type.GetGenericTypeDefinition();
+                if (_Overrides.ContainsKey(definitionType))
+                {
+                    var arguments = type.GetGenericArguments();
+                    type = _Overrides[definitionType].MakeGenericType(arguments);
+                    service = (TService)ActivatorUtilities.CreateInstance(_ServiceProvider, type);
+                }
+                else
+                    service = ActivatorUtilities.CreateInstance<TService>(_ServiceProvider);
+            }
+            else if (_Overrides.ContainsKey(type))
+            {
+                service = (TService)ActivatorUtilities.CreateInstance(_ServiceProvider, _Overrides[type]);
+            }
+            else
+                service = ActivatorUtilities.CreateInstance<TService>(_ServiceProvider);
             List<Type> extensions;
             if (_Extensions.TryGetValue(type, out extensions))
             {
@@ -34,7 +54,38 @@ namespace Wodsoft.ComBoost
                     service.Executed += extension.OnDomainExecutedAsync;
                 }
             }
+            if (type.IsConstructedGenericType)
+            {
+                var definitionType = type.GetGenericTypeDefinition();
+                if (_Extensions.TryGetValue(definitionType, out extensions))
+                {
+                    var arguments = type.GetGenericArguments();
+                    foreach (var extensionType in extensions)
+                    {
+                        IDomainExtension extension = (IDomainExtension)ActivatorUtilities.CreateInstance(_ServiceProvider, extensionType.MakeGenericType(arguments));
+                        service.Executing += extension.OnDomainExecutingAsync;
+                        service.Executed += extension.OnDomainExecutedAsync;
+                    }
+                }
+            }
             return service;
+        }
+
+        public void Override(Type serviceType, Type overrideType)
+        {
+            if (serviceType == null)
+                throw new ArgumentNullException(nameof(serviceType));
+            if (overrideType == null)
+                throw new ArgumentNullException(nameof(overrideType));
+            if (_Overrides.ContainsKey(serviceType))
+            {
+                if (serviceType == overrideType)
+                    _Overrides.Remove(serviceType);
+                else
+                    _Overrides[serviceType] = overrideType;
+            }
+            else
+                _Overrides.Add(serviceType, overrideType);
         }
 
         public void RegisterExtension(Type serviceType, Type extensionType)
