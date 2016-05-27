@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 using Wodsoft.ComBoost.Security;
+using System.Reflection;
 
 namespace Wodsoft.ComBoost.Data
 {
@@ -98,30 +99,32 @@ namespace Wodsoft.ComBoost.Data
                 if (entity == null)
                     throw new EntityNotFoundException(typeof(T), index);
             }
-            await UpdateCore(valueProvider, entity, isNew);
+            UpdateCore(valueProvider, entity, isNew);
             //ExecutionContext.DomainContext.Result = await database.SaveAsync();
         }
 
-        protected virtual Task UpdateCore(IValueProvider valueProvider, T entity, bool isNew)
+        protected virtual void UpdateCore(IValueProvider valueProvider, T entity, bool isNew)
         {
             var properties = isNew ? Metadata.CreateProperties : Metadata.EditProperties;
-            foreach(var property in properties)
+            foreach (var property in properties)
             {
-                
+                UpdateProperty(valueProvider, entity, property);
             }
-            return null;
         }
 
-        protected virtual Task UpdateProperty(IValueProvider valueProvider, T entity)
+        protected virtual void UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
         {
-            return null;
-
+            object value = valueProvider.GetValue(property.ClrName);
+            if (value == null)
+                return;
+            if (!property.ClrType.GetType().IsAssignableFrom(value.GetType()))
+                value = property.Converter.ConvertFrom(value);
+            property.SetValue(entity, value);
         }
 
         public virtual Task Remove(IDomainContext serviceContext)
         {
             return null;
-
         }
 
         public virtual Task Detail(IDomainContext serviceContext)
