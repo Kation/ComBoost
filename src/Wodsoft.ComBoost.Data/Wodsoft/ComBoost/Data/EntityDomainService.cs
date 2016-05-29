@@ -8,6 +8,7 @@ using System.ComponentModel;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 using Wodsoft.ComBoost.Security;
 using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace Wodsoft.ComBoost.Data
 {
@@ -18,17 +19,17 @@ namespace Wodsoft.ComBoost.Data
 
         public EntityDomainService()
         {
-            Metadata = EntityAnalyzer.GetMetadata<T>();
+            Metadata = EntityDescriptor.GetMetadata<T>();
         }
 
         public virtual Task Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
         {
+            var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
             {
-                var auth = authenticationProvider.GetAuthentication();
                 if (auth == null)
                     throw new NotSupportedException("不能从当前权限提供器获取权限。");
-                if (Metadata.AuthenticationRequiredMode == System.ComponentModel.DataAnnotations.AuthenticationRequiredMode.All)
+                if (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
                 {
                     if (Metadata.AddRoles.Any(t => !auth.IsInRole(t)))
                         throw new UnauthorizedAccessException("创建权限不足。");
@@ -40,7 +41,18 @@ namespace Wodsoft.ComBoost.Data
                 }
             }
             var context = database.GetContext<T>();
-            EntityEditModel<T> model = new EntityEditModel<T>(context.Create());
+            var item = context.Create();
+            item.OnCreating();
+            EntityEditModel<T> model = new EntityEditModel<T>(item);
+            model.Properties = Metadata.CreateProperties.Where(t =>
+            {
+                if (!t.AllowAnonymous && auth == null)
+                    return false;
+                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
+                    return t.AddRoles.All(r => auth.IsInRole(r));
+                else
+                    return t.AddRoles.Any(r => auth.IsInRole(r));
+            }).ToArray();
             ExecutionContext.DomainContext.Result = model;
             return Task.FromResult(0);
         }
@@ -55,12 +67,12 @@ namespace Wodsoft.ComBoost.Data
                 index = converter.ConvertFrom(index);
             }
             bool isNew = index == Activator.CreateInstance(Metadata.KeyProperty.ClrType);
+            var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
             {
-                var auth = authenticationProvider.GetAuthentication();
                 if (auth == null)
                     throw new NotSupportedException("不能从当前权限提供器获取权限。");
-                if (Metadata.AuthenticationRequiredMode == System.ComponentModel.DataAnnotations.AuthenticationRequiredMode.All)
+                if (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
                 {
                     if (isNew)
                     {
@@ -99,17 +111,35 @@ namespace Wodsoft.ComBoost.Data
                 if (entity == null)
                     throw new EntityNotFoundException(typeof(T), index);
             }
-            UpdateCore(valueProvider, entity, isNew);
-            //ExecutionContext.DomainContext.Result = await database.SaveAsync();
+            UpdateCore(valueProvider, auth, entity, isNew);
         }
 
-        protected virtual void UpdateCore(IValueProvider valueProvider, T entity, bool isNew)
+        protected virtual void UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, bool isNew)
         {
-            var properties = isNew ? Metadata.CreateProperties : Metadata.EditProperties;
+            var properties = isNew ? Metadata.CreateProperties.Where(t =>
+            {
+                if (!t.AllowAnonymous && authentication == null)
+                    return false;
+                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
+                    return t.AddRoles.All(r => authentication.IsInRole(r));
+                else
+                    return t.AddRoles.Any(r => authentication.IsInRole(r));
+            }).ToArray() :
+            Metadata.EditProperties.Where(t =>
+            {
+                if (!t.AllowAnonymous && authentication == null)
+                    return false;
+                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
+                    return t.EditRoles.All(r => authentication.IsInRole(r));
+                else
+                    return t.EditRoles.Any(r => authentication.IsInRole(r));
+            }).ToArray();
+            var model = new EntityUpdateModel();
             foreach (var property in properties)
             {
                 UpdateProperty(valueProvider, entity, property);
             }
+            model.IsSuccess = model.ErrorMessage.Count == 0;
         }
 
         protected virtual void UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
