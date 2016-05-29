@@ -135,6 +135,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// Get the roles to edit property.
         /// </summary>
+        public IEnumerable<object> AddRoles { get; protected set; }
+
+        /// <summary>
+        /// Get the roles to edit property.
+        /// </summary>
         public IEnumerable<object> EditRoles { get; protected set; }
 
         /// <summary>
@@ -226,6 +231,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             if (authentication == null)
                 throw new ArgumentNullException("authentication");
             AllowAnonymous = authentication.AllowAnonymous;
+            EditRoles = new ReadOnlyCollection<object>(authentication.AddRolesRequired);
             EditRoles = new ReadOnlyCollection<object>(authentication.EditRolesRequired);
             ViewRoles = new ReadOnlyCollection<object>(authentication.ViewRolesRequired);
             AuthenticationRequiredMode = authentication.Mode;

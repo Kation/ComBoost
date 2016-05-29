@@ -119,6 +119,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// Get the roles to edit property.
         /// </summary>
+        IEnumerable<object> AddRoles { get; }
+
+        /// <summary>
+        /// Get the roles to edit property.
+        /// </summary>
         IEnumerable<object> EditRoles { get; }
         
         /// <summary>

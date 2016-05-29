@@ -9,7 +9,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
     /// <summary>
     /// Entity analyzer interface.
     /// </summary>
-    public interface IEntityAnalyzer
+    public interface IEntityDescriptor
     {
         /// <summary>
         /// Get the metadata of entity.
