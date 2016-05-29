@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
+using Wodsoft.ComBoost.Data.Entity.Metadata;
+using System.Linq.Expressions;
 
 namespace Wodsoft.ComBoost.EntityFramework
 {
@@ -12,90 +14,110 @@ namespace Wodsoft.ComBoost.EntityFramework
     {
         public EntityContext(DatabaseContext database, DbSet<T> dbset)
         {
+            if (database == null)
+                throw new ArgumentNullException(nameof(database));
+            if (dbset == null)
+                throw new ArgumentNullException(nameof(dbset));
 
+            Database = database;
+            DbSet = dbset;
+            Metadata = EntityDescriptor.GetMetadata<T>();
         }
 
-        public IDatabaseContext Database
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public DbSet<T> DbSet { get; private set; }
+
+        public IDatabaseContext Database { get; private set; }
+
+        public IEntityMetadata Metadata { get; private set; }
 
         public void Add(T item)
         {
-            throw new NotImplementedException();
+            DbSet.Add(item);
         }
 
         public void AddRange(IEnumerable<T> items)
         {
-            throw new NotImplementedException();
+            DbSet.AddRange(items);
         }
 
         public T Create()
         {
-            throw new NotImplementedException();
+            return new T();
         }
-
-        public Task<T> GetAsync(object key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IQueryable<T> InParent(IQueryable<T> query, object[] parentIds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IQueryable<T> InParent(IQueryable<T> query, string path, object id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsNew(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IOrderedQueryable<T> Order()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IOrderedQueryable<T> Order(IQueryable<T> query)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public IQueryable<T> Query()
         {
-            throw new NotImplementedException();
+            return DbSet;
         }
 
         public void Remove(T item)
         {
-            throw new NotImplementedException();
+            DbSet.Remove(item);
         }
 
         public void RemoveRange(IEnumerable<T> items)
         {
-            throw new NotImplementedException();
+            DbSet.RemoveRange(items);
         }
 
         public Task<T[]> ToArrayAsync(IQueryable<T> query)
         {
-            throw new NotImplementedException();
+            return query.ToArrayAsync();
         }
 
         public Task<List<T>> ToListAsync(IQueryable<T> query)
         {
-            throw new NotImplementedException();
+            return query.ToListAsync();
         }
 
         public void Update(T item)
         {
-            throw new NotImplementedException();
+            DbSet.Update(item);
+        }
+
+        public void UpdateRange(IEnumerable<T> items)
+        {
+            DbSet.UpdateRange(items);
+        }
+
+        public Task<T> SingleOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        {
+            return query.SingleOrDefaultAsync(expression);
+        }
+
+        public Task<T> SingleAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        {
+            return query.SingleAsync(expression);
+        }
+
+        public Task<T> FirstOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        {
+            return query.FirstOrDefaultAsync(expression);
+        }
+
+        public Task<T> FirstAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        {
+            return query.FirstAsync(expression);
+        }
+
+        public Task<T> LastOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        {
+            return query.LastOrDefaultAsync(expression);
+        }
+
+        public Task<T> LastAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        {
+            return query.LastAsync(expression);
+        }
+
+        public Task<int> CountAsync(IQueryable<T> query)
+        {
+            return query.CountAsync();
+        }
+
+        public Task<int> CountAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        {
+            return query.CountAsync(expression);
         }
     }
 }
