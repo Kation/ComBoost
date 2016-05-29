@@ -47,7 +47,7 @@ namespace System.ComponentModel.DataAnnotations
             if (value is string && IsCaseSensitive)
                 value = ((string)value).ToLower();
             ParameterExpression parameter = Expression.Parameter(type);
-            IEntityMetadata metadata = EntityAnalyzer.GetMetadata(type);
+            IEntityMetadata metadata = EntityDescriptor.GetMetadata(type);
             Expression left = Expression.NotEqual(Expression.Property(parameter, metadata.KeyProperty.ClrName), Expression.Constant(metadata.KeyProperty.GetValue(entity)));
             Expression right;
             if (value is string && IsCaseSensitive)

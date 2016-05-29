@@ -34,7 +34,7 @@ namespace System.ComponentModel
         /// </summary>
         public EntitySearchModel()
         {
-            Metadata = EntityAnalyzer.GetMetadata<TEntity>();
+            Metadata = EntityDescriptor.GetMetadata<TEntity>();
             Properties = Metadata.SearchProperties;
         }
     }

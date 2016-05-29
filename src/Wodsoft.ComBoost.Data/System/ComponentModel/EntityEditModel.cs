@@ -19,7 +19,7 @@ namespace System.ComponentModel
         public EntityEditModel(TEntity entity)
         {
             Item = entity;
-            Metadata = EntityAnalyzer.GetMetadata<TEntity>();
+            Metadata = EntityDescriptor.GetMetadata<TEntity>();
             //Let repository library to set Properties value.
             //Don't: Properties = Metadata.EditProperties;
         }

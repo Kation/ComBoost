@@ -17,6 +17,7 @@ namespace System.ComponentModel.DataAnnotations
         public PropertyAuthenticationAttribute()
         {
             AllowAnonymous = true;
+            AddRolesRequired = new string[0];
             EditRolesRequired = new string[0];
             ViewRolesRequired = new string[0];
             Mode = AuthenticationRequiredMode.All;
@@ -31,6 +32,11 @@ namespace System.ComponentModel.DataAnnotations
         /// Get or set the property allow anonymous view.
         /// </summary>
         public bool AllowAnonymous { get; set; }
+
+        /// <summary>
+        /// Get or set the roles to add entity.
+        /// </summary>
+        public object[] AddRolesRequired { get; set; }
 
         /// <summary>
         /// Get or set the roles to edit.

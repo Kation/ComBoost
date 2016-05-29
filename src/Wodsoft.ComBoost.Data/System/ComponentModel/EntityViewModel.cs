@@ -56,7 +56,7 @@ namespace System.ComponentModel
             ItemButtons = new IEntityViewButton[0];
             CurrentSize = size;
             PageSizeOption = Pagination.DefaultPageSizeOption;
-            Metadata = EntityAnalyzer.GetMetadata<TEntity>();
+            Metadata = EntityDescriptor.GetMetadata<TEntity>();
             Queryable = queryable;
             UpdateTotalPage();
             SetPage(page);
