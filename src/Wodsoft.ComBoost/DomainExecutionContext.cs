@@ -8,16 +8,28 @@ namespace Wodsoft.ComBoost
 {
     public class DomainExecutionContext : IDomainExecutionContext
     {
-        public DomainExecutionContext(IDomainContext domainContext, MethodInfo method)
+        public DomainExecutionContext(IDomainService domainService, IDomainContext domainContext, MethodInfo method)
         {
+            if (domainService == null)
+                throw new ArgumentNullException(nameof(domainService));
             if (domainContext == null)
                 throw new ArgumentNullException(nameof(domainContext));
             if (method == null)
                 throw new ArgumentNullException(nameof(method));
+            _DomainService = domainService;
             _Context = domainContext;
             _Method = method;
             _Parameters = _Method.GetParameters();
             _ParameterValues = GetParameters();
+        }
+
+        private IDomainService _DomainService;
+        public IDomainService DomainService
+        {
+            get
+            {
+                return _DomainService;
+            }
         }
 
         private IDomainContext _Context;

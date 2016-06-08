@@ -11,11 +11,6 @@ namespace Wodsoft.ComBoost
     public interface IDomainContext : IServiceProvider
     {
         /// <summary>
-        /// 获取上下文相关的领域服务。
-        /// </summary>
-        IDomainService Domain { get; }
-
-        /// <summary>
         /// 获取或设置结果值。
         /// </summary>
         object Result { get; set; }

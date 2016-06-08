@@ -160,7 +160,7 @@ namespace Wodsoft.ComBoost
         }
         private async Task OnExecuting(IDomainContext domainContext, MethodInfo method)
         {
-            _Context = new DomainExecutionContext(domainContext, method);
+            _Context = new DomainExecutionContext(this, domainContext, method);
             if (Executing != null)
                 await Executing(_Context);
         }
