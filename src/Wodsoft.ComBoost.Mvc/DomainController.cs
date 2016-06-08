@@ -10,68 +10,16 @@ namespace Wodsoft.ComBoost.Mvc
 {
     public class DomainController : Controller
     {
-        private List<IDomainProvider> _DomainProvider;
+        protected IDomainProvider DomainProvider { get; private set; }
 
         public DomainController()
         {
-            _DomainProvider = new List<IDomainProvider>();
+            DomainProvider = HttpContext.RequestServices.GetRequiredService<IDomainProvider>();
         }
-
-        #region DomainCollection Method
-
-        protected void AddDomain(IDomainProvider serviceDescriptor)
+        
+        protected virtual IDomainContext CreateDomainContext()
         {
-            if (serviceDescriptor == null)
-                throw new ArgumentNullException(nameof(serviceDescriptor));
-            _DomainProvider.Add(serviceDescriptor);
-        }
-
-        protected void ClearDomain()
-        {
-            _DomainProvider.Clear();
-        }
-
-        protected void RemoveDomain(IDomainProvider serviceDescriptor)
-        {
-            if (serviceDescriptor == null)
-                throw new ArgumentNullException(nameof(serviceDescriptor));
-            _DomainProvider.Remove(serviceDescriptor);
-        }
-
-        #endregion
-
-        #region DomainService Method
-
-        protected virtual Task ExecuteDomainServiceAsync(IDomainService domainService)
-        {
-            if (domainService == null)
-                throw new ArgumentNullException(nameof(domainService));
-            return null;
-        }
-
-        protected virtual Task OnDomainServiceExecutingAsync(IDomainService domainService, DomainContext domainContext)
-        {
-            return null;
-        }
-
-        #endregion
-
-        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-        {
-            string actionName = context.RouteData.Values["action"] as string;
-            IDomainService item = _DomainProvider.Select(t => t.GetService(actionName)).FirstOrDefault();
-            if (item != null)
-            {
-                IDomainContext serviceContext = null;
-                await item.Service(serviceContext);
-                context.Result = OnOverrideServiceResult(item, serviceContext.Result);
-            }
-            await base.OnActionExecutionAsync(context, next);
-        }
-
-        protected virtual IActionResult OnOverrideServiceResult(IDomainService service, object result)
-        {
-            return View(result);
+            return new MvcDomainContext(this);
         }
     }
 }

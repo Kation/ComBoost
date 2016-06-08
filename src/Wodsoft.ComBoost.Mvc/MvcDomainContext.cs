@@ -9,6 +9,7 @@ namespace Wodsoft.ComBoost.Mvc
     public class MvcDomainContext : DomainContext
     {
         public MvcDomainContext(Controller controller)
+            : base(controller.HttpContext.RequestServices)
         {
             if (controller == null)
                 throw new ArgumentNullException(nameof(controller));
@@ -16,28 +17,6 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         public Controller Controller { get; private set; }
-
-        private ReadableStringProvider _QueryProvider;
-        public ReadableStringProvider QueryProvider
-        {
-            get
-            {
-                if (_QueryProvider == null)
-                    _QueryProvider = new ReadableStringProvider(Controller.Request.Query);
-                return _QueryProvider;
-            }
-        }
-
-        private ReadableStringProvider _FormProvider;
-        public ReadableStringProvider FormProvider
-        {
-            get
-            {
-                if (_FormProvider == null)
-                    _FormProvider = new ReadableStringProvider(Controller.Request.Form);
-                return _FormProvider;
-            }
-        }
 
         public override object GetService(Type serviceType)
         {
