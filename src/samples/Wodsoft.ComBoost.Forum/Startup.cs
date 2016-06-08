@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -51,7 +50,7 @@ namespace Wodsoft.ComBoost.Forum
 
             app.UseStaticFiles();
 
-            app.UseMiddleware<Wodsoft.ComBoost.Security.ComBoostAuthenticationMiddleware>();
+            app.UseMiddleware<Security.ComBoostAuthenticationMiddleware>();
 
             app.UseMvc(routes =>
             {

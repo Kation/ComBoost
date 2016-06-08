@@ -9,7 +9,7 @@ namespace Wodsoft.ComBoost.Forum.Domain
     {
         public static void UseForum(this IDomainProvider provider)
         {
-            provider.RegisterService<ThreadDomain>();
+
         }
     }
 }

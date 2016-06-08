@@ -9,6 +9,8 @@ namespace Wodsoft.ComBoost.Forum.Core
     {
         IMember Member { get; set; }
 
+        IForum Forum { get; set; }
+
         string Title { get; set; }
 
         DateTime CreateDate { get; set; }
