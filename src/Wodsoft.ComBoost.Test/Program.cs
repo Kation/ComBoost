@@ -18,7 +18,7 @@ namespace Wodsoft.ComBoost.Test
 
             TestService service = new TestService();
 
-            DomainContext context = new DomainContext(service, serviceProvider);
+            DomainContext context = new DomainContext(serviceProvider);
 
             service.ExecuteAsync<string>(context, service.Test).Wait();
 
