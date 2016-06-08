@@ -115,5 +115,10 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <param name="name">Name of property.</param>
         /// <returns>Return property metadata. Return null if property doesn't exists.</returns>
         IPropertyMetadata GetProperty(string name);
+
+        /// <summary>
+        /// 获取数据字典。
+        /// </summary>
+        dynamic DataBag { get; }
     }
 }
