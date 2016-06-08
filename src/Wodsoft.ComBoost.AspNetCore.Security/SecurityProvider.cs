@@ -8,10 +8,10 @@ namespace Wodsoft.ComBoost.Security
 {
     public class SecurityProvider : ISecurityProvider
     {
-        public IPermission GetRoleObject(IIdentity identity)
+        public IPermission GetRoleObject(IPrincipal principal)
         {
-            //Microsoft.AspNetCore.Http
-            return null;
+            throw new NotImplementedException();
         }
+
     }
 }
