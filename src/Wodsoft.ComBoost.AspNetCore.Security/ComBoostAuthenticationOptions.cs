@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,5 +14,9 @@ namespace Microsoft.AspNetCore.Builder
             AutomaticAuthenticate = true;
             //AutomaticChallenge = true;
         }
+
+        //public Func<HttpContext, string> CookiePath
     }
+
+    
 }

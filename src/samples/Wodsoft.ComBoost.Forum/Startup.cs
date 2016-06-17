@@ -50,6 +50,8 @@ namespace Wodsoft.ComBoost.Forum
 
             app.UseStaticFiles();
 
+            app.UseSession();
+
             app.UseMiddleware<Security.ComBoostAuthenticationMiddleware>();
 
             app.UseMvc(routes =>
