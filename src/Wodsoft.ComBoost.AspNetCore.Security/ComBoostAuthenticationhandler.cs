@@ -8,6 +8,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features.Authentication;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http;
 
 namespace Wodsoft.ComBoost.Security
 {
@@ -15,29 +17,52 @@ namespace Wodsoft.ComBoost.Security
     {
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            
-            var identity = new ClaimsIdentity("Comboost", ClaimTypes.Name, "Test");
-            identity.AddClaim(new Claim("Test", "1"));
-            identity.AddClaim(new Claim("Test", "2"));
-            identity.AddClaim(new Claim("Test", "3"));
-            identity.AddClaim(new Claim(ClaimTypes.Name, "Kation"));
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()));
-            var principal = new ClaimsPrincipal();
-            principal.AddIdentity(identity);
-            var ticket = new AuthenticationTicket(principal, new AuthenticationProperties()
-            {
-                IsPersistent = true
-            }, "ComBoost");
+            //string cookieValue = Request.Cookies[Options.CookieName(Context)];
+            //if (cookieValue == null)
+            //    return Task.FromResult(AuthenticateResult.Skip());
+            //var ticket = Options.TicketDataFormat.Unprotect(cookieValue);
+            var principal = new ComBoostPrincipal();
+            principal.AddIdentity(new ComBoostIdentity());
+            var ticket = new AuthenticationTicket(principal, null, "ComBoost");
             return Task.FromResult(AuthenticateResult.Success(ticket));
-            //return Task.FromResult(AuthenticateResult.Skip());
-            //Context.Authentication.SignInAsync
         }
 
-        protected override Task HandleSignInAsync(SignInContext context)
+        protected override async Task HandleSignInAsync(SignInContext context)
         {
             var securityProvider = Context.RequestServices.GetRequiredService<ISecurityProvider>();
-            securityProvider.GetPermission(context.Properties);
-            return base.HandleSignInAsync(context);
+            var permission = await securityProvider.GetPermissionAsync(context.Properties);
+            ClaimsPrincipal principal = new ClaimsPrincipal();
+            ClaimsIdentity identity = new ClaimsIdentity("ComBoostAuthentication", ClaimTypes.Name, ClaimTypes.Role);
+            identity.AddClaims(permission.GetStaticRoles().Select(t => new Claim(ClaimTypes.Role, securityProvider.ConvertRoleToString(t))));
+            identity.AddClaim(new Claim(ClaimTypes.Name, permission.Name));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, permission.Identity));
+            principal.AddIdentity(identity);
+
+            var ticket = new AuthenticationTicket(principal, null, Options.AuthenticationScheme);
+            var cookieValue = Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding());
+
+            Response.Cookies.Append(Options.CookieName(Context), cookieValue, new CookieOptions
+            {
+                Domain = Options.CookieDomain(Context),
+                Expires = new DateTimeOffset(DateTime.Now, Options.ExpireTime(Context)),
+                Path = Options.CookiePath(Context)
+            });
+        }
+
+        protected override Task HandleSignOutAsync(SignOutContext context)
+        {
+            Response.Cookies.Delete(Options.CookieName(Context), new CookieOptions
+            {
+                Domain = Options.CookieDomain(Context),
+                Path = Options.CookiePath(Context)
+            });
+            return Task.FromResult(0);
+        }
+
+        private string GetTlsTokenBinding()
+        {
+            var binding = Context.Features.Get<ITlsTokenBindingFeature>()?.GetProvidedTokenBindingId();
+            return binding == null ? null : Convert.ToBase64String(binding);
         }
     }
 }

@@ -8,8 +8,12 @@ namespace Wodsoft.ComBoost.Security
 {
     public interface ISecurityProvider
     {
-        IPermission GetPermission(IDictionary<string, string> properties);
+        Task<IPermission> GetPermissionAsync(IDictionary<string, string> properties);
 
-        IPermission GetPermission(string name);
+        Task<IPermission> GetPermissionAsync(string name);
+
+        string ConvertRoleToString(object role);
+
+        object ConvertRoleFromString(string role);
     }
 }

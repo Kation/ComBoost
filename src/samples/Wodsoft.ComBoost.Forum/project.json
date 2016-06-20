@@ -30,7 +30,6 @@
     "Wodsoft.ComBoost.Mvc.Data": "1.0.0-*",
     "Microsoft.AspNetCore.Session": "1.0.0-rc2-final"
   },
-
   "tools": {
     "Microsoft.AspNetCore.Razor.Tools": {
       "version": "1.0.0-preview1-final",
