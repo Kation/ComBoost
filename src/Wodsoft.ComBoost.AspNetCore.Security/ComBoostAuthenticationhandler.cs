@@ -17,13 +17,10 @@ namespace Wodsoft.ComBoost.Security
     {
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            //string cookieValue = Request.Cookies[Options.CookieName(Context)];
-            //if (cookieValue == null)
-            //    return Task.FromResult(AuthenticateResult.Skip());
-            //var ticket = Options.TicketDataFormat.Unprotect(cookieValue);
-            var principal = new ComBoostPrincipal();
-            principal.AddIdentity(new ComBoostIdentity());
-            var ticket = new AuthenticationTicket(principal, null, "ComBoost");
+            string cookieValue = Request.Cookies[Options.CookieName(Context)];
+            if (cookieValue == null)
+                return Task.FromResult(AuthenticateResult.Skip());
+            var ticket = Options.TicketDataFormat.Unprotect(cookieValue);
             return Task.FromResult(AuthenticateResult.Success(ticket));
         }
 

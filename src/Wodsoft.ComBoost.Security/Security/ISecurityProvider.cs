@@ -10,10 +10,8 @@ namespace Wodsoft.ComBoost.Security
     {
         Task<IPermission> GetPermissionAsync(IDictionary<string, string> properties);
 
-        Task<IPermission> GetPermissionAsync(string name);
+        Task<IPermission> GetPermissionAsync(string identity);
 
         string ConvertRoleToString(object role);
-
-        object ConvertRoleFromString(string role);
     }
 }
