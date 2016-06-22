@@ -32,7 +32,7 @@ namespace Wodsoft.ComBoost.Security
             Response.Cookies.Append(Options.CookieName(Context), cookieValue, new CookieOptions
             {
                 Domain = Options.CookieDomain(Context),
-                Expires = new DateTimeOffset(DateTime.Now, Options.ExpireTime(Context)),
+                Expires = new DateTimeOffset(DateTime.Now.Add(Options.ExpireTime(Context))),
                 Path = Options.CookiePath(Context)
             });
             return Task.FromResult(0);
