@@ -12,6 +12,7 @@ using Wodsoft.ComBoost.Forum.Domain;
 using Wodsoft.ComBoost.Security;
 using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.EntityFramework;
+using Microsoft.AspNetCore.Http;
 
 namespace Wodsoft.ComBoost.Forum
 {
@@ -46,6 +47,9 @@ namespace Wodsoft.ComBoost.Forum
             new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext")).Options));
             services.AddTransient<IDatabaseContext, DatabaseContext>();
             services.AddTransient<ISecurityProvider, ForumSecurityProvider>();
+            services.AddTransient<IAuthenticationProvider, ComBoostAuthenticationProvider>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IDomainProvider, DomainProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

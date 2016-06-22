@@ -6,7 +6,7 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Forum.Core
 {
-    public interface IMember : IEntity
+    public interface IMember : IEntity, IPermission
     {
         string Username { get; set; }
 
