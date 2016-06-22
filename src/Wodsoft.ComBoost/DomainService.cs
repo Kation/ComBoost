@@ -22,6 +22,7 @@ namespace Wodsoft.ComBoost
             await (Task)method.Invoke(this, _Context.ParameterValues);
             await OnExecuted();
         }
+
         public async Task ExecuteAsync(IDomainContext domainContext, Func<Task> method)
         {
             if (domainContext == null)

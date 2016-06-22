@@ -14,9 +14,14 @@ namespace Wodsoft.ComBoost.Mvc
 
         public DomainController()
         {
+            
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
             DomainProvider = HttpContext.RequestServices.GetRequiredService<IDomainProvider>();
         }
-        
+
         protected virtual IDomainContext CreateDomainContext()
         {
             return new MvcDomainContext(this);

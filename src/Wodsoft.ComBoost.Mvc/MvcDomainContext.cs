@@ -18,8 +18,21 @@ namespace Wodsoft.ComBoost.Mvc
 
         public Controller Controller { get; private set; }
 
+        private MvcValueProvider _ValueProvider;
+        public IValueProvider ValueProvider
+        {
+            get
+            {
+                if (_ValueProvider == null)
+                    _ValueProvider = new MvcValueProvider(Controller);
+                return _ValueProvider;
+            }
+        }
+
         public override object GetService(Type serviceType)
         {
+            if (serviceType == typeof(IValueProvider))
+                return ValueProvider;
             return base.GetService(serviceType);
         }
     }

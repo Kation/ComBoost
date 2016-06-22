@@ -15,7 +15,7 @@ namespace Wodsoft.ComBoost
 
         public DomainProvider(IServiceProvider serviceProvider)
         {
-            if (_ServiceProvider == null)
+            if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
             _ServiceProvider = serviceProvider;
             _Extensions = new Dictionary<Type, List<Type>>();
