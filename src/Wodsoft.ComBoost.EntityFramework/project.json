@@ -2,9 +2,6 @@
   "version": "1.0.0-*",
   "description": "Wodsoft.ComBoost.EntityFramework Class Library",
   "authors": [ "Kation" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
   "frameworks": {
     "netstandard1.5": {
       "imports": [

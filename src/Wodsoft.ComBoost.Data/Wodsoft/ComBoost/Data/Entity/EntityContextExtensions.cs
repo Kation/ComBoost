@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost.Data.Entity
     public static class EntityContextExtensions
     {
         public static Task<T> GetAsync<T>(this IEntityContext<T> context, object key)
-            where T : class, new()
+            where T : class, IEntity, new()
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -25,7 +25,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
 
         public static IOrderedQueryable<T> Order<T>(this IEntityContext<T> context)
-            where T : class, new()
+            where T : class, IEntity, new()
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -33,7 +33,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
 
         public static IOrderedQueryable<T> Order<T>(this IEntityContext<T> context, IQueryable<T> query)
-            where T : class, new()
+            where T : class, IEntity, new()
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
 
         public static IQueryable<T> InParent<T>(this IEntityContext<T> context, IQueryable<T> query, string path, object value)
-            where T : class, new()
+            where T : class, IEntity, new()
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -87,7 +87,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
 
         public static IQueryable<T> InParent<T>(this IEntityContext<T> context, IQueryable<T> query, object[] parentIds)
-            where T : class, new()
+            where T : class, IEntity, new()
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));

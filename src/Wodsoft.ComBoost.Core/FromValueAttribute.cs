@@ -20,16 +20,7 @@ namespace Wodsoft.ComBoost
         public override object GetValue(IDomainContext domainContext, ParameterInfo parameter)
         {
             IValueProvider provider = domainContext.GetRequiredService<IValueProvider>();
-            object value = provider.GetValue(parameter.Name);
-            if (value != null)
-            {
-                var type = value.GetType();
-                if (!type.IsAssignableFrom(parameter.ParameterType))
-                {
-                    var converter = TypeDescriptor.GetConverter(type);
-                    value = converter.ConvertFrom(value);
-                }
-            }
+            object value = provider.GetValue(parameter.Name, parameter.ParameterType);
             if (IsRequired && value == null)
                 throw new ArgumentNullException("获取" + parameter.Name + "参数的值为空。");
             return value;

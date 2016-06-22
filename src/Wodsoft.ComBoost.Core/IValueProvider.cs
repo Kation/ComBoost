@@ -9,6 +9,8 @@ namespace Wodsoft.ComBoost
     {
         object GetValue(string name);
 
+        object GetValue(string name, Type valueType);
+        
         T GetValue<T>(string name);
     }
 }

@@ -8,7 +8,7 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 namespace Wodsoft.ComBoost.Data.Entity
 {
     public interface IEntityContext<T>
-        where T : class, new()
+        where T : IEntity
     {
         IEntityMetadata Metadata { get; }
         IDatabaseContext Database { get; }

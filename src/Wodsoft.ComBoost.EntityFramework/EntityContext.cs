@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 namespace Wodsoft.ComBoost.EntityFramework
 {
     public class EntityContext<T> : IEntityContext<T>
-        where T : class, new()
+        where T : class, IEntity, new()
     {
         public EntityContext(DatabaseContext database, DbSet<T> dbset)
         {
@@ -32,19 +32,24 @@ namespace Wodsoft.ComBoost.EntityFramework
 
         public void Add(T item)
         {
+            item.OnCreateCompleted();
             DbSet.Add(item);
         }
 
         public void AddRange(IEnumerable<T> items)
         {
+            foreach (var item in items)
+                item.OnCreateCompleted();
             DbSet.AddRange(items);
         }
 
         public T Create()
         {
-            return new T();
+            var item = new T();
+            item.OnCreating();
+            return item;
         }
-        
+
         public IQueryable<T> Query()
         {
             return DbSet;
@@ -72,11 +77,14 @@ namespace Wodsoft.ComBoost.EntityFramework
 
         public void Update(T item)
         {
+            item.OnEditCompleted();
             DbSet.Update(item);
         }
 
         public void UpdateRange(IEnumerable<T> items)
         {
+            foreach (var item in items)
+                item.OnEditCompleted();
             DbSet.UpdateRange(items);
         }
 

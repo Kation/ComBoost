@@ -10,6 +10,8 @@ namespace Wodsoft.ComBoost.Data.Entity
     {
         public DateTime CreateDate { get; set; }
 
+        public DateTime EditDate { get; set; }
+
         [Key]
         public Guid Index { get; set; }
 
@@ -19,15 +21,19 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public virtual bool IsRemoveAllowed { get { return true; } }
 
-        public virtual void OnCreateCompleted() { }
-
-        public virtual void OnEditCompleted() { }
-
-        public virtual void OnCreating()
+        public virtual void OnCreateCompleted()
         {
             Index = Guid.NewGuid();
             CreateDate = DateTime.Now;
+            EditDate = CreateDate;
         }
+
+        public virtual void OnEditCompleted()
+        {
+            EditDate = DateTime.Now;
+        }
+
+        public virtual void OnCreating() { }
 
         public virtual void OnEditing() { }
     }

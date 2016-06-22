@@ -7,7 +7,9 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public interface IDatabaseContext
     {
-        IEntityContext<T> GetContext<T>() where T : class, new();
+        IEnumerable<Type> SupportTypes { get; }
+
+        IEntityContext<T> GetContext<T>() where T : class, IEntity, new();
 
         Task<int> SaveAsync();
     }
