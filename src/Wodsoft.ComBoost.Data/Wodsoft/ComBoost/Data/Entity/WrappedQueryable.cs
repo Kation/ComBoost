@@ -11,35 +11,33 @@ namespace Wodsoft.ComBoost.Data.Entity
         where T : IEntity
         where M : IEntity, T
     {
-        public WrappedQueryable(IQueryable<M> queryable)
+        public WrappedQueryable(WrappedQueryableProvider<T, M> provider, Expression expression)
         {
-            if (queryable == null)
-                throw new ArgumentNullException(nameof(queryable));
-            InnerQueryable = queryable;
+            if (expression == null)
+                throw new ArgumentNullException(nameof(expression));
+            if (provider == null)
+                throw new ArgumentNullException(nameof(provider));
+            Expression = expression;
+            Provider = provider;
         }
-
-        public IQueryable<M> InnerQueryable { get; private set; }
 
         public Type ElementType { get { return typeof(T); } }
 
-        public Expression Expression
-        {
-            get
-            {
-                return InnerQueryable.Expression;
-            }
-        }
+        public Expression Expression { get; private set; }
 
-        public System.Linq.IQueryProvider Provider { get { return InnerQueryable.Provider; } }
+
+        public WrappedQueryableProvider<T, M> Provider { get; private set; }
+
+        System.Linq.IQueryProvider IQueryable.Provider { get { return Provider; } }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return (IEnumerator<T>)InnerQueryable.GetEnumerator();
+            return new WrappedEnumerator<T, M>(Provider.InnerQueryProvider.CreateQuery<M>(Expression).GetEnumerator());
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return InnerQueryable.GetEnumerator();
+            return new WrappedEnumerator<T, M>(Provider.InnerQueryProvider.CreateQuery<M>(Expression).GetEnumerator());
         }
     }
 }

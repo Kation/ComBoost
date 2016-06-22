@@ -7,11 +7,11 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class EntityMappedContext<T, M> : IEntityContext<T>
+    public class EntityWrappedContext<T, M> : IEntityContext<T>
         where M : IEntity, T
         where T : IEntity
     {
-        public EntityMappedContext(IEntityContext<M> context)
+        public EntityWrappedContext(IEntityContext<M> context)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -34,19 +34,9 @@ namespace Wodsoft.ComBoost.Data.Entity
             InnerContext.AddRange((IEnumerable<M>)items);
         }
 
-        protected virtual IQueryable<T> WrapQueryable(IQueryable<M> query)
-        {
-            
-        }
-
-        protected virtual IQueryable<M> UnwrapQueryable(IQueryable<T> query)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<int> CountAsync(IQueryable<T> query)
         {
-            return InnerContext.CountAsync(UnwrapQueryable(query));
+            return InnerContext.CountAsync(query.Unwrap<T, M>());
         }
 
         protected virtual Expression<Func<M, TResult>> WrapExpression<TResult>(Expression<Func<T, TResult>> expression)
@@ -59,7 +49,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         public Task<int> CountAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
         {
             var newExpression = WrapExpression(expression);
-            return InnerContext.CountAsync(UnwrapQueryable(query), newExpression);
+            return InnerContext.CountAsync(query.Unwrap<T, M>(), newExpression);
         }
 
         public T Create()
@@ -70,30 +60,30 @@ namespace Wodsoft.ComBoost.Data.Entity
         public async Task<T> FirstAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
         {
             var newExpression = WrapExpression(expression);
-            return await InnerContext.FirstAsync(UnwrapQueryable(query), newExpression);
+            return await InnerContext.FirstAsync(query.Unwrap<T, M>(), newExpression);
         }
 
         public async Task<T> FirstOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
         {
             var newExpression = WrapExpression(expression);
-            return await InnerContext.FirstOrDefaultAsync(UnwrapQueryable(query), newExpression);
+            return await InnerContext.FirstOrDefaultAsync(query.Unwrap<T, M>(), newExpression);
         }
 
         public async Task<T> LastAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
         {
             var newExpression = WrapExpression(expression);
-            return await InnerContext.LastAsync(UnwrapQueryable(query), newExpression);
+            return await InnerContext.LastAsync(query.Unwrap<T, M>(), newExpression);
         }
 
         public async Task<T> LastOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
         {
             var newExpression = WrapExpression(expression);
-            return await InnerContext.LastOrDefaultAsync(UnwrapQueryable(query), newExpression);
+            return await InnerContext.LastOrDefaultAsync(query.Unwrap<T, M>(), newExpression);
         }
 
         public IQueryable<T> Query()
         {
-            return WrapQueryable(InnerContext.Query());
+            return InnerContext.Query().Wrap<T, M>();
         }
 
         public void Remove(T item)
@@ -109,23 +99,23 @@ namespace Wodsoft.ComBoost.Data.Entity
         public async Task<T> SingleAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
         {
             var newExpression = WrapExpression(expression);
-            return await InnerContext.SingleAsync(UnwrapQueryable(query), newExpression);
+            return await InnerContext.SingleAsync(query.Unwrap<T, M>(), newExpression);
         }
 
         public async Task<T> SingleOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
         {
             var newExpression = WrapExpression(expression);
-            return await InnerContext.SingleOrDefaultAsync(UnwrapQueryable(query), newExpression);
+            return await InnerContext.SingleOrDefaultAsync(query.Unwrap<T, M>(), newExpression);
         }
 
         public async Task<T[]> ToArrayAsync(IQueryable<T> query)
         {
-            return (await InnerContext.ToArrayAsync(UnwrapQueryable(query))).Cast<T>().ToArray();
+            return (await InnerContext.ToArrayAsync(query.Unwrap<T, M>())).Cast<T>().ToArray();
         }
 
         public async Task<List<T>> ToListAsync(IQueryable<T> query)
         {
-            return (await InnerContext.ToListAsync(UnwrapQueryable(query))).Cast<T>().ToList();
+            return (await InnerContext.ToListAsync(query.Unwrap<T, M>())).Cast<T>().ToList();
         }
 
         public void Update(T item)
