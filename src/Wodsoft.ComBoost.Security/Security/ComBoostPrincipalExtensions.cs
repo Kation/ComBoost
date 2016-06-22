@@ -37,8 +37,8 @@ namespace Microsoft.AspNetCore.Builder
             ComBoostPrincipal comboostPrincipal = principal as ComBoostPrincipal;
             if (comboostPrincipal == null)
                 return false;
-            var roleName = comboostPrincipal.SecurityProvider.ConvertRoleToString(role);
-            return comboostPrincipal.IsInRole(roleName);
+            string roleName = comboostPrincipal.SecurityProvider.ConvertRoleToString(role);
+            return principal.IsInRole(roleName);
         }
 
         public static bool IsInDynamicRole(this IPrincipal principal, object role)
@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.Builder
             ComBoostPrincipal comboostPrincipal = principal as ComBoostPrincipal;
             if (comboostPrincipal == null)
                 return false;
-            return false;
+            return comboostPrincipal.IsInRole(role);
         }
     }
 }

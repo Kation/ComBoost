@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Security
 {
-    public class ComBoostPrincipal : ClaimsPrincipal
+    public class ComBoostPrincipal : ClaimsPrincipal, IAuthentication
     {
         public ComBoostPrincipal(ISecurityProvider securityProvider)
         {
@@ -17,6 +17,14 @@ namespace Wodsoft.ComBoost.Security
 
         public ISecurityProvider SecurityProvider { get; private set; }
 
+        public T GetUser<T>()
+        {
+            throw new NotImplementedException();
+        }
 
+        public bool IsInRole(object role)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
