@@ -14,6 +14,11 @@ namespace Wodsoft.ComBoost.Test
             return value;
         }
 
+        public object GetValue(string name, Type valueType)
+        {
+            throw new NotImplementedException();
+        }
+
         public T GetValue<T>(string name)
         {
             return (T)GetValue(name);

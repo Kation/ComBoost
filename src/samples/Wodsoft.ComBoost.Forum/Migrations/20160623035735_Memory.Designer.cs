@@ -8,9 +8,10 @@ using Wodsoft.ComBoost.Forum;
 namespace Wodsoft.ComBoost.Forum.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20160623035735_Memory")]
+    partial class Memory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.0-rc2-20901")

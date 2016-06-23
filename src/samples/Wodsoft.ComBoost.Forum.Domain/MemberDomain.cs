@@ -40,11 +40,12 @@ namespace Wodsoft.ComBoost.Forum.Domain
             if (password.Length < 3)
                 throw new ArgumentException("密码不能小于3位。");
             username = username.Trim();
-            var memberContext = databaseContext.GetMappedContext<IMember>();
+            var memberContext = databaseContext.GetWrappedContext<IMember>();
             var count = await memberContext.CountAsync(memberContext.Query().Where(t => t.Username.ToLower() == username.ToLower()));
             if (count != 0)
                 throw new ArgumentException("用户名已存在。");
             var member = memberContext.Create();
+            //member.Get(t => t.Thread);
             member.Username = username;
             member.SetPassword(password);
             memberContext.Add(member);

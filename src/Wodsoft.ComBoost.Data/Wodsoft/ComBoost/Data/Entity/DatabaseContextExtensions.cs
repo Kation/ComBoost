@@ -8,7 +8,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public static class DatabaseContextExtensions
     {
-        public static IEntityContext<T> GetMappedContext<T>(this IDatabaseContext context)
+        public static IEntityContext<T> GetWrappedContext<T>(this IDatabaseContext context)
             where T : IEntity
         {
             Type type = typeof(T);

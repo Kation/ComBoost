@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Wodsoft.ComBoost.Forum.Domain;
 using Wodsoft.ComBoost.Security;
 using Wodsoft.ComBoost.Data.Entity;
-using Wodsoft.ComBoost.EntityFramework;
 using Microsoft.AspNetCore.Http;
 
 namespace Wodsoft.ComBoost.Forum

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
 using System.Collections.Concurrent;
 
-namespace Wodsoft.ComBoost.EntityFramework
+namespace Wodsoft.ComBoost.Data.Entity
 {
     public class DatabaseContext : IDatabaseContext
     {

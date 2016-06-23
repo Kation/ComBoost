@@ -7,7 +7,7 @@ using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 using System.Linq.Expressions;
 
-namespace Wodsoft.ComBoost.EntityFramework
+namespace Wodsoft.ComBoost.Data.Entity
 {
     public class EntityContext<T> : IEntityContext<T>
         where T : class, IEntity, new()
@@ -18,7 +18,6 @@ namespace Wodsoft.ComBoost.EntityFramework
                 throw new ArgumentNullException(nameof(database));
             if (dbset == null)
                 throw new ArgumentNullException(nameof(dbset));
-
             Database = database;
             DbSet = dbset;
             Metadata = EntityDescriptor.GetMetadata<T>();
