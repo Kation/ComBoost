@@ -7,12 +7,9 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public interface IEntityContext<T>
+    public interface IEntityContext<T> : IEntityQueryContext<T>
         where T : IEntity
     {
-        IEntityMetadata Metadata { get; }
-        IDatabaseContext Database { get; }
-
         void Add(T item);
         void AddRange(IEnumerable<T> items);
         T Create();
@@ -20,7 +17,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         void UpdateRange(IEnumerable<T> items);
         void Remove(T item);
         void RemoveRange(IEnumerable<T> items);
-        IQueryable<T> Query();
         Task<T[]> ToArrayAsync(IQueryable<T> query);
         Task<List<T>> ToListAsync(IQueryable<T> query);
         Task<T> SingleOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression);

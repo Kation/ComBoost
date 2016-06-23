@@ -36,5 +36,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         public virtual void OnCreating() { }
 
         public virtual void OnEditing() { }
+
+        IEntityQueryContext<IEntity> IEntity.EntityContext { get; set; }
     }
 }

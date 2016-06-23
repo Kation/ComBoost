@@ -22,5 +22,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         bool IsRemoveAllowed { get; }
 
         bool IsEditAllowed { get; }
+
+        IEntityQueryContext<IEntity> EntityContext { get; set; }
     }
 }
