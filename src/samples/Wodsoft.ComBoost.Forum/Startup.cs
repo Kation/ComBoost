@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Wodsoft.ComBoost.Forum.Domain;
 using Wodsoft.ComBoost.Security;
 using Wodsoft.ComBoost.Data.Entity;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace Wodsoft.ComBoost.Forum
 {
@@ -43,7 +45,7 @@ namespace Wodsoft.ComBoost.Forum
             //    option.UseSqlServer(Configuration.GetConnectionString("DataContext"));
             //});
             services.AddTransient<DbContext, DataContext>(serviceProvider =>
-            new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext")).Options));
+            new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext")).Options.WithExtension(new ComBoostOptionExtension())));
             services.AddTransient<IDatabaseContext, DatabaseContext>();
             services.AddTransient<ISecurityProvider, ForumSecurityProvider>();
             services.AddTransient<IAuthenticationProvider, ComBoostAuthenticationProvider>();

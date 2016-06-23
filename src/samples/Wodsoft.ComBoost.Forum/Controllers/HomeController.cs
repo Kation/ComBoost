@@ -44,11 +44,12 @@ namespace Wodsoft.ComBoost.Forum.Controllers
             var databaseContext = HttpContext.RequestServices.GetRequiredService<IDatabaseContext>();
             var forumContext = databaseContext.GetContext<Entity.Forum>();
             var threadContext = databaseContext.GetContext<Entity.Thread>();
-            //var thread = await threadContext.Query().FirstAsync();
+            var thread = await threadContext.Query().FirstAsync();
             //var forum = await thread.LazyLoadEntityAsync(t => t.Forum, forumContext);
             //var forum = await forumContext.Query().FirstAsync();
             //var threadQuery = forum.LazyLoadQuery(t => t.Threads, threadContext);
             //var result = await threadQuery.ToArrayAsync();
+            //var context = new DataContext();
             //var forum = new Entity.Forum();
             //forum.Index = Guid.NewGuid();
             //forum.CreateDate = forum.EditDate = DateTime.Now;
