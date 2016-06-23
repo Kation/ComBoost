@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
 using System.Collections.Concurrent;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -32,6 +33,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                     .Select(t => t.PropertyType.GetGenericArguments()[0]).ToList();
                 return new System.Collections.ObjectModel.ReadOnlyCollection<Type>(properties);
             });
+
         }
 
         public Task<int> SaveAsync()
