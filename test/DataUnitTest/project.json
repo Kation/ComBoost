@@ -1,0 +1,26 @@
+﻿{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "NETStandard.Library": "1.5.0-rc2-24027",
+    "dotnet-test-xunit": "1.0.0-*",
+    "xunit": "2.1.0",
+    "Wodsoft.ComBoost.EntityFramework": "1.0.0-*",
+    "Microsoft.EntityFrameworkCore.InMemory": "1.0.0-rc2-final"
+  },
+  "testRunner": "xunit",
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50",
+        "portable-net452+win81"
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0-rc2-3002702",
+          "type": "platform"
+        }
+      }
+    }
+  }
+}
