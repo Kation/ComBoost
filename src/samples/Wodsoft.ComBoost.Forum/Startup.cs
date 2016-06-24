@@ -46,9 +46,9 @@ namespace Wodsoft.ComBoost.Forum
             //});
             services.AddTransient<DbContext, DataContext>(serviceProvider =>
             new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext")).Options.WithExtension(new ComBoostOptionExtension())));
-            services.AddTransient<IDatabaseContext, DatabaseContext>();
-            services.AddTransient<ISecurityProvider, ForumSecurityProvider>();
-            services.AddTransient<IAuthenticationProvider, ComBoostAuthenticationProvider>();
+            services.AddScoped<IDatabaseContext, DatabaseContext>();
+            services.AddScoped<ISecurityProvider, ForumSecurityProvider>();
+            services.AddScoped<IAuthenticationProvider, ComBoostAuthenticationProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IDomainProvider, DomainProvider>();
         }
