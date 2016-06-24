@@ -38,5 +38,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         public virtual void OnEditing() { }
 
         IEntityQueryContext<IEntity> IEntity.EntityContext { get; set; }
+
+        bool IEntity.IsNewCreated { get { return Index == Guid.Empty; } }
     }
 }

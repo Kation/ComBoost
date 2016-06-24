@@ -24,5 +24,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         bool IsEditAllowed { get; }
 
         IEntityQueryContext<IEntity> EntityContext { get; set; }
+
+        bool IsNewCreated { get; }
     }
 }

@@ -41,9 +41,8 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         protected virtual Expression<Func<M, TResult>> WrapExpression<TResult>(Expression<Func<T, TResult>> expression)
         {
-            var parameters = new ParameterExpression[] { Expression.Parameter(typeof(M)) };
-            var newExpression = Expression.Lambda<Func<M, TResult>>(expression.Update(expression, parameters).Body, parameters);
-            return newExpression;
+            ExpressionWrapper<M, T> wrapper = new ExpressionWrapper<M, T>();
+            return (Expression<Func<M, TResult>>)wrapper.Visit(expression);
         }
 
         public Task<int> CountAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
@@ -126,6 +125,17 @@ namespace Wodsoft.ComBoost.Data.Entity
         public void UpdateRange(IEnumerable<T> items)
         {
             InnerContext.UpdateRange((IEnumerable<M>)items);
+        }
+
+
+        Task<TResult> IEntityQueryContext<T>.LazyLoadEntityAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
+        {
+            return InnerContext.LazyLoadEntityAsync(entity, expression);
+        }
+
+        Task<IQueryableCollection<TResult>> IEntityQueryContext<T>.LazyLoadCollectionAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
+        {
+            return InnerContext.LazyLoadCollectionAsync(entity, expression);
         }
     }
 }

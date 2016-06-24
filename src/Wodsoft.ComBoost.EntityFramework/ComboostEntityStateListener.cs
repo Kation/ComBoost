@@ -14,9 +14,12 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         }
 
+        public event Action<InternalEntityEntry> EntityInit;
+
         public void StateChanged(InternalEntityEntry entry, EntityState oldState, bool skipInitialFixup, bool fromQuery)
         {
-            
+            if (entry.EntityState == EntityState.Unchanged && oldState == EntityState.Detached && EntityInit != null)
+                EntityInit(entry);
         }
 
         public void StateChanging(InternalEntityEntry entry, EntityState newState)
