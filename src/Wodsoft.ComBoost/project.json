@@ -4,12 +4,16 @@
   "authors": [ "Kation" ],
   "frameworks": {
     "netstandard1.5": {
-      "imports": "dnxcore50"
+      "imports": "dnxcore50",
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-rc2-24027",
+        "System.Reflection.Extensions": "4.0.1-rc2-24027"
+      }
+    },
+    "net451": {
     }
   },
   "dependencies": {
-    "Microsoft.CSharp": "4.0.1-rc2-24027",
-    "System.Reflection.Extensions": "4.0.1-rc2-24027",
     "Wodsoft.ComBoost.Core": "1.0.0-*"
   }
 }
