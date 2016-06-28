@@ -6,7 +6,8 @@
     "netstandard1.5": {
       "imports": "",
       "dependencies": {
-        "System.Reflection.Extensions": "4.0.1"
+        "System.Reflection.Extensions": "4.0.1",
+        "Microsoft.CSharp": "4.0.1"
       }
     },
     "net451": {
@@ -15,7 +16,6 @@
     }
   },
   "dependencies": {
-    "Microsoft.CSharp": "4.0.1",
     "Wodsoft.ComBoost.Core": "1.0.0-*"
   }
 }
