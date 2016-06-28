@@ -1,15 +1,15 @@
 {
-  "version": "1.0.0-*",
+  "version": "3.0.0-*",
   "description": "Wodsoft.ComBoost.EntityFramework Class Library",
   "authors": [ "Kation" ],
   "frameworks": {
-    "netstandard1.5": {
+    "netstandard1.6": {
       "imports": [ ]
     },
     "net451": { }
   },
   "dependencies": {
-    "Microsoft.EntityFrameworkCore": "1.0.0",
-    "Wodsoft.ComBoost.Data": "1.0.0-*"
+    "Wodsoft.ComBoost.Data": "3.0.0-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0"
   }
 }

@@ -1,14 +1,14 @@
 {
   "title": "ComBoost Core",
-  "version": "1.0.0-*",
-  "description": "Wodsoft.ComBoost Class Library",
-  "authors": [ "Kation" ],
-  "packOptions": {
-    "tags": ["comboost"]
+  "version": "3.0.0-alpha1",
+
+  "dependencies": {
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0"
   },
+
   "frameworks": {
-    "netstandard1.5": {
-      "imports": "dnxcore50",
+    "netstandard1.6": {
+      "imports": "",
       "dependencies": {
         "System.Reflection.TypeExtensions": "4.1.0",
         "System.Dynamic.Runtime": "4.0.11",
@@ -17,15 +17,7 @@
       }
     },
     "net451": {
-      "frameworkAssemblies": {
-        "System.Dynamic.Runtime": "4.0.0.0",
-        "System.Runtime": {
-          "type": "build"
-        }
-      }
+
     }
-  },
-  "dependencies": {
-    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0"
   }
 }

@@ -2,21 +2,21 @@
   "version": "1.0.0-*",
 
   "dependencies": {
-    "Wodsoft.ComBoost.EntityFramework": "1.0.0-*",
+    "Wodsoft.ComBoost.EntityFramework": "3.0.0-*",
     "Microsoft.EntityFrameworkCore.InMemory": "1.0.0",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
-    "Microsoft.NETCore.App": "1.0.0",
-    "NETStandard.Library": "1.6.0",
     "xunit": "2.2.0-beta2-build3300"
   },
   "testRunner": "xunit",
   "frameworks": {
     "netcoreapp1.0": {
       "imports": [
-        "netstandard1.6",
-        "netstandard1.5"
       ],
       "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        }
       }
     }
   }

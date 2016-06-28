@@ -1,18 +1,18 @@
 {
-  "version": "1.0.0-*",
+  "version": "3.0.0-alpha1",
   "description": "Wodsoft.ComBoost.Security Class Library",
   "authors": [ "Kation" ],
   "frameworks": {
-    "netstandard1.5": {
+    "netstandard1.6": {
       "imports": "",
       "dependencies": {
         "System.Security.Claims": "4.0.1",
-        "System.Security.Principal": "4.0.1"
+        "System.Security.Principal": "4.0.1",
+        "NETStandard.Library": "1.6.0"
       }
     },
     "net451": { }
   },
   "dependencies": {
-    "NETStandard.Library": "1.6.0"
   }
 }
