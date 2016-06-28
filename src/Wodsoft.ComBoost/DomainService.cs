@@ -14,151 +14,17 @@ namespace Wodsoft.ComBoost
         public event DomainExecuteEvent Executed;
         public event DomainExecuteEvent Executing;
 
-        public async Task ExecuteAsync(IDomainContext domainContext, MethodInfo method)
+        public async Task ExecuteAsync(IDomainContext domainContext, Delegate method)
         {
             if (domainContext == null)
                 throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method);
-            await (Task)method.Invoke(this, _Context.ParameterValues);
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
+            await OnExecuting(domainContext, method.GetMethodInfo());
+            await (Task)method.DynamicInvoke(this, _Context.ParameterValues);
             await OnExecuted();
         }
 
-        public async Task ExecuteAsync(IDomainContext domainContext, Func<Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await method();
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1>(IDomainContext domainContext, Func<T1, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2>(IDomainContext domainContext, Func<T1, T2, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3>(IDomainContext domainContext, Func<T1, T2, T3, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4>(IDomainContext domainContext, Func<T1, T2, T3, T4, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, T7, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
-        public async Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(IDomainContext domainContext, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, Task> method)
-        {
-            if (domainContext == null)
-                throw new ArgumentNullException(nameof(domainContext));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(_Context.ParameterValues);
-            await OnExecuted();
-        }
         private async Task OnExecuting(IDomainContext domainContext, MethodInfo method)
         {
             _Context = new DomainExecutionContext(this, domainContext, method);
