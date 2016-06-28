@@ -4,16 +4,12 @@
   "authors": [ "Kation" ],
   "frameworks": {
     "netstandard1.5": {
-      "imports": [
-        "dnxcore50",
-        "portable-net45+win8+wp8+wpa81",
-        "portable-net45+win8+wp8"
-      ]
+      "imports": [ ]
     },
     "net451": { }
   },
   "dependencies": {
-    "Microsoft.EntityFrameworkCore": "1.0.0-rc2-final",
+    "Microsoft.EntityFrameworkCore": "1.0.0",
     "Wodsoft.ComBoost.Data": "1.0.0-*"
   }
 }

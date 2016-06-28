@@ -4,7 +4,7 @@
   "authors": [ "Kation" ],
   "frameworks": {
     "netstandard1.5": {
-      "imports": "dnxcore50"
+      "imports": ""
     }
   },
   "dependencies": {
