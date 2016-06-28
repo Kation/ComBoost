@@ -22,7 +22,7 @@ namespace Wodsoft.ComBoost.Data
             Metadata = EntityDescriptor.GetMetadata<T>();
         }
 
-        public virtual async Task List([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
+        public virtual async Task<IEntityViewModel<T>> List([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
         {
             var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
@@ -47,12 +47,13 @@ namespace Wodsoft.ComBoost.Data
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
             model.Items = await context.ToArrayAsync(queryable);
             ExecutionContext.DomainContext.Result = model;
+            return model;
         }
 
         public event Func<IQueryable<T>, IQueryable<T>> ListQuery;
 
 
-        public virtual Task Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
+        public virtual Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
         {
             var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
@@ -84,10 +85,10 @@ namespace Wodsoft.ComBoost.Data
                     return t.AddRoles.Any(r => auth.IsInRole(r));
             }).ToArray();
             ExecutionContext.DomainContext.Result = model;
-            return Task.FromResult(0);
+            return Task.FromResult((IEntityEditModel<T>)model);
         }
 
-        public virtual async Task Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromValue] object index)
+        public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromValue] object index)
         {
             var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
@@ -120,9 +121,10 @@ namespace Wodsoft.ComBoost.Data
                     return t.EditRoles.Any(r => auth.IsInRole(r));
             }).ToArray();
             ExecutionContext.DomainContext.Result = model;
+            return model;
         }
 
-        public virtual async Task Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
+        public virtual async Task<EntityUpdateModel> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
         {
             var context = database.GetContext<T>();
             object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName);
@@ -176,10 +178,11 @@ namespace Wodsoft.ComBoost.Data
                 if (entity == null)
                     throw new EntityNotFoundException(typeof(T), index);
             }
-            UpdateCore(valueProvider, auth, entity, isNew);
+            var result = UpdateCore(valueProvider, auth, entity, isNew);
+            return result;
         }
 
-        protected virtual void UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, bool isNew)
+        protected virtual EntityUpdateModel UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, bool isNew)
         {
             var properties = isNew ? Metadata.CreateProperties.Where(t =>
             {
@@ -205,6 +208,7 @@ namespace Wodsoft.ComBoost.Data
                 UpdateProperty(valueProvider, entity, property);
             }
             model.IsSuccess = model.ErrorMessage.Count == 0;
+            return model;
         }
 
         protected virtual void UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
@@ -243,7 +247,7 @@ namespace Wodsoft.ComBoost.Data
             await database.SaveAsync();
         }
 
-        public virtual async Task Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromValue] object index)
+        public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromValue] object index)
         {
             var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
@@ -274,6 +278,7 @@ namespace Wodsoft.ComBoost.Data
                     return t.ViewRoles.Any(r => auth.IsInRole(r));
             }).ToArray();
             ExecutionContext.DomainContext.Result = model;
+            return model;
         }
     }
 }
