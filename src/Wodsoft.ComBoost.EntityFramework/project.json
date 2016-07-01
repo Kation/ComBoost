@@ -1,12 +1,23 @@
 {
-  "version": "3.0.0-*",
-  "description": "Wodsoft.ComBoost.EntityFramework Class Library",
+  "title": "ComBoost.EntityFramework",
+  "version": "3.0.0-alpha1",
   "authors": [ "Kation" ],
+  "description": "ComBoost用EntityFramework实现的实体模块。",
+  "packOptions": {
+    "owners": [ "Kation" ],
+    "summary": "ComBoost用EntityFramework实现的实体模块。",
+    "tags": [ "ComBoost" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Kation/ComBoost"
+    },
+    "releaseNotes": "Alpha测试版，请勿用于正式环境。"
+  },
   "frameworks": {
     "netstandard1.6": {
-      "imports": [ ]
+      "imports": []
     },
-    "net451": { }
+    "net451": {}
   },
   "dependencies": {
     "Wodsoft.ComBoost.Data": "3.0.0-*",

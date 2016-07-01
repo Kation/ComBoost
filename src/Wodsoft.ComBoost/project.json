@@ -1,7 +1,18 @@
 {
+  "title": "ComBoost",
   "version": "3.0.0-alpha1",
-  "description": "Wodsoft.ComBoost Class Library",
   "authors": [ "Kation" ],
+  "description": "ComBoost框架基础。",
+  "packOptions": {
+    "owners": [ "Kation" ],
+    "summary": "ComBoost框架基础。",
+    "tags": [ "ComBoost" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Kation/ComBoost"
+    },
+    "releaseNotes": "Alpha测试版，请勿用于正式环境。"
+  },
   "frameworks": {
     "netstandard1.6": {
       "imports": "",

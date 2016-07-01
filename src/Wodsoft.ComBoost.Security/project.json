@@ -1,7 +1,18 @@
 {
+  "title": "ComBoost.Security",
   "version": "3.0.0-alpha1",
-  "description": "Wodsoft.ComBoost.Security Class Library",
   "authors": [ "Kation" ],
+  "description": "ComBoost安全模块。",
+  "packOptions": {
+    "owners": [ "Kation" ],
+    "summary": "ComBoost安全模块。",
+    "tags": [ "ComBoost" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Kation/ComBoost"
+    },
+    "releaseNotes": "Alpha测试版，请勿用于正式环境。"
+  },
   "frameworks": {
     "netstandard1.6": {
       "imports": "",
@@ -11,7 +22,7 @@
         "NETStandard.Library": "1.6.0"
       }
     },
-    "net451": { }
+    "net451": {}
   },
   "dependencies": {
   }
