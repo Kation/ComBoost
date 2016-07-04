@@ -41,13 +41,22 @@ namespace Wodsoft.ComBoost.Mvc
                 return value;
         }
 
-        public T GetValue<T>(string name)
-        {
-            return (T)GetValue(name, typeof(T));
-        }
-
         public object GetValue(string name, Type valueType)
         {
+            if (valueType == typeof(ISelectedFile))
+            {
+                var file = Controller.Request.Form.Files.GetFile(name);
+                if (file == null)
+                    return null;
+                return new SelectedFile(file);
+            }
+            else if (valueType == typeof(ISelectedFile[]))
+            {
+                var files = Controller.Request.Form.Files.GetFiles(name);
+                if (files == null)
+                    return null;
+                return files.Select(t => new SelectedFile(t)).ToArray();
+            }
             object value = Controller.Request.Query[name];
             if (value == StringValues.Empty)
                 value = Controller.Request.Form[name];
