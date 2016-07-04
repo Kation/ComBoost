@@ -7,6 +7,11 @@ namespace Wodsoft.ComBoost
 {
     public static class ValueProviderExtensions
     {
+        public static T GetValue<T>(this IValueProvider provider, string name)
+        {
+            return (T)provider.GetValue(name, typeof(T));
+        }
+
         public static object GetRequiredValue(this IValueProvider valueProvider, string name)
         {
             object value = valueProvider.GetValue(name);
