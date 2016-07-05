@@ -7,7 +7,7 @@ namespace Wodsoft.ComBoost
 {
     public static class CacheExtensions
     {
-        public static async Task<CacheEntry> GetOrSetAsync(this ICache cache, string name, Func<string, CacheEntry> getEntryDelegate)
+        public static async Task<ICacheEntry> GetOrSetAsync(this ICache cache, string name, Func<string, ICacheEntry> getEntryDelegate)
         {
             if (cache == null)
                 throw new ArgumentNullException(nameof(cache));
@@ -21,7 +21,7 @@ namespace Wodsoft.ComBoost
             return entry;
         }
 
-        private static async Task<CacheEntry> SetCache(ICache cache, CacheEntry entry)
+        private static async Task<ICacheEntry> SetCache(ICache cache, ICacheEntry entry)
         {
             if (entry == null)
                 throw new ArgumentNullException(nameof(entry), "返回的缓存不能为空。");
