@@ -21,8 +21,11 @@ namespace Wodsoft.ComBoost
         {
             IValueProvider provider = domainContext.GetRequiredService<IValueProvider>();
             object value = provider.GetValue(parameter.Name, parameter.ParameterType);
-            if (IsRequired && value == null)
-                throw new ArgumentNullException("获取" + parameter.Name + "参数的值为空。");
+            if (value == null)
+                if (parameter.HasDefaultValue)
+                    value = parameter.DefaultValue;
+                else if (IsRequired)
+                    throw new ArgumentNullException("获取" + parameter.Name + "参数的值为空。");
             return value;
         }
     }
