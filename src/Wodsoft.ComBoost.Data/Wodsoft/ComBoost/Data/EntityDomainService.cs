@@ -42,16 +42,18 @@ namespace Wodsoft.ComBoost.Data
             }
             var context = database.GetContext<T>();
             var queryable = context.Query();
-            if (ListQuery != null)
-                queryable = ListQuery(queryable);
+            if (EntityQuery != null)
+            {
+                var e = new EntityQueryEventArgs<T>(queryable);
+                EntityQuery(Context, e);
+                queryable = e.Queryable;
+            }
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
             model.Items = await context.ToArrayAsync(queryable);
-            ExecutionContext.DomainContext.Result = model;
             return model;
         }
 
-        public event Func<IQueryable<T>, IQueryable<T>> ListQuery;
-
+        public event DomainServiceEvent<EntityQueryEventArgs<T>> EntityQuery;
 
         public virtual Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
         {
@@ -84,9 +86,16 @@ namespace Wodsoft.ComBoost.Data
                 else
                     return t.AddRoles.Any(r => auth.IsInRole(r));
             }).ToArray();
-            ExecutionContext.DomainContext.Result = model;
+            if (EntityCreateModelCreated != null)
+            {
+                EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
+                EntityCreateModelCreated(Context, arg);
+                model = arg.Model;
+            }
             return Task.FromResult((IEntityEditModel<T>)model);
         }
+
+        public event DomainServiceEvent<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated;
 
         public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromValue] object index)
         {
@@ -120,9 +129,16 @@ namespace Wodsoft.ComBoost.Data
                 else
                     return t.EditRoles.Any(r => auth.IsInRole(r));
             }).ToArray();
-            ExecutionContext.DomainContext.Result = model;
+            if (EntityEditModelCreated != null)
+            {
+                EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
+                EntityEditModelCreated(Context, arg);
+                model = arg.Model;
+            }
             return model;
         }
+
+        public event DomainServiceEvent<EntityModelCreatedEventArgs<T>> EntityEditModelCreated;
 
         public virtual async Task<EntityUpdateModel> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
         {
@@ -179,6 +195,7 @@ namespace Wodsoft.ComBoost.Data
                     throw new EntityNotFoundException(typeof(T), index);
             }
             var result = UpdateCore(valueProvider, auth, entity, isNew);
+            await database.SaveAsync();
             return result;
         }
 
@@ -203,23 +220,47 @@ namespace Wodsoft.ComBoost.Data
                     return t.EditRoles.Any(r => authentication.IsInRole(r));
             }).ToArray();
             var model = new EntityUpdateModel();
+            if (EntityPreUpdate != null)
+            {
+                var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
+                EntityPreUpdate(Context, arg);
+                properties = arg.Properties;
+            }
             foreach (var property in properties)
             {
                 UpdateProperty(valueProvider, entity, property);
+            }
+            if (EntityUpdated != null)
+            {
+                var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
+                EntityUpdated(Context, arg);
             }
             model.IsSuccess = model.ErrorMessage.Count == 0;
             return model;
         }
 
+        public event DomainServiceEvent<EntityUpdateEventArgs<T>> EntityPreUpdate;
+        public event DomainServiceEvent<EntityUpdateEventArgs<T>> EntityUpdated;
+
         protected virtual void UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
         {
-            object value = valueProvider.GetValue(property.ClrName);
-            if (value == null)
-                return;
-            if (!property.ClrType.GetType().IsAssignableFrom(value.GetType()))
-                value = property.Converter.ConvertFrom(value);
-            property.SetValue(entity, value);
+            object value = valueProvider.GetValue(property.ClrName, property.ClrType);
+            bool handled = false; ;
+            if (EntityPropertyUpdate != null)
+            {
+                var arg = new EntityPropertyUpdateEventArgs<T>(entity, valueProvider, property, value);
+                EntityPropertyUpdate(Context, arg);
+                handled = arg.IsHandled;
+            }
+            if (!handled)
+            {
+                if (value == null)
+                    return;
+                property.SetValue(entity, value);
+            }
         }
+
+        public event DomainServiceEvent<EntityPropertyUpdateEventArgs<T>> EntityPropertyUpdate;
 
         public virtual async Task Remove([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromValue] object index)
         {
@@ -243,9 +284,18 @@ namespace Wodsoft.ComBoost.Data
             T entity = await context.GetAsync(index);
             if (entity == null)
                 throw new EntityNotFoundException(typeof(T), index);
+            if (EntityRemove != null)
+            {
+                var e = new EntityRemoveEventArgs<T>(entity);
+                EntityRemove(Context, e);
+                if (e.IsCanceled)
+                    return;
+            }
             context.Remove(entity);
             await database.SaveAsync();
         }
+
+        public event DomainServiceEvent<EntityRemoveEventArgs<T>> EntityRemove;
 
         public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromValue] object index)
         {
@@ -277,8 +327,15 @@ namespace Wodsoft.ComBoost.Data
                 else
                     return t.ViewRoles.Any(r => auth.IsInRole(r));
             }).ToArray();
-            ExecutionContext.DomainContext.Result = model;
+            if (EntityDetail != null)
+            {
+                var e = new EntityDetailEventArgs<T>(entity, (IPropertyMetadata[])model.Properties);
+                EntityDetail(Context, e);
+                model.Properties = e.Properties;
+            }
             return model;
         }
+
+        public event DomainServiceEvent<EntityDetailEventArgs<T>> EntityDetail;
     }
 }
