@@ -7,8 +7,10 @@ namespace Wodsoft.ComBoost
 {
     public interface IDomainExtension
     {
-        Task OnDomainExecutingAsync(IDomainExecutionContext context);
+        void OnInitialize(IServiceProvider serviceProvider, IDomainService domainService);
 
-        Task OnDomainExecutedAsync(IDomainExecutionContext context);
+        Task OnExecutingAsync(IDomainExecutionContext context);
+
+        Task OnExecutedAsync(IDomainExecutionContext context);
     }
 }

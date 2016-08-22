@@ -12,6 +12,7 @@ namespace Wodsoft.ComBoost
         private IServiceProvider _ServiceProvider;
         private Dictionary<Type, List<Type>> _Extensions;
         private Dictionary<Type, Type> _Overrides;
+        private Dictionary<Type, IDomainService> _Cache;
 
         public DomainProvider(IServiceProvider serviceProvider)
         {
@@ -20,12 +21,17 @@ namespace Wodsoft.ComBoost
             _ServiceProvider = serviceProvider;
             _Extensions = new Dictionary<Type, List<Type>>();
             _Overrides = new Dictionary<Type, Type>();
+            _Cache = new Dictionary<Type, IDomainService>();
         }
-
-        public TService GetService<TService>() where TService : IDomainService
+        
+        public virtual TService GetService<TService>() where TService : IDomainService
         {
             Type type = typeof(TService);
-            TService service;
+            IDomainService service;
+            if (_Cache.TryGetValue(type, out service))
+            {
+                return (TService)service;
+            }
             if (type.IsConstructedGenericType)
             {
                 var definitionType = type.GetGenericTypeDefinition();
@@ -50,8 +56,9 @@ namespace Wodsoft.ComBoost
                 foreach (var extensionType in extensions)
                 {
                     IDomainExtension extension = (IDomainExtension)ActivatorUtilities.CreateInstance(_ServiceProvider, extensionType);
-                    service.Executing += extension.OnDomainExecutingAsync;
-                    service.Executed += extension.OnDomainExecutedAsync;
+                    extension.OnInitialize(_ServiceProvider, service);
+                    service.Executing += extension.OnExecutingAsync;
+                    service.Executed += extension.OnExecutedAsync;
                 }
             }
             if (type.IsConstructedGenericType)
@@ -63,15 +70,17 @@ namespace Wodsoft.ComBoost
                     foreach (var extensionType in extensions)
                     {
                         IDomainExtension extension = (IDomainExtension)ActivatorUtilities.CreateInstance(_ServiceProvider, extensionType.MakeGenericType(arguments));
-                        service.Executing += extension.OnDomainExecutingAsync;
-                        service.Executed += extension.OnDomainExecutedAsync;
+                        extension.OnInitialize(_ServiceProvider, service);
+                        service.Executing += extension.OnExecutingAsync;
+                        service.Executed += extension.OnExecutedAsync;
                     }
                 }
             }
-            return service;
+            _Cache.Add(type, service);
+            return (TService)service;
         }
 
-        public void Override(Type serviceType, Type overrideType)
+        public virtual void Override(Type serviceType, Type overrideType)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
@@ -88,7 +97,7 @@ namespace Wodsoft.ComBoost
                 _Overrides.Add(serviceType, overrideType);
         }
 
-        public void RegisterExtension(Type serviceType, Type extensionType)
+        public virtual void RegisterExtension(Type serviceType, Type extensionType)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
@@ -105,7 +114,7 @@ namespace Wodsoft.ComBoost
                 extensionList.Add(serviceType);
         }
 
-        public void UnregisterExtension(Type serviceType, Type extensionType)
+        public virtual void UnregisterExtension(Type serviceType, Type extensionType)
         {
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));

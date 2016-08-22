@@ -2,40 +2,81 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
 {
     public class DomainService : IDomainService
     {
-        private DomainExecutionContext _Context;
-        public IDomainExecutionContext ExecutionContext { get { return _Context; } }
+        private Dictionary<ExecutionContext, IDomainExecutionContext> _ExecutionContext;
+
+        public DomainService()
+        {
+            _ExecutionContext = new Dictionary<System.Threading.ExecutionContext, IDomainExecutionContext>();
+        }
+
+        public IDomainExecutionContext Context
+        {
+            get
+            {
+                var context = ExecutionContext.Capture();
+                IDomainExecutionContext value;
+                if (_ExecutionContext.TryGetValue(context, out value))
+                    return value;
+                else
+                    return null;
+            }
+        }
 
         public event DomainExecuteEvent Executed;
         public event DomainExecuteEvent Executing;
 
-        public async Task ExecuteAsync(IDomainContext domainContext, Delegate method)
+        public async Task ExecuteAsync(IDomainContext domainContext, MethodInfo method)
         {
             if (domainContext == null)
                 throw new ArgumentNullException(nameof(domainContext));
             if (method == null)
                 throw new ArgumentNullException(nameof(method));
-            await OnExecuting(domainContext, method.GetMethodInfo());
-            await (Task)method.DynamicInvoke(this, _Context.ParameterValues);
-            await OnExecuted();
+            var context = new DomainExecutionContext(this, domainContext, method);
+            var executionContext = ExecutionContext.Capture();
+            _ExecutionContext.Add(executionContext, context);
+            try
+            {
+                if (Executing != null)
+                    await Executing(context);
+                await (Task)method.Invoke(this, context.ParameterValues);
+                if (Executed != null)
+                    await Executed(context);
+            }
+            finally
+            {
+                _ExecutionContext.Remove(executionContext);
+            }
         }
 
-        private async Task OnExecuting(IDomainContext domainContext, MethodInfo method)
+        public async Task<T> ExecuteAsync<T>(IDomainContext domainContext, MethodInfo method)
         {
-            _Context = new DomainExecutionContext(this, domainContext, method);
-            if (Executing != null)
-                await Executing(_Context);
-        }
-        private async Task OnExecuted()
-        {
-            if (Executed != null)
-                await Executed(_Context);
-            _Context = null;
+            if (domainContext == null)
+                throw new ArgumentNullException(nameof(domainContext));
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
+            var context = new DomainExecutionContext(this, domainContext, method);
+            var executionContext = ExecutionContext.Capture();
+            _ExecutionContext.Add(executionContext, context);
+            try
+            {
+                if (Executing != null)
+                    await Executing(context);
+                var result = await (Task<T>)method.Invoke(this, context.ParameterValues);
+                if (Executed != null)
+                    await Executed(context);
+                return result;
+            }
+            finally
+            {
+                _ExecutionContext.Remove(executionContext);
+            }
         }
     }
 }

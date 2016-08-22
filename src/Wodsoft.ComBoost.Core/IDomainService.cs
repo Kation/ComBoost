@@ -8,10 +8,11 @@ namespace Wodsoft.ComBoost
 {
     public interface IDomainService
     {
-        IDomainExecutionContext ExecutionContext { get; }
+        IDomainExecutionContext Context { get; }
 
-        Task ExecuteAsync(IDomainContext context, Delegate method);
-        
+        Task ExecuteAsync(IDomainContext domainContext, MethodInfo method);
+        Task<T> ExecuteAsync<T>(IDomainContext domainContext, MethodInfo method);
+
         event DomainExecuteEvent Executing;
         event DomainExecuteEvent Executed;
     }
