@@ -12,7 +12,7 @@ using System.ComponentModel;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class EntityController<T> : EntityController
+    public class EntityController<T> : EntityController, IHaveEntityMetadata
         where T : class, IEntity, new()
     {
         public EntityController()
@@ -23,7 +23,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         protected EntityDomainService<T> EntityService { get; private set; }
 
-        protected IEntityMetadata Metadata { get; private set; }
+        public IEntityMetadata Metadata { get; private set; }
 
         public async Task<IActionResult> Index()
         {

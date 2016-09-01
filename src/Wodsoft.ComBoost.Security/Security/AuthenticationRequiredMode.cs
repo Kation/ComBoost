@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.ComponentModel.DataAnnotations
+namespace Wodsoft.ComBoost.Security
 {
     /// <summary>
     /// Authentication required mode.
