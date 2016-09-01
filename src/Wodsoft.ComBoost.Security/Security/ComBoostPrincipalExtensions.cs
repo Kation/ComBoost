@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Wodsoft.ComBoost;
 using Wodsoft.ComBoost.Security;
 
-namespace Microsoft.AspNetCore.Builder
+namespace Wodsoft.ComBoost.Security
 {
     public static class ComBoostPrincipalExtensions
     {
