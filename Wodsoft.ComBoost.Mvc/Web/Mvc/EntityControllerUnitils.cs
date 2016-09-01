@@ -132,19 +132,16 @@ namespace System.Web.Mvc
         /// <param name="page">Number of current page.</param>
         /// <param name="size">Number of entities per page.</param>
         /// <returns></returns>
-        public async Task<EntityViewModel<TEntity>> GetIndexModel(IQueryable<TEntity> queryable, int page, int size)
+        public Task<EntityViewModel<TEntity>> GetIndexModel(IQueryable<TEntity> queryable, int page, int size)
         {
-            return await Task.Run<EntityViewModel<TEntity>>(() =>
-            {
-                var model = new EntityViewModel<TEntity>(EntityContext.OrderBy(queryable), page, size);
-                model.Headers = Metadata.ViewProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) &&
-                    (t.ViewRoles.Count() == 0 ||
-                    (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
-                    t.ViewRoles.All(r => Controller.User.IsInRole(r)) :
-                    t.ViewRoles.Any(r => Controller.User.IsInRole(r))))).ToArray();
-                model.PageSizeOption = PageSize;
-                return model;
-            });
+            var model = new EntityViewModel<TEntity>(EntityContext.OrderBy(queryable), page, size);
+            model.Headers = Metadata.ViewProperties.Where(t => (t.AllowAnonymous || Controller.User.Identity.IsAuthenticated) &&
+                (t.ViewRoles.Count() == 0 ||
+                (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
+                t.ViewRoles.All(r => Controller.User.IsInRole(r)) :
+                t.ViewRoles.Any(r => Controller.User.IsInRole(r))))).ToArray();
+            model.PageSizeOption = PageSize;
+            return Task.FromResult(model);
         }
 
         /// <summary>
@@ -867,14 +864,9 @@ namespace System.Web.Mvc
         /// <returns></returns>
         public virtual Task<ActionResult> GetSearchAction(string actionName = "Index")
         {
-            return Task.Run<ActionResult>(() =>
-            {
-                if (!Metadata.ViewRoles.All(t => Controller.User.IsInRole(t)))
-                    return new HttpUnauthorizedResult();
-                EntitySearchModel<TEntity> model = new EntitySearchModel<TEntity>();
-                Controller.ViewBag.Action = actionName;
-                return GetView(model);
-            });
+            EntitySearchModel<TEntity> model = new EntitySearchModel<TEntity>();
+            Controller.ViewBag.Action = actionName;
+            return Task.FromResult(GetView(model));
         }
 
         #endregion
