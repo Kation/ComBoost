@@ -131,16 +131,16 @@ namespace System.Web.Mvc
         /// <param name="filterContext">The filter context.</param>
         public void OnAuthorization(AuthorizationContext filterContext)
         {
+
             if (filterContext.Controller is EntityController)
                 EntityBuilder = ((EntityController)filterContext.Controller).EntityBuilder;
             else
             {
                 if (!filterContext.HttpContext.User.Identity.IsAuthenticated)
-
                     if (filterContext.RouteData.DataTokens["loginUrl"] == null)
-                        filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.ApplicationPath + ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
+                        filterContext.Result = new RedirectResult((filterContext.HttpContext.Request.ApplicationPath == "/" ? "" : filterContext.HttpContext.Request.ApplicationPath) + ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
                     else
-                        filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.ApplicationPath + filterContext.RouteData.DataTokens["loginUrl"].ToString() + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
+                        filterContext.Result = new RedirectResult((filterContext.HttpContext.Request.ApplicationPath == "/" ? "" : filterContext.HttpContext.Request.ApplicationPath) + filterContext.RouteData.DataTokens["loginUrl"].ToString() + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
                 return;
             }
             if (filterContext.Controller is IHaveEntityMetadata)
@@ -153,9 +153,9 @@ namespace System.Web.Mvc
                     filterContext.Result = new HttpUnauthorizedResult();
                 else
                     if (filterContext.RouteData.DataTokens["loginUrl"] == null)
-                        filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.ApplicationPath + ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
+                        filterContext.Result = new RedirectResult((filterContext.HttpContext.Request.ApplicationPath == "/" ? "" : filterContext.HttpContext.Request.ApplicationPath) + ComBoostAuthentication.LoginUrl + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
                     else
-                        filterContext.Result = new RedirectResult(filterContext.HttpContext.Request.ApplicationPath + filterContext.RouteData.DataTokens["loginUrl"].ToString() + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
+                        filterContext.Result = new RedirectResult((filterContext.HttpContext.Request.ApplicationPath == "/" ? "" : filterContext.HttpContext.Request.ApplicationPath) + filterContext.RouteData.DataTokens["loginUrl"].ToString() + "?returnUrl=" + Uri.EscapeDataString(filterContext.RequestContext.HttpContext.Request.Url.PathAndQuery));
             }
         }
     }
