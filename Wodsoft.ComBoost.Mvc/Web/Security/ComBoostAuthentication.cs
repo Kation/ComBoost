@@ -243,7 +243,7 @@ namespace System.Web.Security
             if (forever)
                 SignIn(username, TimeSpan.FromDays(360));
             else
-                SignIn(username, Timeout);
+                SignIn(username, TimeSpan.Zero);
         }
 
         /// <summary>
@@ -254,28 +254,35 @@ namespace System.Web.Security
         public static void SignIn(string username, TimeSpan timeout)
         {
             RouteData route = RouteTable.Routes.GetRouteData(new HttpContextWrapper(HttpContext.Current));
-            string cookieValue;
             string authArea = null;
             if (route.DataTokens.ContainsKey("authArea"))
                 authArea = route.DataTokens["authArea"].ToString();
-            cookieValue = CreateCookies(username, authArea, timeout);
             string cookieName;
             if (authArea == null)
                 cookieName = CookieName;
             else
                 cookieName = CookieName + "_" + authArea;
-            HttpCookie cookie;
-            if (HttpContext.Current.Response.Cookies.AllKeys.Contains(cookieName))
-                cookie = HttpContext.Current.Response.Cookies[cookieName];
+            if (timeout == TimeSpan.Zero)
+            {
+                HttpContext.Current.Session[cookieName] = DateTime.Now.Add(Timeout);
+            }
             else
-                cookie = new HttpCookie(cookieName);
-            cookie.Value = cookieValue;
-            cookie.Domain = CookieDomain;
-            cookie.Expires = DateTime.Now.Add(timeout);
-            cookie.HttpOnly = true;
-            cookie.Path = CookiePath;
-            HttpContext.Current.Response.Cookies.Remove(cookieName);
-            HttpContext.Current.Response.Cookies.Add(cookie);
+            {
+                string cookieValue;
+                cookieValue = CreateCookies(username, authArea, timeout);
+                HttpCookie cookie;
+                if (HttpContext.Current.Response.Cookies.AllKeys.Contains(cookieName))
+                    cookie = HttpContext.Current.Response.Cookies[cookieName];
+                else
+                    cookie = new HttpCookie(cookieName);
+                cookie.Value = cookieValue;
+                cookie.Domain = CookieDomain;
+                cookie.Expires = DateTime.Now.Add(timeout);
+                cookie.HttpOnly = true;
+                cookie.Path = CookiePath;
+                HttpContext.Current.Response.Cookies.Remove(cookieName);
+                HttpContext.Current.Response.Cookies.Add(cookie);
+            }
         }
 
         /// <summary>

@@ -53,24 +53,36 @@ namespace System.Web.Security
                     object state = context.Items[name];
                     if (state == null)
                     {
-                        if (!context.Request.Cookies.AllKeys.Contains(name))
-                        {
-                            _IsAuthenticated = false;
-                        }
-                        else
+                        if (context.Request.Cookies.AllKeys.Contains(name))
                         {
                             string cookies = context.Request.Cookies[name].Value;
                             DateTime expiredDate;
                             _IsAuthenticated = ComBoostAuthentication.VerifyCookie(cookies, authArea, out _Name, out expiredDate);
                             if (_IsAuthenticated.Value && _Principal.RoleEntity != null)
                                 if (expiredDate < DateTime.Now.Add(ComBoostAuthentication.Timeout))
-                                    ComBoostAuthentication.SignIn(_Name, false);
+                                    ComBoostAuthentication.SignIn(_Name, ComBoostAuthentication.Timeout);
+                        }
+                        else if (context.Session != null && context.Session[name] != null)
+                        {
+                            DateTime expiredDate = (DateTime)context.Session[name];
+                            if (expiredDate < DateTime.Now)
+                                _IsAuthenticated = false;
+                            else
+                            {
+                                context.Session[name] = DateTime.Now.Add(ComBoostAuthentication.Timeout);
+                                _IsAuthenticated = true;
+                            }
+                        }
+                        else
+                        {
+                            _IsAuthenticated = false;
                         }
                     }
                     else
                     {
                         _IsAuthenticated = (bool)state;
                     }
+                    context.Items[name] = _IsAuthenticated.Value;
                 }
                 return _IsAuthenticated.Value;
             }
