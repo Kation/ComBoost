@@ -70,6 +70,7 @@ namespace System.Web.Security
                             else
                             {
                                 context.Session[name] = DateTime.Now.Add(ComBoostAuthentication.Timeout);
+                                _Name = (string)context.Session[name + "_Username"];
                                 _IsAuthenticated = true;
                             }
                         }

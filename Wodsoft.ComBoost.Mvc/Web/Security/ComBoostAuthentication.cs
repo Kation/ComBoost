@@ -265,6 +265,7 @@ namespace System.Web.Security
             if (timeout == TimeSpan.Zero)
             {
                 HttpContext.Current.Session[cookieName] = DateTime.Now.Add(Timeout);
+                HttpContext.Current.Session[cookieName + "_Username"] = username;
             }
             else
             {
@@ -294,24 +295,15 @@ namespace System.Web.Security
             string authArea = null;
             if (route.DataTokens.ContainsKey("authArea"))
                 authArea = route.DataTokens["authArea"].ToString();
-            if (authArea == null)
+            string cookieName = authArea == null ? CookieName : CookieName + "_" + authArea;
+            if (HttpContext.Current.Request.Cookies.AllKeys.Contains(cookieName))
             {
-                if (HttpContext.Current.Request.Cookies.AllKeys.Contains(CookieName))
-                {
-                    HttpCookie cookie = HttpContext.Current.Request.Cookies[CookieName];
-                    cookie.Expires = DateTime.Now.AddDays(-1);
-                    HttpContext.Current.Response.Cookies.Set(cookie);
-                }
+                HttpCookie cookie = HttpContext.Current.Request.Cookies[cookieName];
+                cookie.Expires = DateTime.Now.AddDays(-1);
+                HttpContext.Current.Response.Cookies.Set(cookie);
             }
-            else
-            {
-                if (HttpContext.Current.Request.Cookies.AllKeys.Contains(CookieName + "_" + authArea))
-                {
-                    HttpCookie cookie = HttpContext.Current.Request.Cookies[CookieName + "_" + authArea];
-                    cookie.Expires = DateTime.Now.AddDays(-1);
-                    HttpContext.Current.Response.Cookies.Set(cookie);
-                }
-            }
+            HttpContext.Current.Session.Remove(cookieName);
+            HttpContext.Current.Session.Remove(cookieName + "_Username");
         }
     }
 }
