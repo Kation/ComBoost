@@ -24,12 +24,12 @@ namespace Wodsoft.ComBoost.Security
             throw new NotSupportedException("不支持将该对象转换为字符串。");
         }
 
-        public Task<IPermission> GetPermissionAsync(string identity)
+        public virtual Task<IPermission> GetPermissionAsync(string identity)
         {
             return GetPermissionByIdentity(identity);
         }
 
-        public Task<IPermission> GetPermissionAsync(IDictionary<string, string> properties)
+        public virtual Task<IPermission> GetPermissionAsync(IDictionary<string, string> properties)
         {
             if (properties.ContainsKey("username"))
                 return GetPermissionByUsername(properties["username"]);
