@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Wodsoft.ComBoost.Security;
 
 namespace System.ComponentModel.DataAnnotations
 {

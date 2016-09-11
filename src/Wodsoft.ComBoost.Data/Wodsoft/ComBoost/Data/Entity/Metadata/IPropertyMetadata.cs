@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.Data.Entity.Metadata
 {

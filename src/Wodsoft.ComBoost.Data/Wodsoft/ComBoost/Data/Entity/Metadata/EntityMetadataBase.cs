@@ -7,6 +7,7 @@ using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.Data.Entity.Metadata
 {
