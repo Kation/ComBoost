@@ -1,21 +1,20 @@
-﻿using Microsoft.OData.Edm.Library;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data;
 using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 using Wodsoft.ComBoost.Security;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class EntityController<T> : EntityController, IHaveEntityMetadata
+    public class EntityJsonController<T> : EntityController
         where T : class, IEntity, new()
     {
-        public EntityController()
+        public EntityJsonController()
         {
             EntityService = DomainProvider.GetService<EntityDomainService<T>>();
             Metadata = EntityDescriptor.GetMetadata<T>();
@@ -23,7 +22,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         protected EntityDomainService<T> EntityService { get; private set; }
 
-        public IEntityMetadata Metadata { get; private set; }
+        protected IEntityMetadata Metadata { get; private set; }
 
         public async Task<IActionResult> Index()
         {
@@ -135,7 +134,5 @@ namespace Wodsoft.ComBoost.Mvc
                 return StatusCode(404, ex.Message);
             }
         }
-
-
     }
 }
