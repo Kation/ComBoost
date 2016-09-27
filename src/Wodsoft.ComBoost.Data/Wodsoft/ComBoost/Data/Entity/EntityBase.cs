@@ -8,12 +8,12 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public class EntityBase : IEntity
     {
-        public DateTime CreateDate { get; set; }
+        public virtual DateTime CreateDate { get; set; }
 
-        public DateTime EditDate { get; set; }
+        public virtual DateTime EditDate { get; set; }
 
         [Key]
-        public Guid Index { get; set; }
+        public virtual Guid Index { get; set; }
 
         object IEntity.Index { get { return Index; } set { Index = (Guid)value; } }
 
