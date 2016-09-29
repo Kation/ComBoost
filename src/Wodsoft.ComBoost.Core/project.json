@@ -1,4 +1,4 @@
-﻿{
+{
   "title": "ComBoost.Core",
   "version": "3.0.0-alpha1",
   "authors": [ "Kation" ],
@@ -16,7 +16,6 @@
   "dependencies": {
     "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0"
   },
-
   "frameworks": {
     "netstandard1.6": {
       "imports": "",
@@ -28,7 +27,9 @@
       }
     },
     "net451": {
-
     }
+  },
+  "buildOptions": {
+    "xmlDoc": true
   }
 }

@@ -2,16 +2,16 @@
   "title": "ComBoost.EntityFramework",
   "version": "3.0.0-alpha1",
   "authors": [ "Kation" ],
-  "description": "ComBoostÓÃEntityFrameworkÊµÏÖµÄÊµÌåÄ£¿é¡£",
+  "description": "ComBoostç”¨äºEntityFrameworkå®ç°çš„å®ä½“æ¨¡å—ã€‚",
   "packOptions": {
     "owners": [ "Kation" ],
-    "summary": "ComBoostÓÃEntityFrameworkÊµÏÖµÄÊµÌåÄ£¿é¡£",
+    "summary": "ComBoostç”¨äºEntityFrameworkå®ç°çš„å®ä½“æ¨¡å—ã€‚",
     "tags": [ "ComBoost" ],
     "repository": {
       "type": "git",
       "url": "https://github.com/Kation/ComBoost"
     },
-    "releaseNotes": "Alpha²âÊÔ°æ£¬ÇëÎğÓÃÓÚÕıÊ½»·¾³¡£"
+    "releaseNotes": "Alphaæµ‹è¯•ç‰ˆï¼Œè¯·å‹¿ç”¨äºæ­£å¼ç¯å¢ƒã€‚"
   },
   "frameworks": {
     "netstandard1.6": {
@@ -20,7 +20,7 @@
     "net451": {}
   },
   "dependencies": {
-    "Wodsoft.ComBoost.Data": "3.0.0-*",
-    "Microsoft.EntityFrameworkCore": "1.0.0"
+    "Microsoft.EntityFrameworkCore": "1.0.1",
+    "Wodsoft.ComBoost.Data": "[3.0.0-alpha1,4.0.0)"
   }
 }
