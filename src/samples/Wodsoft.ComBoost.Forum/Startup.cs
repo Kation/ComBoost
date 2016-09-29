@@ -14,6 +14,8 @@ using Wodsoft.ComBoost.Security;
 using Wodsoft.ComBoost.Data.Entity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Wodsoft.ComBoost.Data;
+using Wodsoft.ComBoost.Mvc;
 
 namespace Wodsoft.ComBoost.Forum
 {
@@ -50,7 +52,12 @@ namespace Wodsoft.ComBoost.Forum
             services.AddScoped<ISecurityProvider, ForumSecurityProvider>();
             services.AddScoped<IAuthenticationProvider, ComBoostAuthenticationProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IDomainProvider, DomainProvider>();
+            services.AddSingleton<IDomainProvider, DomainProvider>(t =>
+            {
+                var provider = new DomainProvider(t);
+                provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityODataExtension<>));
+                return provider;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
