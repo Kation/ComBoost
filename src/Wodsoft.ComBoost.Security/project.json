@@ -2,16 +2,16 @@
   "title": "ComBoost.Security",
   "version": "3.0.0-alpha1",
   "authors": [ "Kation" ],
-  "description": "ComBoost°²È«Ä£¿é¡£",
+  "description": "ComBoostå®‰å…¨æ¨¡å—ã€‚",
   "packOptions": {
     "owners": [ "Kation" ],
-    "summary": "ComBoost°²È«Ä£¿é¡£",
+    "summary": "ComBoostå®‰å…¨æ¨¡å—ã€‚",
     "tags": [ "ComBoost" ],
     "repository": {
       "type": "git",
       "url": "https://github.com/Kation/ComBoost"
     },
-    "releaseNotes": "Alpha²âÊÔ°æ£¬ÇëÎğÓÃÓÚÕıÊ½»·¾³¡£"
+    "releaseNotes": "Alphaæµ‹è¯•ç‰ˆï¼Œè¯·å‹¿ç”¨äºæ­£å¼ç¯å¢ƒã€‚"
   },
   "frameworks": {
     "netstandard1.6": {

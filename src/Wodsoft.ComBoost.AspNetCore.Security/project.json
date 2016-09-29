@@ -2,16 +2,16 @@
   "title": "ComBoost.AspNetCore.Security",
   "version": "3.0.0-alpha1",
   "authors": [ "Kation" ],
-  "description": "ComBoostÓÃÓÚAspNet CoreµÄ°²È«Ä£¿é¡£",
+  "description": "ComBoostç”¨äºAspNet Coreçš„å®‰å…¨æ¨¡å—ã€‚",
   "packOptions": {
     "owners": [ "Kation" ],
-    "summary": "ComBoostÓÃÓÚAspNet CoreµÄ°²È«Ä£¿é¡£",
+    "summary": "ComBoostç”¨äºAspNet Coreçš„å®‰å…¨æ¨¡å—ã€‚",
     "tags": [ "ComBoost" ],
     "repository": {
       "type": "git",
       "url": "https://github.com/Kation/ComBoost"
     },
-    "releaseNotes": "Alpha²âÊÔ°æ£¬ÇëÎğÓÃÓÚÕıÊ½»·¾³¡£"
+    "releaseNotes": "Alphaæµ‹è¯•ç‰ˆï¼Œè¯·å‹¿ç”¨äºæ­£å¼ç¯å¢ƒã€‚"
   },
   "dependencies": {
     "Microsoft.AspNetCore.Authentication": "1.0.0",
