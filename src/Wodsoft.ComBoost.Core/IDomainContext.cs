@@ -11,11 +11,6 @@ namespace Wodsoft.ComBoost
     public interface IDomainContext : IServiceProvider
     {
         /// <summary>
-        /// 获取或设置结果值。
-        /// </summary>
-        object Result { get; set; }
-
-        /// <summary>
         /// 获取数据字典。
         /// </summary>
         dynamic DataBag { get; }

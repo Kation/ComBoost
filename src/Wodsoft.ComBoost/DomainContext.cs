@@ -27,9 +27,7 @@ namespace Wodsoft.ComBoost
                 return _DataBag;
             }
         }
-
-        public virtual object Result { get; set; }
-
+        
         public virtual object GetService(Type serviceType)
         {
             return _ServiceProvider.GetService(serviceType);
