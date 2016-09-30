@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.Mvc;
@@ -58,13 +59,43 @@ namespace Wodsoft.ComBoost.Mvc
                 return files.Select(t => new SelectedFile(t)).ToArray();
             }
             object value = Controller.Request.Query[name];
-            if (value == StringValues.Empty)
+            if (value == StringValues.Empty && Controller.Request.HasFormContentType)
                 value = Controller.Request.Form[name];
             if (value == StringValues.Empty)
                 value = Controller.HttpContext.GetRouteData()?.Values[name] ?? Controller.Request.Headers[name];
+            if (value == StringValues.Empty)
+                value = Controller.HttpContext.GetRouteData()?.DataTokens[name];
             if (value == null || value == StringValues.Empty)
+            {
+                if (valueType.GetTypeInfo().IsValueType)
+                    return Activator.CreateInstance(valueType);
                 return null;
+            }
             return ModelBindingHelper.ConvertTo(value, valueType);
+        }
+
+        public object GetValue(Type valueType)
+        {
+            throw new NotImplementedException();
+        }
+
+        private System.Collections.ObjectModel.ReadOnlyCollection<string> _Keys;
+        public ICollection<string> Keys
+        {
+            get
+            {
+                if (_Keys != null)
+                    return _Keys;
+
+                List<string> keys = new List<string>();
+                keys.AddRange(Controller.Request.Query.Keys);
+                keys.AddRange(Controller.Request.Form.Keys);
+                keys.AddRange(Controller.HttpContext.GetRouteData()?.Values.Keys);
+                keys.AddRange(Controller.Request.Headers.Keys);
+                keys.AddRange(Controller.HttpContext.GetRouteData()?.DataTokens.Keys);
+                _Keys = new System.Collections.ObjectModel.ReadOnlyCollection<string>(keys.Distinct().ToList());
+                return _Keys;
+            }
         }
     }
 }

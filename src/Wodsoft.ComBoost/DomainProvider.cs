@@ -105,13 +105,13 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(extensionType));
             if (!typeof(IDomainService).IsAssignableFrom(serviceType))
                 throw new ArgumentException("服务类型没有实现领域服务接口IDomainService。");
-            if (!typeof(IDomainService).IsAssignableFrom(extensionType))
+            if (!typeof(IDomainExtension).IsAssignableFrom(extensionType))
                 throw new ArgumentException("扩展类型没有实现领域扩展接口IDomainExtension。");
             if (!_Extensions.ContainsKey(serviceType))
                 _Extensions.Add(serviceType, new List<Type>());
             List<Type> extensionList = _Extensions[serviceType];
             if (!extensionList.Contains(extensionType))
-                extensionList.Add(serviceType);
+                extensionList.Add(extensionType);
         }
 
         public virtual void UnregisterExtension(Type serviceType, Type extensionType)

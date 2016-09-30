@@ -12,6 +12,11 @@ namespace Wodsoft.ComBoost
             return (T)provider.GetValue(name, typeof(T));
         }
 
+        public static T GetValue<T>(this IValueProvider provider)
+        {
+            return (T)provider.GetValue(typeof(T));
+        }
+
         public static object GetRequiredValue(this IValueProvider valueProvider, string name)
         {
             object value = valueProvider.GetValue(name);
@@ -26,6 +31,15 @@ namespace Wodsoft.ComBoost
             if (value == null)
                 throw new ArgumentException("找不到所需值。");
             return value;
+        }
+
+        public static T GetRequiredValue<T>(this IValueProvider valueProvider)
+        {
+            T value = (T)valueProvider.GetValue(typeof(T));
+            if (value == null)
+                throw new ArgumentException("找不到所需值。");
+            return value;
+
         }
     }
 }
