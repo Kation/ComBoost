@@ -28,9 +28,6 @@ namespace Wodsoft.ComBoost.Data
             List<EntitySearchItem> searchItems = new List<EntitySearchItem>();
 
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
-            string filter = valueProvider.GetValue<string>("$filter");
-            if (string.IsNullOrEmpty(filter))
-                return;
 
             IQueryable<T> queryable = e.Queryable;
 
