@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
@@ -9,6 +10,7 @@ namespace Wodsoft.ComBoost.Forum.Entity
 {
     public class Member : EntityBase, IMember, IPermission
     {
+        [Searchable]
         public string Username { get; set; }
 
         public byte[] Password { get; set; }

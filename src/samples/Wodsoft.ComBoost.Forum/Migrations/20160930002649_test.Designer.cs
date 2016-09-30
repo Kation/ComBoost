@@ -8,13 +8,13 @@ using Wodsoft.ComBoost.Forum;
 namespace Wodsoft.ComBoost.Forum.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20160623035735_Memory")]
-    partial class Memory
+    [Migration("20160930002649_test")]
+    partial class test
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.0-rc2-20901")
+                .HasAnnotation("ProductVersion", "1.0.1")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Forum", b =>
@@ -37,8 +37,7 @@ namespace Wodsoft.ComBoost.Forum.Migrations
 
             modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Member", b =>
                 {
-                    b.Property<Guid>("Index")
-                        .ValueGeneratedOnAdd();
+                    b.Property<Guid>("Index");
 
                     b.Property<DateTime>("CreateDate");
 
@@ -51,6 +50,9 @@ namespace Wodsoft.ComBoost.Forum.Migrations
                     b.Property<string>("Username");
 
                     b.HasKey("Index");
+
+                    b.HasIndex("Index")
+                        .IsUnique();
 
                     b.ToTable("Member");
                 });
@@ -66,28 +68,28 @@ namespace Wodsoft.ComBoost.Forum.Migrations
 
                     b.Property<Guid?>("ForumIndex");
 
-                    b.Property<Guid?>("MemberIndex");
-
                     b.Property<string>("Title");
 
                     b.HasKey("Index");
 
                     b.HasIndex("ForumIndex");
 
-                    b.HasIndex("MemberIndex");
-
                     b.ToTable("Thread");
+                });
+
+            modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Member", b =>
+                {
+                    b.HasOne("Wodsoft.ComBoost.Forum.Entity.Thread")
+                        .WithOne("Member")
+                        .HasForeignKey("Wodsoft.ComBoost.Forum.Entity.Member", "Index")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Thread", b =>
                 {
-                    b.HasOne("Wodsoft.ComBoost.Forum.Entity.Forum")
-                        .WithMany()
+                    b.HasOne("Wodsoft.ComBoost.Forum.Entity.Forum", "Forum")
+                        .WithMany("Threads")
                         .HasForeignKey("ForumIndex");
-
-                    b.HasOne("Wodsoft.ComBoost.Forum.Entity.Member")
-                        .WithMany()
-                        .HasForeignKey("MemberIndex");
                 });
         }
     }

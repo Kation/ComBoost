@@ -55,7 +55,8 @@ namespace Wodsoft.ComBoost.Forum
             services.AddSingleton<IDomainProvider, DomainProvider>(t =>
             {
                 var provider = new DomainProvider(t);
-                provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityODataExtension<>));
+                provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntitySearchExtension<>));
+                provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityPagerExtension<>));
                 return provider;
             });
         }
