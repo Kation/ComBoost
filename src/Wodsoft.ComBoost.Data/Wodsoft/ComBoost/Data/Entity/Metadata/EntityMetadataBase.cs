@@ -46,7 +46,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                     }
                 }
             }
-            DataBag = new System.Dynamic.ExpandoObject();
+            DataBag = new EntityMetadataDataBag();
         }
 
         public dynamic DataBag { get; }

@@ -34,10 +34,10 @@ namespace Wodsoft.ComBoost.Data
         private void Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
         {
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
-            int page = valueProvider.GetValue<int>("page");
+            int page = valueProvider.GetValue<int>("$page");
             if (page == 0)
                 page = 1;
-            int size = valueProvider.GetValue<int>("size");
+            int size = valueProvider.GetValue<int>("$size");
             if (size == 0)
                 size = EntityPagerExtension.DefaultPageSize;
             e.Queryable = e.Queryable.Skip((page - 1) * size).Take(size);
