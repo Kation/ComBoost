@@ -7,14 +7,16 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 using Wodsoft.ComBoost.Security;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Wodsoft.ComBoost.Mvc
 {
     public class EntityController<T> : EntityController, IHaveEntityMetadata
         where T : class, IEntity, new()
     {
-        public EntityController()
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
+            base.OnActionExecuting(context);
             EntityService = DomainProvider.GetService<EntityDomainService<T>>();
             Metadata = EntityDescriptor.GetMetadata<T>();
         }

@@ -15,7 +15,7 @@
   },
   "frameworks": {
     "netstandard1.6": {
-      "imports": [ "dnxcore50", "portable-net45+wp8+win8+wpa", "portable-net45+win8+wpa81" ],
+      "imports": [ "dnxcore50", "portable-net45+win8+wpa81" ],
       "dependencies": {
       }
     },
@@ -27,8 +27,6 @@
   },
   "dependencies": {
     "Wodsoft.ComBoost.Data": "[3.0.0-alpha1,4.0.0)",
-    "Wodsoft.ComBoost.Mvc": "[3.0.0-alpha1,4.0.0)",
-    "Microsoft.OData.Core": "7.0.0",
-    "Microsoft.OData.Edm": "7.0.0"
+    "Wodsoft.ComBoost.Mvc": "[3.0.0-alpha1,4.0.0)"
   }
 }
