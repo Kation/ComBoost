@@ -1,0 +1,83 @@
+﻿@model MvcEditorModel
+<div class="input-group col-md-6" style="float: left">
+    <select id="@Model.Metadata.ClrName" multiple="multiple" class="form-control" style="height: 88px; padding-right: 12px;">
+        @foreach (System.Data.Entity.EntityBase v in (System.Collections.IEnumerable)Model.Value)
+        {
+            <option value="@v.Index">@v</option>
+        }
+    </select>
+    <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@(string.Join(",",((System.Collections.IEnumerable)Model.Value).Cast<System.Data.Entity.IEntity>().Select(t=>t. Index).ToArray()))" />
+</div>
+<div class="col-md-2">
+    <div class="btn-group-vertical">
+        <button id="@(Model.Metadata.ClrName)_Add" type="button" class="btn btn-default btn-sm">添加</button>
+        <button id="@(Model.Metadata.ClrName)_Remove" disabled="disabled" type="button" class="btn btn-default btn-sm">移除</button>
+        <button id="@(Model.Metadata.ClrName)_Clear" type="button" class="btn btn-default btn-sm">清除</button>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var select = $('#@Model.Metadata.ClrName');
+        var add = $('#@(Model.Metadata.ClrName)_Add');
+        var remove = $('#@(Model.Metadata.ClrName)_Remove');
+        var clear = $('#@(Model.Metadata.ClrName)_Clear');
+        var value = $('#@(Model.Metadata.ClrName)_Value');
+        select.change(function () {
+            if (select.val() != '')
+                remove.removeAttr('disabled');
+            else
+                remove.attr('disabled', 'disabled');
+        });
+        remove.click(function () {
+            var id = select.val();
+            select.children('[value=' + id + ']').remove();
+            remove.attr('disabled', 'disabled');
+            update();
+        });
+        clear.click(function () {
+            select.empty();
+            value.val('');
+        });
+        add.click(function () {
+            if (window.showModalDialog != undefined) {
+                var result = window.showModalDialog('@Url.RouteUrl(new { controller = Model.Metadata.ClrType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
+                    null,
+                    'dialogHeight:720px;dialogWidth:1024px');
+                if (result == undefined)
+                    result = window.returnValue;
+                if (result == null)
+                    return;
+                for (var x in result) {
+                    var item = $(result[x]);
+                    if (select.children('[value=' + item.val() + ']').length > 0)
+                        return;
+                    select.append(item);
+                }
+                update();
+            }
+            else {
+                window.open('@Url.RouteUrl(new { controller = Model.Metadata.ClrType.GetGenericArguments()[0].Name, action = "MultipleSelector" })',
+                            null,
+                            'dialog=1,modal=1,location=0,menubar=0,resizable=0,scrollbars=0,status=0,toolbar=0,height=720,width=1024')
+            }
+            window.selectCompleted = function (result) {
+                for (var x in result) {
+                    var item = $(result[x]);
+                    if (select.children('[value=' + item.val() + ']').length > 0)
+                        return;
+                    select.append(item);
+                }
+                update();
+            }
+        });
+        function update() {
+            var val = '';
+            select.children().each(function (index, element) {
+                val += $(element).val() + ',';
+            });
+            if (val.length > 0)
+                val = val.substring(0, val.length - 1);
+            value.val(val);
+        }
+    });
+</script>

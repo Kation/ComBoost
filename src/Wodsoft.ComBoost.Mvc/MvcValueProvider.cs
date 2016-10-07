@@ -9,6 +9,7 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Internal;
+using System.Collections;
 
 namespace Wodsoft.ComBoost.Mvc
 {
@@ -63,7 +64,7 @@ namespace Wodsoft.ComBoost.Mvc
                 value = Controller.Request.Form[name];
             if (value == StringValues.Empty)
                 value = Controller.HttpContext.GetRouteData()?.Values[name] ?? Controller.Request.Headers[name];
-            if (value == StringValues.Empty)
+            if (value == null)
                 value = Controller.HttpContext.GetRouteData()?.DataTokens[name];
             if (value == null || value == StringValues.Empty)
             {
@@ -71,6 +72,9 @@ namespace Wodsoft.ComBoost.Mvc
                     return Activator.CreateInstance(valueType);
                 return null;
             }
+            if (value is StringValues && !valueType.IsArray && !typeof(IEnumerable).IsAssignableFrom(valueType))
+                value = ((StringValues)value)[0];
+
             return ModelBindingHelper.ConvertTo(value, valueType);
         }
 
@@ -89,7 +93,8 @@ namespace Wodsoft.ComBoost.Mvc
 
                 List<string> keys = new List<string>();
                 keys.AddRange(Controller.Request.Query.Keys);
-                keys.AddRange(Controller.Request.Form.Keys);
+                if (Controller.Request.HasFormContentType)
+                    keys.AddRange(Controller.Request.Form.Keys);
                 keys.AddRange(Controller.HttpContext.GetRouteData()?.Values.Keys);
                 keys.AddRange(Controller.Request.Headers.Keys);
                 keys.AddRange(Controller.HttpContext.GetRouteData()?.DataTokens.Keys);

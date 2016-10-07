@@ -1,0 +1,5 @@
+﻿@model MvcEditorModel
+<textarea class="form-control" rows="3" id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")>@Model.Value</textarea>
+<script type="text/javascript">
+    $('#@Model.Metadata.ClrName').tinymce();
+</script>

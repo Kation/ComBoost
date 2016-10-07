@@ -1,0 +1,216 @@
+﻿@model IEntityViewModel
+@{
+    ViewBag.Title = Model.Metadata.Name + "列表";
+    object area = ViewContext.RouteData.Values["Area"];
+    if (area == null)
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Areas/" + area.ToString() + "/Views/Shared/_Layout.cshtml";
+    }
+}
+<ul class="breadcrumb">
+    <li><a href="@Url.Action("Index", "Transaction")">首页</a></li>
+    <li class="active">@Model.Metadata.Name</li>
+</ul>
+@if (Model.SearchItem != null)
+{
+    <div class="alert alert-success alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <p><h4>搜索内容</h4></p>
+        @for (int i = 0; i < Model.SearchItem.Length; i++)
+        {
+            @Html.Partial("SearchItem", Model.SearchItem[i])
+        }
+    </div>
+}
+<form method="get">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="@(Model.Parent == null ? "span12":"span9")">
+                <ul class="nav nav-tabs">
+                    <li role="presentation" class="active"><a><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> 列表</a></li>
+                    @if (Model.Metadata.SearchProperties.Count() > 0)
+                    {
+                        <li><a href="@Html.Raw(Url.Action("Search"))" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> 查询</a></li>
+                    }
+                    @if (Model.Metadata.AddRoles.All(t => User.IsInDynamicRole(t)))
+                    {
+                        <li><a href="@Html.Raw(Url.Action("Create"))" class="btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新建</a></li>
+                    }
+                    @foreach (var button in Model.ViewButtons)
+                    {
+                        <li><a href="@Html.Raw(button.Target)" class="btn btn-default" title="@button.Tooltip">@button.Icon@button.Name</a></li>
+                    }
+                    <li id="detailButton" class="pull-right disabled"><a href="javascript:gotoDetail();" class="btn btn-default"><span class="glyphicon glyphicon-record"></span> 详情</a></li>
+                    @if (Model.Metadata.EditRoles.All(t => User.IsInDynamicRole(t)))
+                    {
+                        <li id="editButton" class="pull-right disabled"><a href="javascript:gotoEdit();" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> 编辑</a></li>
+                    }
+                    @if (Model.Metadata.RemoveRoles.All(t => User.IsInDynamicRole(t)))
+                    {
+                        <li id="removeButton" class="pull-right disabled"><a href="javascript:gotoRemove();" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> 删除</a></li>
+                    }
+                    @foreach (var button in Model.ItemButtons)
+                    {
+                        <li id="customButton@(Array.IndexOf(Model.ItemButtons, button))" class="pull-right disabled"><a href="javascript:gotoCustom(@Array.IndexOf(Model.ItemButtons, button));" title="@button.Tooltip">@button.Icon @button.Name</a></li>
+                    }
+                </ul>
+                <div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 32px;"></th>
+                                @foreach (var header in Model.Properties)
+                                {
+                                    <th title="@header.Description">@header.Name</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody id="listview">
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr data-id="@item.Index" data-remove="@item.IsRemoveAllowed" data-edit="@item.IsEditAllowed" @string.Join(" ", Model.ItemButtons.Where(t => { t.SetTarget(Context.RequestServices, item); return t.Target != null; }).Select(t => "data-b-" + Array.IndexOf(Model.ItemButtons, t) + "=\"" + t.Target.ToString() + "\""))>
+                                    <td class="text-center">
+                                        <input type="radio" />
+                                    </td>
+                                    @foreach (var header in Model.Properties)
+                                    {
+                                        <td>
+                                            @Html.Viewer(item, header, header.GetValue(item))
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="@(1 + Model.Properties.Count())">
+                                    <div class="row">
+                                        <div class="col-xs-4 col-sm-5 col-md-6 col-lg-8">
+                                            <div class="btn-group" role="group">
+                                                @foreach (var size in Model.PageSizeOption)
+                                                {
+                                                    <button type="submit" name="size" value="@size" class="btn btn-default @(size == Model.CurrentSize ? "active" : "")">@size</button>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-8 col-sm-7 col-md-6 col-lg-4">
+                                            <div class="input-group">
+                                                <div class="input-group-btn">
+                                                    @if (Model.CurrentPage > 3)
+                                                    {
+                                                        <button type="submit" name="page" value="1" class="btn btn-default" @(Model.CurrentPage == 1 ? " disabled=\"disabled\"" : "" )>1</button>
+                                                        if (Model.CurrentPage > 4)
+                                                        {
+                                                            <button type="button" class="btn btn-default disabled">.</button>
+                                                        }
+                                                    }
+                                                    @for (int i = Model.CurrentPage - 2; i <= Model.CurrentPage + 2; i++)
+                                                    {
+                                                        if (i < 1)
+                                                        {
+                                                            continue;
+                                                        }
+                                                        if (i > Model.TotalPage)
+                                                        {
+                                                            break;
+                                                        }
+                                                        <button type="submit" name="page" value="@i" class="btn btn-default @(Model.CurrentPage == i ? "active" : "")">@i</button>
+                                                    }
+                                                    @if (Model.CurrentPage < Model.TotalPage - 2)
+                                                    {
+                                                        if (Model.CurrentPage < Model.TotalPage - 3)
+                                                        {
+                                                            <button type="button" class="btn btn-default disabled">.</button>
+                                                        }
+                                                        <button type="submit" name="page" value="1" class="btn btn-default" @(Model.CurrentPage == Model.TotalPage ? " disabled=\"disabled\"" : "" )>6</button>
+                                                    }
+                                                </div>
+                                                <input type="text" class="form-control text-center" />
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" type="button">跳转</button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">操作结果</h4>
+            </div>
+            <div class="modal-body">
+                <p>该项已经被引用，无法删除.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var id, selectedItem;
+
+    $('#listview').children('tr').click(function () {
+        $('#listview').children('tr').each(function (index, element) {
+            $(element).children().first().children().first('input').prop('checked', false);
+        });
+        var item = $(this);
+        selectedItem = item;
+        item.children().first().children().first().prop('checked', true);
+
+        id = item.data('id');
+        $('#detailButton').removeClass('disabled');
+        var removeButton = $('#removeButton');
+        if (removeButton.length > 0 && item.data('remove') == 'True')
+            removeButton.removeClass('disabled');
+        var editButton = $('#editButton');
+        if (editButton.length > 0 && item.data('edit') == 'True')
+            editButton.removeClass('disabled');
+    });
+
+    function gotoDetail() {
+        if (id != null)
+            window.location.href = '@Url.Action("Detail")/' + id;
+    }
+
+    function gotoEdit() {
+        if (id != null)
+            window.location.href = '@Url.Action("Edit")/' + id;
+    }
+
+    function remove(id) {
+        $.ajax({
+            url: '@Html.Raw(Url.Action("Remove"))/' + id,
+            cache: false,
+            type: 'POST',
+            success: function () {
+                location.reload();
+            },
+            error: function () {
+                $('#myModal').modal('show');
+            }
+        })
+    }
+
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+    }
+
+
+</script>

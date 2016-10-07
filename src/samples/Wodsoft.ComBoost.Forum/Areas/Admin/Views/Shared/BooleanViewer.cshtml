@@ -1,0 +1,24 @@
+﻿@model MvcEditorModel
+@{
+    bool? value;
+    if (Model.Value is bool)
+    {
+        value = (bool)Model.Value;
+    }
+    else if (Model.Value is bool?)
+    {
+        value = (bool?)Model.Value;
+    }
+    else if (Model.Value == null)
+    {
+        value = null;
+    }
+    else
+    {
+        throw new NotSupportedException("Boolean editor do not support type \"" + Model.Value.GetType() + "\".");
+    }
+}
+@if (value != null)
+{
+    @(value.Value ? "是" : "否")
+}

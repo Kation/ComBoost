@@ -21,6 +21,17 @@ namespace Wodsoft.ComBoost.Data
         {
             Service = (EntityDomainService<T>)domainService;
             Service.EntityQuery += Service_EntityQuery;
+            Service.Executed += Service_Executed;
+        }
+
+        private Task Service_Executed(IDomainExecutionContext context)
+        {
+            if (context.DomainContext.DataBag.SearchItem != null && context.Result != null)
+            {
+                dynamic model = context.Result;
+                model.SearchItem = context.DomainContext.DataBag.SearchItem;
+            }
+            return Task.FromResult(0);
         }
 
         private void Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
@@ -28,6 +39,8 @@ namespace Wodsoft.ComBoost.Data
             List<EntitySearchItem> searchItems = new List<EntitySearchItem>();
 
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
+            if (!valueProvider.GetValue<bool>("Search"))
+                return;
 
             IQueryable<T> queryable = e.Queryable;
 
@@ -58,7 +71,7 @@ namespace Wodsoft.ComBoost.Data
                             else if (options[a] == ".End")
                             {
                                 DateTime end;
-                                if (!DateTime.TryParse(valueProvider.GetValue < string >("Search." + keys[i].Key + options[a]), out end))
+                                if (!DateTime.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]), out end))
                                     continue;
                                 searchItem.LessthanDate = end;
                                 ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
@@ -71,7 +84,7 @@ namespace Wodsoft.ComBoost.Data
                         if (options[0] == "")
                         {
                             bool result;
-                            if (!bool.TryParse(valueProvider.GetValue < string >("Search." + keys[i].Key), out result))
+                            if (!bool.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key), out result))
                                 continue;
                             searchItem.Equal = result;
                             ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
@@ -86,7 +99,7 @@ namespace Wodsoft.ComBoost.Data
                             if (options[a] == ".Start")
                             {
                                 double start;
-                                if (!double.TryParse(valueProvider.GetValue < string > ("Search." + keys[i].Key + options[a]), out start))
+                                if (!double.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]), out start))
                                     continue;
                                 searchItem.Morethan = start;
                                 ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
@@ -95,7 +108,7 @@ namespace Wodsoft.ComBoost.Data
                             else if (options[a] == ".End")
                             {
                                 double end;
-                                if (!double.TryParse(valueProvider.GetValue < string > ("Search." + keys[i].Key + options[a]), out end))
+                                if (!double.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]), out end))
                                     continue;
                                 searchItem.Lessthan = end;
                                 ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
@@ -109,7 +122,7 @@ namespace Wodsoft.ComBoost.Data
                             object result;
                             try
                             {
-                                result = Enum.Parse(property.ClrType, valueProvider.GetValue < string > ("Search." + keys[i].Key));
+                                result = Enum.Parse(property.ClrType, valueProvider.GetValue<string>("Search." + keys[i].Key));
                             }
                             catch
                             {
@@ -121,7 +134,7 @@ namespace Wodsoft.ComBoost.Data
                         }
                         else if (property.CustomType == "Entity")
                         {
-                            searchItem.Contains = valueProvider.GetValue < string > ("Search." + keys[i].Key);
+                            searchItem.Contains = valueProvider.GetValue<string>("Search." + keys[i].Key);
                             ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
                             Expression expression = Expression.Property(Expression.Property(parameter, property.ClrName), EntityDescriptor.GetMetadata(property.ClrType).DisplayProperty.ClrName);
                             expression = Expression.Call(expression, typeof(string).GetTypeInfo().GetMethod("Contains"), Expression.Constant(searchItem.Contains));
@@ -131,7 +144,7 @@ namespace Wodsoft.ComBoost.Data
                     default:
                         if (property.ClrType == typeof(string))
                         {
-                            searchItem.Contains = valueProvider.GetValue < string > ("Search." + keys[i].Key);
+                            searchItem.Contains = valueProvider.GetValue<string>("Search." + keys[i].Key);
                             ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
                             Expression expression = Expression.Property(parameter, property.ClrName);
                             expression = Expression.Call(expression, typeof(string).GetMethod("Contains"), Expression.Constant(searchItem.Contains));

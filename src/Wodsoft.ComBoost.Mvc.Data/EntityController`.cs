@@ -8,6 +8,7 @@ using Wodsoft.ComBoost.Security;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
 
 namespace Wodsoft.ComBoost.Mvc
 {
@@ -30,11 +31,14 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateDomainContext();
             try
             {
-                //EntityService.ListQuery += t =>
-                //{
-                //    return t;
-                //};
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IEntityViewModel<T>>(context, EntityService.List);
+                foreach (var button in model.ViewButtons)
+                    button.SetTarget(HttpContext.RequestServices);
+                if (Request.Headers["accept-content"].Contains("application/json"))
+                {
+                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
+                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
+                }
                 return View(model);
             }
             catch (UnauthorizedAccessException ex)
@@ -49,7 +53,7 @@ namespace Wodsoft.ComBoost.Mvc
             try
             {
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IEntityEditModel<T>>(context, EntityService.Create);
-                return View(model);
+                return View("Edit", model);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -62,7 +66,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateDomainContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, object, IEntityEditModel<T>>(context, EntityService.Edit);
+                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, IEntityEditModel<T>>(context, EntityService.Edit);
                 return View(model);
             }
             catch (UnauthorizedAccessException ex)
@@ -80,7 +84,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateDomainContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, object, IEntityEditModel<T>>(context, EntityService.Detail);
+                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, IEntityEditModel<T>>(context, EntityService.Detail);
                 return View(model);
             }
             catch (UnauthorizedAccessException ex)
@@ -98,7 +102,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateDomainContext();
             try
             {
-                await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, object>(context, EntityService.Remove);
+                await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider>(context, EntityService.Remove);
                 return StatusCode(200);
             }
             catch (UnauthorizedAccessException ex)

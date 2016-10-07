@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
 using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel;
 
 namespace Wodsoft.ComBoost.Data
 {
@@ -29,18 +30,32 @@ namespace Wodsoft.ComBoost.Data
         {
             Service = (EntityDomainService<T>)domainService;
             Service.EntityQuery += Service_EntityQuery;
+            Service.Executed += Service_Executed;
+        }
+
+        private Task Service_Executed(IDomainExecutionContext context)
+        {
+            if (context.Result != null && context.Result is IEntityViewModel)
+            {
+                dynamic model = context.Result;
+                model.CurrentPage = context.DomainContext.DataBag.Page;
+                model.CurrentSize = context.DomainContext.DataBag.Size;
+            }
+            return Task.FromResult(0);
         }
 
         private void Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
         {
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
-            int page = valueProvider.GetValue<int>("$page");
+            int page = valueProvider.GetValue<int>("page");
             if (page == 0)
                 page = 1;
-            int size = valueProvider.GetValue<int>("$size");
+            int size = valueProvider.GetValue<int>("size");
             if (size == 0)
                 size = EntityPagerExtension.DefaultPageSize;
             e.Queryable = e.Queryable.Skip((page - 1) * size).Take(size);
+            context.DomainContext.DataBag.Page = page;
+            context.DomainContext.DataBag.Size = size;
         }
     }
 }

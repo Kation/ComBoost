@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace System.ComponentModel
@@ -11,6 +12,7 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="TEntity">Type of entity.</typeparam>
     public class EntityViewModel<TEntity> : NotifyBase, IEntityViewModel<TEntity>, IEntityViewModel, IPagination
+        where TEntity : IEntity
     {
         private IQueryable<TEntity> _Queryable;
         /// <summary>
@@ -90,7 +92,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the viewlist headers.
         /// </summary>
-        public IEnumerable<IPropertyMetadata> Headers { get; set; }
+        public IEnumerable<IPropertyMetadata> Properties { get; set; }
 
         /// <summary>
         /// Get or set the view buttons.
@@ -117,7 +119,7 @@ namespace System.ComponentModel
         /// </summary>
         public TEntity[] Items { get { return (TEntity[])GetValue(); } set { SetValue(value); } }
 
-        object[] IEntityViewModel.Items { get { return Items.Cast<object>().ToArray(); } }
+        IEntity[] IEntityViewModel.Items { get { return Items.Cast<IEntity>().ToArray(); } }
 
         /// <summary>
         /// Set the current page.

@@ -170,11 +170,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// Set the metadata of display.
         /// </summary>
         /// <param name="display">Display name attribute.</param>
-        protected virtual void SetDisplay(DisplayAttribute display)
+        protected virtual void SetDisplay(DisplayNameAttribute display)
         {
             if (display == null)
                 throw new ArgumentNullException("display");
-            Name = display.Name;
+            Name = display.DisplayName;
         }
 
 
@@ -250,7 +250,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         protected virtual void SetMetadata()
         {
-            DisplayAttribute display = Type.GetTypeInfo().GetCustomAttribute<DisplayAttribute>();
+            DisplayNameAttribute display = Type.GetTypeInfo().GetCustomAttribute<DisplayNameAttribute>();
             if (display != null)
                 SetDisplay(display);
             else

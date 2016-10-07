@@ -20,5 +20,7 @@ namespace Wodsoft.ComBoost
         object[] ParameterValues { get; }
 
         object GetParameterValue(ParameterInfo parameter);
+
+        object Result { get; }
     }
 }

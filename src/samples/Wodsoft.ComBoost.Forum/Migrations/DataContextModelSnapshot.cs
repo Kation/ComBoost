@@ -36,7 +36,8 @@ namespace Wodsoft.ComBoost.Forum.Migrations
 
             modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Member", b =>
                 {
-                    b.Property<Guid>("Index");
+                    b.Property<Guid>("Index")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("CreateDate");
 
@@ -49,9 +50,6 @@ namespace Wodsoft.ComBoost.Forum.Migrations
                     b.Property<string>("Username");
 
                     b.HasKey("Index");
-
-                    b.HasIndex("Index")
-                        .IsUnique();
 
                     b.ToTable("Member");
                 });
@@ -67,21 +65,17 @@ namespace Wodsoft.ComBoost.Forum.Migrations
 
                     b.Property<Guid?>("ForumIndex");
 
+                    b.Property<Guid?>("MemberIndex");
+
                     b.Property<string>("Title");
 
                     b.HasKey("Index");
 
                     b.HasIndex("ForumIndex");
 
-                    b.ToTable("Thread");
-                });
+                    b.HasIndex("MemberIndex");
 
-            modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Member", b =>
-                {
-                    b.HasOne("Wodsoft.ComBoost.Forum.Entity.Thread")
-                        .WithOne("Member")
-                        .HasForeignKey("Wodsoft.ComBoost.Forum.Entity.Member", "Index")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.ToTable("Thread");
                 });
 
             modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Thread", b =>
@@ -89,6 +83,10 @@ namespace Wodsoft.ComBoost.Forum.Migrations
                     b.HasOne("Wodsoft.ComBoost.Forum.Entity.Forum", "Forum")
                         .WithMany("Threads")
                         .HasForeignKey("ForumIndex");
+
+                    b.HasOne("Wodsoft.ComBoost.Forum.Entity.Member", "Member")
+                        .WithMany("Threads")
+                        .HasForeignKey("MemberIndex");
                 });
         }
     }

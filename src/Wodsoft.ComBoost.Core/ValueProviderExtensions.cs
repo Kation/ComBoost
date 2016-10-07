@@ -25,7 +25,15 @@ namespace Wodsoft.ComBoost
             return value;
         }
 
-        public static T GetRequriedValue<T>(this IValueProvider valueProvider, string name)
+        public static object GetRequiredValue(this IValueProvider valueProvider, string name, Type valueType)
+        {
+            object value = valueProvider.GetValue(name, valueType);
+            if (value == null)
+                throw new ArgumentException("找不到所需值。");
+            return value;
+        }
+
+        public static T GetRequiredValue<T>(this IValueProvider valueProvider, string name)
         {
             T value = valueProvider.GetValue<T>(name);
             if (value == null)

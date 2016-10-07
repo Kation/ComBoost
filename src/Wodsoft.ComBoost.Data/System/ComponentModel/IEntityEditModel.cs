@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace System.ComponentModel
@@ -15,7 +16,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the item to edit.
         /// </summary>
-        object Item { get; }
+        IEntity Item { get; }
 
         /// <summary>
         /// Get or set the properties to edit.
@@ -32,7 +33,8 @@ namespace System.ComponentModel
     /// Entity edit model interface.
     /// </summary>
     /// <typeparam name="TEntity">Type of entity.</typeparam>
-    public interface IEntityEditModel<out TEntity> : IEntityEditModel 
+    public interface IEntityEditModel<out TEntity> : IEntityEditModel
+        where TEntity : IEntity
     {
 
         /// <summary>

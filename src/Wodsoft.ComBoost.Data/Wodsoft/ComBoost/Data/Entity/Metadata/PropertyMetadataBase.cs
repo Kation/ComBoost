@@ -272,6 +272,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             else
             {
                 ViewRoles = new string[0];
+                AddRoles = new string[0];
                 EditRoles = new string[0];
                 AllowAnonymous = true;
             }

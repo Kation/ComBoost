@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace System.ComponentModel
@@ -15,7 +16,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Get the items of current page.
         /// </summary>
-        object[] Items { get; }
+        IEntity[] Items { get; }
 
         /// <summary>
         /// Get the metadata of entity.
@@ -25,7 +26,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Get the viewlist headers.
         /// </summary>
-        IEnumerable<IPropertyMetadata> Headers { get; }
+        IEnumerable<IPropertyMetadata> Properties { get; }
 
         /// <summary>
         /// Get the view buttons.
@@ -75,6 +76,7 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="TEntity">Type of entity.</typeparam>
     public interface IEntityViewModel<out TEntity> : IEntityViewModel
+        where TEntity : IEntity
     {
         /// <summary>
         /// Get the queryable object of entity.

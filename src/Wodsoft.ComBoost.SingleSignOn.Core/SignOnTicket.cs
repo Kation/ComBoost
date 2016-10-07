@@ -24,7 +24,7 @@ namespace Wodsoft.ComBoost.SingleSignOn
             return value;
         }
 
-        protected void SetValue(string key,string value)
+        protected void SetValue(string key, string value)
         {
             if (_Data.ContainsKey(key))
                 _Data[key] = value;
@@ -49,5 +49,6 @@ namespace Wodsoft.ComBoost.SingleSignOn
             {
                 throw new FormatException("传入的数据格式不正确。");
             }
+        }
     }
 }

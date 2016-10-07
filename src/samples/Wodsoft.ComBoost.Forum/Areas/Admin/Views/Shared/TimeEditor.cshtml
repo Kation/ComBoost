@@ -1,0 +1,48 @@
+﻿@model MvcEditorModel
+@{
+    TimeSpan? value = Model.Value as TimeSpan?;
+}
+<div class="input-group col-md-4" id="@Model.Metadata.ClrName">
+    <input type="number" id="@(Model.Metadata.ClrName)_Hour" min="0" class="form-control text-center" value="@(value.HasValue ? value.Value.TotalHours.ToString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"") />
+    <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
+    <input type="number" id="@(Model.Metadata.ClrName)_Minute" min="0" max="59" class="form-control text-center" value="@(value.HasValue ? value.Value.Minutes.ToString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"") />
+    <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
+    <input type="number" id="@(Model.Metadata.ClrName)_Seconds" min="0" max="59" class="form-control text-center" value="@(value.HasValue ? value.Value.Seconds.ToString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"") />
+</div>
+<input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@Model.Value" />
+<script type="text/javascript">
+    $(function () {
+        function checkNumber() {
+            var number = new Number($(this).val());
+            if (isNaN(number)) {
+                number = 0;
+            }
+            number = Math.round(number);
+            if (number < 0)
+                number = 0;
+            if (number > 59)
+                number = 59;
+            $(this).val(number);
+        }
+        function checkHour() {
+            var number = new Number($(this).val());
+            if (isNaN(number)) {
+                number = 0;
+            }
+            number = Math.round(number);
+            if (number < 0)
+                number = 0;
+            $(this).val(number);
+        }
+        $('#@(Model.Metadata.ClrName)_Hour').change(checkHour);
+        $('#@(Model.Metadata.ClrName)_Minute').change(checkNumber);
+        $('#@(Model.Metadata.ClrName)_Seconds').change(checkNumber);
+        $('#@Model.Metadata.ClrName').children('input').change(function () {
+            var hidden = $('#@(Model.Metadata.ClrName)_Value');
+            var hour = $('#@(Model.Metadata.ClrName)_Hour').val();
+            var minute = $('#@(Model.Metadata.ClrName)_Minute').val();
+            var second = $('#@(Model.Metadata.ClrName)_Seconds').val();
+            hidden.val(hour + ":" + minute + ":" + second);
+        });
+    });
+</script>

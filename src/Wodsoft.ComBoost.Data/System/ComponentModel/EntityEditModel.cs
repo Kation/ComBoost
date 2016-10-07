@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace System.ComponentModel
@@ -11,6 +12,7 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="TEntity">Type of Entity.</typeparam>
     public class EntityEditModel<TEntity> : NotifyBase, IEntityEditModel<TEntity>, IEntityEditModel
+        where TEntity : IEntity
     {
         /// <summary>
         /// Initialize entity edit model.
@@ -42,6 +44,6 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the item to edit.
         /// </summary>
-        object IEntityEditModel.Item { get { return Item; } }
+        IEntity IEntityEditModel.Item { get { return Item; } }
     }
 }

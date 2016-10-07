@@ -1,0 +1,11 @@
+﻿@model IPagination
+@{
+    string url = ViewContext.Controller.ControllerContext.HttpContext.Request.Url.PathAndQuery;
+    url = Url.SetQueryPath(Url.ClearQueryPath(url, "page"), "size");
+}
+<div class="btn-group">
+    @foreach (var item in Model.PageSizeOption)
+    {
+        <a data-nav="true" href="@Html.Raw(url + item)" class="btn btn-default@(Model.CurrentSize == item ? " active" : "")">@item</a>
+    }
+</div>

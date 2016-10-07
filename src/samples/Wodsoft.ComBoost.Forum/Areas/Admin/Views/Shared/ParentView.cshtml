@@ -1,0 +1,14 @@
+﻿@model EntityParentModel[]
+@for (int i = 0; i < Model.Length; i++)
+{
+    <li @Html.Raw(Model[i].IsOpened ? "class=\" jstree-open\"" : "")>
+        <a href="@Html.Raw(Url.Action(Html.ViewContext.RouteData.Values["action"].ToString(), new { size = Request["size"], parentpath = Model[i].Path, parentid = Model[i].Index }))" @Html.Raw(Model[i].IsSelected ? " class=\"jstree-clicked\"" : "")>@Model[i].Name</a>
+        @{if (Model[i].Items.Length > 0)
+            {
+                <ul>
+                    @Html.Partial("ParentView", Model[i].Items)
+                </ul>
+            }
+        }
+    </li>
+            }

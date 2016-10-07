@@ -57,6 +57,7 @@ namespace Wodsoft.ComBoost.Forum
                 var provider = new DomainProvider(t);
                 provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntitySearchExtension<>));
                 provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityPagerExtension<>));
+                provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityPasswordExtension<>));
                 return provider;
             });
         }
@@ -81,10 +82,11 @@ namespace Wodsoft.ComBoost.Forum
 
             app.UseSession();
 
-            app.UseComBoostAuthentication();
+            app.UseComBoostMvcAuthentication();
 
             app.UseMvc(routes =>
             {
+                routes.MapAreaRoute("areaRoute", "Admin", "Admin/{controller=Home}/{action=Index}/{id?}");
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");

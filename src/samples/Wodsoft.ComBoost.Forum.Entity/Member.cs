@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,13 +9,27 @@ using Wodsoft.ComBoost.Forum.Core;
 
 namespace Wodsoft.ComBoost.Forum.Entity
 {
-    public class Member : EntityBase, IMember, IPermission
+    [DisplayColumn("Username", "CreateDate", true)]
+    [DisplayName("用户")]
+    public class Member : EntityBase, IMember, IPermission, IHavePassword
     {
         [Searchable]
+        [Display(Name = "用户名", Order = 0)]
+        [Required]
         public string Username { get; set; }
 
+        [Hide(IsHiddenOnView = false)]
+        [Display(Name = "创建时间", Order = 20)]
+        public override DateTime CreateDate { get { return base.CreateDate; } set { base.CreateDate = value; } }
+
+        [Display(Name = "密码", Order = 10)]
+        [Hide(IsHiddenOnEdit = false, IsHiddenOnCreate = false, IsHiddenOnDetail = true, IsHiddenOnView = true)]
+        [CustomDataType(CustomDataType.Password)]
+        [Required]
         public byte[] Password { get; set; }
 
+        [Hide]
+        [Required]
         public byte[] Salt { get; set; }
 
         public void SetPassword(string password)
@@ -41,6 +56,9 @@ namespace Wodsoft.ComBoost.Forum.Entity
                 return true;
             }
         }
+        
+        [Hide]
+        public ICollection<Thread> Threads { get; set; }       
 
         string IPermission.Identity { get { return Index.ToString(); } }
 
@@ -55,5 +73,7 @@ namespace Wodsoft.ComBoost.Forum.Entity
         {
             return true;
         }
+
+        ICollection<IThread> IMember.Threads { get { throw new NotSupportedException(); } }
     }
 }

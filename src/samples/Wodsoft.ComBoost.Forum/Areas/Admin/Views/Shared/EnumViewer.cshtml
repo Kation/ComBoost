@@ -1,0 +1,34 @@
+﻿@model MvcEditorModel
+@{
+    EntityExtension.EnumItem[] items;
+    Type enumType;
+    if (Model.Metadata.ClrType.IsGenericType)
+    {
+        enumType = Model.Metadata.ClrType.GetGenericArguments()[0];
+        items = Html.EnumAnalyze(enumType);
+        enumType = Enum.GetUnderlyingType(enumType);
+    }
+    else
+    {
+        items = Html.EnumAnalyze(Model.Metadata.ClrType);
+        enumType = Enum.GetUnderlyingType(Model.Metadata.ClrType);
+    }
+    EnumConverter converter = new EnumConverter(Model.Metadata.ClrType);
+    foreach (var item in items)
+    {
+        if (Model.Metadata.ClrType.GetCustomAttributes(typeof(FlagsAttribute), true).Length == 0)
+        {
+            if (object.Equals(item.Value, Convert.ChangeType(Model.Value, enumType)))
+            {
+                <span>@item.Name</span>
+            }
+        }
+        else
+        {
+            if (((dynamic)Model.Value).HasFlag((Enum)Enum.ToObject(Model.Metadata.ClrType, item.Value)))
+            {
+                <span>@item.Name</span>
+            }
+        }
+    }
+}

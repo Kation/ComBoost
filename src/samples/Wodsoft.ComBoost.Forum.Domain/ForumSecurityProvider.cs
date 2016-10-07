@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
+using Wodsoft.ComBoost.Forum.Core;
 using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.Forum.Domain
@@ -16,14 +17,19 @@ namespace Wodsoft.ComBoost.Forum.Domain
 
         public IDatabaseContext DatabaseContext { get; private set; }
 
-        protected override Task<IPermission> GetPermissionByIdentity(string identity)
+        protected override async Task<IPermission> GetPermissionByIdentity(string identity)
         {
-            throw new NotImplementedException();
+            var memberContext = DatabaseContext.GetWrappedContext<IMember>();
+            var item = await memberContext.GetAsync(identity);
+            return item;
         }
 
-        protected override Task<IPermission> GetPermissionByUsername(string username)
+        protected override async Task<IPermission> GetPermissionByUsername(string username)
         {
-            throw new NotImplementedException();
+            username = username.ToLower();
+            var memberContext = DatabaseContext.GetWrappedContext<IMember>();
+            var item = await memberContext.SingleOrDefaultAsync(memberContext.Query(), t => t.Username.ToLower() == username);
+            return item;
         }
     }
 }

@@ -13,5 +13,7 @@ namespace Wodsoft.ComBoost.Forum.Core
         void SetPassword(string password);
 
         bool VerifyPassword(string password);
+
+        ICollection<IThread> Threads { get; }
     }
 }

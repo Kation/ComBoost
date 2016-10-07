@@ -95,6 +95,8 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 throw new NotSupportedException("不支持接口类型," + type.FullName + "。");
             if (type.GetTypeInfo().IsAbstract)
                 throw new NotSupportedException("不支持抽象类型," + type.FullName + "。");
+            if (!typeof(IEntity).IsAssignableFrom(type))
+                throw new NotSupportedException("该类型没有继承IEntity接口。");
             lock (_Metadata)
                 if (!_Metadata.ContainsKey(type))
                 {

@@ -49,6 +49,15 @@ namespace Wodsoft.ComBoost.Data
                 queryable = e.Queryable;
             }
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
+            model.Properties = Metadata.ViewProperties.Where(t =>
+            {
+                if (!t.AllowAnonymous && auth == null)
+                    return false;
+                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
+                    return t.ViewRoles.All(r => auth.IsInRole(r));
+                else
+                    return t.ViewRoles.Any(r => auth.IsInRole(r));
+            }).ToArray();
             model.Items = await context.ToArrayAsync(queryable);
             return model;
         }
@@ -97,8 +106,9 @@ namespace Wodsoft.ComBoost.Data
 
         public event DomainServiceEvent<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated;
 
-        public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromValue] object index)
+        public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
         {
+            object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
             var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
             {
@@ -142,14 +152,9 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task<EntityUpdateModel> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
         {
+            object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
             var context = database.GetContext<T>();
-            object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName);
-            if (index.GetType() != Metadata.KeyProperty.ClrType)
-            {
-                var converter = TypeDescriptor.GetConverter(Metadata.KeyProperty.ClrType);
-                index = converter.ConvertFrom(index);
-            }
-            bool isNew = index == Activator.CreateInstance(Metadata.KeyProperty.ClrType);
+            bool isNew = index.Equals(Activator.CreateInstance(Metadata.KeyProperty.ClrType));
             var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
             {
@@ -195,6 +200,10 @@ namespace Wodsoft.ComBoost.Data
                     throw new EntityNotFoundException(typeof(T), index);
             }
             var result = UpdateCore(valueProvider, auth, entity, isNew);
+            if (isNew)
+                context.Add(entity);
+            else
+                context.Update(entity);
             await database.SaveAsync();
             return result;
         }
@@ -244,8 +253,20 @@ namespace Wodsoft.ComBoost.Data
 
         protected virtual void UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
         {
-            object value = valueProvider.GetValue(property.ClrName, property.ClrType);
-            bool handled = false; ;
+            object value;
+            if (property.IsFileUpload)
+            {
+                value = valueProvider.GetValue<ISelectedFile>(property.ClrName);
+            }
+            else if (property.Type == CustomDataType.Password)
+            {
+                value = valueProvider.GetValue<string>(property.ClrName);
+            }
+            else
+            {
+                value = valueProvider.GetValue(property.ClrName, property.ClrType);
+            }
+            bool handled = false;
             if (EntityPropertyUpdate != null)
             {
                 var arg = new EntityPropertyUpdateEventArgs<T>(entity, valueProvider, property, value);
@@ -256,14 +277,17 @@ namespace Wodsoft.ComBoost.Data
             {
                 if (value == null)
                     return;
+                if (property.ClrType != value.GetType())
+                    throw new NotImplementedException("未处理的属性“" + property.Name + "”。");
                 property.SetValue(entity, value);
             }
         }
 
         public event DomainServiceEvent<EntityPropertyUpdateEventArgs<T>> EntityPropertyUpdate;
 
-        public virtual async Task Remove([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromValue] object index)
+        public virtual async Task Remove([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider)
         {
+            object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
             var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
             {
@@ -297,8 +321,9 @@ namespace Wodsoft.ComBoost.Data
 
         public event DomainServiceEvent<EntityRemoveEventArgs<T>> EntityRemove;
 
-        public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromValue] object index)
+        public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider)
         {
+            object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
             var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
             {

@@ -63,5 +63,7 @@ namespace Wodsoft.ComBoost
                 return value;
             }).ToArray();
         }
+
+        public object Result { get; internal set; }
     }
 }

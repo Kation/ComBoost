@@ -23,7 +23,7 @@ namespace Wodsoft.ComBoost
             get
             {
                 if (_DataBag == null)
-                    _DataBag = new System.Dynamic.ExpandoObject();
+                    _DataBag = new DomainContextDataBag();
                 return _DataBag;
             }
         }

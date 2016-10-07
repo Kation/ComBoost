@@ -38,6 +38,8 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(domainContext));
             if (method == null)
                 throw new ArgumentNullException(nameof(method));
+            if (method.DeclaringType != GetType())
+                throw new ArgumentException("该方法不是此领域服务的方法。");
             var context = new DomainExecutionContext(this, domainContext, method);
             var executionContext = ExecutionContext.Capture();
             _ExecutionContext.Add(executionContext, context);
@@ -61,6 +63,8 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(domainContext));
             if (method == null)
                 throw new ArgumentNullException(nameof(method));
+            if (method.DeclaringType != GetType())
+                throw new ArgumentException("该方法不是此领域服务的方法。");
             var context = new DomainExecutionContext(this, domainContext, method);
             var executionContext = ExecutionContext.Capture();
             _ExecutionContext.Add(executionContext, context);
@@ -69,6 +73,7 @@ namespace Wodsoft.ComBoost
                 if (Executing != null)
                     await Executing(context);
                 var result = await (Task<T>)method.Invoke(this, context.ParameterValues);
+                context.Result = result;
                 if (Executed != null)
                     await Executed(context);
                 return result;

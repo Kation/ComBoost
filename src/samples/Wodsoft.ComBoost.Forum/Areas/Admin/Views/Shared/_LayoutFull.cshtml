@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0" />
+    <title>柳州市社会保险互联网缴费平台</title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/Content/bootstrap.css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/Scripts/bootstrap.js")
+</head>
+<body style="background-color: white;">
+<nav class="navbar navbar-inverse navbar-fixed-top" style="background-color: #3b5998;">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+           <a class="brand" href="@Url.Action("Index", "Transaction")">社会保险互联网缴费平台</a>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li><a href="@Url.Action("Index", "Transaction")">账单管理</a></li>
+                        <li><a href="@Url.Action("Index", "Admin")">管理员管理</a></li>
+                        @*<li><a href="@Url.Action("Index", "Invoice")">发票管理</a></li>*@
+                    }
+                </ul>
+                <ul class="nav navbar-nav pull-right">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="navbar-text">欢迎，@(User.GetUser<LzSIA.Payment.Entity.Admin>().Username)</li>
+                        <li class="navbar-link"><a href="@Url.Action("SignOut", "Account")">注销</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+    <div style="margin-top: 55px">
+        @RenderBody()
+    </div>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,135 @@
+﻿@model EntitySearchModel
+@{
+    ViewBag.Title = "Create";
+    object area = ViewContext.RouteData.DataTokens["Area"];
+    if (area == null)
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Areas/" + area.ToString() + "/Views/Shared/_Layout.cshtml";
+    }
+}
+<ul class="breadcrumb">
+    <li><a href="@Url.Action("Index", "Transaction")">首页</a><span class="divider">/</span></li>
+    <li><a href="@Html.Raw(Url.Action("Index"))">@Model.Metadata.Name</a><span class="divider">/</span></li>
+    <li class="active">查询</li>
+</ul>
+<br />
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">
+        <strong class="font-size20">查询 @(Model.Metadata.Name)</strong>
+    </div>
+    <div class="panel-body">
+        <form id="form" class="form-horizontal" role="form" action="@Url.Action(ViewBag.Action)" method="get">
+            @foreach (var property in Model.Properties)
+            {
+                <div class="control-group has-feedback">
+                    <label class="control-label">@property.Name</label>
+                    <div class="controls">
+                        @{switch (property.Type)
+                        {
+                            case System.ComponentModel.DataAnnotations.CustomDataType.Date:
+                            case System.ComponentModel.DataAnnotations.CustomDataType.DateTime:
+                                <div class="input-group">
+                                    <input type="date" class="form-control span2" id="Search.@(property.ClrName).Start" name="Search.@(property.ClrName).Start" />
+                                    <span class="input-group-addon">至</span>
+                                    <input type="date" class="form-control span2" id="Search.@(property.ClrName).End" name="Search.@(property.ClrName).End" />
+                                </div>
+                                <script type="text/javascript">
+                                    $('#Search.@(property.ClrName).Start').datepicker();
+                                    $('#Search.@(property.ClrName).End').datepicker();
+                                </script>
+                                break;
+                            case System.ComponentModel.DataAnnotations.CustomDataType.Currency:
+                            case System.ComponentModel.DataAnnotations.CustomDataType.Integer:
+                            case System.ComponentModel.DataAnnotations.CustomDataType.Number:
+                            <div class="input-group">
+                                <input type="number" class="form-control span2" id="Search.@(property.ClrName).Start" name="Search.@(property.ClrName).Start" />
+                                <span class="input-group-addon">至</span>
+                                <input type="number" class="form-control span2" id="Search.@(property.ClrName).End" name="Search.@(property.ClrName).End" />
+                            </div>
+                            <script type="text/javascript">
+                                $('#Search.@(property.ClrName).Start').change(function () {
+                                    var number = new Number($(this).val());
+                                    if (isNaN(number)) {
+                                        $(this).val(0);
+                                        return;
+                                    }
+                                });
+                                $('#Search.@(property.ClrName).End').change(function () {
+                                    var number = new Number($(this).val());
+                                    if (isNaN(number)) {
+                                        $(this).val(0);
+                                        return;
+                                    }
+                                });
+                            </script>
+                                break;
+                            case System.ComponentModel.DataAnnotations.CustomDataType.Other:
+                                if (property.CustomType == "Enum")
+                                {
+                                    EntityExtension.EnumItem[] items;
+                                    if (property.ClrType.IsGenericType)
+                                    {
+                                        items = Html.EnumAnalyze(property.ClrType.GetGenericArguments()[0]);
+                                    }
+                                    else
+                                    {
+                                        items = Html.EnumAnalyze(property.ClrType);
+                                    }
+                                    <select name="Search.@property.ClrName" class="form-control">
+                                        <option value="" selected="selected">请选择…</option>
+                                        @for (int s = 0; s < items.Length; s++)
+                                        {
+                                            <option value="@items[s].Value">@items[s].Name</option>
+                                        }
+                                    </select>
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control" name="Search.@property.ClrName" />
+                                }
+                                break;
+                            case System.ComponentModel.DataAnnotations.CustomDataType.Boolean:
+                            <select class="form-control" name="Search.@property.ClrName">
+                                <option value="" selected="selected"></option>
+                                <option value="True">是</option>
+                                <option value="False">否</option>
+                            </select>
+                                break;
+                            case System.ComponentModel.DataAnnotations.CustomDataType.Sex:
+                            <select class="form-control" name="Search.@property.ClrName">
+                                <option value="" selected="selected"></option>
+                                <option value="True">男</option>
+                                <option value="False">女</option>
+                            </select>
+                                break;
+                            default:
+                            <input type="text" class="form-control" name="Search.@property.ClrName" />
+                                break;
+                        }
+                        }
+                    </div>
+                </div>
+            }
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" class="btn btn-primary" value="查找" />
+                    <a href="@Html.Raw(Url.Action("Index"))" class="btn btn-default">返回</a>
+                    <input type="hidden" name="search" value="True" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#form').submit(function () {
+        $(this).find(':input').each(function (index, element) {
+            if (this.value == '')
+                this.disabled = true;
+        });
+    })
+</script>
