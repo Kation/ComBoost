@@ -20,6 +20,7 @@ namespace Wodsoft.ComBoost.Forum.Entity
 
         [Hide(IsHiddenOnView = false)]
         [Display(Name = "创建时间", Order = 20)]
+        [Searchable]
         public override DateTime CreateDate { get { return base.CreateDate; } set { base.CreateDate = value; } }
 
         [Display(Name = "密码", Order = 10)]
