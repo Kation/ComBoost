@@ -10,7 +10,7 @@ namespace Wodsoft.ComBoost.SingleSignOn
     {
         public virtual Task GetTicket(byte[] data)
         {
-
+            return Task.FromResult(0);
         }
     }
 }

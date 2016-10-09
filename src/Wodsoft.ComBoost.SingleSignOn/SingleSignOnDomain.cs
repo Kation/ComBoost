@@ -20,7 +20,7 @@ namespace Wodsoft.ComBoost.SingleSignOn
 
         public Task<bool> SignIn(IValueProvider valueProvider, IAuthenticationProvider authenticationProvider)
         {
-            var dataString = valueProvider.GetRequriedValue<string>("data");
+            var dataString = valueProvider.GetRequiredValue<string>("data");
             var data = Convert.FromBase64String(dataString);
             data = Cryptography.Decrypt(data);
 
