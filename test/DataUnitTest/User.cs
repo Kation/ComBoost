@@ -6,10 +6,12 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace DataUnitTest
 {
-    public class User : EntityBase
+    public class User : EntityBase, IUser
     {
         public virtual string Username { get; set; }
 
         public virtual Category Category { get; set; }
+
+        ICategory IUser.Category { get { return Category; } set { Category = (Category)value; } }
     }
 }

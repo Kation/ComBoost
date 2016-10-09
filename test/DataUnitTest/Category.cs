@@ -6,10 +6,18 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace DataUnitTest
 {
-    public class Category : EntityBase
+    public class Category : EntityBase, ICategory
     {
         public virtual string Name { get; set; }
 
         public virtual ICollection<User> Users { get; set; }
+        
+        ICollection<IUser> ICategory.Users
+        {
+            get
+            {
+                throw new NotSupportedException();
+            }
+        }
     }
 }
