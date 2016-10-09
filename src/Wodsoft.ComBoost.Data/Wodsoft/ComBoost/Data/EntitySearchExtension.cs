@@ -156,6 +156,8 @@ namespace Wodsoft.ComBoost.Data
                     searchItem.Name = property.Name;
                 if (searchItem.Name != null)
                     searchItems.Add(searchItem);
+
+                e.Queryable = queryable;
             }
 
             context.DomainContext.DataBag.SearchItem = searchItems.ToArray();
