@@ -13,7 +13,7 @@ using System.Collections;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class MvcValueProvider : IValueProvider
+    public class MvcValueProvider : IValueProvider, Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider
     {
         public MvcValueProvider(Controller controller)
         {
@@ -21,17 +21,7 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         public Controller Controller { get; private set; }
-
-        private IModelMetadataProvider _MetadataProvider;
-        public IModelMetadataProvider MetadataProvider
-        {
-            get
-            {
-                if (_MetadataProvider == null)
-                    _MetadataProvider = new EmptyModelMetadataProvider();
-                return _MetadataProvider;
-            }
-        }
+        
         public object GetValue(string name)
         {
             StringValues value = Controller.Request.Query[name];
@@ -59,28 +49,58 @@ namespace Wodsoft.ComBoost.Mvc
                     return null;
                 return files.Select(t => new SelectedFile(t)).ToArray();
             }
-            object value = Controller.Request.Query[name];
-            if (value == StringValues.Empty && Controller.Request.HasFormContentType)
-                value = Controller.Request.Form[name];
-            if (value == StringValues.Empty)
-                value = Controller.HttpContext.GetRouteData()?.Values[name] ?? Controller.Request.Headers[name];
-            if (value == null)
-                value = Controller.HttpContext.GetRouteData()?.DataTokens[name];
-            if (value == null || value == StringValues.Empty)
-            {
-                if (valueType.GetTypeInfo().IsValueType)
-                    return Activator.CreateInstance(valueType);
-                return null;
-            }
-            if (value is StringValues && !valueType.IsArray && !typeof(IEnumerable).IsAssignableFrom(valueType))
-                value = ((StringValues)value)[0];
+            //object value = Controller.Request.Query[name];
+            //if (value == StringValues.Empty && Controller.Request.HasFormContentType)
+            //    value = Controller.Request.Form[name];
+            //if (value == StringValues.Empty)
+            //    value = Controller.HttpContext.GetRouteData()?.Values[name] ?? Controller.Request.Headers[name];
+            //if (value == null)
+            //    value = Controller.HttpContext.GetRouteData()?.DataTokens[name];
+            //if (value == null || value == StringValues.Empty)
+            //{
+            //    if (valueType.GetTypeInfo().IsValueType)
+            //        return Activator.CreateInstance(valueType);
+            //    return null;
+            //}
+            //if (value is StringValues && !valueType.IsArray && !typeof(IEnumerable).IsAssignableFrom(valueType))
+            //    value = ((StringValues)value)[0];
+            ModelBinderFactoryContext context = new ModelBinderFactoryContext();
+            context.BindingInfo = new BindingInfo() { BinderModelName = name, BindingSource = BindingSource.ModelBinding };
+            context.CacheToken = name + "_" + valueType.Name;
+            context.Metadata = Controller.MetadataProvider.GetMetadataForType(valueType);
 
-            return ModelBindingHelper.ConvertTo(value, valueType);
+            var binder = Controller.ModelBinderFactory.CreateBinder(context);
+            var bindingContext = DefaultModelBindingContext.CreateBindingContext(Controller.ControllerContext, this, context.Metadata, context.BindingInfo, name);
+            binder.BindModelAsync(bindingContext).Wait();
+            return bindingContext.Result.Model;
+            //return ModelBindingHelper.ConvertTo(value, valueType);
         }
 
         public object GetValue(Type valueType)
         {
             throw new NotImplementedException();
+        }
+
+        bool Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.ContainsPrefix(string prefix)
+        {
+            throw new NotImplementedException();
+        }
+
+        ValueProviderResult Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.GetValue(string key)
+        {
+            StringValues value = Controller.Request.Query[key];
+            if (value == StringValues.Empty && Controller.Request.HasFormContentType)
+                value = Controller.Request.Form[key];
+            if (value == StringValues.Empty)
+                value = Controller.Request.Headers[key];
+            if (value == StringValues.Empty)
+            {
+                var result = Controller.HttpContext.GetRouteData()?.Values[key];
+                if (result == null)
+                    return ValueProviderResult.None;
+                return new ValueProviderResult(result.ToString());
+            }
+            return new ValueProviderResult(value);
         }
 
         private System.Collections.ObjectModel.ReadOnlyCollection<string> _Keys;

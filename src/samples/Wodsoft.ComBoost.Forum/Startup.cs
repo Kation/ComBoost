@@ -40,7 +40,10 @@ namespace Wodsoft.ComBoost.Forum
             // Add framework services.
             services.AddMemoryCache();
             services.AddSession();
-            services.AddMvc();
+            services.AddMvc(options=>
+            {
+                options.AddComBoostMvcOptions();
+            });
 
             //services.AddDbContext<DataContext>(option =>
             //{

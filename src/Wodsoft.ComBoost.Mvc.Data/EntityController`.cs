@@ -25,7 +25,7 @@ namespace Wodsoft.ComBoost.Mvc
         protected EntityDomainService<T> EntityService { get; private set; }
 
         public IEntityMetadata Metadata { get; private set; }
-
+        
         public async Task<IActionResult> Index()
         {
             var context = CreateDomainContext();

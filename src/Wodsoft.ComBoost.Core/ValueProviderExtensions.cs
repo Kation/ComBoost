@@ -9,12 +9,18 @@ namespace Wodsoft.ComBoost
     {
         public static T GetValue<T>(this IValueProvider provider, string name)
         {
-            return (T)provider.GetValue(name, typeof(T));
+            object value = provider.GetValue(name, typeof(T));
+            if (value == null)
+                return default(T);
+            return (T)value;
         }
 
         public static T GetValue<T>(this IValueProvider provider)
         {
-            return (T)provider.GetValue(typeof(T));
+            object value = provider.GetValue(typeof(T));
+            if (value == null)
+                return default(T);
+            return (T)value;
         }
 
         public static object GetRequiredValue(this IValueProvider valueProvider, string name)
