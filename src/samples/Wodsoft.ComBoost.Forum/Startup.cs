@@ -55,7 +55,7 @@ namespace Wodsoft.ComBoost.Forum
             services.AddScoped<ISecurityProvider, ForumSecurityProvider>();
             services.AddScoped<IAuthenticationProvider, ComBoostAuthenticationProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IDomainProvider, DomainProvider>(t =>
+            services.AddSingleton<IDomainServiceProvider, DomainProvider>(t =>
             {
                 var provider = new DomainProvider(t);
                 provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntitySearchExtension<>));

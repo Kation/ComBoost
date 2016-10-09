@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
 {
-    public class DomainProvider : IDomainProvider
+    public class DomainProvider : IDomainServiceProvider
     {
         private IServiceProvider _ServiceProvider;
         private Dictionary<Type, List<Type>> _Extensions;

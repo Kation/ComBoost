@@ -6,8 +6,18 @@ using System.Reflection;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
+    /// <summary>
+    /// 数据库上下文扩展。
+    /// </summary>
     public static class DatabaseContextExtensions
     {
+        /// <summary>
+        /// 获取包装过的实体上下文。
+        /// 主要用于不完整的实体类型的使用。
+        /// </summary>
+        /// <typeparam name="T">不完整的实体类型。</typeparam>
+        /// <param name="context">数据库上下文。</param>
+        /// <returns>返回实体上下文。</returns>
         public static IEntityContext<T> GetWrappedContext<T>(this IDatabaseContext context)
             where T : IEntity
         {
@@ -25,6 +35,12 @@ namespace Wodsoft.ComBoost.Data.Entity
             return (IEntityContext<T>)wrappedContext;
         }
 
+        /// <summary>
+        /// 获取动态类型实体上下文。
+        /// </summary>
+        /// <param name="context">数据库上下文。</param>
+        /// <param name="entityType">实体类型。</param>
+        /// <returns>返回动态类型的实体上下文。</returns>
         public static dynamic GetDynamicContext(this IDatabaseContext context, Type entityType)
         {
             if (context == null)
