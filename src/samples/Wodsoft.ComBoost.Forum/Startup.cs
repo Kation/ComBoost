@@ -50,7 +50,9 @@ namespace Wodsoft.ComBoost.Forum
             //    option.UseSqlServer(Configuration.GetConnectionString("DataContext"));
             //});
             services.AddTransient<DbContext, DataContext>(serviceProvider =>
-            new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext")).Options.WithExtension(new ComBoostOptionExtension())));
+                new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase()
+                //new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext"))
+                .Options.WithExtension(new ComBoostOptionExtension())));
             services.AddScoped<IDatabaseContext, DatabaseContext>();
             services.AddScoped<ISecurityProvider, ForumSecurityProvider>();
             services.AddScoped<IAuthenticationProvider, ComBoostAuthenticationProvider>();
