@@ -11,5 +11,7 @@ namespace Wodsoft.ComBoost.Forum.Core
         IMember Member { get; set; }
 
         string Content { get; set; }
+
+        IThread Thread { get; set; }
     }
 }
