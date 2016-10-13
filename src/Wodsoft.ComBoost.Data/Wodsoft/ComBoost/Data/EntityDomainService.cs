@@ -12,11 +12,21 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Wodsoft.ComBoost.Data
 {
+    /// <summary>
+    /// 实体领域服务。
+    /// </summary>
+    /// <typeparam name="T">实体类型。</typeparam>
     public class EntityDomainService<T> : DomainService
         where T : class, IEntity, new()
     {
+        /// <summary>
+        /// 获取实体元数据。
+        /// </summary>
         public IEntityMetadata Metadata { get; private set; }
 
+        /// <summary>
+        /// 实例化实体领域服务。
+        /// </summary>
         public EntityDomainService()
         {
             Metadata = EntityDescriptor.GetMetadata<T>();
