@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 namespace Wodsoft.ComBoost.Data.Entity.Metadata
 {
     /// <summary>
-    /// Entity analyzer interface.
+    /// 实体解释器。
     /// </summary>
     public interface IEntityDescriptor
     {
         /// <summary>
-        /// Get the metadata of entity.
+        /// 获取实体元数据。
         /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <param name="type">实体类型。</param>
+        /// <returns>返回实体元数据。</returns>
         IEntityMetadata GetMetadata(Type type);
     }
 }

@@ -9,112 +9,115 @@ using Wodsoft.ComBoost.Security;
 namespace Wodsoft.ComBoost.Data.Entity.Metadata
 {
     /// <summary>
-    /// Entity metadata interface.
+    /// 实体元数据。
     /// </summary>
     public interface IEntityMetadata
     {
         /// <summary>
-        /// Get the system type of entity.
+        /// 获取实体类型。
         /// </summary>
         Type Type { get; }
 
         /// <summary>
-        /// Get the system type of key of entity.
+        /// 获取主键类型。
         /// </summary>
         Type KeyType { get; }
 
+        /// <summary>
+        /// 获取主键属性。
+        /// </summary>
         IPropertyMetadata KeyProperty { get; }
 
         /// <summary>
-        /// Get the display name of entity.
+        /// 获取实体名称。
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// Get the display property of entity.
+        /// 获取显示属性。
         /// </summary>
         IPropertyMetadata DisplayProperty { get; }
 
         /// <summary>
-        /// Get the sort property of entity.
+        /// 获取排序属性。
         /// </summary>
         IPropertyMetadata SortProperty { get; }
 
         /// <summary>
-        /// Get the parent property of entity.
+        /// 获取父级属性。
         /// </summary>
         IPropertyMetadata ParentProperty { get; }
 
         /// <summary>
-        /// Get the sort mode of entity.
+        /// 获取是否倒序排序。
         /// </summary>
-        bool SortDescending { get; }
+        bool IsSortDescending { get; }
 
         /// <summary>
-        /// Get the properties of entity.
+        /// 获取所有属性。
         /// </summary>
         IEnumerable<IPropertyMetadata> Properties { get; }
 
         /// <summary>
-        /// Get the properties of entity in viewlist.
+        /// 获取列表属性。
         /// </summary>
         IEnumerable<IPropertyMetadata> ViewProperties { get; }
 
         /// <summary>
-        /// Get the properties of entity while create.
+        /// 获取创建属性。
         /// </summary>
         IEnumerable<IPropertyMetadata> CreateProperties { get; }
 
         /// <summary>
-        /// Get the properties of entity while edit.
+        /// 获取编辑属性。
         /// </summary>
         IEnumerable<IPropertyMetadata> EditProperties { get; }
 
         /// <summary>
-        /// Get the properties of entity while search.
+        /// 获取搜索属性。
         /// </summary>
         IEnumerable<IPropertyMetadata> SearchProperties { get; }
 
         /// <summary>
-        /// Get the properties of entity in detail.
+        /// 获取详情属性。
         /// </summary>
         IEnumerable<IPropertyMetadata> DetailProperties { get; }
 
         /// <summary>
-        /// Get is entity allow anonymous operate.
+        /// 获取是否允许匿名访问。
         /// </summary>
         bool AllowAnonymous { get; }
 
         /// <summary>
-        /// Get the roles to view entity.
+        /// 获取列表角色。
         /// </summary>
         IEnumerable<object> ViewRoles { get; }
 
         /// <summary>
-        /// Get the roles to add entity.
+        /// 获取新增角色。
         /// </summary>
         IEnumerable<object> AddRoles { get; }
 
         /// <summary>
-        /// Get the roles to edit entity.
+        /// 获取编辑角色。
         /// </summary>
         IEnumerable<object> EditRoles { get; }
 
         /// <summary>
-        /// Get the roles to remove entity.
+        /// 获取删除角色。
         /// </summary>
         IEnumerable<object> RemoveRoles { get; }
 
         /// <summary>
-        /// Get the authentication required mode.
+        /// 获取权限判断模式。
         /// </summary>
         AuthenticationRequiredMode AuthenticationRequiredMode { get; }
 
         /// <summary>
-        /// Get the property of entity.
+        /// 获取属性。
         /// </summary>
-        /// <param name="name">Name of property.</param>
-        /// <returns>Return property metadata. Return null if property doesn't exists.</returns>
+        /// <param name="name">属性名。</param>
+        /// <returns>返回元数据。如果不存在则返回空。</returns>
         IPropertyMetadata GetProperty(string name);
 
         /// <summary>

@@ -16,7 +16,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="dialogTitle">保存</h4>
+                <h4 class="modal-title" id="dialogTitle">保存结果</h4>
             </div>
             <div class="modal-body" id="dialogContent">
 
@@ -45,7 +45,7 @@
     }
     <div class="control-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <input type="submit" class="btn btn-primary" value="保存" />
+            <button type="button" class="btn btn-primary" onclick="gotoSubmit();">保存</button>
             <a href="@Html.Raw(Url.Action("Index"))" class="btn btn-default">返回</a>
             <input name="id" type="hidden" value="@Model.Item.Index" />
         </div>
@@ -70,12 +70,25 @@
         $('#dialog').modal('hide');
     });
     $('#dialog').modal({ show: false });
-    $('#form').ajaxForm({
-        error: function (result) {
-            dialog('保存结果', '<p>保存失败. 原因:' + result.responseText + '。</p>', function () { $('#dialog').modal('hide'); });
-        },
-        success: function (result) {
-            dialog('保存结果', '<p>保存成功,是否返回视图列表.</p>', function () { window.location = '@Url.Action("Index")'; });
-        }
-    });
+    
+    function gotoSubmit() {
+        $.ajax({
+            url: '@Url.Action("Update")',
+            dataType: 'json',
+            type: 'POST',
+            data: $('#form').serialize(),
+            error: function (result) {
+                if (result.statusCode == '500') {
+                    dialog('保存结果', '<p>保存失败. 原因：服务器错误。</p>', function () { $('#dialog').modal('hide'); });
+                    return;
+                }
+
+                result.responseJSON
+                dialog('保存结果', '<p>保存失败. 原因：' + result.responseText + '。</p>', function () { $('#dialog').modal('hide'); });
+            },
+            success: function (result) {
+                dialog('保存结果', '<p>保存成功,是否返回视图列表.</p>', function () { window.location = '@Url.Action("Index")'; });
+            }
+        });
+    }
 </script>

@@ -8,8 +8,18 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
+    /// <summary>
+    /// 实体上下文扩展。
+    /// </summary>
     public static class EntityContextExtensions
     {
+        /// <summary>
+        /// 根据主键获取实体。
+        /// </summary>
+        /// <typeparam name="T">实体类型。</typeparam>
+        /// <param name="context">实体上下文。</param>
+        /// <param name="key">主键。</param>
+        /// <returns>返回实体。找不到实体时返回空。</returns>
         public static Task<T> GetAsync<T>(this IEntityContext<T> context, object key)
             where T : IEntity
         {
@@ -24,6 +34,12 @@ namespace Wodsoft.ComBoost.Data.Entity
             return context.SingleOrDefaultAsync(context.Query(), lambda);
         }
 
+        /// <summary>
+        /// 获取排序后的实体查询。
+        /// </summary>
+        /// <typeparam name="T">实体类型。</typeparam>
+        /// <param name="context">实体上下文。</param>
+        /// <returns>返回排序后的实体查询。</returns>
         public static IOrderedQueryable<T> Order<T>(this IEntityContext<T> context)
             where T : IEntity
         {
@@ -32,6 +48,13 @@ namespace Wodsoft.ComBoost.Data.Entity
             return Order(context, context.Query());
         }
 
+        /// <summary>
+        /// 获取排序后的实体查询。
+        /// </summary>
+        /// <typeparam name="T">实体类型。</typeparam>
+        /// <param name="context">实体上下文。</param>
+        /// <param name="query">实体查询。</param>
+        /// <returns>返回排序后的实体查询。</returns>
         public static IOrderedQueryable<T> Order<T>(this IEntityContext<T> context, IQueryable<T> query)
             where T : IEntity
         {
@@ -42,7 +65,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             var parameter = Expression.Parameter(typeof(T));
             IPropertyMetadata sortProperty = context.Metadata.SortProperty ?? context.Metadata.KeyProperty;
             dynamic express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(T), sortProperty.ClrType), Expression.Property(parameter, sortProperty.ClrName), parameter);
-            if (context.Metadata.SortDescending)
+            if (context.Metadata.IsSortDescending)
                 return Queryable.OrderByDescending(query, express);
             else
                 return Queryable.OrderBy(query, express);

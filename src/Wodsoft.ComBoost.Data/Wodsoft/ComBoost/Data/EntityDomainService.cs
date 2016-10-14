@@ -162,7 +162,7 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task<EntityUpdateModel> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
         {
-            object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
+            object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
             var context = database.GetContext<T>();
             bool isNew = index.Equals(Activator.CreateInstance(Metadata.KeyProperty.ClrType));
             var auth = authenticationProvider.GetAuthentication();

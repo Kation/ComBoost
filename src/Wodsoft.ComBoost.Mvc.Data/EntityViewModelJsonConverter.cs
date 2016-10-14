@@ -42,13 +42,16 @@ namespace Wodsoft.ComBoost.Mvc
             serializer.Serialize(writer, model.ItemButtons);
 
             writer.WritePropertyName("Items");
-            serializer.Serialize(writer, model.Properties);
+            serializer.Serialize(writer, model.Items);
 
             writer.WritePropertyName("Properties");
             serializer.Serialize(writer, model.Properties);
 
             writer.WritePropertyName("SearchItem");
             serializer.Serialize(writer, model.SearchItem);
+
+            writer.WritePropertyName("Metadata");
+            serializer.Serialize(writer, model.Metadata);
 
             writer.WriteEndObject();
         }

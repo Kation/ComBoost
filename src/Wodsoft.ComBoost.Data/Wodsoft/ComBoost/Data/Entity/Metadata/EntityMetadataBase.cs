@@ -86,7 +86,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// Get the sort mode of entity.
         /// </summary>
-        public bool SortDescending { get; protected set; }
+        public bool IsSortDescending { get; protected set; }
 
         /// <summary>
         /// Get the properties of entity.
@@ -190,7 +190,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             if (display.SortColumn != null)
             {
                 SortProperty = GetProperty(display.SortColumn);
-                SortDescending = display.SortDescending;
+                IsSortDescending = display.SortDescending;
             }
         }
 

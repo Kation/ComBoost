@@ -11,42 +11,42 @@ using Wodsoft.ComBoost.Security;
 namespace Wodsoft.ComBoost.Data.Entity.Metadata
 {
     /// <summary>
-    /// Property metadata interface.
+    /// 属性元数据.
     /// </summary>
     public interface IPropertyMetadata
     {
         /// <summary>
-        /// Get the property name.
+        /// 获取属性名称。
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// Get the property runtime name.
+        /// 获取属性运行时名称。
         /// </summary>
         string ClrName { get; }
 
         /// <summary>
-        /// Get the short name of property.
+        /// 获取属性短名称。
         /// </summary>
         string ShortName { get; }
 
         /// <summary>
-        /// Get the description of property.
+        /// 获取属性说明。
         /// </summary>
         string Description { get; }
 
         /// <summary>
-        /// Get the property is distinct.
+        /// 获取是否是唯一值属性。
         /// </summary>
         bool IsDistinct { get; }
 
         /// <summary>
-        /// Get the property is expended.
+        /// 获取是否已展开。
         /// </summary>
         bool IsExpended { get; }
 
         /// <summary>
-        /// Get the runtime type of property.
+        /// 获取属性运行时类型。
         /// </summary>
         Type ClrType { get; }
 
