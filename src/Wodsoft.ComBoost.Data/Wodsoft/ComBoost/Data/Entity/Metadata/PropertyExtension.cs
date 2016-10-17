@@ -71,11 +71,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                     type = CustomDataType.Other;
                     customType = "Collection";
                 }
-                //else if (typeof(IEntity).IsAssignableFrom(propertyType))
-                //{
-                //    type = CustomDataType.Other;
-                //    customType = "Entity";
-                //}
+                else if (typeof(IEntity).IsAssignableFrom(propertyType))
+                {
+                    type = CustomDataType.Other;
+                    customType = "Entity";
+                }
                 else
                 {
                     type = CustomDataType.Default;

@@ -1,7 +1,7 @@
 ﻿@model MvcEditorModel
 <div class="input-group">
     <input type="text" id="@(Model.Metadata.ClrName)_Name" readonly="readonly" class="form-control" value="@Model.Value">
-    <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@(Model.Value != null? ((System.Data.Entity.EntityBase)Model.Value).Index.ToString() : "")" />
+    <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@(Model.Value != null? ((Wodsoft.ComBoost.Data.Entity.EntityBase)Model.Value).Index.ToString() : "")" />
     <span class="input-group-btn">
         <button id="@(Model.Metadata.ClrName)_Select" class="btn btn-default" type="button">选择</button>
         <button id="@(Model.Metadata.ClrName)_Clear" class="btn btn-default" type="button">清空</button>

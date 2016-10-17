@@ -40,15 +40,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             CustomType = customType;
             IsFileUpload = isFileUpload;
             Converter = TypeDescriptor.GetConverter(ClrType);
-            if (Type != CustomDataType.Image && Type != CustomDataType.Password && Type != CustomDataType.Time)
-            {
-                if (CustomType == null || CustomType == "Entity" || CustomType == "Enum")
-                {
-                    SearchableAttribute searchable = propertyInfo.GetCustomAttribute<SearchableAttribute>();
-                    Searchable = searchable != null;
-                }
-            }
+
+            SearchableAttribute searchable = propertyInfo.GetCustomAttribute<SearchableAttribute>();
+            Searchable = searchable != null;
         }
+
 
         /// <summary>
         /// Get the property info.
