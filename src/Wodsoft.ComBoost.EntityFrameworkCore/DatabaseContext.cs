@@ -54,8 +54,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 context = _CachedEntityContext[obj.EntityType.ClrType];
             else
             {
-                object dbset = InnerContext.GetType().GetMethod("Set").MakeGenericMethod(obj.EntityType.ClrType).Invoke(InnerContext, new object[0]);
-                context = Activator.CreateInstance(typeof(EntityContext<>).MakeGenericType(obj.EntityType.ClrType), this, dbset);
+                context = this.GetDynamicContext(obj.EntityType.ClrType);
                 _CachedEntityContext.Add(obj.EntityType.ClrType, context);
             }
             entity.EntityContext = (IEntityQueryContext<IEntity>)context;
