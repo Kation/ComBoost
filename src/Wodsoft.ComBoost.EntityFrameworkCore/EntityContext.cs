@@ -113,16 +113,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             return query.FirstAsync(expression);
         }
 
-        public Task<T> LastOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
-        {
-            return query.LastOrDefaultAsync(expression);
-        }
-
-        public Task<T> LastAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
-        {
-            return query.LastAsync(expression);
-        }
-
         public Task<int> CountAsync(IQueryable<T> query)
         {
             return query.CountAsync();

@@ -90,20 +90,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <returns></returns>
         Task<T> FirstAsync(IQueryable<T> query, Expression<Func<T, bool>> expression);
         /// <summary>
-        /// 异步查找出最后一个对象。
-        /// </summary>
-        /// <param name="query">查询对象。</param>
-        /// <param name="expression">表达式。</param>
-        /// <returns></returns>
-        Task<T> LastOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression);
-        /// <summary>
-        /// 异步查找出最后一个对象。
-        /// </summary>
-        /// <param name="query">查询对象。</param>
-        /// <param name="expression">表达式。</param>
-        /// <returns></returns>
-        Task<T> LastAsync(IQueryable<T> query, Expression<Func<T, bool>> expression);
-        /// <summary>
         /// 异步统计查询结果的数量。
         /// </summary>
         /// <param name="query">查询对象。</param>
