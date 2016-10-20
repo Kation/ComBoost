@@ -68,18 +68,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             return await InnerContext.FirstOrDefaultAsync(query.Unwrap<T, M>(), newExpression);
         }
 
-        public async Task<T> LastAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
-        {
-            var newExpression = WrapExpression(expression);
-            return await InnerContext.LastAsync(query.Unwrap<T, M>(), newExpression);
-        }
-
-        public async Task<T> LastOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
-        {
-            var newExpression = WrapExpression(expression);
-            return await InnerContext.LastOrDefaultAsync(query.Unwrap<T, M>(), newExpression);
-        }
-
         public IQueryable<T> Query()
         {
             return InnerContext.Query().Wrap<T, M>();
