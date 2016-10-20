@@ -69,10 +69,17 @@ namespace Wodsoft.ComBoost
                     var arguments = type.GetGenericArguments();
                     foreach (var extensionType in extensions)
                     {
-                        IDomainExtension extension = (IDomainExtension)ActivatorUtilities.CreateInstance(_ServiceProvider, extensionType.MakeGenericType(arguments));
-                        extension.OnInitialize(_ServiceProvider, service);
-                        service.Executing += extension.OnExecutingAsync;
-                        service.Executed += extension.OnExecutedAsync;
+                        try
+                        {
+                            IDomainExtension extension = (IDomainExtension)ActivatorUtilities.CreateInstance(_ServiceProvider, extensionType.MakeGenericType(arguments));
+                            extension.OnInitialize(_ServiceProvider, service);
+                            service.Executing += extension.OnExecutingAsync;
+                            service.Executed += extension.OnExecutedAsync;
+                        }
+                        catch
+                        {
+                            continue;
+                        }
                     }
                 }
             }

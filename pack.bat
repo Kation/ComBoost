@@ -1,4 +1,7 @@
 @echo off
+cd build
+del *.nupkg
+cd..
 dotnet pack src\Wodsoft.ComBoost.Core --no-build --output build
 dotnet pack src\Wodsoft.ComBoost --no-build --output build
 dotnet pack src\Wodsoft.ComBoost.Security --no-build --output build
