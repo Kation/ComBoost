@@ -183,5 +183,25 @@ namespace Wodsoft.ComBoost.Mvc
                 return StatusCode(401, ex.Message);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> MultipleSelector()
+        {
+            var context = CreateDomainContext();
+            try
+            {
+                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IEntityViewModel<T>>(context, EntityService.List);
+                if (Request.Headers["accept-content"].Contains("application/json"))
+                {
+                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
+                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
+                }
+                return View(model);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(401, ex.Message);
+            }
+        }
     }
 }
