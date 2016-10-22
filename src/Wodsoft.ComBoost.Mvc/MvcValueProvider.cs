@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Internal;
 using System.Collections;
+using System.IO;
 
 namespace Wodsoft.ComBoost.Mvc
 {
@@ -78,12 +79,17 @@ namespace Wodsoft.ComBoost.Mvc
 
         public object GetValue(Type valueType)
         {
-            throw new NotImplementedException();
+            if (valueType == typeof(Uri))
+                return new Uri(Controller.Request.Scheme + "://" + Controller.Request.Host.Value + Controller.Request.Path.Value + Controller.Request.QueryString.Value);
+            else if (valueType == typeof(Stream))
+                return Controller.Request.Body;
+            else
+                throw new NotSupportedException();
         }
 
         bool Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.ContainsPrefix(string prefix)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         ValueProviderResult Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.GetValue(string key)
