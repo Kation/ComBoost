@@ -29,9 +29,10 @@ namespace DataUnitTest
             userContext.Add(user);
             await database.SaveAsync();
 
-            user = await userContext.GetAsync(user.Index);
-
             Assert.Equal(1, await userContext.CountAsync(userContext.Query().Where(t => t.Category.Name == "Test")));
+
+            user = await userContext.GetAsync(user.Index);
+            Assert.NotNull(user);
         }
     }
 }

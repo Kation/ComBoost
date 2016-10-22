@@ -91,10 +91,6 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             while (type.GetTypeInfo().Assembly.IsDynamic)
                 type = type.GetTypeInfo().BaseType;
-            if (type.GetTypeInfo().IsInterface)
-                throw new NotSupportedException("不支持接口类型," + type.FullName + "。");
-            if (type.GetTypeInfo().IsAbstract)
-                throw new NotSupportedException("不支持抽象类型," + type.FullName + "。");
             if (!typeof(IEntity).IsAssignableFrom(type))
                 throw new NotSupportedException("该类型没有继承IEntity接口。");
             lock (_Metadata)
@@ -111,6 +107,22 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                         _Metadata.Add(interfaceType, metadata);
                 }
             return _Metadata[type];
+        }
+
+        /// <summary>
+        /// 初始化程序集实体元数据。
+        /// </summary>
+        /// <param name="assembly"></param>
+        public static void InitMetadata(Assembly assembly)
+        {
+            foreach (var type in assembly.GetTypes().Where(t =>
+            {
+                var info = t.GetTypeInfo();
+                if (!info.IsClass && !typeof(IEntity).IsAssignableFrom(t))
+                    return false;
+                return true;
+            }))
+                GetMetadata(type);
         }
     }
 }

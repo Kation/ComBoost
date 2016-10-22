@@ -40,7 +40,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            if (node.Member.DeclaringType == typeof(T))
+            if (node.Expression.Type == typeof(T))
                 return Expression.MakeMemberAccess(Visit(node.Expression), typeof(M).GetMember(node.Member.Name, BindingFlags.Instance | BindingFlags.Public)[0]);
             return base.VisitMember(node);
         }
@@ -50,6 +50,30 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (node.Type == typeof(T))
                 return _Parameter;
             return base.VisitParameter(node);
+        }
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            if (node.Value != null && node.Type != node.Value)
+                return Expression.Constant(node.Value);
+            return base.VisitConstant(node);
+        }
+
+        protected override Expression VisitBinary(BinaryExpression node)
+        {
+            if (node.NodeType == ExpressionType.Equal)
+            {
+                Expression left = Visit(node.Left);
+                Expression right = Visit(node.Right);
+                return Expression.Equal(left, right);
+            }
+            else if (node.NodeType == ExpressionType.NotEqual)
+            {
+                Expression left = Visit(node.Left);
+                Expression right = Visit(node.Right);
+                return Expression.NotEqual(left, right);
+            }
+            return base.VisitBinary(node);
         }
     }
 }
