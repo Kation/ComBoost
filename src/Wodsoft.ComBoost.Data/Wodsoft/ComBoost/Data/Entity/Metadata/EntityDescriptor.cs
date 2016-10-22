@@ -101,10 +101,14 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 if (!_Metadata.ContainsKey(type))
                 {
                     var metadataField = type.GetField("Metadata", BindingFlags.Static | BindingFlags.Public);
+                    IEntityMetadata metadata;
                     if (metadataField != null)
-                        _Metadata.Add(type, (IEntityMetadata)metadataField.GetValue(null));
+                        metadata = (IEntityMetadata)metadataField.GetValue(null);
                     else
-                        _Metadata.Add(type, new ClrEntityMetadata(type));
+                        metadata = new ClrEntityMetadata(type);
+                    _Metadata.Add(type, metadata);
+                    foreach (var interfaceType in type.GetInterfaces().Where(t => t != typeof(IEntity) && typeof(IEntity).IsAssignableFrom(t)))
+                        _Metadata.Add(interfaceType, metadata);
                 }
             return _Metadata[type];
         }

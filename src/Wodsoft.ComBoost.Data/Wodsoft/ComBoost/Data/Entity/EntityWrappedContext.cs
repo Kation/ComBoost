@@ -41,7 +41,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         protected virtual Expression<Func<M, TResult>> WrapExpression<TResult>(Expression<Func<T, TResult>> expression)
         {
-            ExpressionWrapper<M, T> wrapper = new ExpressionWrapper<M, T>();
+            ExpressionWrapper<T, M> wrapper = new ExpressionWrapper<T, M>();
             return (Expression<Func<M, TResult>>)wrapper.Visit(expression);
         }
 

@@ -27,9 +27,28 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new ArgumentNullException(nameof(context));
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
-            var parameter = Expression.Parameter(context.Metadata.Type);
-            var property = Expression.Property(parameter, context.Metadata.KeyProperty.ClrName);
-            var expression = Expression.Equal(property, Expression.Constant(key));
+            Type type = typeof(T);
+            string keyName = context.Metadata.KeyProperty.ClrName;
+            var parameter = Expression.Parameter(type);
+            MemberExpression property;
+            PropertyInfo propertyInfo = null;
+            if (type.GetTypeInfo().IsInterface)
+            {
+                List<Type> list = new List<Type>() { type };
+                while (list.Count > 0)
+                {
+                    var target = list[0];
+                    propertyInfo = target.GetProperty(keyName);
+                    if (propertyInfo != null)
+                        break;
+                    list.RemoveAt(0);
+                    list.AddRange(target.GetInterfaces());
+                }
+            }
+            else
+                propertyInfo = type.GetProperty(context.Metadata.KeyProperty.ClrName);
+            property = Expression.Property(parameter, propertyInfo);
+            Expression expression = Expression.Equal(property, Expression.Constant(key, propertyInfo.PropertyType));
             var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
             return context.SingleOrDefaultAsync(context.Query(), lambda);
         }
