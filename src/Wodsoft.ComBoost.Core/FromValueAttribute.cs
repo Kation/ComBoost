@@ -26,6 +26,11 @@ namespace Wodsoft.ComBoost
         public FromValueAttribute(bool isRequired) { IsRequired = isRequired; }
 
         /// <summary>
+        /// 自定义来源名称。
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// 获取是否必须存在值。默认为True。
         /// </summary>
         public bool IsRequired { get; private set; }
@@ -39,12 +44,12 @@ namespace Wodsoft.ComBoost
         public override object GetValue(IDomainContext domainContext, ParameterInfo parameter)
         {
             IValueProvider provider = domainContext.GetRequiredService<IValueProvider>();
-            object value = provider.GetValue(parameter.Name, parameter.ParameterType);
+            object value = provider.GetValue(Name ?? parameter.Name, parameter.ParameterType);
             if (value == null)
                 if (parameter.HasDefaultValue)
                     value = parameter.DefaultValue;
                 else if (IsRequired)
-                    throw new ArgumentNullException("获取" + parameter.Name + "参数的值为空。");
+                    throw new ArgumentNullException("获取" + (Name ?? parameter.Name) + "参数的值为空。");
             return value;
         }
     }

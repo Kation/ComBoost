@@ -16,14 +16,19 @@ namespace Wodsoft.ComBoost
 
         public FromEntityAttribute(bool isRequired) { IsRequired = isRequired; }
 
+        /// <summary>
+        /// 自定义来源名称。
+        /// </summary>
+        public string Name { get; set; }
+
         public bool IsRequired { get; private set; }
 
         public override object GetValue(IDomainContext domainContext, ParameterInfo parameter)
         {
-            IValueProvider provider = domainContext.GetRequiredService<IValueProvider>();            
-            object value = provider.GetValue(parameter.Name, EntityDescriptor.GetMetadata(parameter.ParameterType).KeyType);
+            IValueProvider provider = domainContext.GetRequiredService<IValueProvider>();
+            object value = provider.GetValue(Name ?? parameter.Name, EntityDescriptor.GetMetadata(parameter.ParameterType).KeyType);
             if (value == null)
-                throw new ArgumentNullException("获取" + parameter.Name + "参数的值为空。");
+                throw new ArgumentNullException("获取" + (Name ?? parameter.Name) + "参数的值为空。");
             var databaseContext = domainContext.GetRequiredService<IDatabaseContext>();
             dynamic entityContext;
             if (parameter.ParameterType.GetTypeInfo().IsInterface)
