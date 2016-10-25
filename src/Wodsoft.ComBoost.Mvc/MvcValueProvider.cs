@@ -50,6 +50,11 @@ namespace Wodsoft.ComBoost.Mvc
                     return null;
                 return files.Select(t => new SelectedFile(t)).ToArray();
             }
+            else if (valueType == typeof(Stream) && name == "$request")
+                return Controller.Request.Body;
+            else if (valueType == typeof(Stream) && name == "$request")
+                return Controller.Response.Body;
+
             //object value = Controller.Request.Query[name];
             //if (value == StringValues.Empty && Controller.Request.HasFormContentType)
             //    value = Controller.Request.Form[name];
