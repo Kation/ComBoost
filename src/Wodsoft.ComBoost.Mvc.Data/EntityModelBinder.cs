@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
@@ -14,8 +15,12 @@ namespace Wodsoft.ComBoost.Mvc
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
             var metadata = EntityDescriptor.GetMetadata(bindingContext.ModelType);
-            var key = bindingContext.ValueProvider.GetValue(bindingContext.ModelName).ToString();
-            //ToDo: 转换类型
+            object key = bindingContext.ValueProvider.GetValue(bindingContext.ModelName).ToString();
+            if (metadata.KeyType != typeof(string))
+            {
+                var converter = TypeDescriptor.GetConverter(metadata.KeyType);
+                key = converter.ConvertFromString((string)key);
+            }
             var databaseContext = bindingContext.HttpContext.RequestServices.GetRequiredService<IDatabaseContext>();
             var entityContext = databaseContext.GetDynamicContext(metadata.Type);
             var entity = await EntityContextExtensions.GetAsync(entityContext, key);
