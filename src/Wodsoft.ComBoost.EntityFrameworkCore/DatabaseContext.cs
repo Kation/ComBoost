@@ -55,7 +55,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             else
             {
                 context = this.GetDynamicContext(obj.EntityType.ClrType);
-                _CachedEntityContext.Add(obj.EntityType.ClrType, context);
             }
             entity.EntityContext = (IEntityQueryContext<IEntity>)context;
         }
