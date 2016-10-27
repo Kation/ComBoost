@@ -11,14 +11,14 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public static Task<T> LazyLoadEntityAsync<TSource, T>(this TSource source, Expression<Func<TSource, T>> expression)
             where TSource : IEntity
-            where T : class, IEntity, new()
+            where T : IEntity
         {
             return source.EntityContext.LazyLoadEntityAsync(source, expression);
         }
 
         public static Task<IQueryableCollection<T>> LazyLoadCollectionAsync<TSource, T>(this TSource source, Expression<Func<TSource, ICollection<T>>> expression)
             where TSource : IEntity
-            where T : class, IEntity, new()
+            where T : IEntity
         {
             return source.EntityContext.LazyLoadCollectionAsync(source, expression);
         }
