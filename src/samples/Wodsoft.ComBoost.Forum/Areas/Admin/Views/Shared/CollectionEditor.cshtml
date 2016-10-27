@@ -1,12 +1,12 @@
 ﻿@model MvcEditorModel
 <div class="input-group col-md-6" style="float: left">
     <select id="@Model.Metadata.ClrName" multiple="multiple" class="form-control" style="height: 88px; padding-right: 12px;">
-        @foreach (System.Data.Entity.EntityBase v in (System.Collections.IEnumerable)Model.Value)
+        @foreach (Wodsoft.ComBoost.Data.Entity.EntityBase v in (System.Collections.IEnumerable)Model.Value)
         {
             <option value="@v.Index">@v</option>
         }
     </select>
-    <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@(string.Join(",",((System.Collections.IEnumerable)Model.Value).Cast<System.Data.Entity.IEntity>().Select(t=>t. Index).ToArray()))" />
+    <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@(string.Join(",",((System.Collections.IEnumerable)Model.Value).Cast<Wodsoft.ComBoost.Data.Entity.IEntity>().Select(t=>t. Index).ToArray()))" />
 </div>
 <div class="col-md-2">
     <div class="btn-group-vertical">

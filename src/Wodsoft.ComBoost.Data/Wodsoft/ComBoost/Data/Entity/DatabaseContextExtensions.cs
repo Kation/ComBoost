@@ -53,7 +53,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new ArgumentException("实体类型不能为抽象的。");
             if (!typeof(IEntity).IsAssignableFrom(entityType))
                 throw new ArgumentException("实体类型没有继承“IEntity”接口。");
-            return typeof(IDatabaseContext).GetType().GetMethod("GetContext").MakeGenericMethod(entityType).Invoke(context, null);
+            return typeof(IDatabaseContext).GetMethod("GetContext").MakeGenericMethod(entityType).Invoke(context, null);
         }
     }
 }

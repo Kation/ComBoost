@@ -12,7 +12,7 @@ namespace Wodsoft.ComBoost.Mvc
     {
         public IModelBinder GetBinder(ModelBinderProviderContext context)
         {
-            if (typeof(IEntity).IsAssignableFrom( context.BindingInfo.BinderType))
+            if (typeof(IEntity).IsAssignableFrom(context.Metadata.ModelType))
             {
                 return new EntityModelBinder();
             }

@@ -15,6 +15,7 @@ namespace Wodsoft.ComBoost.Mvc
         {
             var metadata = EntityDescriptor.GetMetadata(bindingContext.ModelType);
             var key = bindingContext.ValueProvider.GetValue(bindingContext.ModelName).ToString();
+            //ToDo: 转换类型
             var databaseContext = bindingContext.HttpContext.RequestServices.GetRequiredService<IDatabaseContext>();
             var entityContext = databaseContext.GetDynamicContext(metadata.Type);
             var entity = await EntityContextExtensions.GetAsync(entityContext, key);

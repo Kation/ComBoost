@@ -21,6 +21,7 @@
                     {
                         <li role="presentation"><a role="button" data-toggle="collapse" href="#searchPanel" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> 查询</a></li>
                     }
+                    <li id="okButton" class="pull-right disabled"><a href="javascript:ok();" class="btn btn-default"><span class="glyphicon glyphicon-ok-circle"></span> 选择</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="@(Context.Request.Query["Search"] == "True" ? "collapse in" : "collapse")" id="searchPanel">
@@ -65,7 +66,7 @@
                             <tbody id="listview">
                                 @foreach (var item in Model.Items)
                                 {
-                                    <tr data-id="@item.Index" data-remove="@item.IsRemoveAllowed" data-edit="@item.IsEditAllowed" @string.Join(" ", Model.ItemButtons.Where(t => { t.SetTarget(Context.RequestServices, item); return t.Target != null; }).Select(t => "data-b-" + Array.IndexOf(Model.ItemButtons, t) + "=\"" + t.Target.ToString() + "\""))>
+                                    <tr data-id="@item.Index" data-name="@item">
                                         <td class="text-center">
                                             <input type="radio" />
                                         </td>
@@ -139,114 +140,31 @@
         </div>
     </div>
 </form>
-<div class="row">
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th width="36"></th>
-                @foreach (var header in Model.Headers)
-                {
-                    <th title="@header.Description">@(header.ShortName ?? header.Name)</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Items)
-            {
-                <tr>
-                    <td class="text-center">
-                        <input type="radio" data-name="@item" name="value" value="@item.Index" />
-                    </td>
-                    @foreach (var header in Model.Properties)
-                    {
-                        <th title="@header.Description">@header.Name</th>
-                    }
-                </tr>
-            }
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="@(1 + Model.Properties.Count())">
-                    <div class="row">
-                        <div class="col-xs-4 col-sm-5 col-md-6 col-lg-8">
-                            <div class="btn-group" role="group">
-                                @foreach (var size in Model.PageSizeOption)
-                                {
-                                    <button type="submit" name="size" value="@size" class="btn btn-default @(size == Model.CurrentSize ? "active" : "")">@size</button>
-                                }
-                            </div>
-                        </div>
-                        <div class="col-xs-8 col-sm-7 col-md-6 col-lg-4">
-                            <div class="input-group">
-                                <div class="input-group-btn">
-                                    @if (Model.CurrentPage > 3)
-                                    {
-                                        <button type="submit" name="page" value="1" class="btn btn-default" @(Model.CurrentPage == 1 ? " disabled=\"disabled\"" : "" )>1</button>
-                                        if (Model.CurrentPage > 4)
-                                        {
-                                            <button type="button" class="btn btn-default disabled">.</button>
-                                        }
-                                    }
-                                    @for (int i = Model.CurrentPage - 2; i <= Model.CurrentPage + 2; i++)
-                                    {
-                                        if (i < 1)
-                                        {
-                                            continue;
-                                        }
-                                        if (i > Model.TotalPage)
-                                        {
-                                            break;
-                                        }
-                                        <button type="submit" name="page" value="@i" class="btn btn-default @(Model.CurrentPage == i ? "active" : "")">@i</button>
-                                    }
-                                    @if (Model.CurrentPage < Model.TotalPage - 2)
-                                    {
-                                        if (Model.CurrentPage < Model.TotalPage - 3)
-                                        {
-                                            <button type="button" class="btn btn-default disabled">.</button>
-                                        }
-                                        <button type="submit" name="page" value="1" class="btn btn-default" @(Model.CurrentPage == Model.TotalPage ? " disabled=\"disabled\"" : "" )>6</button>
-                                    }
-                                </div>
-                                <input type="text" class="form-control text-center" />
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button">跳转</button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        @Html.PaginationButton(Model)
-    </div>
-    <div class="col-md-4 text-center">
-        <div class="btn-group">
-            @if (Model.Metadata.SearchProperties.Count() > 0)
-            {
-                <a class="btn btn-default" href="@Html.Raw(Url.Action("Search",new {actionName = "Selector"}))">查找</a>
-            }
-            <button class="btn btn-default" onclick="ok()">确定</button>
-        </div>
-    </div>
-    <div class="col-md-4 text-right">
-        @Html.Pagination(Model)
-    </div>
-</div>
 <script type="text/javascript">
+    var id, name;
+
+    $('#listview').children('tr').click(function () {
+        $('#listview').children('tr').each(function (index, element) {
+            $(element).children().first().children().first('input').prop('checked', false);
+        });
+        var item = $(this);
+        selectedItem = item;
+        item.children().first().children().first().prop('checked', true);
+
+        id = item.data('id');
+        name = item.data('name');
+
+        var okButton = $('#okButton');
+        okButton.removeClass('disabled');
+    });
+
     function ok() {
-        var items = $(':checked[value]');
-        if (items.length == 0) {
-            alert('Please select an item.');
+        if (id == null) {
             return;
         }
         window.returnValue = {
-            name: items.attr('data-name'),
-            value: items.val()
+            name: name,
+            value: id
         };
         if (window.opener) {
             window.opener.returnValue = window.returnValue;
