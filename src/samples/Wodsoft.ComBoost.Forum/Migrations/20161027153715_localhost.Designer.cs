@@ -8,7 +8,7 @@ using Wodsoft.ComBoost.Forum;
 namespace Wodsoft.ComBoost.Forum.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20161007093900_localhost")]
+    [Migration("20161027153715_localhost")]
     partial class localhost
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,11 +44,14 @@ namespace Wodsoft.ComBoost.Forum.Migrations
 
                     b.Property<DateTime>("EditDate");
 
-                    b.Property<byte[]>("Password");
+                    b.Property<byte[]>("Password")
+                        .IsRequired();
 
-                    b.Property<byte[]>("Salt");
+                    b.Property<byte[]>("Salt")
+                        .IsRequired();
 
-                    b.Property<string>("Username");
+                    b.Property<string>("Username")
+                        .IsRequired();
 
                     b.HasKey("Index");
 

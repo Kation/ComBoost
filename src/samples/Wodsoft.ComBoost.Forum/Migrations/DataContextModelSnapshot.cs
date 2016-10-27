@@ -43,11 +43,14 @@ namespace Wodsoft.ComBoost.Forum.Migrations
 
                     b.Property<DateTime>("EditDate");
 
-                    b.Property<byte[]>("Password");
+                    b.Property<byte[]>("Password")
+                        .IsRequired();
 
-                    b.Property<byte[]>("Salt");
+                    b.Property<byte[]>("Salt")
+                        .IsRequired();
 
-                    b.Property<string>("Username");
+                    b.Property<string>("Username")
+                        .IsRequired();
 
                     b.HasKey("Index");
 
