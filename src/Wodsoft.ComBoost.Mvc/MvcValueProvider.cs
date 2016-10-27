@@ -22,7 +22,7 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         public Controller Controller { get; private set; }
-        
+
         public object GetValue(string name)
         {
             StringValues value = Controller.Request.Query[name];
@@ -52,9 +52,16 @@ namespace Wodsoft.ComBoost.Mvc
             }
             else if (valueType == typeof(Stream) && name == "$request")
                 return Controller.Request.Body;
-            else if (valueType == typeof(Stream) && name == "$request")
+            else if (valueType == typeof(Stream) && name == "$response")
                 return Controller.Response.Body;
-
+            else if (valueType == typeof(string))
+            {
+                StringValues values = ((Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider)this).GetValue(name).Values;
+                if (values == StringValues.Empty)
+                    return null;
+                else
+                    return (string)values;
+            }
             //object value = Controller.Request.Query[name];
             //if (value == StringValues.Empty && Controller.Request.HasFormContentType)
             //    value = Controller.Request.Form[name];
@@ -99,19 +106,31 @@ namespace Wodsoft.ComBoost.Mvc
 
         ValueProviderResult Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.GetValue(string key)
         {
-            StringValues value = Controller.Request.Query[key];
-            if (value == StringValues.Empty && Controller.Request.HasFormContentType)
-                value = Controller.Request.Form[key];
-            if (value == StringValues.Empty)
-                value = Controller.Request.Headers[key];
-            if (value == StringValues.Empty)
+            if (Controller.Request.Query.ContainsKey(key))
             {
-                var result = Controller.HttpContext.GetRouteData()?.Values[key];
-                if (result == null)
-                    return ValueProviderResult.None;
-                return new ValueProviderResult(result.ToString());
+                var value = Controller.Request.Query[key];
+                if (value == StringValues.Empty)
+                    value = "123";
+                return new ValueProviderResult(value);
             }
-            return new ValueProviderResult(value);
+            if (Controller.Request.HasFormContentType && Controller.Request.Form.ContainsKey(key))
+            {
+                var value = Controller.Request.Form[key];
+                if (value == StringValues.Empty)
+                    value = "";
+                return new ValueProviderResult(value);
+            }
+            if (Controller.Request.Headers.ContainsKey(key))
+            {
+                var value = Controller.Request.Headers[key];
+                if (value == StringValues.Empty)
+                    value = "";
+                return new ValueProviderResult(value);
+            }
+            var result = Controller.HttpContext.GetRouteData()?.Values[key];
+            if (result == null)
+                return ValueProviderResult.None;
+            return new ValueProviderResult(result.ToString());
         }
 
         private System.Collections.ObjectModel.ReadOnlyCollection<string> _Keys;
