@@ -132,6 +132,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             return query.CountAsync(expression);
         }
 
+        public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
+        {
+            return query.Include(expression);
+        }
+
         Task<TResult> IEntityQueryContext<T>.LazyLoadEntityAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
         {
             if (typeof(TSource) != typeof(T))

@@ -125,5 +125,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             return InnerContext.LazyLoadCollectionAsync(entity, expression);
         }
+
+        public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
+        {
+            var newExpression = WrapExpression(expression);
+            return InnerContext.Include(query.Unwrap<T, M>(), newExpression).Wrap<T, M>();
+        }
     }
 }

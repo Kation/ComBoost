@@ -53,6 +53,51 @@ namespace Wodsoft.ComBoost.Data.Entity
             return context.SingleOrDefaultAsync(context.Query(), lambda);
         }
 
+        public static IQueryable<T> Include<T>(this IEntityContext<T> context, IQueryable<T> query, string property)
+            where T : IEntity
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+            if (query == null)
+                throw new ArgumentNullException(nameof(query));
+            if (property == null)
+                throw new ArgumentNullException(nameof(property));
+            var parameter = Expression.Parameter(typeof(T));
+            var expression = Expression.Property(parameter, property);
+            var lambda = Expression.Lambda<Func<T, object>>(expression, parameter);
+            return context.Include(query, lambda);
+        }
+
+        public static IQueryable<T> Include<T>(this IEntityContext<T> context, string property)
+            where T : IEntity
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+            if (property == null)
+                throw new ArgumentNullException(nameof(property));
+            return Include(context, context.Query(), property);
+        }
+
+        public static IQueryable<T> Include<T, TProperty>(this IEntityContext<T> context, IQueryable<T> query, params Expression<Func<T, TProperty>>[] expressions)
+            where T : IEntity
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+            if (query == null)
+                throw new ArgumentNullException(nameof(query));
+            foreach (var expression in expressions)
+                query = context.Include(query, expression);
+            return query;
+        }
+
+        public static IQueryable<T> Include<T, TProperty>(this IEntityContext<T> context, params Expression<Func<T, TProperty>>[] expressions)
+            where T : IEntity
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+            return Include(context, context.Query(), expressions);
+        }
+
         /// <summary>
         /// 获取排序后的实体查询。
         /// </summary>

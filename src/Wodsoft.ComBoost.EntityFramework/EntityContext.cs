@@ -172,5 +172,10 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new NotSupportedException("不支持的路径。");
             return memberExpression.Member.Name;
         }
+
+        public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
+        {
+            return query.Include(expression);
+        }
     }
 }

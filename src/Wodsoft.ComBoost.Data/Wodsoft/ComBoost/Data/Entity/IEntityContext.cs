@@ -102,5 +102,14 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="expression">表达式。</param>
         /// <returns></returns>
         Task<int> CountAsync(IQueryable<T> query, Expression<Func<T, bool>> expression);
+
+        /// <summary>
+        /// 包含查询。
+        /// </summary>
+        /// <typeparam name="TProperty">要包含的属性类型。</typeparam>
+        /// <param name="query">查询对象。</param>
+        /// <param name="expression">表达式。</param>
+        /// <returns></returns>
+        IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression);
     }
 }

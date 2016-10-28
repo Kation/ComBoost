@@ -52,6 +52,10 @@ namespace Wodsoft.ComBoost.Data
             }
             var context = database.GetContext<T>();
             var queryable = context.Query();
+            foreach (var propertyMetadata in Metadata.Properties.Where(t => t.CustomType == "Entity"))
+            {
+                queryable = context.Include(queryable, propertyMetadata.ClrName);
+            }
             if (EntityQuery != null)
             {
                 var e = new EntityQueryEventArgs<T>(queryable);
