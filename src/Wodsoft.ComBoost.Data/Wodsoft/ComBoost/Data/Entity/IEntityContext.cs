@@ -67,42 +67,34 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="query">查询对象。</param>
         /// <param name="expression">表达式。</param>
         /// <returns></returns>
-        Task<T> SingleOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression);
+        Task<T> SingleOrDefaultAsync(IQueryable<T> query);
         /// <summary>
         /// 异步查找出单个对象。
         /// </summary>
         /// <param name="query">查询对象。</param>
         /// <param name="expression">表达式。</param>
         /// <returns></returns>
-        Task<T> SingleAsync(IQueryable<T> query, Expression<Func<T, bool>> expression);
+        Task<T> SingleAsync(IQueryable<T> query);
         /// <summary>
         /// 异步查找出第一个对象。
         /// </summary>
         /// <param name="query">查询对象。</param>
         /// <param name="expression">表达式。</param>
         /// <returns></returns>
-        Task<T> FirstOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression);
+        Task<T> FirstOrDefaultAsync(IQueryable<T> query);
         /// <summary>
         /// 异步查找出第一个对象。
         /// </summary>
         /// <param name="query">查询对象。</param>
         /// <param name="expression">表达式。</param>
         /// <returns></returns>
-        Task<T> FirstAsync(IQueryable<T> query, Expression<Func<T, bool>> expression);
+        Task<T> FirstAsync(IQueryable<T> query);
         /// <summary>
         /// 异步统计查询结果的数量。
         /// </summary>
         /// <param name="query">查询对象。</param>
         /// <returns></returns>
         Task<int> CountAsync(IQueryable<T> query);
-        /// <summary>
-        /// 异步统计查询结果的数量。
-        /// </summary>
-        /// <param name="query">查询对象。</param>
-        /// <param name="expression">表达式。</param>
-        /// <returns></returns>
-        Task<int> CountAsync(IQueryable<T> query, Expression<Func<T, bool>> expression);
-
         /// <summary>
         /// 包含查询。
         /// </summary>

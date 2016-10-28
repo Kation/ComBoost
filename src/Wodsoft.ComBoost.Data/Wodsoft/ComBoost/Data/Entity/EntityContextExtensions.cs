@@ -50,7 +50,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             property = Expression.Property(parameter, propertyInfo);
             Expression expression = Expression.Equal(property, Expression.Constant(key, propertyInfo.PropertyType));
             var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
-            return context.SingleOrDefaultAsync(context.Query(), lambda);
+            return context.SingleOrDefaultAsync(context.Query().Where(lambda));
         }
 
         public static IQueryable<T> Include<T>(this IEntityContext<T> context, IQueryable<T> query, string property)

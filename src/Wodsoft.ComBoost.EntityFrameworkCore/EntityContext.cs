@@ -102,34 +102,29 @@ namespace Wodsoft.ComBoost.Data.Entity
             DbSet.UpdateRange(items);
         }
 
-        public Task<T> SingleOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        public Task<T> SingleOrDefaultAsync(IQueryable<T> query)
         {
-            return query.SingleOrDefaultAsync(expression);
+            return query.SingleOrDefaultAsync();
         }
 
-        public Task<T> SingleAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        public Task<T> SingleAsync(IQueryable<T> query)
         {
-            return query.SingleAsync(expression);
+            return query.SingleAsync();
         }
 
-        public Task<T> FirstOrDefaultAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        public Task<T> FirstOrDefaultAsync(IQueryable<T> query)
         {
-            return query.FirstOrDefaultAsync(expression);
+            return query.FirstOrDefaultAsync();
         }
 
-        public Task<T> FirstAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
+        public Task<T> FirstAsync(IQueryable<T> query)
         {
-            return query.FirstAsync(expression);
+            return query.FirstAsync();
         }
 
         public Task<int> CountAsync(IQueryable<T> query)
         {
             return query.CountAsync();
-        }
-
-        public Task<int> CountAsync(IQueryable<T> query, Expression<Func<T, bool>> expression)
-        {
-            return query.CountAsync(expression);
         }
 
         public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
