@@ -28,7 +28,7 @@ namespace DataUnitTest
             await database.SaveAsync();
             Assert.Equal(0, await categoryContext.CountAsync(categoryContext.Query()));
         }
-
+        
         [Fact]
         public async Task LazyLoadEntityTest()
         {
@@ -79,6 +79,16 @@ namespace DataUnitTest
             Assert.Equal(1, collection.Count);
             var users = await userContext.ToArrayAsync(collection);
             Assert.Equal("TestUser", users[0].Username);
+        }
+
+        public async Task OrderTest()
+        {
+            var serviceProvider = DataCommon.GetServiceProvider();
+            var database = serviceProvider.GetService<IDatabaseContext>();
+            await DataCommon.DataInitAsync(database);
+            var userContext = database.GetContext<User>();
+            var user = await userContext.FirstOrDefaultAsync(userContext.Order());
+            Assert.Equal("TestUser1", user.Username);
         }
     }
 }
