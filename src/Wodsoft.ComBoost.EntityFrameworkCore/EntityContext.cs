@@ -145,7 +145,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 return Task.FromResult(result);
             string propertyName = GetPropertyName(expression);
             var entry = Database.InnerContext.Entry((object)entity);
-            var property = entry.Metadata.FindProperty(propertyName + "Index");
+            var property = entry.Metadata.FindNavigation(propertyName).ForeignKey.Properties[0];
             var infrastructure = entry.GetInfrastructure();
             var key = infrastructure.GetCurrentValue(property);
             if (key == null)

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -12,7 +14,8 @@ namespace Wodsoft.ComBoost.Data.Entity
     {
         public void ApplyServices(IServiceCollection services)
         {
-            services.AddScoped<IEntityStateListener, ComboostEntityStateListener>();
+            services.AddScoped<IEntityMaterializerSource, ComBoostEntityMaterializerSource>();
+            services.AddScoped<CurrentDatabaseContext, CurrentDatabaseContext>();
         }
     }
 }

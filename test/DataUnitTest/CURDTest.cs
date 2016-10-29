@@ -47,8 +47,9 @@ namespace DataUnitTest
 
             database = serviceProvider.GetService<IDatabaseContext>();
             userContext = database.GetContext<User>();
-            user = (await userContext.ToArrayAsync(userContext.Query()))[0];
+            user = await userContext.FirstOrDefaultAsync(userContext.Query());
             Assert.Null(user.Category);
+            var dbContext = ((DatabaseContext)database).InnerContext;
             category = await user.LazyLoadEntityAsync(t => t.Category);
             Assert.NotNull(category);
             Assert.Equal("Test", category.Name);
