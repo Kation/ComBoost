@@ -104,18 +104,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             InnerContext.UpdateRange((IEnumerable<M>)items);
         }
-
-
-        Task<TResult> IEntityQueryContext<T>.LazyLoadEntityAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
-        {
-            return InnerContext.LazyLoadEntityAsync(entity, expression);
-        }
-
-        Task<IQueryableCollection<TResult>> IEntityQueryContext<T>.LazyLoadCollectionAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
-        {
-            return InnerContext.LazyLoadCollectionAsync(entity, expression);
-        }
-
+        
         public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
         {
             var newExpression = WrapExpression(expression);

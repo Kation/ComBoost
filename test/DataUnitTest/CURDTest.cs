@@ -50,7 +50,7 @@ namespace DataUnitTest
             user = await userContext.FirstOrDefaultAsync(userContext.Query());
             Assert.Null(user.Category);
             var dbContext = ((DatabaseContext)database).InnerContext;
-            category = await user.LazyLoadEntityAsync(t => t.Category);
+            category = await user.LoadAsync(t => t.Category);
             Assert.NotNull(category);
             Assert.Equal("Test", category.Name);
         }
@@ -76,7 +76,7 @@ namespace DataUnitTest
             category = (await categoryContext.ToArrayAsync(categoryContext.Query()))[0];
             userContext = database.GetContext<User>();
             Assert.Null(category.Users);
-            var collection = await category.LazyLoadCollectionAsync(t => t.Users);
+            var collection = await category.LoadAsync(t => t.Users);
             Assert.Equal(1, collection.Count);
             var users = await userContext.ToArrayAsync(collection);
             Assert.Equal("TestUser", users[0].Username);

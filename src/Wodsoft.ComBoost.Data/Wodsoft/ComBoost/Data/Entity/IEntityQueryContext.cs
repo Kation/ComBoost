@@ -28,30 +28,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// 获取查询接口。
         /// </summary>
         /// <returns>返回查询对象。</returns>
-        IQueryable<T> Query();
-
-        /// <summary>
-        /// 加载实体对象。
-        /// </summary>
-        /// <typeparam name="TSource"></typeparam>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="entity"></param>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        Task<TResult> LazyLoadEntityAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
-            where TSource : IEntity
-            where TResult : IEntity;
-
-        /// <summary>
-        /// 加载实体集合。
-        /// </summary>
-        /// <typeparam name="TSource"></typeparam>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="entity"></param>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        Task<IQueryableCollection<TResult>> LazyLoadCollectionAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
-            where TSource : IEntity
-            where TResult : IEntity;
+        IQueryable<T> Query();        
     }
 }

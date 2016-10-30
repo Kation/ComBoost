@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data.Entity
@@ -27,5 +28,29 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         /// <returns>返回受影响的行数。</returns>
         Task<int> SaveAsync();
+
+        /// <summary>
+        /// 加载实体对象。
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        Task<TResult> LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
+            where TSource : IEntity
+            where TResult : IEntity;
+
+        /// <summary>
+        /// 加载实体集合。
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        Task<IQueryableCollection<TResult>> LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
+            where TSource : IEntity
+            where TResult : IEntity;        
     }
 }

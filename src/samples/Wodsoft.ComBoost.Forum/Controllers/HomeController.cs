@@ -48,7 +48,7 @@ namespace Wodsoft.ComBoost.Forum.Controllers
             //var thread = await threadContext.Query().FirstAsync();
             //var forum = await thread.LazyLoadEntityAsync(t => t.Forum);
             var forum = await forumContext.Query().FirstAsync();
-            var threadCollection = await forum.LazyLoadCollectionAsync(t => t.Threads);
+            var threadCollection = await forum.LoadAsync(t => t.Threads);
             var thread = threadContext.Create();
             thread.Member = await memberContext.Query().SingleAsync(t => t.Username.ToLower() == "admin");
             thread.Title = "Collection添加";

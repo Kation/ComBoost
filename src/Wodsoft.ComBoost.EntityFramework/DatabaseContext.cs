@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Linq.Expressions;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -68,6 +69,52 @@ namespace Wodsoft.ComBoost.Data.Entity
             var context = new EntityContext<T>(this, InnerContext.Set<T>());
             _CachedEntityContext.Add(typeof(T), context);
             return context;
+        }
+
+        async Task<TResult> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+            if (expression == null)
+                throw new ArgumentNullException(nameof(expression));
+            //TResult result = expression.Compile()(entity);
+            //if (result != null)
+            //    return result;
+            string propertyName = GetPropertyName(expression);
+            var entry = InnerContext.Entry((object)entity);
+            var property = entry.Reference(propertyName);
+            if (property.IsLoaded)
+                return (TResult)property.CurrentValue;
+            //var infrastructure = entry.GetInfrastructure();
+            await property.LoadAsync();
+            return (TResult)property.CurrentValue;
+        }
+
+        async Task<IQueryableCollection<TResult>> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+            if (expression == null)
+                throw new ArgumentNullException(nameof(expression));
+            string propertyName = GetPropertyName(expression);
+            var entry = InnerContext.Entry((object)entity);
+            var property = entry.Collection(propertyName);
+            IQueryable<TResult> queryable = (IQueryable<TResult>)property.Query();
+
+            var context = this.GetWrappedContext<TResult>();
+            var count = await context.CountAsync(queryable);
+            return new ComBoostEntityCollection<TResult>(entry, context, property, queryable, count);
+        }
+
+        private static string GetPropertyName<TSource, TResult>(Expression<Func<TSource, TResult>> expression)
+        {
+            MemberExpression memberExpression = expression.Body as MemberExpression;
+            if (memberExpression == null)
+                throw new NotSupportedException("不支持的路径。");
+            var parameter = memberExpression.Expression as ParameterExpression;
+            if (parameter == null)
+                throw new NotSupportedException("不支持的路径。");
+            return memberExpression.Member.Name;
         }
     }
 }
