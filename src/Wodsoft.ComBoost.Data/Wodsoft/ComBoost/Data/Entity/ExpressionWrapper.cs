@@ -19,10 +19,12 @@ namespace Wodsoft.ComBoost.Data.Entity
         protected override Expression VisitLambda<F>(Expression<F> node)
         {
             var lambdaType = typeof(F);
-            if (lambdaType.IsConstructedGenericType && lambdaType.GetGenericTypeDefinition() == typeof(Func<,>) && lambdaType.GenericTypeArguments[0] == typeof(T) && lambdaType.GenericTypeArguments[1] == typeof(bool))
+            if (lambdaType.IsConstructedGenericType && lambdaType.GetGenericTypeDefinition() == typeof(Func<,>) && lambdaType.GenericTypeArguments[0] == typeof(T))
             {
-                Expression<Func<T, bool>> expression = (Expression<Func<T, bool>>)(object)node;
-                return Expression.Lambda<Func<M, bool>>(Visit(expression.Body), _Parameter);
+                var definition = lambdaType.GetGenericArguments();
+                definition[0] = typeof(M);
+                lambdaType = lambdaType.GetGenericTypeDefinition().MakeGenericType(definition);
+                return Expression.Lambda(lambdaType, Visit(node.Body), _Parameter);
             }
             return base.VisitLambda<F>(node);
         }
