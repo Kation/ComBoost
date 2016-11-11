@@ -190,6 +190,8 @@ namespace System.Web.Mvc
                                 DateTime end;
                                 if (!DateTime.TryParse(Controller.Request.QueryString["Search." + keys[i].Key + options[a]], out end))
                                     continue;
+                                if (property.Type == CustomDataType.Date)
+                                    end.AddDays(1);
                                 searchItem.LessthanDate = end;
                                 ParameterExpression parameter = Expression.Parameter(Metadata.Type);
                                 queryable = queryable.Where<TEntity>(Expression.Lambda<Func<TEntity, bool>>(Expression.LessThanOrEqual(Expression.Property(parameter, property.ClrName), Expression.Constant(end)), parameter));
