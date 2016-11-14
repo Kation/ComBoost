@@ -12,6 +12,7 @@ namespace Microsoft.AspNetCore.Builder
     {
         public static void UseComBoostMvcAuthentication(this IApplicationBuilder app)
         {
+            app.UseComBoostAuthentication();
             UseComBoostMvcAuthentication(app, new ComBoostAuthenticationOptions());
         }
 
