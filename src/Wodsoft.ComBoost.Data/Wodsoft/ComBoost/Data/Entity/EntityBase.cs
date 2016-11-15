@@ -10,7 +10,7 @@ namespace Wodsoft.ComBoost.Data.Entity
     /// <summary>
     /// 实现了IEntity接口的实体基类。
     /// </summary>
-    public class EntityBase : IEntity
+    public abstract class EntityBase : IEntity
     {
         /// <summary>
         /// 获取或设置创建日期。
