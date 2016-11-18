@@ -140,7 +140,12 @@ namespace Wodsoft.ComBoost.Data
                 }
             }
             var context = database.GetContext<T>();
-            T entity = await context.GetAsync(index);
+            var queryable = context.Query();
+            foreach (var propertyMetadata in Metadata.Properties.Where(t => t.CustomType == "Entity"))
+            {
+                queryable = context.Include(queryable, propertyMetadata.ClrName);
+            }
+            T entity = await context.GetAsync(queryable, index);
             if (entity == null)
                 throw new EntityNotFoundException(typeof(T), index);
             var model = new EntityEditModel<T>(entity);
@@ -355,7 +360,12 @@ namespace Wodsoft.ComBoost.Data
                 }
             }
             var context = database.GetContext<T>();
-            T entity = await context.GetAsync(index);
+            var queryable = context.Query();
+            foreach (var propertyMetadata in Metadata.Properties.Where(t => t.CustomType == "Entity"))
+            {
+                queryable = context.Include(queryable, propertyMetadata.ClrName);
+            }
+            T entity = await context.GetAsync(queryable, index);
             var model = new EntityEditModel<T>(entity);
             model.Properties = Metadata.DetailProperties.Where(t =>
             {

@@ -27,6 +27,25 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new ArgumentNullException(nameof(context));
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
+            return GetAsync(context, context.Query(), key);
+        }
+
+
+        /// <summary>
+        /// 根据主键获取实体。
+        /// </summary>
+        /// <typeparam name="T">实体类型。</typeparam>
+        /// <param name="context">实体上下文。</param>
+        /// <param name="query">查询器。</param>
+        /// <param name="key">主键。</param>
+        /// <returns>返回实体。找不到实体时返回空。</returns>
+        public static Task<T> GetAsync<T>(this IEntityContext<T> context, IQueryable<T> query, object key)
+            where T : IEntity
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
             Type type = typeof(T);
             string keyName = context.Metadata.KeyProperty.ClrName;
             var parameter = Expression.Parameter(type);
@@ -50,8 +69,9 @@ namespace Wodsoft.ComBoost.Data.Entity
             property = Expression.Property(parameter, propertyInfo);
             Expression expression = Expression.Equal(property, Expression.Constant(key, propertyInfo.PropertyType));
             var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
-            return context.SingleOrDefaultAsync(context.Query().Where(lambda));
+            return context.SingleOrDefaultAsync(query.Where(lambda));
         }
+
 
         public static IQueryable<T> Include<T>(this IEntityContext<T> context, IQueryable<T> query, string property)
             where T : IEntity
