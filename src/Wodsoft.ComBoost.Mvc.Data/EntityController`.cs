@@ -27,7 +27,7 @@ namespace Wodsoft.ComBoost.Mvc
         public IEntityMetadata Metadata { get; private set; }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public virtual async Task<IActionResult> Index()
         {
             var context = CreateDomainContext();
             try
@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public virtual async Task<IActionResult> Create()
         {
             var context = CreateDomainContext();
             try
@@ -69,7 +69,7 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit()
+        public virtual async Task<IActionResult> Edit()
         {
             var context = CreateDomainContext();
             try
@@ -93,7 +93,7 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         [HttpGet]
-        public async Task<IActionResult> Detail()
+        public virtual async Task<IActionResult> Detail()
         {
             var context = CreateDomainContext();
             try
@@ -117,7 +117,7 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         [HttpPost]
-        public async Task<IActionResult> Remove()
+        public virtual async Task<IActionResult> Remove()
         {
             var context = CreateDomainContext();
             try
@@ -136,7 +136,7 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update()
+        public virtual async Task<IActionResult> Update()
         {
             var context = CreateDomainContext();
             try
@@ -165,7 +165,7 @@ namespace Wodsoft.ComBoost.Mvc
 
 
         [HttpGet]
-        public async Task<IActionResult> Selector()
+        public virtual async Task<IActionResult> Selector()
         {
             var context = CreateDomainContext();
             try
@@ -185,7 +185,7 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         [HttpGet]
-        public async Task<IActionResult> MultipleSelector()
+        public virtual async Task<IActionResult> MultipleSelector()
         {
             var context = CreateDomainContext();
             try

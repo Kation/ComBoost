@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wodsoft.ComBoost.Data.Entity;
 
 namespace System.ComponentModel
 {
@@ -16,6 +17,6 @@ namespace System.ComponentModel
         /// </summary>
         /// <param name="provider">Service provider.</param>
         /// <param name="entity">Dependency entity.</param>
-        void SetTarget(IServiceProvider provider, object entity);
+        void SetTarget(IServiceProvider provider, IEntity entity);
     }
 }
