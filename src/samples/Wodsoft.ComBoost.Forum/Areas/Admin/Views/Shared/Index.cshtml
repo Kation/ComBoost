@@ -70,7 +70,7 @@
                                     <button class="btn btn-default" onclick="cancelSearch();">取消</button>
                                     @if (Context.Request.Query["Search"] == "True")
                                     {
-                                        <input type="hidden" id="searchTag" name="Search" value="True"/>
+                                        <input type="hidden" id="searchTag" name="Search" value="True" />
                                     }
                                 </td>
                             </tr>
@@ -183,6 +183,12 @@
 </div>
 <script type="text/javascript">
     var id, selectedItem;
+    var customButtonCount = new Number('@Model.ItemButtons.Length');
+    var customButton = new Array(customButtonCount);
+    for (var i = 0; i < customButtonCount; i++) {
+        customButton[i] = null;
+    }
+
 
     $('#listview').children('tr').click(function () {
         $('#listview').children('tr').each(function (index, element) {
@@ -200,6 +206,14 @@
         var editButton = $('#editButton');
         if (editButton.length > 0 && item.data('edit') == 'True')
             editButton.removeClass('disabled');
+        for (var i = 0; i < customButtonCount; i++) {
+            var link = item.attr('data-b-' + i);
+            customButton[i] = link;
+            if (link == null)
+                $('#customButton' + i).addClass('disabled');
+            else
+                $('#customButton' + i).removeClass('disabled');
+        }
     });
 
     function gotoDetail() {
@@ -221,21 +235,23 @@
     }
 
     function gotoRemove() {
-        $.ajax({
-            url: '@Html.Raw(Url.Action("Remove"))/' + id,
-            cache: false,
-            type: 'POST',
-            success: function () {
-                location.reload();
-            },
-            error: function (xhr) {
-                $('#dialogContent').html(xhr.responseText);
-                $('#dialog').modal('show');
-            }
-        })
+        if (id != null)
+            $.ajax({
+                url: '@Html.Raw(Url.Action("Remove"))/' + id,
+                cache: false,
+                type: 'POST',
+                success: function () {
+                    location.reload();
+                },
+                error: function (xhr) {
+                    $('#dialogContent').html(xhr.responseText);
+                    $('#dialog').modal('show');
+                }
+            })
     }
 
     function gotoCustom(index) {
-        
+        if (customButton[index] != null)
+            window.location.href = customButton[index];
     }
 </script>

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Wodsoft.ComBoost.Data;
 using Wodsoft.ComBoost.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Wodsoft.ComBoost.Forum
 {
@@ -44,12 +45,8 @@ namespace Wodsoft.ComBoost.Forum
             {
                 options.AddComBoostMvcOptions();
             });
-
-            //services.AddDbContext<DataContext>(option =>
-            //{
-            //    option.UseSqlServer(Configuration.GetConnectionString("DataContext"));
-            //});
-            services.AddTransient<DbContext, DataContext>(serviceProvider =>
+            
+            services.AddScoped<DbContext, DataContext>(serviceProvider =>
                 new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase()
                 //new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext"))
                 .Options.WithExtension(new ComBoostOptionExtension())));
@@ -57,6 +54,7 @@ namespace Wodsoft.ComBoost.Forum
             services.AddScoped<ISecurityProvider, ForumSecurityProvider>();
             services.AddScoped<IAuthenticationProvider, ComBoostAuthenticationProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton<IDomainServiceProvider, DomainProvider>(t =>
             {
                 var provider = new DomainProvider(t);

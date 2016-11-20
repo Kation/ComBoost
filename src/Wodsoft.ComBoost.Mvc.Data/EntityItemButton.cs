@@ -51,15 +51,14 @@ namespace Wodsoft.ComBoost.Mvc
         /// <param name="provider">Service provider.</param>
         /// <param name="entity">Dependency entity.</param>
         public void SetTarget(IServiceProvider provider, IEntity entity)
-        {
+        {            
             if (GetLink == null)
                 return;
             if (provider == null)
                 throw new NotSupportedException();
-            Controller controller = provider.GetService<Controller>();
-            if (controller == null)
-                throw new InvalidOperationException("Can not get controller from service provider.");
-            Link = GetLink(controller.Url, entity);
+            var accessor = provider.GetService<Microsoft.AspNetCore.Mvc.Infrastructure.IActionContextAccessor>();
+            var urlHelper = provider.GetService<Microsoft.AspNetCore.Mvc.Routing.IUrlHelperFactory>().GetUrlHelper(accessor.ActionContext);
+            Link = GetLink(urlHelper, entity);
         }
 
         /// <summary>
