@@ -1,5 +1,5 @@
 {
-  "title": "ComBoost.EntityFramework",
+  "title": "Wodsoft.ComBoost.EntityFrameworkCore",
   "version": "3.0.0-alpha1",
   "authors": [ "Kation" ],
   "description": "ComBoost用于EntityFrameworkCore实现的实体模块。",
