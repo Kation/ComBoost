@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Wodsoft.ComBoost.Data;
 using Wodsoft.ComBoost.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Wodsoft.ComBoost.Forum.Entity;
 
 namespace Wodsoft.ComBoost.Forum
 {
@@ -47,8 +48,8 @@ namespace Wodsoft.ComBoost.Forum
             });
             
             services.AddScoped<DbContext, DataContext>(serviceProvider =>
-                new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase()
-                //new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext"))
+                //new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase()
+                new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext"))
                 .Options.WithExtension(new ComBoostOptionExtension())));
             services.AddScoped<IDatabaseContext, DatabaseContext>();
             services.AddScoped<ISecurityProvider, ForumSecurityProvider>();
@@ -61,6 +62,7 @@ namespace Wodsoft.ComBoost.Forum
                 provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntitySearchExtension<>));
                 provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityPagerExtension<>));
                 provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityPasswordExtension<>));
+                provider.RegisterExtension<EntityDomainService<Thread>, ThreadDomainExtension<Thread>>();
                 return provider;
             });
         }
