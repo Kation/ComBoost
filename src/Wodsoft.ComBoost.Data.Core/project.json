@@ -1,0 +1,36 @@
+{
+  "title": "Wodsoft.ComBoost.Data.Core",
+  "version": "3.0.0-alpha2",
+  "authors": [ "Kation" ],
+  "description": "ComBoost实体模块核心。",
+  "packOptions": {
+    "owners": [ "Kation" ],
+    "summary": "ComBoost实体模块核心。",
+    "tags": [ "ComBoost" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Kation/ComBoost"
+    },
+    "releaseNotes": "Alpha测试版，请勿用于正式环境。"
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "",
+      "dependencies": {
+        "System.ComponentModel.Annotations": "4.3.0",
+        "System.Linq.Queryable": "4.3.0",
+        "Microsoft.CSharp": "4.3.0"
+      }
+    },
+    "net451": {
+      "frameworkAssemblies": {
+        "System.ComponentModel.DataAnnotations": "4.0.0.0"
+      },
+      "dependencies": {
+      }
+    }
+  },
+  "dependencies": {
+    "Wodsoft.ComBoost.Security": "[3.0.0-alpha2,4.0.0)"
+  }
+}

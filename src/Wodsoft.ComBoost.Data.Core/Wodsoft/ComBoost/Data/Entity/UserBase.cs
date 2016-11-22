@@ -11,11 +11,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         [Hide(IsHiddenOnEdit = false, IsHiddenOnCreate = false, IsHiddenOnDetail = true, IsHiddenOnView = true)]
         [CustomDataType(CustomDataType.Password)]
         [Required]
-        public byte[] Password { get; set; }
+        public virtual byte[] Password { get; set; }
 
         [Hide]
         [Required]
-        public byte[] Salt { get; set; }
+        public virtual byte[] Salt { get; set; }
 
         public virtual void SetPassword(string password)
         {
