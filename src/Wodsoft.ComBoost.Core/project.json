@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.Core",
-  "version": "3.0.0-alpha1",
+  "version": "3.0.0-alpha2",
   "authors": [ "Kation" ],
   "description": "ComBoost框架核心。",
   "packOptions": {
@@ -14,16 +14,16 @@
     "releaseNotes": "Alpha测试版，请勿用于正式环境。"
   },
   "dependencies": {
-    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0"
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0"
   },
   "frameworks": {
     "netstandard1.6": {
       "imports": "",
       "dependencies": {
-        "System.Reflection.TypeExtensions": "4.1.0",
-        "System.Dynamic.Runtime": "4.0.11",
-        "System.ComponentModel.TypeConverter": "4.1.0",
-        "NETStandard.Library": "1.6.0"
+        "System.Reflection.TypeExtensions": "4.3.0",
+        "System.ComponentModel.TypeConverter": "4.3.0",
+        "System.Dynamic.Runtime": "4.3.0",
+        "NETStandard.Library": "1.6.1"
       }
     },
     "net451": {

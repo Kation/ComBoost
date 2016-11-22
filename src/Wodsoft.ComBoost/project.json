@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost",
-  "version": "3.0.0-alpha1",
+  "version": "3.0.0-alpha2",
   "authors": [ "Kation" ],
   "description": "ComBoost框架基础。",
   "packOptions": {
@@ -17,17 +17,17 @@
     "netstandard1.6": {
       "imports": "",
       "dependencies": {
-        "System.Reflection.Extensions": "4.0.1",
-        "Microsoft.CSharp": "4.0.1"
+        "System.Reflection.Extensions": "4.3.0",
+        "System.Runtime": "4.3.0",
+        "Microsoft.CSharp": "4.3.0"
       }
     },
     "net451": {
       "dependencies": {
-        "System.Runtime": "4.0.10"
       }
     }
   },
   "dependencies": {
-    "Wodsoft.ComBoost.Core": "[3.0.0-alpha1,4.0.0)"
+    "Wodsoft.ComBoost.Core": "[3.0.0-alpha2,4.0.0)"
   }
 }

@@ -5,11 +5,8 @@
     "Wodsoft.ComBoost.EntityFrameworkCore": "3.0.0-*",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
     "xunit": "2.2.0-beta2-build3300",
-    "Microsoft.EntityFrameworkCore.InMemory": "1.0.1",
-    "Microsoft.NETCore.App": {
-      "version": "1.0.1",
-      "type": "platform"
-    }
+    "Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
+    "Microsoft.NETCore.App": "1.1.0"
   },
   "testRunner": "xunit",
   "frameworks": {

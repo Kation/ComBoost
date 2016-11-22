@@ -6,12 +6,13 @@
     "netstandard1.6": {
       "imports": "",
       "dependencies": {
-        "NETStandard.Library": "1.6.0",
         "Wodsoft.ComBoost.Forum.Core": "1.0.0-*",
-        "Wodsoft.ComBoost.Security": "3.0.0-*"
+        "Wodsoft.ComBoost.Security": "3.0.0-*",
+        "Wodsoft.ComBoost": "3.0.0-*"
       }
     }
   },
   "dependencies": {
+    "NETStandard.Library": "1.6.1"
   }
 }

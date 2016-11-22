@@ -13,7 +13,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public class ComBoostEntityMaterializerSource : EntityMaterializerSource
     {
-        public ComBoostEntityMaterializerSource(IMemberMapper memberMapper, CurrentDatabaseContext current) : base(memberMapper)
+        public ComBoostEntityMaterializerSource(CurrentDatabaseContext current)
         {
             _database = current.Context;
         }

@@ -16,15 +16,20 @@ namespace Wodsoft.ComBoost.Mvc
 {
     public class MvcValueProvider : IValueProvider, Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider
     {
+        private Dictionary<string, object> _Values;
+
         public MvcValueProvider(Controller controller)
         {
             Controller = controller;
+            _Values = new Dictionary<string, object>();
         }
 
         public Controller Controller { get; private set; }
 
         public object GetValue(string name)
         {
+            if (_Values.ContainsKey(name))
+                return _Values[name];
             StringValues value = Controller.Request.Query[name];
             if (value == StringValues.Empty)
                 value = Controller.Request.Form[name];
@@ -36,6 +41,12 @@ namespace Wodsoft.ComBoost.Mvc
 
         public object GetValue(string name, Type valueType)
         {
+            object value;
+            if (_Values.TryGetValue(name, out value))
+                if (valueType.IsAssignableFrom(value.GetType()))
+                    return value;
+                else
+                    return ModelBindingHelper.ConvertTo(value, valueType, System.Globalization.CultureInfo.CurrentUICulture);
             if (valueType == typeof(ISelectedFile))
             {
                 var file = Controller.Request.Form.Files.GetFile(name);
@@ -62,21 +73,6 @@ namespace Wodsoft.ComBoost.Mvc
                 else
                     return (string)values;
             }
-            //object value = Controller.Request.Query[name];
-            //if (value == StringValues.Empty && Controller.Request.HasFormContentType)
-            //    value = Controller.Request.Form[name];
-            //if (value == StringValues.Empty)
-            //    value = Controller.HttpContext.GetRouteData()?.Values[name] ?? Controller.Request.Headers[name];
-            //if (value == null)
-            //    value = Controller.HttpContext.GetRouteData()?.DataTokens[name];
-            //if (value == null || value == StringValues.Empty)
-            //{
-            //    if (valueType.GetTypeInfo().IsValueType)
-            //        return Activator.CreateInstance(valueType);
-            //    return null;
-            //}
-            //if (value is StringValues && !valueType.IsArray && !typeof(IEnumerable).IsAssignableFrom(valueType))
-            //    value = ((StringValues)value)[0];
             ModelBinderFactoryContext context = new ModelBinderFactoryContext();
             context.BindingInfo = new BindingInfo() { BinderModelName = name, BindingSource = BindingSource.ModelBinding };
             context.CacheToken = name + "_" + valueType.Name;
@@ -86,7 +82,6 @@ namespace Wodsoft.ComBoost.Mvc
             var bindingContext = DefaultModelBindingContext.CreateBindingContext(Controller.ControllerContext, this, context.Metadata, context.BindingInfo, name);
             binder.BindModelAsync(bindingContext).Wait();
             return bindingContext.Result.Model;
-            //return ModelBindingHelper.ConvertTo(value, valueType);
         }
 
         public object GetValue(Type valueType)
@@ -97,6 +92,14 @@ namespace Wodsoft.ComBoost.Mvc
                 return Controller.Request.Body;
             else
                 throw new NotSupportedException();
+        }
+
+        public void SetValue(string name, object value)
+        {
+            if (_Values.ContainsKey(name))
+                _Values[name] = value;
+            else
+                _Values.Add(name, value);
         }
 
         bool Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.ContainsPrefix(string prefix)

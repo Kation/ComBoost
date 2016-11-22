@@ -6,12 +6,12 @@
     "netstandard1.6": {
       "imports": "",
       "dependencies": {
-        "NETStandard.Library": "1.6.0"
       }
     }
   },
   "dependencies": {
-    "System.Security.Cryptography.Algorithms": "4.2.0",
+    "NETStandard.Library": "1.6.1",
+    "System.Security.Cryptography.Algorithms": "4.3.0",
     "Wodsoft.ComBoost.Forum.Core": "1.0.0-*"
   }
 }

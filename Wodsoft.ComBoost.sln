@@ -9,7 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
 		LICENSE = LICENSE
-		Nuget.config = Nuget.config
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -50,6 +49,8 @@ EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.EntityFrameworkCore", "src\Wodsoft.ComBoost.EntityFrameworkCore\Wodsoft.ComBoost.EntityFrameworkCore.xproj", "{833CD0DC-15C1-4D0B-BD97-6E05B51A37CB}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.EntityFramework", "src\Wodsoft.ComBoost.EntityFramework\Wodsoft.ComBoost.EntityFramework.xproj", "{45011749-94FF-4DAD-BDEF-AC228875A78E}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Data.Core", "src\Wodsoft.ComBoost.Data.Core\Wodsoft.ComBoost.Data.Core.xproj", "{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -253,6 +254,18 @@ Global
 		{45011749-94FF-4DAD-BDEF-AC228875A78E}.Release|ARM.Build.0 = Release|Any CPU
 		{45011749-94FF-4DAD-BDEF-AC228875A78E}.Release|x86.ActiveCfg = Release|Any CPU
 		{45011749-94FF-4DAD-BDEF-AC228875A78E}.Release|x86.Build.0 = Release|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Debug|ARM.Build.0 = Debug|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Debug|x86.Build.0 = Debug|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Release|ARM.ActiveCfg = Release|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Release|ARM.Build.0 = Release|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Release|x86.ActiveCfg = Release|Any CPU
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -276,5 +289,6 @@ Global
 		{D8DA6819-CAF7-4E9C-AA53-708A62FBA9BD} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
 		{833CD0DC-15C1-4D0B-BD97-6E05B51A37CB} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
 		{45011749-94FF-4DAD-BDEF-AC228875A78E} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
 	EndGlobalSection
 EndGlobal

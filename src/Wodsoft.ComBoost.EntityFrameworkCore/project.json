@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.EntityFrameworkCore",
-  "version": "3.0.0-alpha1",
+  "version": "3.0.0-alpha2",
   "authors": [ "Kation" ],
   "description": "ComBoost用于EntityFrameworkCore实现的实体模块。",
   "packOptions": {
@@ -20,7 +20,7 @@
     "net451": {}
   },
   "dependencies": {
-    "Microsoft.EntityFrameworkCore": "1.0.1",
-    "Wodsoft.ComBoost.Data": "[3.0.0-alpha1,4.0.0)"
+    "Microsoft.EntityFrameworkCore": "1.1.0",
+    "Wodsoft.ComBoost.Data.Core": "[3.0.0-alpha2,4.0.0)"
   }
 }

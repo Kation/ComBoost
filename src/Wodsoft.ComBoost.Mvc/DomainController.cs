@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost.Mvc
             DomainProvider = HttpContext.RequestServices.GetRequiredService<IDomainServiceProvider>();
         }
 
-        protected virtual IDomainContext CreateDomainContext()
+        protected virtual MvcDomainContext CreateDomainContext()
         {
             return new MvcDomainContext(this);
         }

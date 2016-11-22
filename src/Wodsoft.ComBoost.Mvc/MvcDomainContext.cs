@@ -19,7 +19,7 @@ namespace Wodsoft.ComBoost.Mvc
         public Controller Controller { get; private set; }
 
         private MvcValueProvider _ValueProvider;
-        public IValueProvider ValueProvider
+        public MvcValueProvider ValueProvider
         {
             get
             {
