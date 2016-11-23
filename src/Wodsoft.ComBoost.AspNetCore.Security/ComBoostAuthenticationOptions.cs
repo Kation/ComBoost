@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost.Security
             AutomaticAuthenticate = true;
             //TicketDataFormat = new TicketDataFormat()
             CookieDomain = c => null;
-            CookiePath = c => null;
+            CookiePath = c => "/";
             CookieName = c => "ComBoostAuthentication";
             ExpireTime = c => TimeSpan.FromMinutes(15);
             //LoginPath = c => "/Account/Login";
