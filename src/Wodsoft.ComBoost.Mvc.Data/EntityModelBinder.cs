@@ -23,7 +23,7 @@ namespace Wodsoft.ComBoost.Mvc
             }
             var databaseContext = bindingContext.HttpContext.RequestServices.GetRequiredService<IDatabaseContext>();
             var entityContext = databaseContext.GetDynamicContext(metadata.Type);
-            var entity = await EntityContextExtensions.GetAsync(entityContext, key);
+            var entity = await entityContext.GetAsync(key);
             if (entity != null)
                 bindingContext.Result = ModelBindingResult.Success(entity);
             else

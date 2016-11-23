@@ -103,5 +103,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="expression">表达式。</param>
         /// <returns></returns>
         IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression);
+        /// <summary>
+        /// 根据主键获取实体。
+        /// </summary>
+        /// <param name="key">主键。</param>
+        /// <returns>返回对应实体对象。</returns>
+        Task<T> GetAsync(object key);
     }
 }

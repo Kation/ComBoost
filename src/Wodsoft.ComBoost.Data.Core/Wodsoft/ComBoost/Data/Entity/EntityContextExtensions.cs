@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -13,22 +14,22 @@ namespace Wodsoft.ComBoost.Data.Entity
     /// </summary>
     public static class EntityContextExtensions
     {
-        /// <summary>
-        /// 根据主键获取实体。
-        /// </summary>
-        /// <typeparam name="T">实体类型。</typeparam>
-        /// <param name="context">实体上下文。</param>
-        /// <param name="key">主键。</param>
-        /// <returns>返回实体。找不到实体时返回空。</returns>
-        public static Task<T> GetAsync<T>(this IEntityContext<T> context, object key)
-            where T : IEntity
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-            return GetAsync(context, context.Query(), key);
-        }
+        ///// <summary>
+        ///// 根据主键获取实体。
+        ///// </summary>
+        ///// <typeparam name="T">实体类型。</typeparam>
+        ///// <param name="context">实体上下文。</param>
+        ///// <param name="key">主键。</param>
+        ///// <returns>返回实体。找不到实体时返回空。</returns>
+        //public static Task<T> GetAsync<T>(this IEntityContext<T> context, object key)
+        //    where T : IEntity
+        //{
+        //    if (context == null)
+        //        throw new ArgumentNullException(nameof(context));
+        //    if (key == null)
+        //        throw new ArgumentNullException(nameof(key));
+        //    return GetAsync(context, context.Query(), key);
+        //}
 
 
         /// <summary>
@@ -50,7 +51,9 @@ namespace Wodsoft.ComBoost.Data.Entity
             string keyName = context.Metadata.KeyProperty.ClrName;
             var parameter = Expression.Parameter(type);
             MemberExpression property;
-            PropertyInfo propertyInfo = null;
+            PropertyInfo propertyInfo = context.Metadata.Type.GetProperty(context.Metadata.KeyProperty.ClrName);
+            if (propertyInfo.PropertyType != key.GetType())
+                key = TypeDescriptor.GetConverter(propertyInfo.PropertyType).ConvertFrom(key);
             if (type.GetTypeInfo().IsInterface)
             {
                 List<Type> list = new List<Type>() { type };
@@ -71,7 +74,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
             return context.SingleOrDefaultAsync(query.Where(lambda));
         }
-
 
         public static IQueryable<T> Include<T>(this IEntityContext<T> context, IQueryable<T> query, string property)
             where T : IEntity

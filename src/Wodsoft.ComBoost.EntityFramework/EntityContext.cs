@@ -122,5 +122,14 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             return query.Include(expression);
         }
+
+        public Task<T> GetAsync(object key)
+        {
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+            if (key.GetType() != Metadata.KeyType)
+                key = TypeDescriptor.GetConverter(Metadata.KeyType).ConvertFrom(key);
+            return DbSet.FindAsync(key);
+        }
     }
 }

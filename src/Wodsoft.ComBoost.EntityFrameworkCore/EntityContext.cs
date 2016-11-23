@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -130,6 +131,15 @@ namespace Wodsoft.ComBoost.Data.Entity
         public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
         {
             return query.Include(expression);
+        }
+
+        public Task<T> GetAsync(object key)
+        {
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+            if (key.GetType() != Metadata.KeyType)
+                key = TypeDescriptor.GetConverter(Metadata.KeyType).ConvertFrom(key);
+            return DbSet.FindAsync(key);
         }
     }
 }

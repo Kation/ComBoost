@@ -44,7 +44,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             ExpressionWrapper<T, M> wrapper = new ExpressionWrapper<T, M>();
             return (Expression<Func<M, TResult>>)wrapper.Visit(expression);
         }
-        
+
         public T Create()
         {
             return InnerContext.Create();
@@ -104,11 +104,16 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             InnerContext.UpdateRange((IEnumerable<M>)items);
         }
-        
+
         public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
         {
             var newExpression = WrapExpression(expression);
             return InnerContext.Include(query.Unwrap<T, M>(), newExpression).Wrap<T, M>();
+        }
+
+        public async Task<T> GetAsync(object key)
+        {
+            return (M)await InnerContext.GetAsync(key);
         }
     }
 }
