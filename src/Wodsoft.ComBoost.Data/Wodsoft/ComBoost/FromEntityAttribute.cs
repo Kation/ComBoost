@@ -31,11 +31,12 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException("获取" + (Name ?? parameter.Name) + "参数的值为空。");
             var databaseContext = domainContext.GetRequiredService<IDatabaseContext>();
             dynamic entityContext;
-            if (parameter.ParameterType.GetTypeInfo().IsInterface)
-                entityContext = typeof(DatabaseContextExtensions).GetMethod("GetWrappedContext").MakeGenericMethod(parameter.ParameterType).Invoke(null, new object[] { databaseContext });
-            else
-                entityContext = typeof(IDatabaseContext).GetMethod("GetContext").MakeGenericMethod(parameter.ParameterType).Invoke(databaseContext, new object[0]);
-            object entity = EntityContextExtensions.GetAsync(entityContext, value).Result;
+            //if (parameter.ParameterType.GetTypeInfo().IsInterface)
+            //    entityContext = typeof(DatabaseContextExtensions).GetMethod("GetWrappedContext").MakeGenericMethod(parameter.ParameterType).Invoke(null, new object[] { databaseContext });
+            //else
+            var type = EntityDescriptor.GetMetadata(parameter.ParameterType).Type;
+            entityContext = typeof(IDatabaseContext).GetMethod("GetContext").MakeGenericMethod(type).Invoke(databaseContext, new object[0]);
+            object entity = entityContext.GetAsync(value).Result;
             if (IsRequired && entity == null)
                 throw new EntityNotFoundException(parameter.ParameterType, value);
             return entity;
