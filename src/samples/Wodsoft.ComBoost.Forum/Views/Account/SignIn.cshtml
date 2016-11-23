@@ -1,0 +1,55 @@
+﻿@{
+    ViewBag.Title = "用户登录";
+}
+<div class="jumbotron">
+    <form class="form-horizontal" id="form" method="post" onsubmit="return false;">
+        <div class="form-group">
+            <label for="username" class="col-sm-2 control-label">用户名<span class="text-warning">*</span></label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="username" name="username" value="@ViewBag.Username" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="password" class="col-sm-2 control-label">密码<span class="text-warning">*</span></label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" id="password" name="password" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="button" onclick="submit()" class="btn btn-primary">登录</button>
+                没有账号？点击
+                <a asp-action="SignUp">注册</a>。
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    function submit() {        
+        if ($('#username').val().trim() == '') {
+            alert('用户名不能为空。');
+            return;
+        }
+        if ($('#password').val() == '') {
+            alert('密码不能为空。');
+            return;
+        }
+
+        $.ajax({
+            url : @Html.Raw(Url.Action("SignIn")),
+            data : $('#form').serialize(),
+            type: 'POST',
+            success: function(){
+                window.location = '@Html.Raw(Url.Action("Index", "Home"))';
+            },
+            error: function(xhr){
+                if (xhr.statusCode == '401'){
+                    alert(xhr.responseText);
+                }
+                else{
+                    alert('服务器错误。');
+                }
+            }
+        })
+    }
+</script>

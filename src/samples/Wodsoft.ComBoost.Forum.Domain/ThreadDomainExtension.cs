@@ -11,10 +11,12 @@ namespace Wodsoft.ComBoost.Forum.Domain
     public class ThreadDomainExtension<T> : DomainExtension
         where T : class, IThread, new()
     {
+        private EntityDomainService<T> _Domain;
+
         public override void OnInitialize(IServiceProvider serviceProvider, IDomainService domainService)
         {
-            var domain = (EntityDomainService<T>)domainService;
-            domain.EntityQuery += Domain_EntityQuery;
+            _Domain = (EntityDomainService<T>)domainService;
+            _Domain.EntityQuery += Domain_EntityQuery;
         }
 
         private void Domain_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)

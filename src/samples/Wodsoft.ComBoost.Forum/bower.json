@@ -5,7 +5,8 @@
     "bootstrap": "3.3.6",
     "jquery": "2.2.3",
     "jquery-validation": "1.14.0",
-    "jquery-validation-unobtrusive": "3.2.4"
+    "jquery-validation-unobtrusive": "3.2.4",
+    "editor.md": "1.5.0"
   },
   "resolutions": {
     "jquery": ">= 1.9.1",

@@ -6,16 +6,11 @@
     "Wodsoft.ComBoost.Forum.Entity": "1.0.0-*",
     "Wodsoft.ComBoost.Forum.Domain": "1.0.0-*",
     "Wodsoft.ComBoost.Mvc.Data": "3.0.0-*",
-    //"Microsoft.AspNetCore.Razor.Tools": {
-    //  "version": "1.0.0-preview2-final",
-    //  "type": "build"
-    //},
-    //"Microsoft.EntityFrameworkCore.Tools": {
-    //  "version": "1.0.0-preview2-final",
-    //  "type": "build"
-    //},
+    "Microsoft.AspNetCore.Razor.Tools": {
+      "version": "1.1.0-preview4-final",
+      "type": "build"
+    },
     "BundlerMinifier.Core": "2.2.306",
-    "Microsoft.EntityFrameworkCore.SqlServer": "1.1.0",
     "Microsoft.AspNetCore.Diagnostics": "1.1.0",
     "Microsoft.AspNetCore.Mvc": "1.1.0",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.1.0",
@@ -25,6 +20,11 @@
     "Microsoft.EntityFrameworkCore": "1.1.0",
     "Microsoft.EntityFrameworkCore.Design": "1.1.0",
     "Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
+    "Microsoft.EntityFrameworkCore.SqlServer": "1.1.0",
+    "Microsoft.EntityFrameworkCore.Tools": {
+      "version": "1.1.0-preview4-final",
+      "type": "build"
+    },
     "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.1.0",
     "Microsoft.Extensions.Configuration.Json": "1.1.0",
     "Microsoft.Extensions.Logging": "1.1.0",
@@ -37,9 +37,9 @@
     }
   },
   "tools": {
-    "Microsoft.AspNetCore.Razor.Tools": "1.0.0-preview2-final",
-    "Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.0.0-preview2-final",
-    "Microsoft.EntityFrameworkCore.Tools.DotNet": "1.1.0-preview4"
+    "Microsoft.AspNetCore.Razor.Tools": "1.1.0-preview4-final",
+    "Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.1.0-preview4-final",
+    "Microsoft.EntityFrameworkCore.Tools.DotNet": "1.1.0-preview4-final"
   },
 
   "frameworks": {

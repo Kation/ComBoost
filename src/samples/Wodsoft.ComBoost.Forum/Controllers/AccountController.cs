@@ -26,15 +26,15 @@ namespace Wodsoft.ComBoost.Forum.Controllers
         {
             if (User.Identity.IsAuthenticated)
                 return StatusCode(200);
-            var memberDomain = DomainProvider.GetService<MemberDomain>();
+            var memberDomain = DomainProvider.GetService<MemberDomainService>();
             var context = CreateDomainContext();
             try
             {
                 await memberDomain.ExecuteAsync<IAuthenticationProvider, string, string>(context, memberDomain.SignIn);
             }
-            catch (Exception ex)
+            catch (UnauthorizedAccessException ex)
             {
-                return StatusCode(400, ex.Message);
+                return StatusCode(401, ex.Message);
             }
             return StatusCode(200);
         }
@@ -51,17 +51,27 @@ namespace Wodsoft.ComBoost.Forum.Controllers
         {
             if (User.Identity.IsAuthenticated)
                 return StatusCode(200);
-            var memberDomain = DomainProvider.GetService<MemberDomain>();
+            var memberDomain = DomainProvider.GetService<MemberDomainService>();
             var context = CreateDomainContext();
-            //try
-            //{
-            await memberDomain.ExecuteAsync<IAuthenticationProvider, IDatabaseContext, string, string>(context, memberDomain.SignUp);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return StatusCode(400, ex.Message);
-            //}
+            try
+            {
+                await memberDomain.ExecuteAsync(context, "SignUp");
+            }
+            catch (ArgumentException ex)
+            {
+                return StatusCode(400, ex.Message);
+            }
             return StatusCode(200);
+        }
+
+        public async Task<IActionResult> SignOut()
+        {
+            if (!User.Identity.IsAuthenticated)
+                return RedirectToAction("Index", "Home");
+            var memberDomain = DomainProvider.GetService<MemberDomainService>();
+            var context = CreateDomainContext();
+            await memberDomain.ExecuteAsync(context, "SignOut");
+            return RedirectToAction("Index", "Home");
         }
     }
 }

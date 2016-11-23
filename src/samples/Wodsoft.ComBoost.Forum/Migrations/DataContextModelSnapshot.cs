@@ -13,7 +13,7 @@ namespace Wodsoft.ComBoost.Forum.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.1")
+                .HasAnnotation("ProductVersion", "1.1.0-rtm-22752")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Forum", b =>
@@ -57,6 +57,30 @@ namespace Wodsoft.ComBoost.Forum.Migrations
                     b.ToTable("Member");
                 });
 
+            modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Post", b =>
+                {
+                    b.Property<Guid>("Index")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Content");
+
+                    b.Property<DateTime>("CreateDate");
+
+                    b.Property<DateTime>("EditDate");
+
+                    b.Property<Guid?>("MemberIndex");
+
+                    b.Property<Guid?>("ThreadIndex");
+
+                    b.HasKey("Index");
+
+                    b.HasIndex("MemberIndex");
+
+                    b.HasIndex("ThreadIndex");
+
+                    b.ToTable("Post");
+                });
+
             modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Thread", b =>
                 {
                     b.Property<Guid>("Index")
@@ -79,6 +103,17 @@ namespace Wodsoft.ComBoost.Forum.Migrations
                     b.HasIndex("MemberIndex");
 
                     b.ToTable("Thread");
+                });
+
+            modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Post", b =>
+                {
+                    b.HasOne("Wodsoft.ComBoost.Forum.Entity.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("MemberIndex");
+
+                    b.HasOne("Wodsoft.ComBoost.Forum.Entity.Thread", "Thread")
+                        .WithMany()
+                        .HasForeignKey("ThreadIndex");
                 });
 
             modelBuilder.Entity("Wodsoft.ComBoost.Forum.Entity.Thread", b =>

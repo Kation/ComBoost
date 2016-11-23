@@ -28,5 +28,7 @@ namespace Wodsoft.ComBoost.Forum
         public DbSet<Entity.Forum> Forum { get; set; }
 
         public DbSet<Thread> Thread { get; set; }
+
+        public DbSet<Post> Post { get; set; }
     }
 }

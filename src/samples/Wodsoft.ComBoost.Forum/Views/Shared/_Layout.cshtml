@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+    <title>@ViewData["Title"] - ComBoost论坛示例</title>
 
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -31,6 +31,18 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a asp-controller="Home" asp-action="Index">主页</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li><p class="navbar-text">您好，@User.Identity.Name</p></li>
+                        <li><a asp-controller="Account" asp-action="SignOut">登出</a></li>
+                    }
+                    else
+                    {
+                        <li><a asp-controller="Account" asp-action="SignIn">登录</a></li>
+                        <li><a asp-controller="Account" asp-action="SignUp">注册</a></li>
+                    }
                 </ul>
             </div>
         </div>
