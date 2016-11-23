@@ -19,12 +19,18 @@ namespace Wodsoft.ComBoost.Security
 
         public T GetUser<T>()
         {
-            throw new NotImplementedException();
+            if (!Identity.IsAuthenticated)
+                return default(T);
+            string id = ((ClaimsIdentity)Identity).FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
+            return (T)SecurityProvider.GetPermissionAsync(id).Result;
         }
 
         public bool IsInRole(object role)
         {
-            throw new NotImplementedException();
+            if (!Identity.IsAuthenticated)
+                return false;
+            string id = ((ClaimsIdentity)Identity).FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
+            return SecurityProvider.GetPermissionAsync(id).Result.IsInRole(role);
         }
     }
 }
