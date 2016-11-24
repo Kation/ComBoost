@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Collections.ObjectModel;
+using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -15,6 +16,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             WrappedQueryableProvider<T, M> provider = new WrappedQueryableProvider<T, M>(queryable.Provider);
             return provider.CreateQuery<T>(queryable.Expression);
+        }
+
+        public static object Wrap(this object value)
+        {
+            return value;
         }
 
         public static IQueryable<M> Unwrap<T, M>(this IQueryable<T> queryable)
