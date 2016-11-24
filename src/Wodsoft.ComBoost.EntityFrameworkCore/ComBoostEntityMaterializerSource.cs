@@ -13,21 +13,26 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public class ComBoostEntityMaterializerSource : EntityMaterializerSource
     {
-        public ComBoostEntityMaterializerSource(CurrentDatabaseContext current)
+        public ComBoostEntityMaterializerSource(IServiceProvider serviceProvider)
         {
-            _database = current.Context;
+            _Provider = serviceProvider;
         }
 
-        private IDatabaseContext _database;
+        private IServiceProvider _Provider;
+        private static readonly MethodInfo _GetService = typeof(IServiceProvider).GetMethod("GetService");
+        private static readonly MethodInfo _GetContext = typeof(DatabaseContextExtensions).GetMethod("GetDynamicContext");
 
         public override Expression CreateMaterializeExpression(IEntityType entityType, Expression valueBufferExpression, int[] indexMap = null)
         {
             BlockExpression expression = (BlockExpression)base.CreateMaterializeExpression(entityType, valueBufferExpression, indexMap);
             if (typeof(IEntity).IsAssignableFrom(entityType.ClrType))
             {
-                var entityContext = _database.GetDynamicContext(entityType.ClrType);
+                var provider = Expression.Constant(_Provider);
+                var currentDatabaseContext = Expression.Call(provider, _GetService, Expression.Constant(typeof(CurrentDatabaseContext)));
+                var databaseContext = Expression.Property(Expression.Convert(currentDatabaseContext, typeof(CurrentDatabaseContext)), "Context");
+                var entityContext = Expression.Call(_GetContext, databaseContext, Expression.Constant(entityType.ClrType));
                 var property = Expression.Property(expression.Variables[0], typeof(IEntity).GetProperty("EntityContext"));
-                var assign = Expression.Assign(property, Expression.Constant(entityContext));
+                var assign = Expression.Assign(property, Expression.Convert(entityContext, typeof(IEntityContext<>).MakeGenericType(entityType.ClrType)));
                 var list = expression.Expressions.ToList();
                 list.Insert(list.Count - 1, assign);
                 expression = Expression.Block(expression.Variables, list);
