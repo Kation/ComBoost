@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
@@ -18,7 +19,7 @@ namespace Wodsoft.ComBoost.Forum.Entity
 
         [Display(Name = "板块名称", Order = 0)]
         public virtual string Name { get; set; }
-
+        
         [Hide]
         public virtual ICollection<Thread> Threads { get; set; }
     }

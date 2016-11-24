@@ -13,5 +13,7 @@ namespace Wodsoft.ComBoost.Forum.Core
         IForum Forum { get; set; }
 
         string Title { get; set; }
+
+        ICollection<IPost> Replies { get; }
     }
 }

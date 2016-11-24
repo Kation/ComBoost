@@ -27,5 +27,9 @@ namespace Wodsoft.ComBoost.Forum.Entity
 
         [Hide]
         IMember IThread.Member { get { return Member; } set { Member = (Member)value; } }
+
+        public virtual ICollection<Post> Replies { get; set; }
+        
+        ICollection<IPost> IThread.Replies { get { throw new NotSupportedException(); } }
     }
 }

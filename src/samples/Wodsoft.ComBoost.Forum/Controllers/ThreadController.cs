@@ -22,19 +22,19 @@ namespace Wodsoft.ComBoost.Forum.Controllers
         {
             var context = CreateDomainContext();
             var threadDomain = DomainProvider.GetService<EntityDomainService<Thread>>();
+            IEntityEditModel<Thread> threadResult;
             try
             {
-                var model = await threadDomain.ExecuteAsync<IEntityEditModel<Thread>>(context, "Detail");
-                return View(model);
+                threadResult = await threadDomain.ExecuteAsync<IEntityEditModel<Thread>>(context, "Detail");
+                ViewBag.Thread = threadResult.Item;
             }
             catch (EntityNotFoundException ex)
             {
-                return StatusCode(404);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            var postDomain = DomainProvider.GetService<EntityDomainService<Post>>();
+            IEntityViewModel<Post> postResult = await postDomain.ExecuteAsync<IEntityViewModel<Post>>(context, "List");
+            return View(postResult);
         }
 
         [HttpPost]

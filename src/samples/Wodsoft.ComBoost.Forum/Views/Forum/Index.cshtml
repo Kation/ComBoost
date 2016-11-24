@@ -78,11 +78,15 @@
         @foreach (var item in Model.Items)
         {
             <tr>
-                <td></td>
-                <td>@item.Title</td>
-                <td>@item.Member.Username</td>
-                <td>0</td>
-                <td>0</td>
+                <td><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span></td>
+                <td><a href="@Html.Raw(Url.Action("Index", "Thread", new { id = item.Index }))">@item.Title</a></td>
+                <td style="text-align: center; padding: 0; line-height: 16px;">
+                    <small>@item.Member.Username</small>
+                    <br />
+                    <small>@item.CreateDate.ToString("yyyy-MM-dd")</small>
+                </td>
+                <td style="text-align: center;">@((await item.LoadAsync(t => t.Replies)).Count)</td>
+                <td style="text-align: center;">0</td>
             </tr>
         }
     </tbody>

@@ -9,8 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Wodsoft.ComBoost.Forum.Domain
 {
-    public class ThreadDomainExtension<T> : DomainExtension
-        where T : class, IThread, new()
+    public class PostDomainExtension<T> : DomainExtension
+        where T : class, IPost, new()
     {
         private EntityDomainService<T> _Domain;
 
@@ -23,11 +23,11 @@ namespace Wodsoft.ComBoost.Forum.Domain
         private void Domain_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
         {
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
-            var forumId = valueProvider.GetValue<Guid?>("id");
-            if (!forumId.HasValue)
+            var threadId = valueProvider.GetValue<Guid?>("id");
+            if (!threadId.HasValue)
                 return;
-            Guid key = forumId.Value;
-            e.Queryable = e.Queryable.Wrap<IThread, T>().Where(t => t.Forum.Index == forumId.Value.Wrap()).Unwrap<IThread, T>();
+            Guid key = threadId.Value;
+            e.Queryable = e.Queryable.Wrap<IPost, T>().Where(t => t.Thread.Index == threadId.Value.Wrap()).Unwrap<IPost, T>();
         }
     }
 }
