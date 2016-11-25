@@ -56,5 +56,22 @@ namespace Wodsoft.ComBoost.Forum.Controllers
                 throw ex;
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Reply()
+        {
+            var context = CreateDomainContext();
+            var threadDomain = DomainProvider.GetService<EntityDomainService<Thread>>();
+            IEntityEditModel<Thread> threadResult;
+            try
+            {
+                threadResult = await threadDomain.ExecuteAsync<IEntityEditModel<Thread>>(context, "Detail");
+                return View(threadResult.Item);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return NotFound();
+            }
+        }
     }
 }

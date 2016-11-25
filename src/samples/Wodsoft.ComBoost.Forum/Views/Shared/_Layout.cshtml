@@ -36,12 +36,12 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li><p class="navbar-text">您好，@User.Identity.Name</p></li>
-                        <li><a asp-controller="Account" asp-action="SignOut">登出</a></li>
+                        <li><a href="@Url.Action("SignOut", "Account", new { returnUrl = Context.Request.Path })">登出</a></li>
                     }
                     else
                     {
-                        <li><a asp-controller="Account" asp-action="SignIn">登录</a></li>
-                        <li><a asp-controller="Account" asp-action="SignUp">注册</a></li>
+                        <li><a href="@Url.Action("SignIn", "Account", new { returnUrl = Context.Request.Path })">登录</a></li>
+                        <li><a href="@Url.Action("SignOut", "Account", new { returnUrl = Context.Request.Path })">注册</a></li>
                     }
                 </ul>
             </div>

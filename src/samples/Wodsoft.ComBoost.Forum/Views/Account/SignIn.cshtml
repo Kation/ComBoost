@@ -17,15 +17,15 @@
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <button type="button" onclick="submit()" class="btn btn-primary">登录</button>
+                <button type="button" onclick="submitForm()" class="btn btn-primary">登录</button>
                 没有账号？点击
-                <a asp-action="SignUp">注册</a>。
+                <a href="@Html.Raw(Url.Action("SignUp", new { returnUrl = Context.Request.Query["returnUrl"].Count > 0 ? Context.Request.Query["returnUrl"][0] : Url.Action("Index", "Home") }))">注册</a>。
             </div>
         </div>
     </form>
 </div>
 <script type="text/javascript">
-    function submit() {        
+    function submitForm() {        
         if ($('#username').val().trim() == '') {
             alert('用户名不能为空。');
             return;
@@ -36,11 +36,11 @@
         }
 
         $.ajax({
-            url : @Html.Raw(Url.Action("SignIn")),
+            url : '@Html.Raw(Url.Action("SignIn"))',
             data : $('#form').serialize(),
             type: 'POST',
             success: function(){
-                window.location = '@Html.Raw(Url.Action("Index", "Home"))';
+                window.location = '@Html.Raw(Context.Request.Query["returnUrl"].Count > 0 ? Context.Request.Query["returnUrl"][0] : Url.Action("Index", "Home"))';
             },
             error: function(xhr){
                 if (xhr.statusCode == '401'){

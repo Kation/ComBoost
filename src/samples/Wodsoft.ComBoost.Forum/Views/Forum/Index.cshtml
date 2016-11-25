@@ -77,17 +77,29 @@
     <tbody>
         @foreach (var item in Model.Items)
         {
+            var replies = await item.LoadAsync(t => t.Replies);
             <tr>
-                <td><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span></td>
+                <td><a target="_blank" href="@Html.Raw(Url.Action("Index", "Thread", new { id = item.Index }))"><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span></a></td>
                 <td><a href="@Html.Raw(Url.Action("Index", "Thread", new { id = item.Index }))">@item.Title</a></td>
-                <td style="text-align: center; padding: 0; line-height: 16px;">
+                <td style="text-align: center; vertical-align: middle; padding: 0; line-height: 16px;">
                     <small>@item.Member.Username</small>
                     <br />
                     <small>@item.CreateDate.ToString("yyyy-MM-dd")</small>
                 </td>
-                <td style="text-align: center;">@((await item.LoadAsync(t => t.Replies)).Count)</td>
-                <td style="text-align: center;">0</td>
+                <td style="text-align: center; vertical-align: middle; padding: 0; line-height: 16px;">
+                    <small>@replies.Count</small>
+                    <br />
+                    <small>0</small>
+                </td>
+                <td style="text-align: center; vertical-align: middle; padding: 0; line-height: 16px;">
+                    @{
+                        var last = await replies.Include(t => t.Member).OrderByDescending(t => t.CreateDate).FirstAsync();
+                        <small>@last.Member.Username</small>
+                        <br />
+                        <small>@last.CreateDate.ToString("yyyy-MM-dd HH:mm")</small>
+                    }
+                </td>
             </tr>
-        }
+                        }
     </tbody>
 </table>

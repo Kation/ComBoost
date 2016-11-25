@@ -53,9 +53,7 @@
                         <small>发表于 @(item.CreateDate.ToString("yyyy-MM-dd HH:mm:ss"))</small>
                     </div>
                     <div class="postContent" id="C_@item.Index">
-                        <textarea style="display: none">
-                            @Html.Raw(item.Content)
-                        </textarea>
+                        <textarea style="display: none">@Html.Raw(item.Content)</textarea>
                     </div>
                 </td>
             </tr>
@@ -77,11 +75,12 @@
         <tr>
             <td style="width: 160px; background-color: rgb(242,242,242);"></td>
             <td>
-                <form>
+                <form action="@Html.Raw(Url.Action("Create", "Post"))" method="post">
+                    <input type="hidden" name="thread" value="@thread.Index" />
                     <div id="content">
                         <textarea class="form-control" name="content" style="display:none;"></textarea>
                     </div>
-                    <button class="btn btn-info">发表回复</button>
+                    <button type="submit" class="btn btn-info">发表回复</button>
                 </form>
             </td>
         </tr>

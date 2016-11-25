@@ -71,7 +71,10 @@ namespace Wodsoft.ComBoost.Forum.Controllers
             var memberDomain = DomainProvider.GetService<MemberDomainService>();
             var context = CreateDomainContext();
             await memberDomain.ExecuteAsync(context, "SignOut");
-            return RedirectToAction("Index", "Home");
+            if (Request.Query["returnUrl"].Count > 0)
+                return Redirect(Request.Query["returnUrl"][0]);
+            else
+                return RedirectToAction("Index", "Home");
         }
     }
 }
