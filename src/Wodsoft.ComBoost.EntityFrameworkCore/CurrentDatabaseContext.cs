@@ -7,13 +7,6 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public class CurrentDatabaseContext
     {
-        public CurrentDatabaseContext(IServiceProvider serviceProvider)
-        {
-            _Provider = serviceProvider;
-        }
-
-        private IServiceProvider _Provider;
-
         public DatabaseContext Context
         {
             get;
