@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace System.ComponentModel.DataAnnotations
 {
@@ -37,13 +38,11 @@ namespace System.ComponentModel.DataAnnotations
             if (value == null)
                 return null;
             object entity = validationContext.ObjectInstance;
-            dynamic entityContext;
             Type type = validationContext.ObjectType;
             while (type.GetTypeInfo().Assembly.IsDynamic)
                 type = type.GetTypeInfo().BaseType;
-            entityContext = validationContext.GetService(typeof(IEntityContext<>).MakeGenericType(type));
-            if (entityContext == null)
-                return null;
+            var databaseContext = validationContext.GetRequiredService<IDatabaseContext>();
+            var entityContext = databaseContext.GetDynamicContext(type);
             if (value is string && IsCaseSensitive)
                 value = ((string)value).ToLower();
             ParameterExpression parameter = Expression.Parameter(type);
@@ -56,15 +55,18 @@ namespace System.ComponentModel.DataAnnotations
                 right = Expression.Equal(Expression.Property(parameter, validationContext.MemberName), Expression.Constant(value));
             Expression expression = Expression.And(left, right);
             expression = Expression.Lambda(typeof(Func<,>).MakeGenericType(type, typeof(bool)), expression, parameter);
-            object where = _QWhereMethod.MakeGenericMethod(type).Invoke(null, new[] { entityContext.Query(), expression });
-            int count = (int)_QCountMethod.MakeGenericMethod(type).Invoke(null, new[] { where });
+            dynamic where = _QWhereMethod.MakeGenericMethod(type).Invoke(null, new[] { entityContext.Query(), expression });
+            int count = ((Task<int>)entityContext.CountAsync(where)).Result; ;
             if (count != 0)
-                return new ValidationResult(string.Format("{0} can not be {1}, there is a same value in the database.", validationContext.MemberName, value));
+                if (ErrorMessage != null)
+                    return new ValidationResult(ErrorMessage);
+                else
+                    return new ValidationResult(string.Format("{0}不能为“{1}”，因为数据库已存在同样的值。", validationContext.DisplayName, value));
             else
-                return null;
+                return ValidationResult.Success;
         }
-        
+
         private static MethodInfo _QWhereMethod = typeof(Queryable).GetMethods().Where(t => t.Name == "Where" && t.GetParameters().Length == 2).First();
-        private static MethodInfo _QCountMethod = typeof(Queryable).GetMethods().Where(t => t.Name == "Count" && t.GetParameters().Length == 1).First();
+        //private static MethodInfo _QCountMethod = typeof(Queryable).GetMethods().Where(t => t.Name == "Count" && t.GetParameters().Length == 1).First();
     }
 }
