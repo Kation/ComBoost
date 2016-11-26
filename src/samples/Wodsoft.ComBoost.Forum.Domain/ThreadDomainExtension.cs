@@ -54,7 +54,7 @@ namespace Wodsoft.ComBoost.Forum.Domain
             if (!forumId.HasValue)
                 return;
             Guid key = forumId.Value;
-            e.Queryable = e.Queryable.Wrap<IThread, T>().Where(t => t.Forum.Index == forumId.Value.Wrap()).Unwrap<IThread, T>();
+            e.Queryable = e.Queryable.Wrap<IThread, T>().Where(t => t.Forum.Index == key.Wrap()).Unwrap<IThread, T>();
         }
     }
 }

@@ -43,7 +43,7 @@
                 window.location = '@Html.Raw(Context.Request.Query["returnUrl"].Count > 0 ? Context.Request.Query["returnUrl"][0] : Url.Action("Index", "Home"))';
             },
             error: function(xhr){
-                if (xhr.statusCode == '401'){
+                if (xhr.status == '401'){
                     alert(xhr.responseText);
                 }
                 else{

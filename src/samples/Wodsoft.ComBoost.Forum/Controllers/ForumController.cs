@@ -25,6 +25,10 @@ namespace Wodsoft.ComBoost.Forum.Controllers
                 forumResult = await forumDomain.ExecuteAsync<IEntityEditModel<Entity.Forum>>(context, "Detail");
                 ViewBag.Forum = forumResult.Item;
             }
+            catch (ArgumentException ex)
+            {
+                return NotFound();
+            }
             catch (EntityNotFoundException ex)
             {
                 return NotFound();
@@ -33,7 +37,7 @@ namespace Wodsoft.ComBoost.Forum.Controllers
             IEntityViewModel<Thread> threadResult = await threadDomain.ExecuteAsync<IEntityViewModel<Thread>>(context, "List");
             return View(threadResult);
         }
-        
+
         public async Task<IActionResult> Create()
         {
             var context = CreateDomainContext();
@@ -43,6 +47,10 @@ namespace Wodsoft.ComBoost.Forum.Controllers
             {
                 forumResult = await forumDomain.ExecuteAsync<IEntityEditModel<Entity.Forum>>(context, "Detail");
                 ViewBag.Forum = forumResult.Item;
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound();
             }
             catch (EntityNotFoundException ex)
             {

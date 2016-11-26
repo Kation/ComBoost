@@ -28,6 +28,10 @@ namespace Wodsoft.ComBoost.Forum.Controllers
                 threadResult = await threadDomain.ExecuteAsync<IEntityEditModel<Thread>>(context, "Detail");
                 ViewBag.Thread = threadResult.Item;
             }
+            catch (ArgumentException ex)
+            {
+                return NotFound();
+            }
             catch (EntityNotFoundException ex)
             {
                 return NotFound();

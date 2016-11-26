@@ -6,13 +6,9 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Forum.Core
 {
-    public interface IMember : IEntity, IPermission
+    public interface IMember : IEntity, IHavePassword, IPermission
     {
         string Username { get; set; }
-
-        void SetPassword(string password);
-
-        bool VerifyPassword(string password);
 
         ICollection<IThread> Threads { get; }
     }

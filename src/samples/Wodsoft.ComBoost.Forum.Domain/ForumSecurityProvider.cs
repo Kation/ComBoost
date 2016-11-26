@@ -31,5 +31,13 @@ namespace Wodsoft.ComBoost.Forum.Domain
             var item = await memberContext.SingleOrDefaultAsync(memberContext.Query().Where(t => t.Username.ToLower() == username));
             return item;
         }
+
+        public override async Task<IPermission> GetPermissionAsync(IDictionary<string, string> properties)
+        {
+            var user = (IMember)await base.GetPermissionAsync(properties);
+            if (user != null && properties.ContainsKey("password") && !user.VerifyPassword(properties["password"]))
+                return null;
+            return user;
+        }
     }
 }

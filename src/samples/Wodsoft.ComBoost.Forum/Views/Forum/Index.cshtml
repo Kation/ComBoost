@@ -2,13 +2,16 @@
 @{
     Forum forum = ViewBag.Forum;
     ViewBag.Title = "板块 - " + forum.Name;
+    var threads = await forum.LoadAsync(t => t.Threads);
+    var today = DateTime.Today;
+    var todayCount = await threads.CountAsync(t => t.CreateDate >= today);
 }
 <ol class="breadcrumb">
     <li><a asp-controller="Home" asp-action="Index">论坛</a></li>
     <li class="active">@forum.Name</li>
 </ol>
 <div class="page-header">
-    <h1>@forum.Name<small> 今日：0。</small></h1>
+    <h1>@forum.Name<small> 今日：@todayCount。</small></h1>
 </div>
 <div class="row">
     <div class="col-xs-6">
