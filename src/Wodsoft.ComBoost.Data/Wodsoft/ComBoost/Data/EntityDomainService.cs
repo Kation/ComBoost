@@ -169,7 +169,7 @@ namespace Wodsoft.ComBoost.Data
 
         public event DomainServiceEvent<EntityModelCreatedEventArgs<T>> EntityEditModelCreated;
 
-        public virtual async Task<EntityUpdateModel> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
+        public virtual async Task<IEntityUpdateModel<T>> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
         {
             object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
             var context = database.GetContext<T>();
@@ -227,7 +227,7 @@ namespace Wodsoft.ComBoost.Data
             return result;
         }
 
-        protected virtual EntityUpdateModel UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, bool isNew)
+        protected virtual EntityUpdateModel<T> UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, bool isNew)
         {
             var properties = isNew ? Metadata.CreateProperties.Where(t =>
             {
@@ -247,7 +247,7 @@ namespace Wodsoft.ComBoost.Data
                 else
                     return t.EditRoles.Any(r => authentication.IsInRole(r));
             }).ToArray();
-            var model = new EntityUpdateModel();
+            var model = new EntityUpdateModel<T>();
             if (EntityPreUpdate != null)
             {
                 var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
@@ -264,6 +264,7 @@ namespace Wodsoft.ComBoost.Data
                 EntityUpdated(Context, arg);
             }
             model.IsSuccess = model.ErrorMessage.Count == 0;
+            model.Result = entity;
             return model;
         }
 
