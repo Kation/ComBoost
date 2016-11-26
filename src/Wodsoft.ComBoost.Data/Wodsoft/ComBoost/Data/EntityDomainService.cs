@@ -56,6 +56,7 @@ namespace Wodsoft.ComBoost.Data
             {
                 queryable = context.Include(queryable, propertyMetadata.ClrName);
             }
+            queryable = context.Order(queryable);
             if (EntityQuery != null)
             {
                 var e = new EntityQueryEventArgs<T>(queryable);
