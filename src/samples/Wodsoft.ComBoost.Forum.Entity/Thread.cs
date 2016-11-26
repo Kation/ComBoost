@@ -14,22 +14,26 @@ namespace Wodsoft.ComBoost.Forum.Entity
     public class Thread : EntityBase, IThread
     {
         [Display(Name = "所属板块", Order = 0)]
+        [Required]
         public virtual Forum Forum { get; set; }
 
         [Display(Name = "创建用户", Order = 10)]
+        [Required]
+        [Hide(IsHiddenOnView = false)]
         public virtual Member Member { get; set; }
 
         [Display(Name = "标题", Order = 20)]
+        [Required]
         public virtual string Title { get; set; }
 
         [Hide]
+        public virtual ICollection<Post> Replies { get; set; }
+
         IForum IThread.Forum { get { return Forum; } set { Forum = (Forum)value; } }
 
-        [Hide]
         IMember IThread.Member { get { return Member; } set { Member = (Member)value; } }
 
-        public virtual ICollection<Post> Replies { get; set; }
-        
+
         ICollection<IPost> IThread.Replies { get { throw new NotSupportedException(); } }
     }
 }

@@ -18,6 +18,7 @@ namespace Wodsoft.ComBoost.Forum.Entity
         public virtual string Description { get; set; }
 
         [Display(Name = "板块名称", Order = 0)]
+        [Required]
         public virtual string Name { get; set; }
         
         [Hide]

@@ -41,11 +41,14 @@ namespace Wodsoft.ComBoost.Forum.Controllers
         public async Task<IActionResult> Create()
         {
             var context = CreateDomainContext();
-            var domain = DomainProvider.GetService<ThreadDomainService<Thread>>();
+            var threadDomain = DomainProvider.GetService<EntityDomainService<Thread>>();
+            var postDomain = DomainProvider.GetService<EntityDomainService<Post>>();
             try
             {
-                var thread = await domain.ExecuteAsync<Thread>(context, "Create");
-                return RedirectToAction("Index", new { id = thread.Index });
+                var threadUpdateModel = await threadDomain.ExecuteAsync<IEntityUpdateModel<Thread>>(context, "Update");
+                context.ValueProvider.SetValue("Thread", threadUpdateModel.Result);
+                var postUpdateModel = await postDomain.ExecuteAsync<IEntityUpdateModel<Post>>(context, "Update");
+                return RedirectToAction("Index", new { id = threadUpdateModel.Result.Index });
             }
             catch (ArgumentNullException ex)
             {

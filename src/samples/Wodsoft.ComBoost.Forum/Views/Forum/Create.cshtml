@@ -11,6 +11,7 @@
 <br />
 <form class="form-horizontal" method="post" action="@Url.Action("Create", "Thread")">
     <input type="hidden" name="Forum" value="@Model.Item.Forum.Index" />
+    <input type="hidden" name="id" value="@Model.Item.Index" />
     <div class="form-group">
         <div class="col-xs-12 col-md-6">
             <input type="text" class="form-control" id="title" name="title" maxlength="20" placeholder="请输入标题" />

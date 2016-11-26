@@ -18,7 +18,7 @@ namespace Wodsoft.ComBoost.Forum
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("server=10.0.0.253;database=ComBoostForum;uid=sa;pwd=123@abc");
+                optionsBuilder.UseSqlServer("server=127.0.0.1;database=ComBoostForum;uid=sa;pwd=123@abc");
             }
             base.OnConfiguring(optionsBuilder);
         }

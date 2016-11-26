@@ -76,7 +76,8 @@
             <td style="width: 160px; background-color: rgb(242,242,242);"></td>
             <td>
                 <form action="@Html.Raw(Url.Action("Create", "Post"))" method="post">
-                    <input type="hidden" name="thread" value="@thread.Index" />
+                    <input type="hidden" name="Thread" value="@thread.Index" />
+                    <input type="hidden" name="id" value="@Guid.Empty" />
                     <div id="content">
                         <textarea class="form-control" name="content" style="display:none;"></textarea>
                     </div>

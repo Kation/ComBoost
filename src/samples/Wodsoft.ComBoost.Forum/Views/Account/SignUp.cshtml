@@ -50,7 +50,7 @@
         }
 
         $.ajax({
-            url : @Html.Raw(Url.Action("SignUp")),
+            url : '@Html.Raw(Url.Action("SignUp"))',
             data : $('#form').serialize(),
             type: 'POST',
             success: function(){
