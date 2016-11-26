@@ -28,6 +28,8 @@ namespace Wodsoft.ComBoost.Mvc
 
         public object GetValue(string name)
         {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
             if (_Values.ContainsKey(name))
                 return _Values[name];
             StringValues value = Controller.Request.Query[name];
@@ -41,8 +43,12 @@ namespace Wodsoft.ComBoost.Mvc
 
         public object GetValue(string name, Type valueType)
         {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            if (valueType == null)
+                throw new ArgumentNullException(nameof(valueType));
             object value;
-            if (_Values.TryGetValue(name, out value))
+            if (_Values.TryGetValue(name.ToLower(), out value))
                 if (valueType.IsAssignableFrom(value.GetType()))
                     return value;
                 else
@@ -96,6 +102,9 @@ namespace Wodsoft.ComBoost.Mvc
 
         public void SetValue(string name, object value)
         {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            name = name.ToLower();
             if (_Values.ContainsKey(name))
                 _Values[name] = value;
             else
