@@ -297,8 +297,14 @@ namespace Wodsoft.ComBoost.Data
             {
                 if (value == null)
                     return;
-                if (property.ClrType != value.GetType())
+                if (!property.ClrType.IsAssignableFrom(value.GetType()))
                     throw new NotImplementedException("未处理的属性“" + property.Name + "”。");
+                ValidationContext validationContext = new ValidationContext(entity, Context.DomainContext, null);
+                validationContext.MemberName = property.ClrName;
+                validationContext.DisplayName = property.Name;
+                var error = property.GetAttributes<ValidationAttribute>().Select(t => t.GetValidationResult(value, validationContext)).Where(t => t != ValidationResult.Success).ToArray();
+                if (error.Length > 0)
+                    throw new ArgumentException(string.Join("，", error.Select(t => t.ErrorMessage)));
                 property.SetValue(entity, value);
             }
         }
