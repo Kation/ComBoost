@@ -12,6 +12,11 @@ namespace System.ComponentModel
 
         Dictionary<IPropertyMetadata, string> ErrorMessage { get; }
 
-        object Result { get; set; }
+        object Result { get; }
+    }
+
+    public interface IEntityUpdateModel<T> : IEntityUpdateModel
+    {
+        new T Result { get; }
     }
 }

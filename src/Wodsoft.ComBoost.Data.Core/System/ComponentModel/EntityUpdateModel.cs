@@ -6,7 +6,7 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace System.ComponentModel
 {
-    public class EntityUpdateModel : IEntityUpdateModel
+    public class EntityUpdateModel<T> : IEntityUpdateModel<T>
     {
         public EntityUpdateModel()
         {
@@ -24,6 +24,8 @@ namespace System.ComponentModel
 
         public bool IsSuccess { get; set; }
 
-        public object Result { get; set; }
+        public T Result { get; set; }
+
+        object IEntityUpdateModel.Result { get { return Result;  } }
     }
 }

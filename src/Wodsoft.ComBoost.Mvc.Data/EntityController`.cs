@@ -141,7 +141,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateDomainContext();
             try
             {
-                var result = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityUpdateModel>(context, EntityService.Update);
+                var result = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, IEntityUpdateModel<T>>(context, EntityService.Update);
                 if (result.IsSuccess)
                     return StatusCode(204);
                 Response.StatusCode = 400;
