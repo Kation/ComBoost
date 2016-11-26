@@ -2,6 +2,7 @@
 @{
     Thread thread = ViewBag.Thread;
     ViewBag.Title = thread.Title + " - " + thread.Forum.Name;
+    var replies = await thread.LoadAsync(t => t.Replies);
 }
 <link href="~/lib/editor.md/css/editormd.css" rel="stylesheet" />
 <style>
@@ -32,7 +33,7 @@
     <thead>
         <tr>
             <td class="text-center" style="vertical-align: middle;">
-                <small>回复：0 | 查看：0</small>
+                <small>回复：@replies.Count | 查看：0</small>
             </td>
             <td>
                 <strong style="font-size: 20px; padding-left: 7px;">@thread.Title</strong>

@@ -8,6 +8,7 @@ using Wodsoft.ComBoost.Forum.Core;
 
 namespace Wodsoft.ComBoost.Forum.Entity
 {
+    [DisplayColumn("Content", "CreateDate", false)]
     public class Post : EntityBase, IPost
     {
         [Required]
