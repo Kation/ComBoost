@@ -12,18 +12,18 @@ namespace Wodsoft.ComBoost.Security
     public static class ComBoostPrincipalExtensions
     {
         public static async Task<TPermission> GetPermission<TPermission>(this IPrincipal principal)
-            where TPermission : class, IPermission
+            where TPermission : IPermission
         {
             if (principal == null)
                 throw new ArgumentNullException(nameof(principal));
             if (!principal.Identity.IsAuthenticated)
-                return null;
+                return default(TPermission);
             ComBoostPrincipal comboostPrincipal = principal as ComBoostPrincipal;
             if (comboostPrincipal == null)
-                return null;
+                return default(TPermission);
             string identity = comboostPrincipal.Claims.First(t => t.Type == ClaimTypes.NameIdentifier).Value;
             var permission = await comboostPrincipal.SecurityProvider.GetPermissionAsync(identity);
-            return permission as TPermission;
+            return (TPermission)permission;
         }
 
         public static bool IsInStaticRole(this IPrincipal principal, object role)
