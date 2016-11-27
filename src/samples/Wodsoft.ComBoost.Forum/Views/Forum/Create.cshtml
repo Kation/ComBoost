@@ -2,7 +2,7 @@
 <link href="~/lib/editor.md/css/editormd.css" rel="stylesheet" />
 <ol class="breadcrumb">
     <li><a asp-controller="Home" asp-action="Index">论坛</a></li>
-    <li><a asp-controller="Forum" asp-action="Index" asp-id="@Model.Item.Forum.Index">@Model.Item.Forum.Name</a></li>
+    <li><a href="@Html.Raw(Url.Action("Index", "Forum", new { id = Model.Item.Forum.Index }))">@Model.Item.Forum.Name</a></li>
     <li class="active">发表帖子</li>
 </ol>
 <ul class="nav nav-tabs">
