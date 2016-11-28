@@ -7,6 +7,7 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Data.Entity;
+using System.ComponentModel;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
