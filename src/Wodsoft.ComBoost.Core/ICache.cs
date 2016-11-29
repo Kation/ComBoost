@@ -7,8 +7,8 @@ namespace Wodsoft.ComBoost
 {
     public interface ICache
     {
-        Task<ICacheEntry> GetAsync(string name);
-        Task RemoveAsync(string name);
-        Task SetAsync(ICacheEntry entry);
+        Task<object> GetAsync(string name, Type valueType);
+        Task<bool> DeleteAsync(string name);
+        Task SetAsync(string name, object value, TimeSpan? expireTime);
     }
 }

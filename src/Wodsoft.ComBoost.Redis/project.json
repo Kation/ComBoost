@@ -1,0 +1,20 @@
+﻿{
+  "version": "3.0.0-alpha2",
+
+  "dependencies": {
+    "Wodsoft.ComBoost.Core": "[3.0.0-alpha2,4.0.0)",
+    "StackExchange.Redis": "1.1.608"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50",
+      "dependencies": {
+        "System.Runtime.Serialization.Formatters": "4.3.0",
+        "System.Runtime.Serialization.Json": "4.3.0",
+        "System.Runtime.Serialization.Xml": "4.3.0"
+      }
+    },
+    "net451": {}
+  }
+}
