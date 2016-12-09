@@ -1,6 +1,7 @@
 ﻿using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,45 +11,51 @@ namespace Wodsoft.ComBoost.Redis
     {
         private IDatabase _Database;
         private string _Key;
+        private TimeSpan _ExpireTime;
 
-        public RedisSemaphore(IDatabase database, string key)
+        public RedisSemaphore(IDatabase database, string key, TimeSpan expireTime)
         {
             if (database == null)
                 throw new ArgumentNullException(nameof(database));
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
+            if (expireTime.TotalMilliseconds <= 0)
+                throw new ArgumentOutOfRangeException(nameof(expireTime), "超时时间不能小于零。");
             _Database = database;
             _Key = key;
+            _ExpireTime = expireTime;
         }
 
-        public void Dispose()
+        public async Task EnterAsync()
         {
-
+            while (true)
+            {
+                if (await TryEnterAsync())
+                    return;
+                await Task.Delay(10);
+            }
         }
 
-        public Task EnterAsync()
+        public async Task<bool> EnterAsync(int timeout)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> EnterAsync(int timeout)
-        {
-            throw new NotImplementedException();
+            Stopwatch watch = new Stopwatch();
+            while (watch.ElapsedMilliseconds < timeout)
+            {
+                if (await TryEnterAsync())
+                    return true;
+                await Task.Delay(10);
+            }
+            return false;
         }
 
         public Task ExitAsync()
         {
-            throw new NotImplementedException();
+            return _Database.LockReleaseAsync(_Key, true);
         }
 
         public Task<bool> TryEnterAsync()
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> TryEnterAsync(int timeout)
-        {
-            throw new NotImplementedException();
+            return _Database.LockTakeAsync(_Key, true, _ExpireTime);
         }
     }
 }
