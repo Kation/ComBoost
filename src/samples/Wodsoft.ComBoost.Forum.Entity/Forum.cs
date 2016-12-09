@@ -10,17 +10,27 @@ using Wodsoft.ComBoost.Forum.Core;
 
 namespace Wodsoft.ComBoost.Forum.Entity
 {
-    [DisplayName("论坛板块")]
-    [DisplayColumn("Name", "Name", false)]
+    [DisplayName("论坛")]
+    [DisplayColumn("Name", "Order", false)]
     public class Forum : EntityBase, IForum
     {
-        [Display(Name = "板块说明", Order = 10)]
+        [Display(Name = "论坛说明", Order = 20)]
         public virtual string Description { get; set; }
 
-        [Display(Name = "板块名称", Order = 0)]
+        [Display(Name = "论坛名称", Order = 10)]
         [Required]
         public virtual string Name { get; set; }
-        
+
+        [Display(Name = "所属板块", Order = 0)]
+        [Required]
+        public virtual Board Board { get; set; }
+
+        [Display(Name = "排序", Order = 30)]
+        [Required]
+        public virtual int Order { get; set; }
+
+        IBoard IForum.Board { get { return Board; } set { Board = (Board)value; } }
+
         [Hide]
         public virtual ICollection<Thread> Threads { get; set; }
     }

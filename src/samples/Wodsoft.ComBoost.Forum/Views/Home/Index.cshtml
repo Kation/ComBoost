@@ -3,32 +3,34 @@
     ViewData["Title"] = "主页";
     int count = 0;
 }
-
-<div class="page-header">
-    <h1>默认论坛分组<small> Default forum group.</small></h1>
-</div>
-@foreach (var item in Model.Items)
+@foreach (var board in Model.Items.GroupBy(t => t.Board))
 {
-    if (count % 2 == 0)
+    <div class="page-header">
+        <h1>@board.Key.Name<small> @board.Key.Description</small></h1>
+    </div>
+    @foreach (var item in board)
     {
-        @Html.Raw("<div class=\"media\">")
+        if (count % 2 == 0)
+        {
+            @Html.Raw("<div class=\"media\">")
+        }
+        <div class="media-left">
+            <a href="@Html.Raw(Url.Action("Index", "Forum", new { id = item.Index }))">
+                <img class="media-object" src="" alt="..." />
+            </a>
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading"><a href="@Html.Raw(Url.Action("Index", "Forum", new { id = item.Index }))">@item.Name</a></h4>
+            @item.Description
+        </div>
+        if (count % 2 == 1)
+        {
+            @Html.Raw("</div>")
+        }
+        count++;
     }
-    <div class="media-left">
-        <a href="@Html.Raw(Url.Action("Index", "Forum", new { id = item.Index }))">
-            <img class="media-object" src="" alt="..." />
-        </a>
-    </div>
-    <div class="media-body">
-        <h4 class="media-heading"><a href="@Html.Raw(Url.Action("Index", "Forum", new { id = item.Index }))">@item.Name</a></h4>
-        @item.Description
-    </div>
-    if (count % 2 == 1)
+    @if (count % 2 == 0)
     {
         @Html.Raw("</div>")
     }
-    count++;
-}
-@if (count % 2 == 1)
-{
-    @Html.Raw("</div>")
 }

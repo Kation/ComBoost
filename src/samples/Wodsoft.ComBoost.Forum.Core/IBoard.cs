@@ -6,10 +6,10 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Forum.Core
 {
-    public interface IForum : IEntity
+    public interface IBoard : IEntity
     {
         string Name { get; set; }
 
-        IBoard Board { get; set; }
+        ICollection<IForum> Forums { get; }
     }
 }
