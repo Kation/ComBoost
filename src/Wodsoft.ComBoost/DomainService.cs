@@ -1,33 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+#if NET451
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Messaging;
+#endif
 
 namespace Wodsoft.ComBoost
 {
     public class DomainService : IDomainService
     {
-        private Dictionary<ExecutionContext, IDomainExecutionContext> _ExecutionContext;
+#if NET451
+        private static readonly string LogicalDataKey = "__IDomainExecutionContext_Current__" + AppDomain.CurrentDomain.Id;
+
+        public IDomainExecutionContext Context
+        {
+            get
+            {
+                var handle = CallContext.LogicalGetData(LogicalDataKey) as ObjectHandle;
+                return handle?.Unwrap() as IDomainExecutionContext;
+            }
+            private set
+            {
+                CallContext.LogicalSetData(LogicalDataKey, new ObjectHandle(value));
+            }
+        }
+#else
+        private AsyncLocal<IDomainExecutionContext> _ExecutionContext;
 
         public DomainService()
         {
-            _ExecutionContext = new Dictionary<System.Threading.ExecutionContext, IDomainExecutionContext>();
+            _ExecutionContext = new AsyncLocal<IDomainExecutionContext>();
         }
 
         public IDomainExecutionContext Context
         {
             get
             {
-                var context = ExecutionContext.Capture();
-                IDomainExecutionContext value;
-                if (_ExecutionContext.TryGetValue(context, out value))
-                    return value;
-                else
-                    return null;
+                return _ExecutionContext.Value;
+            }
+            private set
+            {
+                _ExecutionContext.Value = value;
             }
         }
+#endif
 
         public event DomainExecuteEvent Executed;
         public event DomainExecuteEvent Executing;
@@ -41,8 +62,7 @@ namespace Wodsoft.ComBoost
             if (method.DeclaringType != GetType())
                 throw new ArgumentException("该方法不是此领域服务的方法。");
             var context = new DomainExecutionContext(this, domainContext, method);
-            var executionContext = ExecutionContext.Capture();
-            _ExecutionContext.Add(executionContext, context);
+            Context = context;
             try
             {
                 if (Executing != null)
@@ -53,7 +73,7 @@ namespace Wodsoft.ComBoost
             }
             finally
             {
-                _ExecutionContext.Remove(executionContext);
+
             }
         }
 
@@ -67,7 +87,7 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentException("该方法不是此领域服务的方法。");
             var context = new DomainExecutionContext(this, domainContext, method);
             var executionContext = ExecutionContext.Capture();
-            _ExecutionContext.Add(executionContext, context);
+            Context = context;
             try
             {
                 if (Executing != null)
@@ -80,7 +100,7 @@ namespace Wodsoft.ComBoost
             }
             finally
             {
-                _ExecutionContext.Remove(executionContext);
+
             }
         }
     }

@@ -5,13 +5,11 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
 {
-    public interface ISemaphore : IDisposable
+    public interface ISemaphore
     {
         Task EnterAsync();
 
         Task<bool> TryEnterAsync();
-
-        Task<bool> TryEnterAsync(int timeout);
 
         Task<bool> EnterAsync(int timeout);
 

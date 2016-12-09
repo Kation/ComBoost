@@ -31,7 +31,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             context.GetService<CurrentDatabaseContext>().Context = this;
             _CachedEntityContext = new Dictionary<Type, object>();
             InnerContext = context;
-            //context.ChangeTracker.AutoDetectChangesEnabled = false;
+            context.ChangeTracker.AutoDetectChangesEnabled = false;
             SupportTypes = _CachedSupportTypes.GetOrAdd(context.GetType(), type =>
             {
                 var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)

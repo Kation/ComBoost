@@ -14,9 +14,9 @@ namespace Wodsoft.ComBoost.Data.Entity
     {
         public void ApplyServices(IServiceCollection services)
         {
-            //services.AddSingleton<IEntityMaterializerSource, ComBoostEntityMaterializerSource>();
-            services.AddScoped<IStateManager, ComBoostStateManager>();
-            services.AddScoped<CurrentDatabaseContext, CurrentDatabaseContext>();
+            services.AddSingleton<IEntityMaterializerSource, ComBoostEntityMaterializerSource>();
+            //services.AddScoped<IStateManager, ComBoostStateManager>();
+            services.AddSingleton<CurrentDatabaseContext, CurrentDatabaseContext>();
         }
     }
 }

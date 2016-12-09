@@ -73,6 +73,8 @@ namespace Wodsoft.ComBoost.Data
                                 DateTime end;
                                 if (!DateTime.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]), out end))
                                     continue;
+                                if (property.Type == CustomDataType.Date)
+                                    end = end.AddDays(1);
                                 searchItem.LessthanDate = end;
                                 ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
                                 queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(Expression.LessThanOrEqual(Expression.Property(parameter, property.ClrName), Expression.Constant(end)), parameter));

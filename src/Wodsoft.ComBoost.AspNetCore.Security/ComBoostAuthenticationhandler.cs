@@ -20,8 +20,15 @@ namespace Wodsoft.ComBoost.Security
             string cookieValue = Request.Cookies[Options.CookieName(Context)];
             if (cookieValue == null)
                 return Task.FromResult(AuthenticateResult.Skip());
-            var ticket = Options.TicketDataFormat.Unprotect(cookieValue);
-            return Task.FromResult(AuthenticateResult.Success(ticket));
+            try
+            {
+                var ticket = Options.TicketDataFormat.Unprotect(cookieValue, GetTlsTokenBinding());
+                return Task.FromResult(AuthenticateResult.Success(ticket));
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(AuthenticateResult.Fail(ex));
+            }
         }
 
         protected override Task HandleSignInAsync(SignInContext context)
