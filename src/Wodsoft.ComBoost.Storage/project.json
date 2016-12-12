@@ -1,0 +1,32 @@
+﻿{
+  "title": "Wodsoft.ComBoost.Storage",
+  "version": "3.0.0-alpha3",
+  "authors": [ "Kation" ],
+  "description": "ComBoost框架储存服务。",
+  "packOptions": {
+    "owners": [ "Kation" ],
+    "summary": "ComBoost框架储存服务。",
+    "tags": [ "ComBoost" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Kation/ComBoost"
+    },
+    "releaseNotes": "Alpha测试版，请勿用于正式环境。"
+  },
+
+  "dependencies": {
+    "Wodsoft.ComBoost.Core": "[3.0.0-alpha3,4.0.0)"
+  },
+
+  "frameworks": {
+    "netstandard1.3": {
+      "imports": "",
+      "dependencies": {
+      }
+    },
+    "net451": {
+      "dependencies": {
+      }
+    }
+  }
+}

@@ -56,6 +56,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Forum.Exte
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Redis", "src\Wodsoft.ComBoost.Redis\Wodsoft.ComBoost.Redis.xproj", "{AB5C40DD-D2F2-4BBE-A7F9-1369A7A4AE8D}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Wodsoft.ComBoost.Storage", "src\Wodsoft.ComBoost.Storage\Wodsoft.ComBoost.Storage.xproj", "{274ED3FB-FDED-4145-A836-768C0C2F63CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -294,6 +296,18 @@ Global
 		{AB5C40DD-D2F2-4BBE-A7F9-1369A7A4AE8D}.Release|ARM.Build.0 = Release|Any CPU
 		{AB5C40DD-D2F2-4BBE-A7F9-1369A7A4AE8D}.Release|x86.ActiveCfg = Release|Any CPU
 		{AB5C40DD-D2F2-4BBE-A7F9-1369A7A4AE8D}.Release|x86.Build.0 = Release|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Debug|ARM.Build.0 = Debug|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Debug|x86.Build.0 = Debug|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Release|ARM.ActiveCfg = Release|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Release|ARM.Build.0 = Release|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Release|x86.ActiveCfg = Release|Any CPU
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -320,5 +334,6 @@ Global
 		{C6527B3C-B42C-4CEE-8B10-D8FF8483B568} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
 		{C88BEEEF-498D-46AE-A4AC-59A6F1EEDCCF} = {1494E8D3-905F-4A33-A4CA-4C320A9282F7}
 		{AB5C40DD-D2F2-4BBE-A7F9-1369A7A4AE8D} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{274ED3FB-FDED-4145-A836-768C0C2F63CD} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
 	EndGlobalSection
 EndGlobal
