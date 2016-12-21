@@ -70,13 +70,15 @@
         $('#dialog').modal('hide');
     });
     $('#dialog').modal({ show: false });
-    
+
     function gotoSubmit() {
         $.ajax({
             url: '@Url.Action("Update")',
             dataType: 'json',
             type: 'POST',
-            data: $('#form').serialize(),
+            data: new FormData($('#form')[0]),
+            processData: false,
+            contentType: false,
             error: function (result) {
                 if (result.statusCode == '500') {
                     dialog('保存结果', '<p>保存失败. 原因：服务器错误。</p>', function () { $('#dialog').modal('hide'); });

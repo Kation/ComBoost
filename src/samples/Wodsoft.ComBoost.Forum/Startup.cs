@@ -32,8 +32,10 @@ namespace Wodsoft.ComBoost.Forum
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
+            _Env = env;
         }
 
+        private IHostingEnvironment _Env;
         public IConfigurationRoot Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -42,11 +44,11 @@ namespace Wodsoft.ComBoost.Forum
             // Add framework services.
             services.AddMemoryCache();
             services.AddSession();
-            services.AddMvc(options=>
+            services.AddMvc(options =>
             {
                 options.AddComBoostMvcOptions();
             });
-            
+
             services.AddScoped<DbContext, DataContext>(serviceProvider =>
                 //new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase()
                 new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext"))
@@ -56,12 +58,17 @@ namespace Wodsoft.ComBoost.Forum
             services.AddScoped<IAuthenticationProvider, ComBoostAuthenticationProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddScoped<IStorageProvider, PhysicalStorageProvider>(t =>
+            {
+                return new PhysicalStorageProvider(PhysicalStorageOptions.CreateDefault(_Env.ContentRootPath + System.IO.Path.DirectorySeparatorChar + "Uploads"));
+            });
             services.AddSingleton<IDomainServiceProvider, DomainProvider>(t =>
             {
                 var provider = new DomainProvider(t);
                 provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntitySearchExtension<>));
                 provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityPagerExtension<>));
                 provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityPasswordExtension<>));
+                provider.RegisterExtension(typeof(EntityDomainService<>), typeof(ImageExtension<>));
                 provider.AddForumExtensions();
                 return provider;
             });

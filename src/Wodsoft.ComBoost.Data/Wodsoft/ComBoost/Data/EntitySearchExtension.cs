@@ -139,7 +139,7 @@ namespace Wodsoft.ComBoost.Data
                             searchItem.Contains = valueProvider.GetValue<string>("Search." + keys[i].Key);
                             ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
                             Expression expression = Expression.Property(Expression.Property(parameter, property.ClrName), EntityDescriptor.GetMetadata(property.ClrType).DisplayProperty.ClrName);
-                            expression = Expression.Call(expression, typeof(string).GetTypeInfo().GetMethod("Contains"), Expression.Constant(searchItem.Contains));
+                            expression = Expression.Call(expression, typeof(string).GetMethod("Contains"), Expression.Constant(searchItem.Contains));
                             queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(expression, parameter));
                         }
                         break;

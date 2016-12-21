@@ -25,7 +25,11 @@ namespace Wodsoft.ComBoost.Forum.Entity
         [Required]
         public virtual Board Board { get; set; }
 
-        [Display(Name = "排序", Order = 30)]
+        [Display(Name = "图标", Order = 30)]
+        [CustomDataType(CustomDataType.Image)]
+        public virtual string Image { get; set; }
+
+        [Display(Name = "排序", Order = 40)]
         [Required]
         public virtual int Order { get; set; }
 

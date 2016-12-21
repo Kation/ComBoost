@@ -23,7 +23,7 @@ namespace Wodsoft.ComBoost
             _Options = options;
         }
 
-        public Task<bool> Delete(string path)
+        public Task<bool> DeleteAsync(string path)
         {
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
@@ -34,17 +34,18 @@ namespace Wodsoft.ComBoost
             return Task.FromResult(true);
         }
 
-        public Task<Stream> Get(string path)
+        public Task<Stream> GetAsync(string path)
         {
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
+            path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             path = Path.Combine(_Options.Root, path);
             if (!File.Exists(path))
                 return null;
             return Task.FromResult<Stream>(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
 
-        public async Task<string> Put(Stream stream, string filename)
+        public async Task<string> PutAsync(Stream stream, string filename)
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
@@ -52,10 +53,13 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(filename));
             string folder = _Options.FolderSelector();
             filename = _Options.FilenameSelector(filename);
-            var path = Path.Combine(_Options.Root, folder + "\\" + filename);
+            var path = Path.Combine(_Options.Root, folder);
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            path = Path.Combine(path, filename);
             var file = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.Read);
             await stream.CopyToAsync(file);
-            return filename;
+            return Path.Combine(folder, filename).Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
     }
 }

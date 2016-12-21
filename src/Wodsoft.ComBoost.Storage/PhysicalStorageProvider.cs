@@ -7,14 +7,18 @@ namespace Wodsoft.ComBoost
 {
     public class PhysicalStorageProvider : IStorageProvider
     {
-        public PhysicalStorageProvider()
-        {
+        private PhysicalStorageOptions _Options;
 
+        public PhysicalStorageProvider(PhysicalStorageOptions options)
+        {
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
+            _Options = options;
         }
 
         public IStorage GetStorage()
         {
-            throw new NotImplementedException();
+            return new PhysicalStorage(_Options);
         }
 
         public IStorage GetStorage(string name)
