@@ -65,6 +65,16 @@ namespace Wodsoft.ComBoost.Data.Entity
                 var type = EntityDescriptor.GetMetadata(node.Expression.Type).Type;
                 return Expression.MakeMemberAccess(Visit(node.Expression), type.GetMember(node.Member.Name, BindingFlags.Instance | BindingFlags.Public)[0]);
             }
+            else if (node.Expression is ConstantExpression && node.Expression.Type.Name.Contains("<>"))
+            {
+                var value = Expression.Lambda<Func<object>>(node).Compile()();
+                return Expression.Constant(value);
+            }
+            else if (node.Expression is MemberExpression && ((MemberExpression)node.Expression).Member.DeclaringType.Name.Contains("<>"))
+            {
+                var value = Expression.Lambda<Func<object>>(node).Compile()();
+                return Expression.Constant(value);
+            }
             return base.VisitMember(node);
         }
 
