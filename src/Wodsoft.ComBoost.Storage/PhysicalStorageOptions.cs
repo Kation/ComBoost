@@ -14,9 +14,9 @@ namespace Wodsoft.ComBoost
 
         public Func<string, string> FilenameSelector { get; set; }
 
-        public static readonly Func<string> DefaultFolderSelector = () => Path.DirectorySeparatorChar + DateTime.Now.Year + DateTime.Now.Month.ToString().PadLeft(2, '0') + Path.DirectorySeparatorChar + DateTime.Now.Day.ToString().PadLeft(2, '0');
+        public static Func<string> DefaultFolderSelector = () => DateTime.Now.Year + DateTime.Now.Month.ToString().PadLeft(2, '0') + Path.DirectorySeparatorChar + DateTime.Now.Day.ToString().PadLeft(2, '0');
 
-        public static readonly Func<string, string> DefaultFilenameSelector = (filename) => Guid.NewGuid().ToString() + Path.GetExtension(filename);
+        public static Func<string, string> DefaultFilenameSelector = (filename) => Guid.NewGuid().ToString() + Path.GetExtension(filename);
 
         public static PhysicalStorageOptions CreateDefault(string root)
         {

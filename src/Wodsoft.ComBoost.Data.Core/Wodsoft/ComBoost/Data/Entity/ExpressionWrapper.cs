@@ -11,6 +11,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
     public class ExpressionWrapper : ExpressionVisitor
     {
+        private static readonly MethodInfo _WrapMethod = typeof(QueryableExtensions).GetMethod("Wrap");
         private Type _T, _M;
 
         public ExpressionWrapper(Type target, Type mapped)
@@ -47,12 +48,12 @@ namespace Wodsoft.ComBoost.Data.Entity
                 t == _T ? _M : t).ToArray());
                 return Expression.Call(method, node.Arguments.Select(t => Visit(t)));
             }
-            else if (node.Method.DeclaringType == typeof(QueryableExtensions) && node.Method.Name == "Wrap")
+            else if (node.Method == _WrapMethod)
             {
                 Expression expression = node.Arguments[0];
                 if (expression.NodeType == ExpressionType.Convert)
                     expression = ((UnaryExpression)expression).Operand;
-                return expression;
+                return Visit(expression);
             }
             return base.VisitMethodCall(node);
         }

@@ -67,7 +67,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IQueryable<T> Query()
         {
-            return DbSet;//.AsNoTracking();
+            return DbSet.AsNoTracking();
         }
 
         public void Remove(T item)
