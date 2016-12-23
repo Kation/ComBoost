@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
     public class ExpressionWrapper : ExpressionVisitor
     {
-        private static readonly MethodInfo _WrapMethod = typeof(QueryableExtensions).GetMethod("Wrap");
+        private static readonly MethodInfo _WrapMethod = typeof(QueryableExtensions).GetMethod("Wrap", new Type[] { typeof(object) });
         private Type _T, _M;
 
         public ExpressionWrapper(Type target, Type mapped)
