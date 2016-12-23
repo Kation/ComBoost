@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.Mvc.Data",
-  "version": "3.0.0-alpha4",
+  "version": "3.0.0-alpha5",
   "authors": [ "Kation" ],
   "description": "ComBoost用于AspNetCore Mvc的实体模块。",
   "packOptions": {
@@ -26,7 +26,7 @@
     }
   },
   "dependencies": {
-    "Wodsoft.ComBoost.Data": "[3.0.0-alpha4,4.0.0)",
-    "Wodsoft.ComBoost.Mvc": "[3.0.0-alpha4,4.0.0)"
+    "Wodsoft.ComBoost.Data": "[3.0.0-alpha5,4.0.0)",
+    "Wodsoft.ComBoost.Mvc": "[3.0.0-alpha5,4.0.0)"
   }
 }
