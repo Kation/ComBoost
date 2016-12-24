@@ -41,10 +41,14 @@ namespace Wodsoft.ComBoost.Data
                 model.CurrentPage = context.DomainContext.DataBag.Page;
                 model.CurrentSize = context.DomainContext.DataBag.Size;
             }
+#if NET451
             return Task.FromResult(0);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
-        private void Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
+        private Task Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
         {
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
             int page = valueProvider.GetValue<int>("page");
@@ -56,6 +60,11 @@ namespace Wodsoft.ComBoost.Data
             e.Queryable = e.Queryable.Skip((page - 1) * size).Take(size);
             context.DomainContext.DataBag.Page = page;
             context.DomainContext.DataBag.Size = size;
+#if NET451
+            return Task.FromResult(0);
+#else
+            return Task.CompletedTask;
+#endif
         }
     }
 }

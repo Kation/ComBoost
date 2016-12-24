@@ -22,23 +22,24 @@ namespace Wodsoft.ComBoost.Forum.Domain
             _Domain.EntityPreUpdate += Domain_EntityPreUpdate;
         }
         
-        private void Domain_EntityPreUpdate(IDomainExecutionContext context, EntityUpdateEventArgs<T> e)
+        private async Task Domain_EntityPreUpdate(IDomainExecutionContext context, EntityUpdateEventArgs<T> e)
         {
             if (e.Entity.Member == null)
             {
                 var authProvider = context.DomainContext.GetRequiredService<IAuthenticationProvider>();
-                e.Entity.Member = authProvider.GetAuthentication().GetPermission<IMember>().Result;
+                e.Entity.Member = await authProvider.GetAuthentication().GetPermission<IMember>();
             }
         }
 
-        private void Domain_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
+        private Task Domain_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
         {
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
             var forumId = valueProvider.GetValue<Guid?>("id");
             if (!forumId.HasValue)
-                return;
+                return Task.CompletedTask;
             Guid key = forumId.Value;
             e.Queryable = e.Queryable.Wrap<IThread, T>().Where(t => t.Forum.Index == key.Wrap()).Unwrap<IThread, T>();
+            return Task.CompletedTask;
         }
     }
 }
