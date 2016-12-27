@@ -34,13 +34,17 @@ namespace Wodsoft.ComBoost.Data
             return Task.FromResult(0);
         }
 
-        private void Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
+        private Task Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
         {
             List<EntitySearchItem> searchItems = new List<EntitySearchItem>();
 
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
             if (!valueProvider.GetValue<bool>("Search"))
-                return;
+#if NET451
+            return Task.FromResult(0);
+#else
+                return Task.CompletedTask;
+#endif
 
             IQueryable<T> queryable = e.Queryable;
 
@@ -163,6 +167,11 @@ namespace Wodsoft.ComBoost.Data
             }
 
             context.DomainContext.DataBag.SearchItem = searchItems.ToArray();
+#if NET451
+            return Task.FromResult(0);
+#else
+            return Task.CompletedTask;
+#endif
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost.Forum.Domain
             domain.EntityPropertyUpdate += Domain_EntityPropertyUpdate;
         }
 
-        private void Domain_EntityPropertyUpdate(IDomainExecutionContext context, EntityPropertyUpdateEventArgs<T> e)
+        private async Task Domain_EntityPropertyUpdate(IDomainExecutionContext context, EntityPropertyUpdateEventArgs<T> e)
         {
             if (e.Property.Type == System.ComponentModel.DataAnnotations.CustomDataType.Image)
             {
@@ -26,7 +26,7 @@ namespace Wodsoft.ComBoost.Forum.Domain
                 var file = (ISelectedFile)e.Value;
                 if (file == null)
                     return;
-                var path = storage.PutAsync(file.Stream, file.Filename).Result;
+                var path = await storage.PutAsync(file.Stream, file.Filename);
                 e.Property.SetValue(e.Entity, path);
             }
         }

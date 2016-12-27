@@ -60,7 +60,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityQuery != null)
             {
                 var e = new EntityQueryEventArgs<T>(queryable);
-                EntityQuery(Context, e);
+                await EntityQuery(Context, e);
                 queryable = e.Queryable;
             }
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
@@ -79,7 +79,7 @@ namespace Wodsoft.ComBoost.Data
 
         public event DomainServiceEvent<EntityQueryEventArgs<T>> EntityQuery;
 
-        public virtual Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
+        public virtual async Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
         {
             var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
@@ -113,10 +113,10 @@ namespace Wodsoft.ComBoost.Data
             if (EntityCreateModelCreated != null)
             {
                 EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
-                EntityCreateModelCreated(Context, arg);
+                await EntityCreateModelCreated(Context, arg);
                 model = arg.Model;
             }
-            return Task.FromResult((IEntityEditModel<T>)model);
+            return model;
         }
 
         public event DomainServiceEvent<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated;
@@ -162,7 +162,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityEditModelCreated != null)
             {
                 EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
-                EntityEditModelCreated(Context, arg);
+                await EntityEditModelCreated(Context, arg);
                 model = arg.Model;
             }
             return model;
@@ -219,7 +219,7 @@ namespace Wodsoft.ComBoost.Data
                 if (entity == null)
                     throw new EntityNotFoundException(typeof(T), index);
             }
-            var result = UpdateCore(valueProvider, auth, entity, isNew);
+            var result = await UpdateCore(valueProvider, auth, entity, isNew);
             if (isNew)
                 context.Add(entity);
             else
@@ -228,7 +228,7 @@ namespace Wodsoft.ComBoost.Data
             return result;
         }
 
-        protected virtual EntityUpdateModel<T> UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, bool isNew)
+        protected virtual async Task<EntityUpdateModel<T>> UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, bool isNew)
         {
             var properties = isNew ? Metadata.CreateProperties.Where(t =>
             {
@@ -252,17 +252,17 @@ namespace Wodsoft.ComBoost.Data
             if (EntityPreUpdate != null)
             {
                 var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
-                EntityPreUpdate(Context, arg);
+                await EntityPreUpdate(Context, arg);
                 properties = arg.Properties;
             }
             foreach (var property in properties)
             {
-                UpdateProperty(valueProvider, entity, property);
+                await UpdateProperty(valueProvider, entity, property);
             }
             if (EntityUpdated != null)
             {
                 var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
-                EntityUpdated(Context, arg);
+                await EntityUpdated(Context, arg);
             }
             model.IsSuccess = model.ErrorMessage.Count == 0;
             model.Result = entity;
@@ -272,7 +272,7 @@ namespace Wodsoft.ComBoost.Data
         public event DomainServiceEvent<EntityUpdateEventArgs<T>> EntityPreUpdate;
         public event DomainServiceEvent<EntityUpdateEventArgs<T>> EntityUpdated;
 
-        protected virtual void UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
+        protected virtual async Task UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
         {
             object value;
             if (property.IsFileUpload)
@@ -291,7 +291,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityPropertyUpdate != null)
             {
                 var arg = new EntityPropertyUpdateEventArgs<T>(entity, valueProvider, property, value);
-                EntityPropertyUpdate(Context, arg);
+                await EntityPropertyUpdate(Context, arg);
                 handled = arg.IsHandled;
             }
             if (!handled)
@@ -338,7 +338,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityRemove != null)
             {
                 var e = new EntityRemoveEventArgs<T>(entity);
-                EntityRemove(Context, e);
+                await EntityRemove(Context, e);
                 if (e.IsCanceled)
                     return;
             }
@@ -389,7 +389,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityDetail != null)
             {
                 var e = new EntityDetailEventArgs<T>(entity, (IPropertyMetadata[])model.Properties);
-                EntityDetail(Context, e);
+                await EntityDetail(Context, e);
                 model.Properties = e.Properties;
             }
             return model;
