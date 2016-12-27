@@ -59,6 +59,11 @@ namespace Wodsoft.ComBoost
             path = Path.Combine(path, filename);
             var file = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.Read);
             await stream.CopyToAsync(file);
+            await file.FlushAsync();
+#if NET451
+            file.Close();
+#endif
+            file.Dispose();
             return Path.Combine(folder, filename).Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
     }
