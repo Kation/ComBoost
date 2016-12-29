@@ -67,12 +67,12 @@ namespace Wodsoft.ComBoost.Data.Entity
             }
             else if (node.Expression is ConstantExpression && node.Expression.Type.Name.Contains("<>"))
             {
-                var value = Expression.Lambda<Func<object>>(node).Compile()();
+                var value = Expression.Lambda<Func<object>>(Expression.Convert(node, typeof(object))).Compile()();
                 return Expression.Constant(value);
             }
             else if (node.Expression is MemberExpression && ((MemberExpression)node.Expression).Member.DeclaringType.Name.Contains("<>"))
             {
-                var value = Expression.Lambda<Func<object>>(node).Compile()();
+                var value = Expression.Lambda<Func<object>>(Expression.Convert(node, typeof(object))).Compile()();
                 return Expression.Constant(value);
             }
             return base.VisitMember(node);
