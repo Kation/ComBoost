@@ -21,16 +21,16 @@ namespace Wodsoft.ComBoost.Data
         {
             if (e.Property.Type == System.ComponentModel.DataAnnotations.CustomDataType.Password)
             {
-                if ((string)e.Value == "")
-                    if (e.Entity.IsNewCreated)
-#if NET451
-            return Task.FromResult(0);
-#else
-                        return Task.CompletedTask;
-#endif
-                    else
-                        throw new ArgumentNullException("“" + e.Property.Name + "”不能为空。");
-                e.Entity.SetPassword((string)e.Value);
+                if (e.Value != null && (string)e.Value != "")
+                    //                    if (e.Entity.IsNewCreated)
+                    //#if NET451
+                    //            return Task.FromResult(0);
+                    //#else
+                    //                        return Task.CompletedTask;
+                    //#endif
+                    //                    else
+                    //                        throw new ArgumentNullException("“" + e.Property.Name + "”不能为空。");
+                    e.Entity.SetPassword((string)e.Value);
                 e.IsHandled = true;
             }
 #if NET451
