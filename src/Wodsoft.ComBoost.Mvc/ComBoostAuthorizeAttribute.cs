@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class ComBoostAuthorizeAttribute : IActionFilter
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class ComBoostAuthorizeAttribute : Attribute, IActionFilter
     {
         public ComBoostAuthorizeAttribute()
         { }

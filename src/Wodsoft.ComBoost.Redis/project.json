@@ -10,9 +10,6 @@
     "netstandard1.3": {
       "imports": "dnxcore50",
       "dependencies": {
-        "System.Runtime.Serialization.Formatters": "4.3.0",
-        "System.Runtime.Serialization.Json": "4.3.0",
-        "System.Runtime.Serialization.Xml": "4.3.0"
       }
     },
     "net451": {}
