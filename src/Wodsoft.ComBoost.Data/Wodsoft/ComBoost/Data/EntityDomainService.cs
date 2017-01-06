@@ -174,7 +174,7 @@ namespace Wodsoft.ComBoost.Data
         {
             object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
             var context = database.GetContext<T>();
-            bool isNew = index.Equals(Activator.CreateInstance(Metadata.KeyProperty.ClrType));
+            bool isNew = Metadata.KeyProperty.ClrType.GetTypeInfo().IsValueType ? index.Equals(Activator.CreateInstance(Metadata.KeyProperty.ClrType)) : index == null;
             var auth = authenticationProvider.GetAuthentication();
             if (!Metadata.AllowAnonymous)
             {
