@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.Mvc",
-  "version": "3.0.0-alpha5",
+  "version": "3.0.0-alpha6",
   "authors": [ "Kation" ],
   "description": "ComBoost用于AspNetCore的Mvc模块。",
   "packOptions": {
@@ -25,8 +25,8 @@
     }
   },
   "dependencies": {
-    "Wodsoft.ComBoost": "[3.0.0-alpha5,4.0.0)",
-    "Wodsoft.ComBoost.AspNetCore.Security": "[3.0.0-alpha5,4.0.0)",
+    "Wodsoft.ComBoost": "[3.0.0-alpha6,4.0.0)",
+    "Wodsoft.ComBoost.AspNetCore.Security": "[3.0.0-alpha6,4.0.0)",
     "Microsoft.Extensions.DependencyInjection": "1.1.0",
     "Microsoft.Extensions.Options": "1.1.0",
     "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.1.0"
