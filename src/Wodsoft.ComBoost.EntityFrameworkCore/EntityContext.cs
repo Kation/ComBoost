@@ -94,6 +94,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             item.OnEditCompleted();
             DbSet.Update(item);
+            Database.InnerContext.Entry<T>(item);
         }
 
         public void UpdateRange(IEnumerable<T> items)
@@ -140,6 +141,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (key.GetType() != Metadata.KeyType)
                 key = TypeDescriptor.GetConverter(Metadata.KeyType).ConvertFrom(key);
             return DbSet.FindAsync(key);
+        }
+
+        public Task ReloadAsync(T item)
+        {
+            return Database.InnerContext.Entry(item).ReloadAsync();
         }
     }
 }

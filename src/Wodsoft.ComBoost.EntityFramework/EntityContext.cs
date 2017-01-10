@@ -83,6 +83,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             item.OnEditCompleted();
             DbSet.Attach(item);
+            Database.InnerContext.Entry(item).State = EntityState.Modified;
         }
 
         public void UpdateRange(IEnumerable<T> items)
@@ -91,6 +92,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             {
                 item.OnEditCompleted();
                 DbSet.Attach(item);
+                Database.InnerContext.Entry(item).State = EntityState.Modified;
             }
         }
 
@@ -131,6 +133,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (key.GetType() != Metadata.KeyType)
                 key = TypeDescriptor.GetConverter(Metadata.KeyType).ConvertFrom(key);
             return DbSet.FindAsync(key);
+        }
+
+        public Task ReloadAsync(T item)
+        {
+            return Database.InnerContext.Entry(item).ReloadAsync();
         }
     }
 }

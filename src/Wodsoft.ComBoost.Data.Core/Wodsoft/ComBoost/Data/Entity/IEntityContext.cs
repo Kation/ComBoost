@@ -109,5 +109,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="key">主键。</param>
         /// <returns>返回对应实体对象。</returns>
         Task<T> GetAsync(object key);
+        /// <summary>
+        /// 重新载入实体。
+        /// </summary>
+        /// <param name="item">实体对象。</param>
+        /// <returns></returns>
+        Task ReloadAsync(T item);
     }
 }
