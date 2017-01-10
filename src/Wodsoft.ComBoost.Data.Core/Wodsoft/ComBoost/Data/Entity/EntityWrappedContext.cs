@@ -115,5 +115,10 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             return (M)await InnerContext.GetAsync(key);
         }
+
+        public Task ReloadAsync(T item)
+        {
+            return InnerContext.ReloadAsync((M)item);
+        }
     }
 }
