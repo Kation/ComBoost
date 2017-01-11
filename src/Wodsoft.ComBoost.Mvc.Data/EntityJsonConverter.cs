@@ -79,6 +79,8 @@ namespace Wodsoft.ComBoost.Mvc
             }
 
             writer.WriteStartObject();
+            writer.WritePropertyName(metadata.KeyProperty.ClrName);
+            writer.WriteValue(metadata.KeyProperty.GetValue(entity));
             foreach (var property in propertyMetadatas)
             {
                 object propertyValue = property.GetValue(value);
@@ -99,7 +101,8 @@ namespace Wodsoft.ComBoost.Mvc
                     }
                     else if (property.CustomType == "Collection")
                         continue;
-                    throw new NotSupportedException("不支持序列化的属性“" + property.Name + "”");
+                    else
+                        throw new NotSupportedException("不支持序列化的属性“" + property.Name + "”");
                 }
                 else
                     writer.WriteValue(propertyValue);
