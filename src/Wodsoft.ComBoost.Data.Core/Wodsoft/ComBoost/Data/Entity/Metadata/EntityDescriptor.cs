@@ -117,7 +117,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             foreach (var type in assembly.GetTypes().Where(t =>
             {
                 var info = t.GetTypeInfo();
-                if (!info.IsClass && !typeof(IEntity).IsAssignableFrom(t))
+                if (!info.IsClass || !typeof(IEntity).IsAssignableFrom(t))
                     return false;
                 return true;
             }))
