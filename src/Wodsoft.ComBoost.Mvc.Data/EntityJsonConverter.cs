@@ -38,7 +38,7 @@ namespace Wodsoft.ComBoost.Mvc
         {
             IEntity entity = (IEntity)value;
             var metadata = EntityDescriptor.GetMetadata(value.GetType());
-            IEnumerable<IPropertyMetadata> propertyMetadatas;
+            IPropertyMetadata[] propertyMetadatas;
             switch (Action)
             {
                 case EntityAuthorizeAction.View:
@@ -79,8 +79,11 @@ namespace Wodsoft.ComBoost.Mvc
             }
 
             writer.WriteStartObject();
-            writer.WritePropertyName(metadata.KeyProperty.ClrName);
-            writer.WriteValue(metadata.KeyProperty.GetValue(entity));
+            if (!propertyMetadatas.Contains(metadata.KeyProperty))
+            {
+                writer.WritePropertyName(metadata.KeyProperty.ClrName);
+                writer.WriteValue(metadata.KeyProperty.GetValue(entity));
+            }
             foreach (var property in propertyMetadatas)
             {
                 object propertyValue = property.GetValue(value);
@@ -99,6 +102,8 @@ namespace Wodsoft.ComBoost.Mvc
                         writer.WriteValue(item.ToString());
                         writer.WriteEndObject();
                     }
+                    else if (property.CustomType == "Enum")
+                        writer.WriteValue(property.GetValue(entity));
                     else if (property.CustomType == "Collection")
                         continue;
                     else
