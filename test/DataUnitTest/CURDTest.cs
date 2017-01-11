@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataUnitTest
 {
@@ -28,7 +29,66 @@ namespace DataUnitTest
             await database.SaveAsync();
             Assert.Equal(0, await categoryContext.CountAsync(categoryContext.Query()));
         }
-        
+
+        [Fact]
+        public async Task ReferenceTest()
+        {
+            DataContext context = new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase().Options);
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            var category = new Category();
+            category.Index = Guid.NewGuid();
+            category.Name = "Test";
+            context.Category.Add(category);
+            var user = new User();
+            user.Index = Guid.NewGuid();
+            user.Username = "TestUser";
+            context.User.Add(user);
+            await context.SaveChangesAsync();
+
+            context = new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase().Options);
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            user = await context.User.FirstOrDefaultAsync();
+            category = await context.Category.FirstOrDefaultAsync();
+            user.Category = category;
+            context.User.Update(user);
+            var refCategory = context.Entry(user).Reference(t => t.Category);
+            //var proCategory = ((DatabaseContext)database).InnerContext.Entry(user).Property(t => t.Category);
+            await context.SaveChangesAsync();
+
+            context = new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase().Options);
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            user = await context.User.Include(t => t.Category).FirstOrDefaultAsync();
+            Assert.NotNull(user.Category);
+
+            //var serviceProvider = DataCommon.GetServiceProvider();
+            //var database = serviceProvider.GetService<IDatabaseContext>();
+            //var categoryContext = database.GetContext<Category>();
+            //var category = categoryContext.Create();
+            //category.Name = "Test";
+            //categoryContext.Add(category);
+            //var userContext = database.GetContext<User>();
+            //var user = userContext.Create();
+            //user.Username = "TestUser";
+            //userContext.Add(user);
+            //await database.SaveAsync();
+
+            //database = serviceProvider.GetService<IDatabaseContext>();
+            //userContext = database.GetContext<User>();
+            //user = await userContext.FirstOrDefaultAsync(userContext.Query());
+            //categoryContext = database.GetContext<Category>();
+            //category = await categoryContext.FirstOrDefaultAsync(categoryContext.Query());
+            //user.Category = category;
+            //userContext.Update(user);
+            //var refCategory = ((DatabaseContext)database).InnerContext.Entry(user).Reference(t => t.Category);
+            ////var proCategory = ((DatabaseContext)database).InnerContext.Entry(user).Property(t => t.Category);
+            //await database.SaveAsync();
+
+            //database = serviceProvider.GetService<IDatabaseContext>();
+            //userContext = database.GetContext<User>();
+            //user = await userContext.FirstOrDefaultAsync(userContext.Include(userContext.Query(), t=>t.Category));
+            //Assert.NotNull(user.Category);
+        }
+
         [Fact]
         public async Task LazyLoadEntityTest()
         {

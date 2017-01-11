@@ -93,19 +93,18 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 type = type.GetTypeInfo().BaseType;
             if (!typeof(IEntity).IsAssignableFrom(type))
                 throw new NotSupportedException("该类型没有继承IEntity接口。");
-            lock (_Metadata)
-                if (!_Metadata.ContainsKey(type))
-                {
-                    var metadataField = type.GetField("Metadata", BindingFlags.Static | BindingFlags.Public);
-                    IEntityMetadata metadata;
-                    if (metadataField != null)
-                        metadata = (IEntityMetadata)metadataField.GetValue(null);
-                    else
-                        metadata = new ClrEntityMetadata(type);
-                    _Metadata.Add(type, metadata);
-                    foreach (var interfaceType in type.GetInterfaces().Where(t => t != typeof(IEntity) && typeof(IEntity).IsAssignableFrom(t)))
-                        _Metadata.Add(interfaceType, metadata);
-                }
+            if (!_Metadata.ContainsKey(type))
+            {
+                var metadataField = type.GetField("Metadata", BindingFlags.Static | BindingFlags.Public);
+                IEntityMetadata metadata;
+                if (metadataField != null)
+                    metadata = (IEntityMetadata)metadataField.GetValue(null);
+                else
+                    metadata = new ClrEntityMetadata(type);
+                _Metadata.Add(type, metadata);
+                foreach (var interfaceType in type.GetInterfaces().Where(t => t != typeof(IEntity) && t.GetTypeInfo().GetCustomAttribute<EntityInterfaceAttribute>() != null && typeof(IEntity).IsAssignableFrom(t)))
+                    _Metadata.Add(interfaceType, metadata);
+            }
             return _Metadata[type];
         }
 

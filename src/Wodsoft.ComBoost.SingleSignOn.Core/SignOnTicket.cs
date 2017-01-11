@@ -7,48 +7,58 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.SingleSignOn
 {
-    public abstract class SignOnTicket
+    public class SignOnTicket
     {
-        private Dictionary<string, string> _Data;
+        private Dictionary<string, List<SignOnTicketValue>> _Values;
 
         public SignOnTicket()
         {
-            _Data = new Dictionary<string, string>();
+            _Values = new Dictionary<string, List<SignOnTicketValue>>();
         }
 
-        protected string GetValue(string key)
-        {
-            string value;
-            if (!_Data.TryGetValue(key, out value))
-                return null;
-            return value;
-        }
+        public string Identifier { get; set; }
 
-        protected void SetValue(string key, string value)
+        public string Name { get; set; }
+
+        public byte[] Signature { get; set; }
+
+        public void Add(SignOnTicketValue value)
         {
-            if (_Data.ContainsKey(key))
-                _Data[key] = value;
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+            if (_Values.ContainsKey(value.Name))
+                _Values[value.Name].Add(value);
             else
-                _Data.Add(key, value);
+                _Values.Add(value.Name, new List<SignOnTicketValue>() { value });
         }
 
-        public virtual byte[] GetData()
+        public void Remove(SignOnTicketValue value)
         {
-            var data = JsonConvert.SerializeObject(_Data);
-            return Encoding.UTF8.GetBytes(data);
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+            List<SignOnTicketValue> values;
+            if (!_Values.TryGetValue(value.Name, out values))
+                return;
+            values.Remove(value);
+            if (values.Count == 0)
+                _Values.Remove(value.Name);
         }
 
-        public virtual void SetData(byte[] data)
+        public SignOnTicketValue GetValue(string name)
         {
-            try
-            {
-                var json = Encoding.UTF8.GetString(data);
-                _Data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-            }
-            catch
-            {
-                throw new FormatException("传入的数据格式不正确。");
-            }
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            return GetValues(name).FirstOrDefault();
+        }
+
+        public IEnumerable<SignOnTicketValue> GetValues(string name)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            List<SignOnTicketValue> values;
+            if (!_Values.TryGetValue(name, out values))
+                return new SignOnTicketValue[0];
+            return values;
         }
     }
 }

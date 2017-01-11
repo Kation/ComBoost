@@ -18,8 +18,10 @@ namespace DataUnitTest
 
         public virtual string Username { get; set; }
 
-        public virtual Guid CategoryId { get; set; }
-        [ForeignKey("CategoryId")]
+        //private Guid _CategoryId;
+        //public virtual Guid CategoryId { get { if (Category != null) return Category.Index; return _CategoryId; } set { _CategoryId = value; } }
+        //public virtual Guid CategoryId { get; set; }
+        //[ForeignKey("CategoryId")]
         public virtual Category Category { get; set; }
 
         ICategory IUser.Category { get { return Category; } set { Category = (Category)value; } }

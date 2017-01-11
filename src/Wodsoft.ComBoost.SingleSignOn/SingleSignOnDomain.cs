@@ -28,6 +28,6 @@ namespace Wodsoft.ComBoost.SingleSignOn
             return authenticationProvider.SignInAsync(dict);
         }
 
-
+        
     }
 }
