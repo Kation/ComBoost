@@ -122,7 +122,7 @@ namespace Wodsoft.ComBoost.Mvc
             {
                 var value = Controller.Request.Query[key];
                 if (value == StringValues.Empty)
-                    value = "123";
+                    value = "";
                 return new ValueProviderResult(value);
             }
             if (Controller.Request.HasFormContentType && Controller.Request.Form.ContainsKey(key))

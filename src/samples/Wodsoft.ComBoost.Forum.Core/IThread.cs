@@ -6,6 +6,7 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Forum.Core
 {
+    [EntityInterface]
     public interface IThread : IEntity
     {
         IMember Member { get; set; }

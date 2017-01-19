@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Interface, AllowMultiple = false, Inherited = false)]
     public class EntityInterfaceAttribute : Attribute
     {
     }
