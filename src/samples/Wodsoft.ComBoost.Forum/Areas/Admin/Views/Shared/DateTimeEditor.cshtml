@@ -3,13 +3,13 @@
     DateTime? value = Model.Value as DateTime?;
 }
 <div class="input-group col-md-4" style="float:left">
-    <input type="date" class="form-control col-md-6" id="@(Model.Metadata.ClrName)_Date" value="@(value.HasValue ? value.Value.ToShortDateString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")/>
+    <input type="date" class="form-control col-md-6" id="@(Model.Metadata.ClrName)_Date" value="@(value.HasValue ? value.Value.ToString("yyyy-MM-dd") : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")/>
 </div>
 <div class="input-group col-md-4" style="float:left" id="@Model.Metadata.ClrName">
     <input type="number" id="@(Model.Metadata.ClrName)_Hour" min="0" class="form-control text-center" value="@(value.HasValue ? value.Value.TimeOfDay.Hours.ToString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")/>
-    <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
+    <span class="input-group-addon">:</span>
     <input type="number" id="@(Model.Metadata.ClrName)_Minute" min="0" max="59" class="form-control text-center" value="@(value.HasValue ? value.Value.TimeOfDay.Minutes.ToString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")/>
-    <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.TimeSeparator</span>
+    <span class="input-group-addon">:</span>
     <input type="number" id="@(Model.Metadata.ClrName)_Seconds" min="0" max="59" class="form-control text-center" value="@(value.HasValue ? value.Value.TimeOfDay.Seconds.ToString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")/>
 </div>
 <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@Model.Value" />

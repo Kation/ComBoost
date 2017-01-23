@@ -10,7 +10,7 @@
     </script>*@
 
 <div class="input-group date col-md-4">
-    <input type="text" class="form-control" id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" value="@(value.HasValue ? value.Value.ToLongDateString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+    <input type="text" class="form-control" id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" value="@(value.HasValue ? value.Value.ToString("yyyy-MM-dd") : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
 </div>
 
 <script type="text/javascript">
