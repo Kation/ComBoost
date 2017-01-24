@@ -1,29 +1,27 @@
 ﻿@model MvcEditorModel
 @{
-    EntityExtension.EnumItem[] items;
-    Type enumType;
-    if (Model.Metadata.ClrType.IsGenericType)
+    Type enumType = Model.Metadata.ClrType;
+    if (enumType.GetTypeInfo().IsGenericType)
     {
         enumType = Model.Metadata.ClrType.GetGenericArguments()[0];
-        items = Html.EnumAnalyze(enumType);
-        enumType = Enum.GetUnderlyingType(enumType);
+    }
+    if (Model.Metadata.ClrType.GetTypeInfo().GetCustomAttribute<FlagsAttribute>() == null)
+    {
+        var field = enumType.GetField(Enum.GetName(enumType, Model.Value));
+        var name = field.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? field.Name;
+        <span>@name</span>
     }
     else
     {
-        items = Html.EnumAnalyze(Model.Metadata.ClrType);
-        enumType = Enum.GetUnderlyingType(Model.Metadata.ClrType);
-    }
-    EnumConverter converter = new EnumConverter(Model.Metadata.ClrType);
-    foreach (var item in items)
-    {
-        if (Model.Metadata.ClrType.GetCustomAttributes(typeof(FlagsAttribute), true).Length == 0)
+        var items = Enum.GetNames(enumType).Select(t =>
         {
-            if (object.Equals(item.Value, Convert.ChangeType(Model.Value, enumType)))
-            {
-                <span>@item.Name</span>
-            }
-        }
-        else
+            var field = enumType.GetField(t);
+            var name = field.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? t;
+            var value = (int)field.GetValue(null);
+            return new { Name = name, Value = value };
+        }).ToArray();
+        enumType = Enum.GetUnderlyingType(Model.Metadata.ClrType);
+        foreach (var item in items)
         {
             if (((dynamic)Model.Value).HasFlag((Enum)Enum.ToObject(Model.Metadata.ClrType, item.Value)))
             {
