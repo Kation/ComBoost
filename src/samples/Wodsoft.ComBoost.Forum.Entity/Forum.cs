@@ -12,6 +12,7 @@ namespace Wodsoft.ComBoost.Forum.Entity
 {
     [DisplayName("论坛")]
     [DisplayColumn("Name", "Order", false)]
+    [EntityAuthentication(AllowAnonymous = false)]
     public class Forum : EntityBase, IForum
     {
         [Display(Name = "论坛说明", Order = 20)]

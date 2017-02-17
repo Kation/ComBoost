@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.StaticFiles;
 namespace Wodsoft.ComBoost.Forum.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [ComBoostAuthorize]
     public class ForumController : EntityController<Entity.Forum>
     {
         public async Task<IActionResult> ImageToProperty(string path)

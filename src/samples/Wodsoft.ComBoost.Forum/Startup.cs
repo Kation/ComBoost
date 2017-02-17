@@ -48,6 +48,7 @@ namespace Wodsoft.ComBoost.Forum
             {
                 options.AddComBoostMvcOptions();
             });
+            services.AddComBoostMvcAuthentication(new ComBoostAuthenticationOptions("/Account/SignIn", "/Account/SignOut"));
 
             services.AddScoped<DbContext, DataContext>(serviceProvider =>
                 //new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase()
@@ -94,7 +95,7 @@ namespace Wodsoft.ComBoost.Forum
 
             app.UseSession();
 
-            app.UseComBoostMvcAuthentication();
+            app.UseComBoostAuthentication();
 
             app.UseMvc(routes =>
             {
