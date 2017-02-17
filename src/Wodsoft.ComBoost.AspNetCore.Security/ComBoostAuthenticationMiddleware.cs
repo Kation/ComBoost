@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost.Security
         public ComBoostAuthenticationMiddleware(RequestDelegate next, IOptions<ComBoostAuthenticationOptions> options, ILoggerFactory loggerFactory,
             IDataProtectionProvider dataProtectionProvider, UrlEncoder encoder)
             : base(next, options, loggerFactory, encoder)
-        {
+        {            
             if (Options.TicketDataFormat == null)
             {
                 var provider = Options.DataProtectionProvider ?? dataProtectionProvider;

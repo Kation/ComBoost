@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Wodsoft.ComBoost.Security;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.Features.Authentication;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Wodsoft.ComBoost.Mvc
 {
@@ -12,6 +14,7 @@ namespace Wodsoft.ComBoost.Mvc
     public class ComBoostAuthorizeAttribute : Attribute, IActionFilter
     {
         public ComBoostAuthorizeAttribute()
+            : this(AuthenticationRequiredMode.All, new object[0])
         { }
 
         public ComBoostAuthorizeAttribute(params object[] roles) : this(AuthenticationRequiredMode.All, roles) { }
@@ -43,9 +46,9 @@ namespace Wodsoft.ComBoost.Mvc
             }
             if (!isAuthed)
             {
-                var middleware = context.HttpContext.Features.Get<ComBoostAuthenticationMiddleware>();
-                var loginUrl = middleware.Options.LoginPath(context.HttpContext);
-                loginUrl = context.HttpContext.Request.PathBase.Add(loginUrl + "?returlUrl=" + Uri.EscapeDataString(context.HttpContext.Request.Path));
+                var options = context.HttpContext.RequestServices.GetRequiredService<ComBoostAuthenticationOptions>();
+                var loginUrl = options.LoginPath(context.HttpContext);
+                loginUrl = context.HttpContext.Request.PathBase.Add(loginUrl) + "?returlUrl=" + Uri.EscapeDataString(context.HttpContext.Request.Path);
                 context.Result = new RedirectResult(loginUrl);
             }
         }

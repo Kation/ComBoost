@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost.Security
 {
     public class ComBoostAuthenticationOptions : AuthenticationOptions
     {
-        public ComBoostAuthenticationOptions()
+        public ComBoostAuthenticationOptions(string loginPath, string logoutPath)
         {
             AuthenticationScheme = "ComBoost";
             AutomaticAuthenticate = true;
@@ -20,9 +20,15 @@ namespace Wodsoft.ComBoost.Security
             CookiePath = c => "/";
             CookieName = c => "ComBoostAuthentication";
             ExpireTime = c => TimeSpan.FromMinutes(15);
-            //LoginPath = c => "/Account/Login";
+            LoginPath = c => loginPath;
+            LogoutPath = c => logoutPath;
             //AutomaticChallenge = true;
         }
+
+        public ComBoostAuthenticationOptions()
+            : this("/Account/Login", "/Account/Logout")
+        { }
+
         public IDataProtectionProvider DataProtectionProvider { get; set; }
 
         public ISecureDataFormat<AuthenticationTicket> TicketDataFormat { get; set; }
