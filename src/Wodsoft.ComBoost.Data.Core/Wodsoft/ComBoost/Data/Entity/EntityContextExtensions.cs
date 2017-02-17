@@ -121,6 +121,17 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
 
         /// <summary>
+        /// 异步统计查询结果的数量。
+        /// </summary>
+        /// <param name="context">实体上下文。</param>
+        /// <returns></returns>
+        public static Task<int> CountAsync<T>(this IEntityContext<T> context)
+            where T : IEntity
+        {
+            return context.CountAsync(context.Query());
+        }
+
+        /// <summary>
         /// 获取排序后的实体查询。
         /// </summary>
         /// <typeparam name="T">实体类型。</typeparam>
