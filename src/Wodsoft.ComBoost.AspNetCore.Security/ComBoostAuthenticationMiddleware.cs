@@ -14,8 +14,10 @@ namespace Wodsoft.ComBoost.Security
 {
     public class ComBoostAuthenticationMiddleware : AuthenticationMiddleware<ComBoostAuthenticationOptions>
     {
+        private ComBoostAuthenticationHandler _Handler;
+
         public ComBoostAuthenticationMiddleware(RequestDelegate next, IOptions<ComBoostAuthenticationOptions> options, ILoggerFactory loggerFactory,
-            IDataProtectionProvider dataProtectionProvider, UrlEncoder encoder)
+            IDataProtectionProvider dataProtectionProvider, UrlEncoder encoder, ComBoostAuthenticationHandler handler)
             : base(next, options, loggerFactory, encoder)
         {            
             if (Options.TicketDataFormat == null)
@@ -24,11 +26,14 @@ namespace Wodsoft.ComBoost.Security
                 var dataProtector = provider.CreateProtector(typeof(ComBoostAuthenticationMiddleware).FullName, Options.AuthenticationScheme);
                 Options.TicketDataFormat = new TicketDataFormat(dataProtector);
             }
+            if (handler == null)
+                throw new ArgumentNullException(nameof(handler));
+            _Handler = handler;
         }
 
         protected override AuthenticationHandler<ComBoostAuthenticationOptions> CreateHandler()
         {
-            return new ComBoostAuthenticationHandler();
+            return _Handler;
         }
     }
 }

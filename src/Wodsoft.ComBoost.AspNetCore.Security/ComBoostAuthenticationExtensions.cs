@@ -15,7 +15,10 @@ namespace Microsoft.AspNetCore.Builder
             if (app == null)
                 throw new ArgumentNullException(nameof(app));
             var options = app.ApplicationServices.GetRequiredService<ComBoostAuthenticationOptions>();
-            app.UseMiddleware<ComBoostAuthenticationMiddleware>(new Microsoft.Extensions.Options.OptionsWrapper<ComBoostAuthenticationOptions>(options));
+            var handler = app.ApplicationServices.GetService<ComBoostAuthenticationHandler>();
+            if (handler == null)
+                handler = new ComBoostAuthenticationHandler();
+            app.UseMiddleware<ComBoostAuthenticationMiddleware>(new Microsoft.Extensions.Options.OptionsWrapper<ComBoostAuthenticationOptions>(options), handler);
             app.UseClaimsTransformation(new ClaimsTransformationOptions
             {
                 Transformer = new ComBoostAuthenticationTransformer()
