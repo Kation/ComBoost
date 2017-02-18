@@ -48,7 +48,7 @@ namespace Wodsoft.ComBoost.Forum
             {
                 options.AddComBoostMvcOptions();
             });
-            services.AddComBoostMvcAuthentication(new ComBoostAuthenticationOptions("/Account/SignIn", "/Account/SignOut"));
+            services.AddComBoostMvcAuthentication();
 
             services.AddScoped<DbContext, DataContext>(serviceProvider =>
                 //new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase()
@@ -95,14 +95,21 @@ namespace Wodsoft.ComBoost.Forum
 
             app.UseSession();
 
-            app.UseComBoostAuthentication();
+            //app.UseComBoostAuthentication();
 
-            app.UseMvc(routes =>
+            app.UseComBoostMvc(routes =>
             {
-                routes.MapAreaRoute("areaRoute", "Admin", "Admin/{controller=Home}/{action=Index}/{id?}");
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                routes.MapAreaRoute("areaRoute", "Admin", "Admin/{controller=Home}/{action=Index}/{id?}", null, null, new
+                {
+                    authArea = "Admin",
+                    loginPath = "/Admin/Account/SignIn",
+                    logoutPath = "/Admin/Account/SignOut"
+                });
+                routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}", null, null, new
+                {
+                    loginPath = "/Account/SignIn",
+                    logoutPath = "/Account/SignOut"
+                });
             });
         }
     }
