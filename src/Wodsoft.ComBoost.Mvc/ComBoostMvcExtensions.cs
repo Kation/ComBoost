@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Security;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.Extensions.DependencyInjection;
+using Wodsoft.ComBoost.Mvc;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -35,25 +38,44 @@ namespace Microsoft.Extensions.DependencyInjection
                     return cookieName;
                 return cookieName + "_" + area;
             };
-            //options.LoginPath = context =>
-            //{
-            //    var routeData = context.GetRouteData();
-            //    var area = routeData.DataTokens["authArea"];
-            //    string path = "/Account/LoginIn";
-            //    if (area == null)
-            //        return path;
-            //    return area + "/" + path;
-            //};
-            //options.LogoutPath = context =>
-            //{
-            //    var routeData = context.GetRouteData();
-            //    var area = routeData.DataTokens["authArea"];
-            //    string path = "/Account/LoginOut";
-            //    if (area == null)
-            //        return path;
-            //    return area + "/" + path;
-            //};
+            var oldLoginPath = options.LoginPath;
+            options.LoginPath = context =>
+            {
+                var routeData = context.GetRouteData();
+                var path = routeData.DataTokens["loginPath"] as string;
+                return path ?? oldLoginPath(context);
+            };
+            var oldLogoutPath = options.LogoutPath;
+            options.LogoutPath = context =>
+            {
+                var routeData = context.GetRouteData();
+                var path = routeData.DataTokens["logoutPath"] as string;
+                return path ?? oldLogoutPath(context);
+            };
             serviceCollection.AddSingleton(options);
+        }
+    }
+}
+
+namespace Microsoft.AspNetCore.Builder
+{
+    public static class ComBoostMvcExtensions
+    {
+        public static void UseComBoostMvc(this IApplicationBuilder app, Action<IRouteBuilder> configureRoutes)
+        {
+            if (app == null)
+                throw new ArgumentNullException(nameof(app));
+
+            var routes = new RouteBuilder(app)
+            {
+                DefaultHandler = app.ApplicationServices.GetRequiredService<MvcRouteHandler>(),
+            };
+            configureRoutes(routes);
+            routes.Routes.Insert(0, AttributeRouting.CreateAttributeMegaRoute(app.ApplicationServices));
+            var router = routes.Build();
+            app.UseMiddleware<ComBoostMvcMiddleware>(router);
+            app.UseComBoostAuthentication();
+            app.UseMvc(configureRoutes);
         }
     }
 }
