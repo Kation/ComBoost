@@ -9,31 +9,33 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Wodsoft.ComBoost.Security
 {
     public class ComBoostAuthenticationMiddleware : AuthenticationMiddleware<ComBoostAuthenticationOptions>
     {
-        private ComBoostAuthenticationHandler _Handler;
+        private IServiceProvider _ServiceProvider;
 
         public ComBoostAuthenticationMiddleware(RequestDelegate next, IOptions<ComBoostAuthenticationOptions> options, ILoggerFactory loggerFactory,
-            IDataProtectionProvider dataProtectionProvider, UrlEncoder encoder, ComBoostAuthenticationHandler handler)
+            IDataProtectionProvider dataProtectionProvider, UrlEncoder encoder, IServiceProvider serviceProvider)
             : base(next, options, loggerFactory, encoder)
-        {            
+        {
             if (Options.TicketDataFormat == null)
             {
                 var provider = Options.DataProtectionProvider ?? dataProtectionProvider;
                 var dataProtector = provider.CreateProtector(typeof(ComBoostAuthenticationMiddleware).FullName, Options.AuthenticationScheme);
                 Options.TicketDataFormat = new TicketDataFormat(dataProtector);
             }
-            if (handler == null)
-                throw new ArgumentNullException(nameof(handler));
-            _Handler = handler;
+            _ServiceProvider = serviceProvider;
         }
 
         protected override AuthenticationHandler<ComBoostAuthenticationOptions> CreateHandler()
         {
-            return _Handler;
+            var handler = _ServiceProvider.GetService<ComBoostAuthenticationHandler>();
+            if (handler == null)
+                handler = new Security.ComBoostAuthenticationHandler();
+            return handler;
         }
     }
 }
