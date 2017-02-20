@@ -55,7 +55,7 @@ namespace Wodsoft.ComBoost.Security
             return Task.FromResult(0);
         }
 
-        private string GetTlsTokenBinding()
+        protected virtual string GetTlsTokenBinding()
         {
             var binding = Context.Features.Get<ITlsTokenBindingFeature>()?.GetProvidedTokenBindingId();
             return binding == null ? null : Convert.ToBase64String(binding);
