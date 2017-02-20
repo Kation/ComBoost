@@ -1,8 +1,8 @@
 ﻿{
-  "version": "3.0.0-alpha8",
+  "version": "3.0.0-alpha9",
 
   "dependencies": {
-    "Wodsoft.ComBoost.Core": "[3.0.0-alpha8,4.0.0)",
+    "Wodsoft.ComBoost.Core": "[3.0.0-alpha9,4.0.0)",
     "StackExchange.Redis": "1.1.608"
   },
 
