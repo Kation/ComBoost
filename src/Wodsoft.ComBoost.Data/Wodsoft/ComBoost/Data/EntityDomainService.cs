@@ -274,31 +274,35 @@ namespace Wodsoft.ComBoost.Data
 
         protected virtual async Task UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
         {
+            bool handled = false;
+            bool hasValue = valueProvider.Keys.Contains(property.ClrName);
             object value;
-            if (property.IsFileUpload)
+            if (hasValue)
             {
-                value = valueProvider.GetValue<ISelectedFile>(property.ClrName);
-            }
-            else if (property.Type == CustomDataType.Password)
-            {
-                value = valueProvider.GetValue<string>(property.ClrName);
+                if (property.IsFileUpload)
+                {
+                    value = valueProvider.GetValue<ISelectedFile>(property.ClrName);
+                }
+                else if (property.Type == CustomDataType.Password)
+                {
+                    value = valueProvider.GetValue<string>(property.ClrName);
+                }
+                else
+                {
+                    value = valueProvider.GetValue(property.ClrName, property.ClrType);
+                }
+                if (EntityPropertyUpdate != null)
+                {
+                    var arg = new EntityPropertyUpdateEventArgs<T>(entity, valueProvider, property, value);
+                    await EntityPropertyUpdate(Context, arg);
+                    handled = arg.IsHandled;
+                }
             }
             else
-            {
-                value = valueProvider.GetValue(property.ClrName, property.ClrType);
-            }
-            bool handled = false;
-            if (EntityPropertyUpdate != null)
-            {
-                var arg = new EntityPropertyUpdateEventArgs<T>(entity, valueProvider, property, value);
-                await EntityPropertyUpdate(Context, arg);
-                handled = arg.IsHandled;
-            }
+                value = property.GetValue(entity);
             if (!handled)
             {
-                if (value == null)
-                    return;
-                if (!property.ClrType.IsAssignableFrom(value.GetType()))
+                if (value != null && !property.ClrType.IsAssignableFrom(value.GetType()))
                     throw new NotImplementedException("未处理的属性“" + property.Name + "”。");
                 ValidationContext validationContext = new ValidationContext(entity, Context.DomainContext, null);
                 validationContext.MemberName = property.ClrName;
@@ -306,7 +310,8 @@ namespace Wodsoft.ComBoost.Data
                 var error = property.GetAttributes<ValidationAttribute>().Select(t => t.GetValidationResult(value, validationContext)).Where(t => t != ValidationResult.Success).ToArray();
                 if (error.Length > 0)
                     throw new ArgumentException(string.Join("，", error.Select(t => t.ErrorMessage)));
-                property.SetValue(entity, value);
+                if (hasValue)
+                    property.SetValue(entity, value);
             }
         }
 
