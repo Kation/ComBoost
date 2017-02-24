@@ -156,7 +156,10 @@ namespace Wodsoft.ComBoost.Mvc
                 List<string> keys = new List<string>();
                 keys.AddRange(Controller.Request.Query.Keys);
                 if (Controller.Request.HasFormContentType)
+                {
                     keys.AddRange(Controller.Request.Form.Keys);
+                    keys.AddRange(Controller.Request.Form.Files.Select(t => t.Name));
+                }
                 keys.AddRange(Controller.HttpContext.GetRouteData()?.Values.Keys);
                 keys.AddRange(Controller.Request.Headers.Keys);
                 keys.AddRange(Controller.HttpContext.GetRouteData()?.DataTokens.Keys);
