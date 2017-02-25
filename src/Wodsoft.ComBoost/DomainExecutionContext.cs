@@ -65,5 +65,7 @@ namespace Wodsoft.ComBoost
         }
 
         public object Result { get; internal set; }
+
+        public bool IsAborted { get { return DomainContext.ServiceAborted.IsCancellationRequested; } }
     }
 }

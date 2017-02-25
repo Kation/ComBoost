@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -49,6 +50,7 @@ namespace Wodsoft.ComBoost
             }
         }
 #endif
+        private ConcurrentDictionary<MethodInfo, IDomainServiceFilter[]> _FilterCache = new ConcurrentDictionary<MethodInfo, IDomainServiceFilter[]>();
 
         public event DomainExecuteEvent Executed;
         public event DomainExecuteEvent Executing;
@@ -61,15 +63,18 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(method));
             if (method.DeclaringType != GetType())
                 throw new ArgumentException("该方法不是此领域服务的方法。");
+            IDomainServiceFilter[] filters = _FilterCache.GetOrAdd(method, t => t.GetCustomAttributes<DomainServiceFilterAttribute>().ToArray());
             var context = new DomainExecutionContext(this, domainContext, method);
             Context = context;
             try
             {
+                await Task.WhenAll(filters.Select(t => t.OnExecutingAsync(context)));
                 if (Executing != null)
                     await Executing(context);
                 await (Task)method.Invoke(this, context.ParameterValues);
                 if (Executed != null)
                     await Executed(context);
+                await Task.WhenAll(filters.Select(t => t.OnExecutedAsync(context)));
             }
             finally
             {
@@ -85,17 +90,20 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(method));
             if (method.DeclaringType != GetType())
                 throw new ArgumentException("该方法不是此领域服务的方法。");
+            IDomainServiceFilter[] filters = _FilterCache.GetOrAdd(method, t => t.GetCustomAttributes<DomainServiceFilterAttribute>().ToArray());
             var context = new DomainExecutionContext(this, domainContext, method);
             var executionContext = ExecutionContext.Capture();
             Context = context;
             try
             {
+                await Task.WhenAll(filters.Select(t => t.OnExecutingAsync(context)));
                 if (Executing != null)
                     await Executing(context);
                 var result = await (Task<T>)method.Invoke(this, context.ParameterValues);
                 context.Result = result;
                 if (Executed != null)
                     await Executed(context);
+                await Task.WhenAll(filters.Select(t => t.OnExecutedAsync(context)));
                 return result;
             }
             finally

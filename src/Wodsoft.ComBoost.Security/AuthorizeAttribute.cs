@@ -24,7 +24,7 @@ namespace Wodsoft.ComBoost
 
         public object[] Roles { get; private set; }
 
-        public override Task OnActionExecuting(IDomainExecutionContext context)
+        public override Task OnExecutingAsync(IDomainExecutionContext context)
         {
             var provider = context.DomainContext.GetService<IAuthenticationProvider>();
             var authentication = provider.GetAuthentication();
