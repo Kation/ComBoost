@@ -68,17 +68,18 @@ namespace Wodsoft.ComBoost
             Context = context;
             try
             {
-                await Task.WhenAll(filters.Select(t => t.OnExecutingAsync(context)));
-                if (Executing != null)
-                    await Executing(context);
-                await (Task)method.Invoke(this, context.ParameterValues);
-                if (Executed != null)
-                    await Executed(context);
-                await Task.WhenAll(filters.Select(t => t.OnExecutedAsync(context)));
+                    await Task.WhenAll(filters.Select(t => t.OnExecutingAsync(context)));
+                    if (Executing != null)
+                        await Executing(context);
+                    await (Task)method.Invoke(this, context.ParameterValues);
+                    if (Executed != null)
+                        await Executed(context);
+                    await Task.WhenAll(filters.Select(t => t.OnExecutedAsync(context)));
             }
-            finally
+            catch (Exception ex)
             {
-
+                await Task.WhenAll(filters.Select(t => t.OnExceptionThrowingAsync(context, ex)));
+                throw ex;
             }
         }
 
@@ -106,9 +107,10 @@ namespace Wodsoft.ComBoost
                 await Task.WhenAll(filters.Select(t => t.OnExecutedAsync(context)));
                 return result;
             }
-            finally
+            catch (Exception ex)
             {
-
+                await Task.WhenAll(filters.Select(t => t.OnExceptionThrowingAsync(context, ex)));
+                throw ex;
             }
         }
     }
