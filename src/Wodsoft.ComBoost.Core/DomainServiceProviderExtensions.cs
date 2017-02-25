@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
@@ -11,31 +12,69 @@ namespace Wodsoft.ComBoost
     public static class DomainServiceProviderExtensions
     {
         /// <summary>
-        /// 注册领域扩展。
+        /// 添加领域泛型扩展。
         /// </summary>
-        /// <typeparam name="TService">领域服务类型。</typeparam>
-        /// <typeparam name="TExtension">领域扩展类型。</typeparam>
         /// <param name="domainProvider">领域服务提供器。</param>
-        public static void RegisterExtension<TService, TExtension>(this IDomainServiceProvider domainProvider)
-            where TService : IDomainService
-            where TExtension : IDomainExtension
+        /// <param name="serviceDefinitionType">领域服务泛型定义类型。</param>
+        /// <param name="extensionDefinitionType">领域扩展泛型定义类型。</param>
+        public static void AddGenericDefinitionExtension(this IDomainServiceProvider domainProvider, Type serviceDefinitionType, Type extensionDefinitionType)
         {
             if (domainProvider == null)
                 throw new ArgumentNullException(nameof(domainProvider));
-            domainProvider.RegisterExtension(typeof(TService), typeof(TExtension));
+            if (!typeof(IDomainService).IsAssignableFrom(serviceDefinitionType))
+                throw new ArgumentException("不是领域服务类型。", nameof(serviceDefinitionType));
+            if (!typeof(IDomainExtension).IsAssignableFrom(extensionDefinitionType))
+                throw new ArgumentException("不是领域扩展类型。", nameof(serviceDefinitionType));
+            if (!serviceDefinitionType.GetTypeInfo().IsGenericTypeDefinition)
+                throw new ArgumentException("仅支持泛型定义类型。。", nameof(serviceDefinitionType));
+            if (!extensionDefinitionType.GetTypeInfo().IsGenericTypeDefinition)
+                throw new ArgumentException("仅支持泛型定义类型。。", nameof(extensionDefinitionType));
+            var serviceConstraints = serviceDefinitionType.GetTypeInfo().GenericTypeParameters;
+            var extensionConstraints = extensionDefinitionType.GetTypeInfo().GenericTypeParameters;
+            if (serviceConstraints.Length != extensionConstraints.Length)
+                throw new ArgumentException("领域服务类型与领域扩展类型的泛型数量不一致。");
+            //for (int i = 0; i < serviceConstraints.Length; i++)
+            //{
+            //    if (extensionConstraints[i].GetTypeInfo().GetGenericParameterConstraints().Any(t => !t.IsAssignableFrom(serviceConstraints[i])))
+            //        throw new ArgumentException("领域服务第" + i + "个泛型约束不满足领域扩展泛型约束。");
+            //}
+            domainProvider.AddExtensionSelector(type =>
+            {
+                if (!type.GetTypeInfo().IsGenericType)
+                    return null;
+                if (type.GetGenericTypeDefinition() != serviceDefinitionType)
+                    return null;
+                try
+                {
+                    var extensionType = extensionDefinitionType.MakeGenericType(type.GetGenericArguments());
+                    return extensionType;
+                }
+                catch
+                {
+                    return null;
+                }
+            });
         }
 
         /// <summary>
-        /// 注销领域扩展。
+        /// 添加领域扩展。
         /// </summary>
-        /// <typeparam name="TService">领域服务类型。</typeparam>
-        /// <typeparam name="TExtension">领域扩展类型。</typeparam>
         /// <param name="domainProvider">领域服务提供器。</param>
-        public static void UnregisterExtension<TService, TExtension>(this IDomainServiceProvider domainProvider)
+        /// <param name="serviceType">领域服务类型。（支持子类绑定。）</param>
+        /// <param name="extensionType">领域扩展类型。</param>
+        public static void AddExtension(this IDomainServiceProvider domainProvider, Type serviceType, Type extensionType)
         {
             if (domainProvider == null)
                 throw new ArgumentNullException(nameof(domainProvider));
-            domainProvider.UnregisterExtension(typeof(TService), typeof(TExtension));
+            if (!typeof(IDomainService).IsAssignableFrom(serviceType))
+                throw new ArgumentException("不是领域服务类型。", nameof(serviceType));
+            if (!typeof(IDomainExtension).IsAssignableFrom(extensionType))
+                throw new ArgumentException("不是领域扩展类型。", nameof(serviceType));
+            if (serviceType.GetTypeInfo().IsGenericTypeDefinition)
+                throw new ArgumentException("不支持泛型定义类型。。", nameof(serviceType));
+            if (extensionType.GetTypeInfo().IsGenericTypeDefinition)
+                throw new ArgumentException("不支持泛型定义类型。。", nameof(extensionType));
+            domainProvider.AddExtensionSelector(t => serviceType.IsAssignableFrom(t) ? extensionType : null);
         }
     }
 }

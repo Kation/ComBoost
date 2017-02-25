@@ -10,20 +10,21 @@ namespace Wodsoft.ComBoost
     public class DomainProvider : IDomainServiceProvider
     {
         private IServiceProvider _ServiceProvider;
-        private Dictionary<Type, List<Type>> _Extensions;
         private Dictionary<Type, Type> _Overrides;
         private Dictionary<Type, IDomainService> _Cache;
+        private List<Func<Type, Type>> _ServiceSelectors, _ExtensionSelectors;
 
         public DomainProvider(IServiceProvider serviceProvider)
         {
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
             _ServiceProvider = serviceProvider;
-            _Extensions = new Dictionary<Type, List<Type>>();
             _Overrides = new Dictionary<Type, Type>();
             _Cache = new Dictionary<Type, IDomainService>();
+            _ServiceSelectors = new List<Func<Type, Type>>();
+            _ExtensionSelectors = new List<Func<Type, Type>>();
         }
-        
+
         public virtual TService GetService<TService>() where TService : IDomainService
         {
             Type type = typeof(TService);
@@ -32,106 +33,53 @@ namespace Wodsoft.ComBoost
             {
                 return (TService)service;
             }
-            if (type.IsConstructedGenericType)
+            if (_Overrides.ContainsKey(type))
+                type = _Overrides[type];
+            foreach (var selector in _ServiceSelectors)
             {
-                var definitionType = type.GetGenericTypeDefinition();
-                if (_Overrides.ContainsKey(definitionType))
-                {
-                    var arguments = type.GetGenericArguments();
-                    type = _Overrides[definitionType].MakeGenericType(arguments);
-                    service = (TService)ActivatorUtilities.CreateInstance(_ServiceProvider, type);
-                }
-                else
-                    service = ActivatorUtilities.CreateInstance<TService>(_ServiceProvider);
+                type = selector(type);
+                if (type == null)
+                    throw new InvalidOperationException("领域服务选择器返回的类型为空。");
             }
-            else if (_Overrides.ContainsKey(type))
+            service = (TService)ActivatorUtilities.CreateInstance(_ServiceProvider, type);
+            Type[] extensions = _ExtensionSelectors.Select(t => t(type)).Where(t => t != null).ToArray();
+            foreach (var extensionType in extensions)
             {
-                service = (TService)ActivatorUtilities.CreateInstance(_ServiceProvider, _Overrides[type]);
-            }
-            else
-                service = ActivatorUtilities.CreateInstance<TService>(_ServiceProvider);
-            List<Type> extensions;
-            if (_Extensions.TryGetValue(type, out extensions))
-            {
-                foreach (var extensionType in extensions)
-                {
-                    IDomainExtension extension = (IDomainExtension)ActivatorUtilities.CreateInstance(_ServiceProvider, extensionType);
-                    extension.OnInitialize(_ServiceProvider, service);
-                    service.Executing += extension.OnExecutingAsync;
-                    service.Executed += extension.OnExecutedAsync;
-                }
-            }
-            if (type.IsConstructedGenericType)
-            {
-                var definitionType = type.GetGenericTypeDefinition();
-                if (_Extensions.TryGetValue(definitionType, out extensions))
-                {
-                    var arguments = type.GetGenericArguments();
-                    foreach (var extensionType in extensions)
-                    {
-                        try
-                        {
-                            IDomainExtension extension = (IDomainExtension)ActivatorUtilities.CreateInstance(_ServiceProvider, extensionType.MakeGenericType(arguments));
-                            extension.OnInitialize(_ServiceProvider, service);
-                            service.Executing += extension.OnExecutingAsync;
-                            service.Executed += extension.OnExecutedAsync;
-                        }
-                        catch
-                        {
-                            continue;
-                        }
-                    }
-                }
+                IDomainExtension extension = (IDomainExtension)ActivatorUtilities.CreateInstance(_ServiceProvider, extensionType);
+                extension.OnInitialize(_ServiceProvider, service);
+                service.Executing += extension.OnExecutingAsync;
+                service.Executed += extension.OnExecutedAsync;
             }
             _Cache.Add(type, service);
             return (TService)service;
         }
 
-        public virtual void Override(Type serviceType, Type overrideType)
+        public void AddService<TService, TImplementation>()
         {
-            if (serviceType == null)
-                throw new ArgumentNullException(nameof(serviceType));
-            if (overrideType == null)
-                throw new ArgumentNullException(nameof(overrideType));
+            var serviceType = typeof(TService);
+            if (serviceType.GetTypeInfo().IsGenericTypeDefinition)
+                throw new NotSupportedException("不支持泛型定义类型。");
+            var implementationType = typeof(TImplementation);
+            if (implementationType.GetTypeInfo().IsGenericTypeDefinition)
+                throw new NotSupportedException("不支持泛型定义类型。");
             if (_Overrides.ContainsKey(serviceType))
-            {
-                if (serviceType == overrideType)
-                    _Overrides.Remove(serviceType);
-                else
-                    _Overrides[serviceType] = overrideType;
-            }
+                _Overrides[serviceType] = implementationType;
             else
-                _Overrides.Add(serviceType, overrideType);
+                _Overrides.Add(serviceType, implementationType);
         }
 
-        public virtual void RegisterExtension(Type serviceType, Type extensionType)
+        public void AddServiceSelector(Func<Type, Type> serviceSelector)
         {
-            if (serviceType == null)
-                throw new ArgumentNullException(nameof(serviceType));
-            if (extensionType == null)
-                throw new ArgumentNullException(nameof(extensionType));
-            if (!typeof(IDomainService).IsAssignableFrom(serviceType))
-                throw new ArgumentException("服务类型没有实现领域服务接口IDomainService。");
-            if (!typeof(IDomainExtension).IsAssignableFrom(extensionType))
-                throw new ArgumentException("扩展类型没有实现领域扩展接口IDomainExtension。");
-            if (!_Extensions.ContainsKey(serviceType))
-                _Extensions.Add(serviceType, new List<Type>());
-            List<Type> extensionList = _Extensions[serviceType];
-            if (!extensionList.Contains(extensionType))
-                extensionList.Add(extensionType);
+            if (serviceSelector == null)
+                throw new ArgumentNullException(nameof(serviceSelector));
+            _ServiceSelectors.Add(serviceSelector);
         }
 
-        public virtual void UnregisterExtension(Type serviceType, Type extensionType)
+        public void AddExtensionSelector(Func<Type, Type> extensionSelector)
         {
-            if (serviceType == null)
-                throw new ArgumentNullException(nameof(serviceType));
-            if (extensionType == null)
-                throw new ArgumentNullException(nameof(extensionType));
-            List<Type> extensionList;
-            if (_Extensions.TryGetValue(serviceType, out extensionList))
-            {
-                extensionList.Remove(extensionType);
-            }
+            if (extensionSelector == null)
+                throw new ArgumentNullException(nameof(extensionSelector));
+            _ExtensionSelectors.Add(extensionSelector);
         }
     }
 }

@@ -18,6 +18,7 @@ using Wodsoft.ComBoost.Data;
 using Wodsoft.ComBoost.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Wodsoft.ComBoost.Forum.Entity;
+using System.Reflection;
 
 namespace Wodsoft.ComBoost.Forum
 {
@@ -66,10 +67,10 @@ namespace Wodsoft.ComBoost.Forum
             services.AddSingleton<IDomainServiceProvider, DomainProvider>(t =>
             {
                 var provider = new DomainProvider(t);
-                provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntitySearchExtension<>));
-                provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityPagerExtension<>));
-                provider.RegisterExtension(typeof(EntityDomainService<>), typeof(EntityPasswordExtension<>));
-                provider.RegisterExtension(typeof(EntityDomainService<>), typeof(ImageExtension<>));
+                provider.AddGenericDefinitionExtension(typeof(EntityDomainService<>), typeof(EntitySearchExtension<>));
+                provider.AddGenericDefinitionExtension(typeof(EntityDomainService<>), typeof(EntityPagerExtension<>));
+                provider.AddGenericDefinitionExtension(typeof(EntityDomainService<>), typeof(EntityPasswordExtension<>));
+                provider.AddGenericDefinitionExtension(typeof(EntityDomainService<>), typeof(ImageExtension<>));
                 provider.AddForumExtensions();
                 return provider;
             });

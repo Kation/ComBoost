@@ -18,24 +18,22 @@ namespace Wodsoft.ComBoost
         TService GetService<TService>() where TService : IDomainService;
 
         /// <summary>
-        /// 覆盖领域服务。
+        /// 添加领域服务。
         /// </summary>
-        /// <param name="serviceType">要被覆盖的领域服务类型。</param>
-        /// <param name="overrideType">要替换为的领域服务类型。</param>
-        void Override(Type serviceType, Type overrideType);
+        /// <typeparam name="TService">目标服务类型。</typeparam>
+        /// <typeparam name="TImplementation">实现服务类型。</typeparam>
+        void AddService<TService, TImplementation>();
 
         /// <summary>
-        /// 注册领域扩展。
+        /// 添加领域服务选择器。
         /// </summary>
-        /// <param name="serviceType">领域服务类型。</param>
-        /// <param name="extensionType">领域扩展类型。</param>
-        void RegisterExtension(Type serviceType, Type extensionType);
+        /// <param name="serviceSelector">服务选择器。</param>
+        void AddServiceSelector(Func<Type, Type> serviceSelector);
 
         /// <summary>
-        /// 注销领域扩展。
+        /// 添加领域扩展选择器。
         /// </summary>
-        /// <param name="serviceType">领域服务类型。</param>
-        /// <param name="extensionType">领域扩展类型。</param>
-        void UnregisterExtension(Type serviceType, Type extensionType);
+        /// <param name="extensionSelector">扩展选择器。</param>
+        void AddExtensionSelector(Func<Type, Type> extensionSelector);
     }
 }
