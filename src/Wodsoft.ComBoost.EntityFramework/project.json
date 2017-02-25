@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.EntityFramework",
-  "version": "3.0.0-alpha9",
+  "version": "3.0.0-alpha10",
   "authors": [ "Kation" ],
   "description": "ComBoost用于EntityFramework实现的实体模块。",
   "packOptions": {
@@ -16,7 +16,7 @@
   "dependencies": {
     "EntityFramework": "6.1.3",
     "System.Interactive.Async": "3.0.0",
-    "Wodsoft.ComBoost.Data.Core": "[3.0.0-alpha9,4.0.0)"
+    "Wodsoft.ComBoost.Data.Core": "[3.0.0-alpha10,4.0.0)"
   },
 
   "frameworks": {

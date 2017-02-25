@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.AspNetCore.Security",
-  "version": "3.0.0-alpha9-1",
+  "version": "3.0.0-alpha10",
   "authors": [ "Kation" ],
   "description": "ComBoost用于AspNet Core的安全模块。",
   "packOptions": {
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "Microsoft.AspNetCore.Authentication": "1.1.0",
-    "Wodsoft.ComBoost.Security": "[3.0.0-alpha9,4.0.0)"
+    "Wodsoft.ComBoost.Security": "[3.0.0-alpha10,4.0.0)"
   },
 
   "frameworks": {
