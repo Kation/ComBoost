@@ -29,11 +29,6 @@ namespace Wodsoft.ComBoost.Redis
             return new RedisCache(_Conn.GetDatabase(), _SerializerProvider);
         }
 
-        public ICache GetCache(string location)
-        {
-            throw new NotSupportedException();
-        }
-
         public ISemaphore GetSemaphore(string name)
         {
             return new RedisSemaphore(_Conn.GetDatabase(), name, LockerTimeout);
