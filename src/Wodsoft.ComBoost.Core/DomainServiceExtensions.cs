@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Collections.Concurrent;
 
 namespace Wodsoft.ComBoost
 {
+    /// <summary>
+    /// 领域服务扩展。
+    /// </summary>
     public static class DomainServiceExtensions
     {
         public static Task ExecuteAsync(this IDomainService domainService, IDomainContext domainContext, Func<Task> method)
@@ -214,18 +218,26 @@ namespace Wodsoft.ComBoost
             return domainService.ExecuteAsync<TResult>(domainContext, method.GetMethodInfo());
         }
 
+        private static ConcurrentDictionary<Type, ConcurrentDictionary<string, MethodInfo>> _MethodCache = new ConcurrentDictionary<Type, ConcurrentDictionary<string, MethodInfo>>();
+
         public static Task ExecuteAsync(this IDomainService domainService, IDomainContext domainContext, string method)
         {
             if (domainService == null)
                 throw new ArgumentNullException(nameof(domainService));
-            return domainService.ExecuteAsync(domainContext, domainService.GetType().GetMethod(method));
+            var type = domainService.GetType();
+            ConcurrentDictionary<string, MethodInfo> cache = _MethodCache.GetOrAdd(type, t => new ConcurrentDictionary<string, MethodInfo>());
+            MethodInfo methodInfo = cache.GetOrAdd(method, t => type.GetMethod(method));
+            return domainService.ExecuteAsync(domainContext, methodInfo);
         }
 
         public static Task<TResult> ExecuteAsync<TResult>(this IDomainService domainService, IDomainContext domainContext, string method)
         {
             if (domainService == null)
                 throw new ArgumentNullException(nameof(domainService));
-            return domainService.ExecuteAsync<TResult>(domainContext, domainService.GetType().GetMethod(method));
+            var type = domainService.GetType();
+            ConcurrentDictionary<string, MethodInfo> cache = _MethodCache.GetOrAdd(type, t => new ConcurrentDictionary<string, MethodInfo>());
+            MethodInfo methodInfo = cache.GetOrAdd(method, t => type.GetMethod(method));
+            return domainService.ExecuteAsync<TResult>(domainContext, methodInfo);
         }
     }
 }

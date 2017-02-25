@@ -33,7 +33,7 @@ namespace Wodsoft.ComBoost
         object GetValue(string name, Type valueType);
 
         /// <summary>
-        /// 
+        /// 获取存在的键集合。
         /// </summary>
         ICollection<string> Keys { get; }
     }

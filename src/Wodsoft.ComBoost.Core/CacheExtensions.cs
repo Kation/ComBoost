@@ -5,13 +5,32 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
 {
+    /// <summary>
+    /// 缓存扩展。
+    /// </summary>
     public static class CacheExtensions
     {
+        /// <summary>
+        /// 异步获取。
+        /// </summary>
+        /// <typeparam name="T">值类型。</typeparam>
+        /// <param name="cache">缓存。</param>
+        /// <param name="name">键名称。</param>
+        /// <returns></returns>
         public static async Task<T> GetAsync<T>(this ICache cache, string name)
         {
             return (T)await cache.GetAsync(name, typeof(T));
         }
-        
+
+        /// <summary>
+        /// 异步获取或设置。
+        /// </summary>
+        /// <typeparam name="T">值类型。</typeparam>
+        /// <param name="cache">缓存。</param>
+        /// <param name="name">键名称。</param>
+        /// <param name="getEntryDelegate">获取值的委托。</param>
+        /// <param name="expireTime">过期时间。</param>
+        /// <returns></returns>
         public static async Task<T> GetOrSetAsync<T>(this ICache cache, string name, Func<string, T> getEntryDelegate, TimeSpan? expireTime)
         {
             if (cache == null)
@@ -26,17 +45,5 @@ namespace Wodsoft.ComBoost
             }
             return entry;
         }
-
-        //private static async Task<ICacheEntry> SetCache(ICache cache, ICacheEntry entry)
-        //{
-        //    if (entry == null)
-        //        throw new ArgumentNullException(nameof(entry), "返回的缓存不能为空。");
-        //    if (entry.Value == null)
-        //        throw new InvalidOperationException("缓存值不能为空。");
-        //    if (entry.ExpiredDate < DateTime.Now)
-        //        throw new InvalidOperationException("该缓存已过期。");
-        //    await cache.SetAsync(entry);
-        //    return entry;
-        //}
     }
 }
