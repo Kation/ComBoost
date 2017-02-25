@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,10 +11,12 @@ namespace Wodsoft.ComBoost
     {
         private IServiceProvider _ServiceProvider;
 
-        public DomainContext(IServiceProvider serviceProvider)
+        public DomainContext(IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
+            if (cancellationToken == null)
+                throw new ArgumentNullException(nameof(cancellationToken));
             _ServiceProvider = serviceProvider;
         }
 
@@ -27,7 +30,9 @@ namespace Wodsoft.ComBoost
                 return _DataBag;
             }
         }
-        
+
+        public CancellationToken ServiceAborted { get; private set; }
+
         public virtual object GetService(Type serviceType)
         {
             return _ServiceProvider.GetService(serviceType);

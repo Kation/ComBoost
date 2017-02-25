@@ -9,7 +9,7 @@ namespace Wodsoft.ComBoost.Mvc
     public class MvcDomainContext : DomainContext
     {
         public MvcDomainContext(Controller controller)
-            : base(controller.HttpContext.RequestServices)
+            : base(controller.HttpContext.RequestServices, controller.HttpContext.RequestAborted)
         {
             if (controller == null)
                 throw new ArgumentNullException(nameof(controller));
