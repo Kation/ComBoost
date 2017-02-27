@@ -32,9 +32,9 @@ namespace Wodsoft.ComBoost.Security
 
         protected override AuthenticationHandler<ComBoostAuthenticationOptions> CreateHandler()
         {
-            var handler = _ServiceProvider.GetService<ComBoostAuthenticationHandler>();
+            var handler = _ServiceProvider.GetService<AuthenticationHandler<ComBoostAuthenticationOptions>>();
             if (handler == null)
-                handler = new Security.ComBoostAuthenticationHandler();
+                handler = new ComBoostAuthenticationCookieHandler();
             return handler;
         }
     }

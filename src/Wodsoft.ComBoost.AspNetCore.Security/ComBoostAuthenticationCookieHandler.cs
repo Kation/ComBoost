@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Wodsoft.ComBoost.Security
 {
-    public class ComBoostAuthenticationHandler : AuthenticationHandler<ComBoostAuthenticationOptions>
+    public class ComBoostAuthenticationCookieHandler : AuthenticationHandler<ComBoostAuthenticationOptions>
     {
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
