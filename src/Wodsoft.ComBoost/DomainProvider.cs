@@ -55,6 +55,8 @@ namespace Wodsoft.ComBoost
         }
 
         public void AddService<TService, TImplementation>()
+            where TService : IDomainService
+            where TImplementation : TService
         {
             var serviceType = typeof(TService);
             if (serviceType.GetTypeInfo().IsGenericTypeDefinition)

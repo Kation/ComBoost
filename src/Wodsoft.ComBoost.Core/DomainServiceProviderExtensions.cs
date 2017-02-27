@@ -76,5 +76,18 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentException("不支持泛型定义类型。。", nameof(extensionType));
             domainProvider.AddExtensionSelector(t => serviceType.IsAssignableFrom(t) ? extensionType : null);
         }
+
+        /// <summary>
+        /// 添加领域扩展。
+        /// </summary>
+        /// <typeparam name="TService">领域服务类型。（支持子类绑定。）</typeparam>
+        /// <typeparam name="TExtension">领域扩展类型。</typeparam>
+        /// <param name="domainProvider">领域服务提供器。</param>
+        public static void AddExtension<TService, TExtension>(this IDomainServiceProvider domainProvider)
+            where TService : IDomainService
+            where TExtension : IDomainExtension
+        {
+            AddExtension(domainProvider, typeof(TService), typeof(TExtension));
+        }
     }
 }

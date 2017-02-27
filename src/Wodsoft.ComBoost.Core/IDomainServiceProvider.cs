@@ -22,7 +22,9 @@ namespace Wodsoft.ComBoost
         /// </summary>
         /// <typeparam name="TService">目标服务类型。</typeparam>
         /// <typeparam name="TImplementation">实现服务类型。</typeparam>
-        void AddService<TService, TImplementation>();
+        void AddService<TService, TImplementation>()
+            where TService : IDomainService
+            where TImplementation : TService;
 
         /// <summary>
         /// 添加领域服务选择器。
