@@ -51,6 +51,23 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <returns></returns>
         Task<IQueryableCollection<TResult>> LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
             where TSource : IEntity
-            where TResult : IEntity;        
+            where TResult : IEntity;
+        
+        /// <summary>
+        /// 执行非查询Sql语句。
+        /// </summary>
+        /// <param name="sql">Sql语句。</param>
+        /// <param name="parameters">Sql参数。</param>
+        /// <returns></returns>
+        Task<int> ExecuteNonQueryAsync(string sql, params object[] parameters);
+
+        /// <summary>
+        /// 执行Sql语句并返回标量。
+        /// </summary>
+        /// <typeparam name="TValue">返回类型。</typeparam>
+        /// <param name="sql">Sql语句。</param>
+        /// <param name="parameters">Sql参数。</param>
+        /// <returns></returns>
+        Task<TValue> ExecuteScalarAsync<TValue>(string sql, params object[] parameters);
     }
 }

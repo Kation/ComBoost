@@ -115,5 +115,13 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="item">实体对象。</param>
         /// <returns></returns>
         Task ReloadAsync(T item);
+
+        /// <summary>
+        /// 执行Sql查询。
+        /// </summary>
+        /// <param name="sql">Sql语句。</param>
+        /// <param name="parameters">Sql参数</param>
+        /// <returns>返回查询器。</returns>
+        IQueryable<T> ExecuteQuery(string sql, params object[] parameters);
     }
 }

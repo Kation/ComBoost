@@ -139,5 +139,10 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             return Database.InnerContext.Entry(item).ReloadAsync();
         }
+
+        public IQueryable<T> ExecuteQuery(string sql, params object[] parameters)
+        {
+            return DbSet.SqlQuery(sql, parameters).AsNoTracking().AsQueryable();
+        }
     }
 }

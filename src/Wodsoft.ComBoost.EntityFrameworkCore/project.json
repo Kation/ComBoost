@@ -20,7 +20,7 @@
     "net451": {}
   },
   "dependencies": {
-    "Microsoft.EntityFrameworkCore": "1.1.0",
+    "Microsoft.EntityFrameworkCore.Relational": "1.1.0",
     "Wodsoft.ComBoost.Data.Core": "[3.0.0-alpha10,4.0.0)"
   }
 }

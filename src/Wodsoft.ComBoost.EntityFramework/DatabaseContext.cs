@@ -117,5 +117,15 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new NotSupportedException("不支持的路径。");
             return memberExpression.Member.Name;
         }
+        
+        public Task<int> ExecuteNonQueryAsync(string sql, params object[] parameters)
+        {
+            return InnerContext.Database.ExecuteSqlCommandAsync(sql, parameters);
+        }
+
+        public Task<TValue> ExecuteScalarAsync<TValue>(string sql, params object[] parameters)
+        {
+            return InnerContext.Database.SqlQuery<TValue>(sql, parameters).FirstOrDefaultAsync();
+        }
     }
 }

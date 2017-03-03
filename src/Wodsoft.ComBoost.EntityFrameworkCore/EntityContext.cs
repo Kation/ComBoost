@@ -8,6 +8,7 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Extensions;
 using System.Reflection;
 using System.ComponentModel;
 
@@ -146,6 +147,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         public Task ReloadAsync(T item)
         {
             return Database.InnerContext.Entry(item).ReloadAsync();
+        }
+
+        public IQueryable<T> ExecuteQuery(string sql, params object[] parameters)
+        {
+            return DbSet.FromSql(sql, parameters).AsNoTracking();
         }
     }
 }
