@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 #if NET451
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
@@ -64,17 +65,20 @@ namespace Wodsoft.ComBoost
             if (method.DeclaringType != GetType())
                 throw new ArgumentException("该方法不是此领域服务的方法。");
             IDomainServiceFilter[] filters = _FilterCache.GetOrAdd(method, t => t.GetCustomAttributes<DomainServiceFilterAttribute>().ToArray());
+            var accessor = domainContext.GetRequiredService<IDomainServiceAccessor>();
             var context = new DomainExecutionContext(this, domainContext, method);
             Context = context;
             try
             {
-                    await Task.WhenAll(filters.Select(t => t.OnExecutingAsync(context)));
-                    if (Executing != null)
-                        await Executing(context);
-                    await (Task)method.Invoke(this, context.ParameterValues);
-                    if (Executed != null)
-                        await Executed(context);
-                    await Task.WhenAll(filters.Select(t => t.OnExecutedAsync(context)));
+                accessor.DomainService = this;
+                await Task.WhenAll(filters.Select(t => t.OnExecutingAsync(context)));
+                if (Executing != null)
+                    await Executing(context);
+                await (Task)method.Invoke(this, context.ParameterValues);
+                if (Executed != null)
+                    await Executed(context);
+                await Task.WhenAll(filters.Select(t => t.OnExecutedAsync(context)));
+                accessor.DomainService = null;
             }
             catch (Exception ex)
             {
@@ -92,11 +96,13 @@ namespace Wodsoft.ComBoost
             if (method.DeclaringType != GetType())
                 throw new ArgumentException("该方法不是此领域服务的方法。");
             IDomainServiceFilter[] filters = _FilterCache.GetOrAdd(method, t => t.GetCustomAttributes<DomainServiceFilterAttribute>().ToArray());
+            var accessor = domainContext.GetRequiredService<IDomainServiceAccessor>();
             var context = new DomainExecutionContext(this, domainContext, method);
             var executionContext = ExecutionContext.Capture();
             Context = context;
             try
             {
+                accessor.DomainService = this;
                 await Task.WhenAll(filters.Select(t => t.OnExecutingAsync(context)));
                 if (Executing != null)
                     await Executing(context);
@@ -105,6 +111,7 @@ namespace Wodsoft.ComBoost
                 if (Executed != null)
                     await Executed(context);
                 await Task.WhenAll(filters.Select(t => t.OnExecutedAsync(context)));
+                accessor.DomainService = null;
                 return result;
             }
             catch (Exception ex)
