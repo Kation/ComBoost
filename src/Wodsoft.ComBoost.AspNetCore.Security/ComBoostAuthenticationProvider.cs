@@ -14,6 +14,8 @@ namespace Wodsoft.ComBoost.Security
         {
             if (accessor == null)
                 throw new ArgumentNullException(nameof(accessor));
+            if (accessor.HttpContext == null)
+                throw new ArgumentException("当前环境不存在Http上下文。", "accessor");
             Context = accessor.HttpContext;
         }
 
@@ -21,7 +23,10 @@ namespace Wodsoft.ComBoost.Security
 
         public IAuthentication GetAuthentication()
         {
-            return Context.User as ComBoostPrincipal;
+            var authentication = Context.User as ComBoostPrincipal;
+            if (authentication == null)
+                throw new NotSupportedException("当前环境找不到身份验证对象。");
+            return authentication;
         }
 
         public async Task<bool> SignInAsync(IDictionary<string, string> properties)

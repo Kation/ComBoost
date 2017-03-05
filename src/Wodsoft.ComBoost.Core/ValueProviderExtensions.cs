@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost
         {
             object value = valueProvider.GetValue(name);
             if (value == null)
-                throw new ArgumentException("找不到所需值。");
+                throw new ArgumentException("找不到所需值。", name);
             return value;
         }
 
@@ -64,7 +64,7 @@ namespace Wodsoft.ComBoost
         {
             object value = valueProvider.GetValue(name, valueType);
             if (value == null)
-                throw new ArgumentException("找不到所需值。");
+                throw new ArgumentException("找不到所需值。", name);
             return value;
         }
 
@@ -79,7 +79,7 @@ namespace Wodsoft.ComBoost
         {
             T value = valueProvider.GetValue<T>(name);
             if (value == null)
-                throw new ArgumentException("找不到所需值。");
+                throw new ArgumentException("找不到所需值。", name);
             return value;
         }
 
@@ -93,7 +93,7 @@ namespace Wodsoft.ComBoost
         {
             T value = (T)valueProvider.GetValue(typeof(T));
             if (value == null)
-                throw new ArgumentException("找不到所需值。");
+                throw new ArgumentException("找不到所需值。", typeof(T).FullName);
             return value;
 
         }

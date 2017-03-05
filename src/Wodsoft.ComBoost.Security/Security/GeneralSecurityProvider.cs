@@ -8,7 +8,7 @@ namespace Wodsoft.ComBoost.Security
 {
     public abstract class GeneralSecurityProvider : ISecurityProvider
     {
-        public string ConvertRoleToString(object role)
+        public virtual string ConvertRoleToString(object role)
         {
             if (role == null)
                 throw new ArgumentNullException(nameof(role));
