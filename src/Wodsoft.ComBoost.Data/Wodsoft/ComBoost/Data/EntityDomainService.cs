@@ -149,6 +149,7 @@ namespace Wodsoft.ComBoost.Data
             T entity = await context.GetAsync(queryable, index);
             if (entity == null)
                 throw new EntityNotFoundException(typeof(T), index);
+            entity.OnEditing();
             var model = new EntityEditModel<T>(entity);
             model.Properties = Metadata.EditProperties.Where(t =>
             {
