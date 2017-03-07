@@ -120,5 +120,10 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             return InnerContext.ReloadAsync((M)item);
         }
+
+        public IQueryable<T> ExecuteQuery(string sql, params object[] parameters)
+        {
+            throw new NotSupportedException();
+        }
     }
 }
