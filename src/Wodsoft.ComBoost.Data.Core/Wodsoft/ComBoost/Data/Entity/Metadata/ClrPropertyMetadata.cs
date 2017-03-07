@@ -31,7 +31,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
 
             HideAttribute hide = propertyInfo.GetCustomAttribute<HideAttribute>();
             if (hide == null)
-                if (propertyInfo.PropertyType.GetTypeInfo().IsGenericType)
+                if (!propertyInfo.PropertyType.GetTypeInfo().IsValueType && propertyInfo.PropertyType.GetTypeInfo().IsGenericType)
                     IsHiddenOnView = true;
 
             string customType;
