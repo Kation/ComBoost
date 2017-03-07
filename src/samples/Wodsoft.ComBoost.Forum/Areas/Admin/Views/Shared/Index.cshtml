@@ -15,7 +15,7 @@
     <li><a href="@Url.Action("Index", "Home")">首页</a></li>
     <li class="active">@Model.Metadata.Name</li>
 </ul>
-<form method="get" class="form-horizontal">
+<form id="listForm" method="get" class="form-horizontal">
     <div class="container-fluid">
         <div class="row">
             <div class="@(Model.Parent == null ? "span12":"span9")">
@@ -44,7 +44,7 @@
                     }
                     @foreach (var button in Model.ItemButtons)
                     {
-                        <li id="customButton@(Array.IndexOf(Model.ItemButtons, button))" class="pull-right disabled"><a href="javascript:gotoCustom(@Array.IndexOf(Model.ItemButtons, button));" title="@button.Tooltip">@button.Icon @button.Name</a></li>
+                        <li id="customButton@(Array.IndexOf(Model.ItemButtons, button))" class="pull-right disabled"><a href="javascript:gotoCustom(@Array.IndexOf(Model.ItemButtons, button));" class="btn btn-default" title="@button.Tooltip">@Html.Raw(button.Icon) @button.Name</a></li>
                     }
                 </ul>
                 <div class="tab-content">
@@ -68,10 +68,7 @@
                                 <td>
                                     <button class="btn btn-default" onclick="doSearch();" name="Search" value="True">确定</button>
                                     <button class="btn btn-default" onclick="cancelSearch();">取消</button>
-                                    @if (Context.Request.Query["Search"] == "True")
-                                    {
-                                        <input type="hidden" id="searchTag" name="Search" value="True" />
-                                    }
+                                    <input type="hidden" id="searchTag" name="Search" value="True" disabled="disabled" />
                                 </td>
                             </tr>
                         </table>
@@ -90,7 +87,7 @@
                             <tbody id="listview">
                                 @foreach (var item in Model.Items)
                                 {
-                                    <tr data-id="@item.Index" data-remove="@item.IsRemoveAllowed" data-edit="@item.IsEditAllowed" @string.Join(" ", Model.ItemButtons.Where(t => { t.SetTarget(Context.RequestServices, item); return t.Target != null; }).Select(t => "data-b-" + Array.IndexOf(Model.ItemButtons, t) + "=\"" + t.Target.ToString() + "\""))>
+                                    <tr data-id="@item.Index" data-remove="@item.IsRemoveAllowed" data-edit="@item.IsEditAllowed" @Html.Raw(string.Join(" ", Model.ItemButtons.Where(t => { t.SetTarget(Context.RequestServices, item); return t.Target != null; }).Select(t => "data-b-" + Array.IndexOf(Model.ItemButtons, t) + "=\"" + t.Target.ToString() + "\"")))>
                                         <td class="text-center">
                                             <input type="radio" />
                                         </td>
@@ -228,10 +225,12 @@
 
     function cancelSearch() {
         $('#searchPanel').find('input').prop('disabled', true);
+        $('#listForm').submit();
     }
 
     function doSearch() {
-        $('#searchTag').prop('disabled', true);
+        $('#searchTag').prop('disabled', false);
+        $('#listForm').submit();
     }
 
     function gotoRemove() {
