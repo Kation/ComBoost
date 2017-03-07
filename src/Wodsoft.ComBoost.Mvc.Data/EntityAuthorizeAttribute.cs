@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class EntityAuthorizeAttribute : IActionFilter
+    public class EntityAuthorizeAttribute : Attribute, IActionFilter
     {
         /// <summary>
         /// Initialize entity authorize attribute.
@@ -26,18 +26,18 @@ namespace Wodsoft.ComBoost.Mvc
         public EntityAuthorizeAction Action { get; private set; }
 
         public virtual void OnActionExecuted(ActionExecutedContext context) { }
-        
+
         public virtual void OnActionExecuting(ActionExecutingContext context)
         {
             var controller = context.Controller as IHaveEntityMetadata;
             if (controller == null)
                 return;
-            
+
             bool isAuthed = true;
             switch (Action)
             {
                 case EntityAuthorizeAction.Create:
-                    isAuthed= controller.Metadata.AddRoles.Count() == 0 ||
+                    isAuthed = controller.Metadata.AddRoles.Count() == 0 ||
                         (controller.Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All ?
                         controller.Metadata.AddRoles.All(t => context.HttpContext.User.IsInDynamicRole(t)) :
                         controller.Metadata.AddRoles.Any(t => context.HttpContext.User.IsInDynamicRole(t)));

@@ -26,6 +26,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         public IEntityMetadata Metadata { get; private set; }
 
+        [EntityAuthorize(EntityAuthorizeAction.View)]
         [HttpGet]
         public virtual async Task<IActionResult> Index()
         {
@@ -48,6 +49,7 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        [EntityAuthorize(EntityAuthorizeAction.Create)]
         [HttpGet]
         public virtual async Task<IActionResult> Create()
         {
@@ -68,6 +70,7 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        [EntityAuthorize(EntityAuthorizeAction.Edit)]
         [HttpGet]
         public virtual async Task<IActionResult> Edit()
         {
@@ -92,6 +95,7 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        [EntityAuthorize(EntityAuthorizeAction.View)]
         [HttpGet]
         public virtual async Task<IActionResult> Detail()
         {
@@ -116,6 +120,7 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        [EntityAuthorize(EntityAuthorizeAction.Remove)]
         [HttpPost]
         public virtual async Task<IActionResult> Remove()
         {
@@ -135,6 +140,7 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        [EntityAuthorize(EntityAuthorizeAction.Edit)]
         [HttpPost]
         public virtual async Task<IActionResult> Update()
         {
@@ -164,6 +170,7 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
 
+        [EntityAuthorize(EntityAuthorizeAction.View)]
         [HttpGet]
         public virtual async Task<IActionResult> Selector()
         {
@@ -184,6 +191,7 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        [EntityAuthorize(EntityAuthorizeAction.View)]
         [HttpGet]
         public virtual async Task<IActionResult> MultipleSelector()
         {
