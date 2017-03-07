@@ -52,6 +52,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 var path = routeData.DataTokens["logoutPath"] as string;
                 return path ?? oldLogoutPath(context);
             };
+            var oldExpireTime = options.ExpireTime;
+            options.ExpireTime = context =>
+            {
+                var routeData = context.GetRouteData();
+                var path = routeData.DataTokens["expireTime"] as TimeSpan?;
+                return path ?? oldExpireTime(context);
+            };
             serviceCollection.AddSingleton(options);
         }
     }
