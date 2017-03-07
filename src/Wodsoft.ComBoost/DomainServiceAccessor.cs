@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+#if NET451
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
+#endif
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
 {
     public class DomainServiceAccessor : IDomainServiceAccessor
     {
-#if NET451        
+#if NET451
         private static readonly string LogicalDataKey = "__DomainService_Current__" + AppDomain.CurrentDomain.Id;
 
         public IDomainService DomainService
