@@ -29,13 +29,19 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 添加领域服务选择器。
         /// </summary>
-        /// <param name="serviceSelector">服务选择器。</param>
+        /// <param name="serviceSelector">服务选择器。传入领域服务类型，返回实际领域服务类型。</param>
         void AddServiceSelector(Func<Type, Type> serviceSelector);
 
         /// <summary>
         /// 添加领域扩展选择器。
         /// </summary>
-        /// <param name="extensionSelector">扩展选择器。</param>
+        /// <param name="extensionSelector">扩展选择器。传入领域服务类型，返回领域扩展类型，可为空。</param>
         void AddExtensionSelector(Func<Type, Type> extensionSelector);
+
+        /// <summary>
+        /// 添加领域扩展筛选器。
+        /// </summary>
+        /// <param name="extensionFilter">扩展筛选器。传入领域服务类型，领域扩展类型，返回是否允许的布尔型结果。</param>
+        void AddExtensionFilter(Func<Type, Type, bool> extensionFilter);
     }
 }

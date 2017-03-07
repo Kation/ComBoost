@@ -13,6 +13,7 @@ namespace Wodsoft.ComBoost
         private Dictionary<Type, Type> _Overrides;
         private Dictionary<Type, IDomainService> _Cache;
         private List<Func<Type, Type>> _ServiceSelectors, _ExtensionSelectors;
+        private List<Func<Type, Type, bool>> _ExtensionFilters;
 
         public DomainProvider(IServiceProvider serviceProvider)
         {
@@ -23,6 +24,7 @@ namespace Wodsoft.ComBoost
             _Cache = new Dictionary<Type, IDomainService>();
             _ServiceSelectors = new List<Func<Type, Type>>();
             _ExtensionSelectors = new List<Func<Type, Type>>();
+            _ExtensionFilters = new List<Func<Type, Type, bool>>();
         }
 
         public virtual TService GetService<TService>() where TService : IDomainService
@@ -45,6 +47,8 @@ namespace Wodsoft.ComBoost
             Type[] extensions = _ExtensionSelectors.Select(t => t(type)).Where(t => t != null).ToArray();
             foreach (var extensionType in extensions)
             {
+                if (_ExtensionFilters.Any(t => t(type, extensionType) == false))
+                    continue;
                 IDomainExtension extension = (IDomainExtension)ActivatorUtilities.CreateInstance(_ServiceProvider, extensionType);
                 extension.OnInitialize(_ServiceProvider, service);
                 service.Executing += extension.OnExecutingAsync;
@@ -82,6 +86,13 @@ namespace Wodsoft.ComBoost
             if (extensionSelector == null)
                 throw new ArgumentNullException(nameof(extensionSelector));
             _ExtensionSelectors.Add(extensionSelector);
+        }
+
+        public void AddExtensionFilter(Func<Type, Type, bool> extensionFilter)
+        {
+            if (extensionFilter == null)
+                throw new ArgumentNullException(nameof(extensionFilter));
+            _ExtensionFilters.Add(extensionFilter);
         }
     }
 }

@@ -89,5 +89,18 @@ namespace Wodsoft.ComBoost
         {
             AddExtension(domainProvider, typeof(TService), typeof(TExtension));
         }
+
+        /// <summary>
+        /// 移除领域扩展。（最终判定）
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <typeparam name="TExtension"></typeparam>
+        /// <param name="domainProvider"></param>
+        public static void RemoveExtension<TService, TExtension>(this IDomainServiceProvider domainProvider)
+        {
+            if (domainProvider == null)
+                throw new ArgumentNullException(nameof(domainProvider));
+            domainProvider.AddExtensionFilter((service, extension) => service == typeof(TService) && extension == typeof(TExtension) ? false : true);
+        }
     }
 }
