@@ -40,6 +40,8 @@ namespace Wodsoft.ComBoost.Data
                 dynamic model = context.Result;
                 model.CurrentPage = context.DomainContext.DataBag.Page;
                 model.CurrentSize = context.DomainContext.DataBag.Size;
+                model.TotalPage = context.DomainContext.DataBag.TotalPage;
+                model.PageSizeOption = EntityPagerExtension.PageSizeOptions;
             }
 #if NET451
             return Task.FromResult(0);
@@ -48,7 +50,7 @@ namespace Wodsoft.ComBoost.Data
 #endif
         }
 
-        private Task Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
+        private async Task Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
         {
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
             int page = valueProvider.GetValue<int>("page");
@@ -57,14 +59,13 @@ namespace Wodsoft.ComBoost.Data
             int size = valueProvider.GetValue<int>("size");
             if (size == 0)
                 size = EntityPagerExtension.DefaultPageSize;
+            var databaseContext = context.DomainContext.GetRequiredService<IDatabaseContext>();
+            var entityContext = databaseContext.GetContext<T>();
+            var count = await entityContext.CountAsync(e.Queryable);
             e.Queryable = e.Queryable.Skip((page - 1) * size).Take(size);
             context.DomainContext.DataBag.Page = page;
             context.DomainContext.DataBag.Size = size;
-#if NET451
-            return Task.FromResult(0);
-#else
-            return Task.CompletedTask;
-#endif
+            context.DomainContext.DataBag.TotalPage = (int)Math.Ceiling((count / (double)size));
         }
     }
 }
