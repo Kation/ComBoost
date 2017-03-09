@@ -11,9 +11,9 @@ namespace Wodsoft.ComBoost
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public class FromAuthenticationAttribute : FromAttribute
     {
-        public override object GetValue(IDomainContext domainContext, ParameterInfo parameter)
+        public override object GetValue(IDomainExecutionContext executionContext, ParameterInfo parameter)
         {
-            IAuthenticationProvider provider = domainContext.GetRequiredService<IAuthenticationProvider>();
+            IAuthenticationProvider provider = executionContext.DomainContext.GetRequiredService<IAuthenticationProvider>();
             var user = typeof(IAuthentication).GetMethod("GetUser").MakeGenericMethod(parameter.ParameterType).Invoke(provider.GetAuthentication(), new object[0]);
             if (user == null)
                 throw new ArgumentNullException("获取" + parameter.Name + "参数的值为空。");

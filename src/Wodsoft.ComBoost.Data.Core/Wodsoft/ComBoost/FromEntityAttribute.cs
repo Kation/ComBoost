@@ -23,13 +23,13 @@ namespace Wodsoft.ComBoost
 
         public bool IsRequired { get; private set; }
 
-        public override object GetValue(IDomainContext domainContext, ParameterInfo parameter)
+        public override object GetValue(IDomainExecutionContext executionContext, ParameterInfo parameter)
         {
-            IValueProvider provider = domainContext.GetRequiredService<IValueProvider>();
+            IValueProvider provider = executionContext.DomainContext.GetRequiredService<IValueProvider>();
             object value = provider.GetValue(Name ?? parameter.Name, EntityDescriptor.GetMetadata(parameter.ParameterType).KeyType);
             if (value == null)
                 throw new ArgumentNullException("获取" + (Name ?? parameter.Name) + "参数的值为空。");
-            var databaseContext = domainContext.GetRequiredService<IDatabaseContext>();
+            var databaseContext = executionContext.DomainContext.GetRequiredService<IDatabaseContext>();
             dynamic entityContext;
             //if (parameter.ParameterType.GetTypeInfo().IsInterface)
             //    entityContext = typeof(DatabaseContextExtensions).GetMethod("GetWrappedContext").MakeGenericMethod(parameter.ParameterType).Invoke(null, new object[] { databaseContext });

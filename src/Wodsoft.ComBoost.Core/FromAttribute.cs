@@ -15,9 +15,9 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取值。
         /// </summary>
-        /// <param name="domainContext">领域上下文。</param>
+        /// <param name="executionContext">领域执行上下文。</param>
         /// <param name="parameter">参数信息。</param>
         /// <returns>返回值。</returns>
-        public abstract object GetValue(IDomainContext domainContext, ParameterInfo parameter);
+        public abstract object GetValue(IDomainExecutionContext executionContext, ParameterInfo parameter);
     }
 }
