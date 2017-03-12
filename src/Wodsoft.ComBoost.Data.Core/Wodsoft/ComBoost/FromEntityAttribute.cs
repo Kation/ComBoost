@@ -28,7 +28,7 @@ namespace Wodsoft.ComBoost
             IValueProvider provider = executionContext.DomainContext.GetRequiredService<IValueProvider>();
             object value = provider.GetValue(Name ?? parameter.Name, EntityDescriptor.GetMetadata(parameter.ParameterType).KeyType);
             if (value == null)
-                throw new ArgumentNullException("获取" + (Name ?? parameter.Name) + "参数的值为空。");
+                throw new ArgumentNullException(parameter.Name, "获取" + (Name ?? parameter.Name) + "实体的值为空。");
             var databaseContext = executionContext.DomainContext.GetRequiredService<IDatabaseContext>();
             dynamic entityContext;
             //if (parameter.ParameterType.GetTypeInfo().IsInterface)

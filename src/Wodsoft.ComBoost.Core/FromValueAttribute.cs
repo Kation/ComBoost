@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost
                 if (parameter.HasDefaultValue)
                     value = parameter.DefaultValue;
                 else if (IsRequired)
-                    throw new ArgumentNullException("获取" + (Name ?? parameter.Name) + "参数的值为空。");
+                    throw new ArgumentNullException(parameter.Name, "获取" + (Name ?? parameter.Name) + "的值为空。");
             return value;
         }
     }
