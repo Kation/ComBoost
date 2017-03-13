@@ -36,6 +36,11 @@ namespace Wodsoft.ComBoost
         public bool IsRequired { get; private set; }
 
         /// <summary>
+        /// 获取或设置默认值。
+        /// </summary>
+        public object DefaultValue { get; set; }
+
+        /// <summary>
         /// 获取值。
         /// </summary>
         /// <param name="executionContext">领域执行上下文。</param>
@@ -46,8 +51,8 @@ namespace Wodsoft.ComBoost
             IValueProvider provider = executionContext.DomainContext.GetRequiredService<IValueProvider>();
             object value = provider.GetValue(Name ?? parameter.Name, parameter.ParameterType);
             if (value == null)
-                if (parameter.HasDefaultValue)
-                    value = parameter.DefaultValue;
+                if (DefaultValue != null || parameter.HasDefaultValue)
+                    value = DefaultValue ?? parameter.DefaultValue;
                 else if (IsRequired)
                     throw new ArgumentNullException(parameter.Name, "获取" + (Name ?? parameter.Name) + "的值为空。");
             return value;
