@@ -32,24 +32,12 @@ namespace Wodsoft.ComBoost.Data
             Metadata = EntityDescriptor.GetMetadata<T>();
         }
 
-        public virtual async Task<IEntityViewModel<T>> List([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
+        public virtual async Task<IEntityViewModel<T>> List([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             var auth = authenticationProvider.GetAuthentication();
-            if (!Metadata.AllowAnonymous)
-            {
-                if (auth == null)
-                    throw new NotSupportedException("不能从当前权限提供器获取权限。");
-                if (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                {
-                    if (Metadata.ViewRoles.Any(t => !auth.IsInRole(t)))
-                        throw new UnauthorizedAccessException("查看权限不足。");
-                }
-                else
-                {
-                    if (Metadata.ViewRoles.All(t => !auth.IsInRole(t)))
-                        throw new UnauthorizedAccessException("查看权限不足。");
-                }
-            }
+            if (authorizeOption == null)
+                authorizeOption = EntityDomainAuthorizeOption.View;
+            authorizeOption.Validate(Metadata, auth);
             var context = database.GetContext<T>();
             var queryable = context.Query();
             foreach (var propertyMetadata in Metadata.Properties.Where(t => t.CustomType == "Entity"))
@@ -64,52 +52,24 @@ namespace Wodsoft.ComBoost.Data
                 queryable = e.Queryable;
             }
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
-            model.Properties = Metadata.ViewProperties.Where(t =>
-            {
-                if (!t.AllowAnonymous && auth == null)
-                    return false;
-                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                    return t.ViewRoles.All(r => auth.IsInRole(r));
-                else
-                    return t.ViewRoles.Any(r => auth.IsInRole(r));
-            }).ToArray();
+            model.Properties = authorizeOption.GetProperties(Metadata, auth);
             model.Items = await context.ToArrayAsync(queryable);
             return model;
         }
 
-        public event DomainServiceEvent<EntityQueryEventArgs<T>> EntityQuery;
+        public event DomainServiceAsyncEvent<EntityQueryEventArgs<T>> EntityQuery;
 
-        public virtual async Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider)
+        public virtual async Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             var auth = authenticationProvider.GetAuthentication();
-            if (!Metadata.AllowAnonymous)
-            {
-                if (auth == null)
-                    throw new NotSupportedException("不能从当前权限提供器获取权限。");
-                if (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                {
-                    if (Metadata.AddRoles.Any(t => !auth.IsInRole(t)))
-                        throw new UnauthorizedAccessException("创建权限不足。");
-                }
-                else
-                {
-                    if (Metadata.AddRoles.All(t => !auth.IsInRole(t)))
-                        throw new UnauthorizedAccessException("创建权限不足。");
-                }
-            }
+            if (authorizeOption == null)
+                authorizeOption = EntityDomainAuthorizeOption.Create;
+            authorizeOption.Validate(Metadata, auth);
             var context = database.GetContext<T>();
             var item = context.Create();
             item.OnCreating();
             EntityEditModel<T> model = new EntityEditModel<T>(item);
-            model.Properties = Metadata.CreateProperties.Where(t =>
-            {
-                if (!t.AllowAnonymous && auth == null)
-                    return false;
-                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                    return t.AddRoles.All(r => auth.IsInRole(r));
-                else
-                    return t.AddRoles.Any(r => auth.IsInRole(r));
-            }).ToArray();
+            model.Properties = authorizeOption.GetProperties(Metadata, auth);
             if (EntityCreateModelCreated != null)
             {
                 EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
@@ -119,27 +79,15 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public event DomainServiceEvent<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated;
+        public event DomainServiceAsyncEvent<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated;
 
-        public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
+        public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
             var auth = authenticationProvider.GetAuthentication();
-            if (!Metadata.AllowAnonymous)
-            {
-                if (auth == null)
-                    throw new NotSupportedException("不能从当前权限提供器获取权限。");
-                if (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                {
-                    if (Metadata.EditRoles.Any(t => !auth.IsInRole(t)))
-                        throw new UnauthorizedAccessException("编辑权限不足。");
-                }
-                else
-                {
-                    if (Metadata.EditRoles.All(t => !auth.IsInRole(t)))
-                        throw new UnauthorizedAccessException("编辑权限不足。");
-                }
-            }
+            if (authorizeOption == null)
+                authorizeOption = EntityDomainAuthorizeOption.Edit;
+            authorizeOption.Validate(Metadata, auth);
             var context = database.GetContext<T>();
             var queryable = context.Query();
             foreach (var propertyMetadata in Metadata.Properties.Where(t => t.CustomType == "Entity"))
@@ -151,15 +99,7 @@ namespace Wodsoft.ComBoost.Data
                 throw new EntityNotFoundException(typeof(T), index);
             entity.OnEditing();
             var model = new EntityEditModel<T>(entity);
-            model.Properties = Metadata.EditProperties.Where(t =>
-            {
-                if (!t.AllowAnonymous && auth == null)
-                    return false;
-                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                    return t.EditRoles.All(r => auth.IsInRole(r));
-                else
-                    return t.EditRoles.Any(r => auth.IsInRole(r));
-            }).ToArray();
+            model.Properties = authorizeOption.GetProperties(Metadata, auth);
             if (EntityEditModelCreated != null)
             {
                 EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
@@ -169,45 +109,20 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public event DomainServiceEvent<EntityModelCreatedEventArgs<T>> EntityEditModelCreated;
+        public event DomainServiceAsyncEvent<EntityModelCreatedEventArgs<T>> EntityEditModelCreated;
 
-        public virtual async Task<IEntityUpdateModel<T>> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider)
+        public virtual async Task<IEntityUpdateModel<T>> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             object index = valueProvider.GetValue("id", Metadata.KeyProperty.ClrType);
             var context = database.GetContext<T>();
             bool isNew = Metadata.KeyProperty.ClrType.GetTypeInfo().IsValueType ? index.Equals(Activator.CreateInstance(Metadata.KeyProperty.ClrType)) : index == null;
             var auth = authenticationProvider.GetAuthentication();
-            if (!Metadata.AllowAnonymous)
-            {
-                if (auth == null)
-                    throw new NotSupportedException("不能从当前权限提供器获取权限。");
-                if (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                {
-                    if (isNew)
-                    {
-                        if (Metadata.AddRoles.Any(t => !auth.IsInRole(t)))
-                            throw new UnauthorizedAccessException("创建权限不足。");
-                    }
-                    else
-                    {
-                        if (Metadata.EditRoles.Any(t => !auth.IsInRole(t)))
-                            throw new UnauthorizedAccessException("编辑权限不足。");
-                    }
-                }
+            if (authorizeOption == null)
+                if (isNew)
+                    authorizeOption = EntityDomainAuthorizeOption.Create;
                 else
-                {
-                    if (isNew)
-                    {
-                        if (Metadata.AddRoles.All(t => !auth.IsInRole(t)))
-                            throw new UnauthorizedAccessException("创建权限不足。");
-                    }
-                    else
-                    {
-                        if (Metadata.EditRoles.All(t => !auth.IsInRole(t)))
-                            throw new UnauthorizedAccessException("编辑权限不足。");
-                    }
-                }
-            }
+                    authorizeOption = EntityDomainAuthorizeOption.Edit;
+            authorizeOption.Validate(Metadata, auth);
             T entity;
             if (isNew)
             {
@@ -220,7 +135,7 @@ namespace Wodsoft.ComBoost.Data
                 if (entity == null)
                     throw new EntityNotFoundException(typeof(T), index);
             }
-            var result = await UpdateCore(valueProvider, auth, entity, isNew);
+            var result = await UpdateCore(valueProvider, auth, entity, authorizeOption.GetProperties(Metadata, auth).ToArray());
             if (isNew)
                 context.Add(entity);
             else
@@ -229,26 +144,8 @@ namespace Wodsoft.ComBoost.Data
             return result;
         }
 
-        protected virtual async Task<EntityUpdateModel<T>> UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, bool isNew)
+        protected virtual async Task<EntityUpdateModel<T>> UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, IPropertyMetadata[] properties)
         {
-            var properties = isNew ? Metadata.CreateProperties.Where(t =>
-            {
-                if (!t.AllowAnonymous && authentication == null)
-                    return false;
-                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                    return t.AddRoles.All(r => authentication.IsInRole(r));
-                else
-                    return t.AddRoles.Any(r => authentication.IsInRole(r));
-            }).ToArray() :
-            Metadata.EditProperties.Where(t =>
-            {
-                if (!t.AllowAnonymous && authentication == null)
-                    return false;
-                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                    return t.EditRoles.All(r => authentication.IsInRole(r));
-                else
-                    return t.EditRoles.Any(r => authentication.IsInRole(r));
-            }).ToArray();
             var model = new EntityUpdateModel<T>();
             if (EntityPreUpdate != null)
             {
@@ -270,8 +167,8 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public event DomainServiceEvent<EntityUpdateEventArgs<T>> EntityPreUpdate;
-        public event DomainServiceEvent<EntityUpdateEventArgs<T>> EntityUpdated;
+        public event DomainServiceAsyncEvent<EntityUpdateEventArgs<T>> EntityPreUpdate;
+        public event DomainServiceAsyncEvent<EntityUpdateEventArgs<T>> EntityUpdated;
 
         protected virtual async Task UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
         {
@@ -316,27 +213,15 @@ namespace Wodsoft.ComBoost.Data
             }
         }
 
-        public event DomainServiceEvent<EntityPropertyUpdateEventArgs<T>> EntityPropertyUpdate;
+        public event DomainServiceAsyncEvent<EntityPropertyUpdateEventArgs<T>> EntityPropertyUpdate;
 
-        public virtual async Task Remove([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider)
+        public virtual async Task Remove([FromService] IDatabaseContext database, [FromService]IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
             var auth = authenticationProvider.GetAuthentication();
-            if (!Metadata.AllowAnonymous)
-            {
-                if (auth == null)
-                    throw new NotSupportedException("不能从当前权限提供器获取权限。");
-                if (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                {
-                    if (Metadata.EditRoles.Any(t => !auth.IsInRole(t)))
-                        throw new UnauthorizedAccessException("创建权限不足。");
-                }
-                else
-                {
-                    if (Metadata.EditRoles.All(t => !auth.IsInRole(t)))
-                        throw new UnauthorizedAccessException("创建权限不足。");
-                }
-            }
+            if (authorizeOption == null)
+                authorizeOption = EntityDomainAuthorizeOption.Remove;
+            authorizeOption.Validate(Metadata, auth);
             var context = database.GetContext<T>();
             T entity = await context.GetAsync(index);
             if (entity == null)
@@ -352,27 +237,15 @@ namespace Wodsoft.ComBoost.Data
             await database.SaveAsync();
         }
 
-        public event DomainServiceEvent<EntityRemoveEventArgs<T>> EntityRemove;
+        public event DomainServiceAsyncEvent<EntityRemoveEventArgs<T>> EntityRemove;
 
-        public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider)
+        public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
             var auth = authenticationProvider.GetAuthentication();
-            if (!Metadata.AllowAnonymous)
-            {
-                if (auth == null)
-                    throw new NotSupportedException("不能从当前权限提供器获取权限。");
-                if (Metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                {
-                    if (Metadata.ViewRoles.Any(t => !auth.IsInRole(t)))
-                        throw new UnauthorizedAccessException("查看权限不足。");
-                }
-                else
-                {
-                    if (Metadata.ViewRoles.All(t => !auth.IsInRole(t)))
-                        throw new UnauthorizedAccessException("查看权限不足。");
-                }
-            }
+            if (authorizeOption == null)
+                authorizeOption = EntityDomainAuthorizeOption.Detail;
+            authorizeOption.Validate(Metadata, auth);
             var context = database.GetContext<T>();
             var queryable = context.Query();
             foreach (var propertyMetadata in Metadata.Properties.Where(t => t.CustomType == "Entity"))
@@ -383,15 +256,7 @@ namespace Wodsoft.ComBoost.Data
             if (entity == null)
                 throw new EntityNotFoundException(typeof(T), index);
             var model = new EntityEditModel<T>(entity);
-            model.Properties = Metadata.DetailProperties.Where(t =>
-            {
-                if (!t.AllowAnonymous && auth == null)
-                    return false;
-                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                    return t.ViewRoles.All(r => auth.IsInRole(r));
-                else
-                    return t.ViewRoles.Any(r => auth.IsInRole(r));
-            }).ToArray();
+            model.Properties = authorizeOption.GetProperties(Metadata, auth);
             if (EntityDetail != null)
             {
                 var e = new EntityDetailEventArgs<T>(entity, (IPropertyMetadata[])model.Properties);
@@ -401,6 +266,6 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public event DomainServiceEvent<EntityDetailEventArgs<T>> EntityDetail;
+        public event DomainServiceAsyncEvent<EntityDetailEventArgs<T>> EntityDetail;
     }
 }

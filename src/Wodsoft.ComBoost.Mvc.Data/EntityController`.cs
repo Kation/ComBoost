@@ -25,15 +25,15 @@ namespace Wodsoft.ComBoost.Mvc
         protected EntityDomainService<T> EntityService { get; private set; }
 
         public IEntityMetadata Metadata { get; private set; }
-
-        [EntityAuthorize(EntityAuthorizeAction.View)]
+        
         [HttpGet]
+        [EntityAuthorize]
         public virtual async Task<IActionResult> Index()
         {
             var context = CreateDomainContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IEntityViewModel<T>>(context, EntityService.List);
+                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel <T>>(context, EntityService.List);
                 foreach (var button in model.ViewButtons)
                     button.SetTarget(HttpContext.RequestServices);
                 if (Request.Headers["accept-content"].Contains("application/json"))
@@ -48,15 +48,15 @@ namespace Wodsoft.ComBoost.Mvc
                 return StatusCode(401, ex.Message);
             }
         }
-
-        [EntityAuthorize(EntityAuthorizeAction.Create)]
+        
         [HttpGet]
+        [EntityAuthorize]
         public virtual async Task<IActionResult> Create()
         {
             var context = CreateDomainContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IEntityEditModel<T>>(context, EntityService.Create);
+                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Create);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
@@ -69,15 +69,15 @@ namespace Wodsoft.ComBoost.Mvc
                 return StatusCode(401, ex.Message);
             }
         }
-
-        [EntityAuthorize(EntityAuthorizeAction.Edit)]
+        
         [HttpGet]
+        [EntityAuthorize]
         public virtual async Task<IActionResult> Edit()
         {
             var context = CreateDomainContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, IEntityEditModel<T>>(context, EntityService.Edit);
+                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Edit);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
@@ -94,15 +94,15 @@ namespace Wodsoft.ComBoost.Mvc
                 return StatusCode(404, ex.Message);
             }
         }
-
-        [EntityAuthorize(EntityAuthorizeAction.View)]
+        
         [HttpGet]
+        [EntityAuthorize]
         public virtual async Task<IActionResult> Detail()
         {
             var context = CreateDomainContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, IEntityEditModel<T>>(context, EntityService.Detail);
+                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Detail);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
@@ -119,15 +119,15 @@ namespace Wodsoft.ComBoost.Mvc
                 return StatusCode(404, ex.Message);
             }
         }
-
-        [EntityAuthorize(EntityAuthorizeAction.Remove)]
+        
         [HttpPost]
+        [EntityAuthorize]
         public virtual async Task<IActionResult> Remove()
         {
             var context = CreateDomainContext();
             try
             {
-                await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider>(context, EntityService.Remove);
+                await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption>(context, EntityService.Remove);
                 return StatusCode(200);
             }
             catch (UnauthorizedAccessException ex)
@@ -139,15 +139,15 @@ namespace Wodsoft.ComBoost.Mvc
                 return StatusCode(404, ex.Message);
             }
         }
-
-        [EntityAuthorize(EntityAuthorizeAction.Edit)]
+        
         [HttpPost]
+        [EntityAuthorize]
         public virtual async Task<IActionResult> Update()
         {
             var context = CreateDomainContext();
             try
             {
-                var result = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, IEntityUpdateModel<T>>(context, EntityService.Update);
+                var result = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityUpdateModel<T>>(context, EntityService.Update);
                 if (result.IsSuccess)
                     return StatusCode(204);
                 Response.StatusCode = 400;
@@ -168,16 +168,15 @@ namespace Wodsoft.ComBoost.Mvc
                 return StatusCode(404, ex.Message);
             }
         }
-
-
-        [EntityAuthorize(EntityAuthorizeAction.View)]
+                
         [HttpGet]
+        [EntityAuthorize]
         public virtual async Task<IActionResult> Selector()
         {
             var context = CreateDomainContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IEntityViewModel<T>>(context, EntityService.List);
+                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel <T>>(context, EntityService.List);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
@@ -190,15 +189,15 @@ namespace Wodsoft.ComBoost.Mvc
                 return StatusCode(401, ex.Message);
             }
         }
-
-        [EntityAuthorize(EntityAuthorizeAction.View)]
+        
         [HttpGet]
+        [EntityAuthorize]
         public virtual async Task<IActionResult> MultipleSelector()
         {
             var context = CreateDomainContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IEntityViewModel<T>>(context, EntityService.List);
+                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel<T>>(context, EntityService.List);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
