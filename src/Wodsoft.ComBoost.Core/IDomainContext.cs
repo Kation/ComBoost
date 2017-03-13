@@ -20,5 +20,7 @@ namespace Wodsoft.ComBoost
         /// 获取数据字典。
         /// </summary>
         dynamic DataBag { get; }
+
+        IDomainServiceOptions Options { get; }
     }
 }
