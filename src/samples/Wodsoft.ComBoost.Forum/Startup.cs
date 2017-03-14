@@ -59,6 +59,7 @@ namespace Wodsoft.ComBoost.Forum
             services.AddScoped<ISecurityProvider, ForumSecurityProvider>();
             services.AddScoped<IAuthenticationProvider, ComBoostAuthenticationProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IDomainServiceAccessor, DomainServiceAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IStorageProvider, PhysicalStorageProvider>(t =>
             {

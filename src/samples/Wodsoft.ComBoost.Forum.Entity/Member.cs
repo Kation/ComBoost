@@ -28,7 +28,10 @@ namespace Wodsoft.ComBoost.Forum.Entity
         [CustomDataType(CustomDataType.Password)]
         [Required]
         public override byte[] Password { get { return base.Password; } set { base.Password = value; } }
-        
+
+        //[Display(Name = "管理员", Order = 30)]
+        //public bool IsAdmin { get; set; }
+
         [Hide]
         public ICollection<Thread> Threads { get; set; }
 
