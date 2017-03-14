@@ -68,9 +68,9 @@ namespace Wodsoft.ComBoost
             var accessor = domainContext.GetRequiredService<IDomainServiceAccessor>();
             var context = new DomainExecutionContext(this, domainContext, method);
             Context = context;
+            accessor.DomainService = this;
             try
             {
-                accessor.DomainService = this;
                 await Task.WhenAll(filters.Select(t => t.OnExecutingAsync(context)));
                 if (Executing != null)
                     await Executing(context);
@@ -78,12 +78,15 @@ namespace Wodsoft.ComBoost
                 if (Executed != null)
                     await Executed(context);
                 await Task.WhenAll(filters.Select(t => t.OnExecutedAsync(context)));
-                accessor.DomainService = null;
             }
             catch (Exception ex)
             {
                 await Task.WhenAll(filters.Select(t => t.OnExceptionThrowingAsync(context, ex)));
                 throw ex;
+            }
+            finally
+            {
+                accessor.DomainService = null;
             }
         }
 
@@ -100,9 +103,9 @@ namespace Wodsoft.ComBoost
             var context = new DomainExecutionContext(this, domainContext, method);
             var executionContext = ExecutionContext.Capture();
             Context = context;
+            accessor.DomainService = this;
             try
             {
-                accessor.DomainService = this;
                 await Task.WhenAll(filters.Select(t => t.OnExecutingAsync(context)));
                 if (Executing != null)
                     await Executing(context);
@@ -111,13 +114,16 @@ namespace Wodsoft.ComBoost
                 if (Executed != null)
                     await Executed(context);
                 await Task.WhenAll(filters.Select(t => t.OnExecutedAsync(context)));
-                accessor.DomainService = null;
                 return result;
             }
             catch (Exception ex)
             {
                 await Task.WhenAll(filters.Select(t => t.OnExceptionThrowingAsync(context, ex)));
                 throw ex;
+            }
+            finally
+            {
+                accessor.DomainService = null;
             }
         }
     }
