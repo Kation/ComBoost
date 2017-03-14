@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Wodsoft.ComBoost.Data;
 using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 using Wodsoft.ComBoost.Security;
@@ -14,15 +15,19 @@ namespace Wodsoft.ComBoost.Mvc
 {
     public class EntityJsonConverter : JsonConverter
     {
-        public EntityJsonConverter(EntityAuthorizeAction action, ClaimsPrincipal principal)
+        public EntityJsonConverter(EntityDomainAuthorizeOption option, IAuthentication authentication)
         {
-            Principal = principal;
-            Action = action;
+            if (option == null)
+                throw new ArgumentNullException(nameof(option));
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+            Authentication = authentication;
+            Option = option;
         }
 
-        public EntityAuthorizeAction Action { get; private set; }
+        public EntityDomainAuthorizeOption Option { get; private set; }
 
-        public ClaimsPrincipal Principal { get; private set; }
+        public IAuthentication Authentication { get; private set; }
 
         public override bool CanConvert(Type objectType)
         {
@@ -38,45 +43,7 @@ namespace Wodsoft.ComBoost.Mvc
         {
             IEntity entity = (IEntity)value;
             var metadata = EntityDescriptor.GetMetadata(value.GetType());
-            IPropertyMetadata[] propertyMetadatas;
-            switch (Action)
-            {
-                case EntityAuthorizeAction.View:
-                    propertyMetadatas = metadata.ViewProperties.Where(t =>
-                    {
-                        if (!t.AllowAnonymous && !Principal.Identity.IsAuthenticated)
-                            return false;
-                        if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                            return t.ViewRoles.All(r => Principal.IsInDynamicRole(r));
-                        else
-                            return t.ViewRoles.Any(r => Principal.IsInDynamicRole(r));
-                    }).ToArray();
-                    break;
-                case EntityAuthorizeAction.Create:
-                    propertyMetadatas = metadata.CreateProperties.Where(t =>
-                    {
-                        if (!t.AllowAnonymous && !Principal.Identity.IsAuthenticated)
-                            return false;
-                        if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                            return t.AddRoles.All(r => Principal.IsInDynamicRole(r));
-                        else
-                            return t.AddRoles.Any(r => Principal.IsInDynamicRole(r));
-                    }).ToArray();
-                    break;
-                case EntityAuthorizeAction.Edit:
-                    propertyMetadatas = metadata.EditProperties.Where(t =>
-                    {
-                        if (!t.AllowAnonymous && !Principal.Identity.IsAuthenticated)
-                            return false;
-                        if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                            return t.EditRoles.All(r => Principal.IsInDynamicRole(r));
-                        else
-                            return t.EditRoles.Any(r => Principal.IsInDynamicRole(r));
-                    }).ToArray();
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+            IPropertyMetadata[] propertyMetadatas = Option.GetProperties(metadata, Authentication).ToArray();
 
             writer.WriteStartObject();
             if (!propertyMetadatas.Contains(metadata.KeyProperty))

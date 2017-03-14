@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Wodsoft.ComBoost.Mvc
 {
@@ -38,7 +39,7 @@ namespace Wodsoft.ComBoost.Mvc
                     button.SetTarget(HttpContext.RequestServices);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
+                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
                     return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View(model);
@@ -59,7 +60,7 @@ namespace Wodsoft.ComBoost.Mvc
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Create);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
+                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Create, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
                     return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityEditModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View("Edit", model);
@@ -80,7 +81,7 @@ namespace Wodsoft.ComBoost.Mvc
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Edit);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
+                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Edit, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
                     return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityEditModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View(model);
@@ -105,7 +106,7 @@ namespace Wodsoft.ComBoost.Mvc
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Detail);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
+                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Detail, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
                     return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityEditModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View(model);
@@ -179,7 +180,7 @@ namespace Wodsoft.ComBoost.Mvc
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel <T>>(context, EntityService.List);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
+                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
                     return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View(model);
@@ -200,7 +201,7 @@ namespace Wodsoft.ComBoost.Mvc
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel<T>>(context, EntityService.List);
                 if (Request.Headers["accept-content"].Contains("application/json"))
                 {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityAuthorizeAction.View, User);
+                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
                     return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View(model);
