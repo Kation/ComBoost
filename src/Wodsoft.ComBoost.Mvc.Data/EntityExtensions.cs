@@ -145,7 +145,7 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
 
-        private static Dictionary<Type, EnumItem[]> _EnumCache;
+        private static Dictionary<Type, EnumItem[]> _EnumCache = new Dictionary<Type, EnumItem[]>();
         /// <summary>
         /// Analyze a enum type.
         /// </summary>
