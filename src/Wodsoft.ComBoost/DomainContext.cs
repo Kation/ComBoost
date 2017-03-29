@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Wodsoft.ComBoost
 {
-    public abstract class DomainContext : IDomainContext
+    public class DomainContext : IDomainContext
     {
         private IServiceProvider _ServiceProvider;
 
@@ -33,7 +33,16 @@ namespace Wodsoft.ComBoost
 
         public CancellationToken ServiceAborted { get; private set; }
 
-        public abstract IDomainServiceOptions Options { get; }
+        private IDomainServiceOptions _Options;
+        public virtual IDomainServiceOptions Options
+        {
+            get
+            {
+                if (_Options == null)
+                    _Options = new DomainServiceOptions();
+                return _Options;
+            }
+        }
 
         public virtual object GetService(Type serviceType)
         {
