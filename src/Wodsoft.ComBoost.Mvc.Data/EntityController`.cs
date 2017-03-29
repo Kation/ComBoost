@@ -19,7 +19,7 @@ namespace Wodsoft.ComBoost.Mvc
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             base.OnActionExecuting(context);
-            EntityService = DomainProvider.GetService<EntityDomainService<T>>();
+            EntityService = GetEntityDomainService();
             Metadata = EntityDescriptor.GetMetadata<T>();
         }
 
@@ -210,6 +210,11 @@ namespace Wodsoft.ComBoost.Mvc
             {
                 return StatusCode(401, ex.Message);
             }
+        }
+
+        protected virtual EntityDomainService<T> GetEntityDomainService()
+        {
+            return DomainProvider.GetService<EntityDomainService<T>>();
         }
     }
 }
