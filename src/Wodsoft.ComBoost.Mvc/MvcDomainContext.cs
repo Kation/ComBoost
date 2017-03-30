@@ -16,7 +16,6 @@ namespace Wodsoft.ComBoost.Mvc
             if (controller == null)
                 throw new ArgumentNullException(nameof(controller));
             Controller = controller;
-            _Options = new DomainServiceOptions();
         }
         
         public Controller Controller { get; private set; }
@@ -31,16 +30,7 @@ namespace Wodsoft.ComBoost.Mvc
                 return _ValueProvider;
             }
         }
-
-        private IDomainServiceOptions _Options;
-        public override IDomainServiceOptions Options
-        {
-            get
-            {
-                return _Options;
-            }
-        }
-
+        
         public override object GetService(Type serviceType)
         {
             if (serviceType == typeof(IValueProvider))
