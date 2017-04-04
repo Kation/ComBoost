@@ -29,8 +29,9 @@ namespace Wodsoft.ComBoost.Security
         {
             if (!Identity.IsAuthenticated)
                 return false;
-            string id = ((ClaimsIdentity)Identity).FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
-            return SecurityProvider.GetPermissionAsync(id).Result.IsInRole(role);
+            if (this.IsInStaticRole(role))
+                return true;
+            return this.IsInDynamicRole(role);
         }
     }
 }

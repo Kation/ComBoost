@@ -37,8 +37,10 @@ namespace Wodsoft.ComBoost.Security
             ComBoostPrincipal comboostPrincipal = principal as ComBoostPrincipal;
             if (comboostPrincipal == null)
                 return false;
-            string roleName = comboostPrincipal.SecurityProvider.ConvertRoleToString(role);
-            return principal.IsInRole(roleName);
+            var roles = comboostPrincipal.FindAll(t => t.Type == ClaimTypes.Role);
+            if (roles.Any(t => t.Value == comboostPrincipal.SecurityProvider.ConvertRoleToString(role)))
+                return true;
+            return false;
         }
 
         public static bool IsInDynamicRole(this IPrincipal principal, object role)
@@ -52,7 +54,8 @@ namespace Wodsoft.ComBoost.Security
             ComBoostPrincipal comboostPrincipal = principal as ComBoostPrincipal;
             if (comboostPrincipal == null)
                 return false;
-            return comboostPrincipal.IsInRole(role);
+            string id = comboostPrincipal.FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
+            return comboostPrincipal.SecurityProvider.GetPermissionAsync(id).Result.IsInRole(role);
         }
     }
 }
