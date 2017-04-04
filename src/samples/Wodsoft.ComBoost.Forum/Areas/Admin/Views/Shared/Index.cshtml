@@ -15,7 +15,7 @@
     <li><a href="@Url.Action("Index", "Home")">首页</a></li>
     <li class="active">@Model.Metadata.Name</li>
 </ul>
-<form id="listForm" method="get" class="form-horizontal">
+<form id="listForm" method="get" class="form-horizontal" onsubmit="checkSearch();">
     <div class="container-fluid">
         <div class="row">
             <div class="@(Model.Parent == null ? "span12":"span9")">
@@ -25,140 +25,146 @@
                     {
                         <li role="presentation"><a role="button" data-toggle="collapse" href="#searchPanel" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> 查询</a></li>
                     }
-                    @if (Model.Metadata.AddRoles.All(t => User.IsInDynamicRole(t)))
+                    @if (Model.Metadata.AddRoles.All(t => User.IsInRole(t)))
                     {
                         <li><a href="@Html.Raw(Url.Action("Create"))" class="btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新建</a></li>
                     }
                     @foreach (var button in Model.ViewButtons)
                     {
-                        <li><a href="@Html.Raw(button.Target)" class="btn btn-default" title="@button.Tooltip">@button.Icon@button.Name</a></li>
+                        @if (button.Target != null)
+                        {
+                            <li><a href="@Html.Raw(button.Target)" class="btn btn-default" title="@button.Tooltip">@button.Icon@button.Name</a></li>
+                        }
                     }
                     <li id="detailButton" class="pull-right disabled"><a href="javascript:gotoDetail();" class="btn btn-default"><span class="glyphicon glyphicon-record"></span> 详情</a></li>
-                    @if (Model.Metadata.EditRoles.All(t => User.IsInDynamicRole(t)))
+                    @if (Model.Metadata.EditRoles.All(t => User.IsInRole(t)))
                     {
                         <li id="editButton" class="pull-right disabled"><a href="javascript:gotoEdit();" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> 编辑</a></li>
                     }
-                    @if (Model.Metadata.RemoveRoles.All(t => User.IsInDynamicRole(t)))
+                    @if (Model.Metadata.RemoveRoles.All(t => User.IsInRole(t)))
                     {
                         <li id="removeButton" class="pull-right disabled"><a href="javascript:gotoRemove();" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> 删除</a></li>
                     }
                     @foreach (var button in Model.ItemButtons)
                     {
-                        <li id="customButton@(Array.IndexOf(Model.ItemButtons, button))" class="pull-right disabled"><a href="javascript:gotoCustom(@Array.IndexOf(Model.ItemButtons, button));" class="btn btn-default" title="@button.Tooltip">@Html.Raw(button.Icon) @button.Name</a></li>
+                        <li id="customButton@(Array.IndexOf(Model.ItemButtons, button))" class="pull-right disabled"><a href="javascript:gotoCustom(@Array.IndexOf(Model.ItemButtons, button));" class="btn btn-default" title="@button.Tooltip">@Html.Raw(button.Icon)@button.Name</a></li>
                     }
                 </ul>
                 <div class="tab-content">
                     <div class="@(Context.Request.Query["Search"] == "True" ? "collapse in" : "collapse")" id="searchPanel">
-                        <table class="table">
-                            <tr>
-                                <td>
+                        <div class="container-fluid">
+                            <div class="row" style="padding-top: 10px; padding-bottom: 10px;">
+                                <div class="col-sm-10">
                                     @{ int searchCount = 0;}
                                     @foreach (var property in Model.Metadata.SearchProperties)
                                     {
-                                        @Html.Raw(searchCount % 2 == 0 ? "<div class=\"form-group\">" : "")
-                                        <label class="col-sm-2 control-label">@property.Name</label>
-                                        <div class="col-sm-4">
+                                        @Html.Raw(searchCount % 2 == 0 ? "<div class=\"form-group\">\r\n" : "")
+                                        <label class="col-sx-4 col-sm-2 control-label" style="padding-right:0;">@property.Name</label>
+                                        <div class="col-sx-8 col-sm-4">
                                             @Html.Partial("Search", property)
                                         </div>
                                         @Html.Raw(searchCount % 2 == 1 ? "</div>" : "")
                                         searchCount++;
                                     }
                                     @Html.Raw(searchCount % 2 == 1 ? "</div>" : "")
-                                </td>
-                                <td>
+                                </div>
+                                <div class="col-sm-2">
                                     <button class="btn btn-default" onclick="doSearch();" name="Search" value="True">确定</button>
                                     <button class="btn btn-default" onclick="cancelSearch();">取消</button>
-                                    <input type="hidden" id="searchTag" name="Search" value="True" disabled="disabled" />
-                                </td>
-                            </tr>
-                        </table>
+                                    <input type="hidden" id="searchTag" name="Search" value="True" @Html.Raw(Context.Request.Query["Search"] == "True" ? "" : "disabled=\"disabled\"") />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="tab-pane active">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="width: 32px;"></th>
+                </div>
+                <div class="tab-pane active">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 32px;"></th>
+                                @foreach (var header in Model.Properties)
+                                {
+                                    <th title="@header.Description">@header.Name</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody id="listview">
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr data-id="@item.Index" data-remove="@item.IsRemoveAllowed" data-edit="@item.IsEditAllowed" @Html.Raw(string.Join(" ", Model.ItemButtons.Where(t => { t.SetTarget(Context.RequestServices, item); return t.Target != null; }).Select(t => " data-b-" + Array.IndexOf(Model.ItemButtons, t) + "=\" " + t.Target.ToString() + "\" ")))>
+                                    <td class="text-center">
+                                        <input type="radio" />
+                                    </td>
                                     @foreach (var header in Model.Properties)
                                     {
-                                        <th title="@header.Description">@header.Name</th>
+                                        <td>
+                                            @Html.Viewer(item, header, header.GetValue(item))
+                                        </td>
                                     }
                                 </tr>
-                            </thead>
-                            <tbody id="listview">
-                                @foreach (var item in Model.Items)
-                                {
-                                    <tr data-id="@item.Index" data-remove="@item.IsRemoveAllowed" data-edit="@item.IsEditAllowed" @Html.Raw(string.Join(" ", Model.ItemButtons.Where(t => { t.SetTarget(Context.RequestServices, item); return t.Target != null; }).Select(t => "data-b-" + Array.IndexOf(Model.ItemButtons, t) + "=\"" + t.Target.ToString() + "\"")))>
-                                        <td class="text-center">
-                                            <input type="radio" />
-                                        </td>
-                                        @foreach (var header in Model.Properties)
-                                        {
-                                            <td>
-                                                @Html.Viewer(item, header, header.GetValue(item))
-                                            </td>
-                                        }
-                                    </tr>
-                                }
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="@(1 + Model.Properties.Count())">
-                                        <div class="row">
-                                            <div class="col-xs-4 col-sm-5 col-md-6 col-lg-8">
-                                                <div class="btn-group" role="group">
-                                                    @foreach (var size in Model.PageSizeOption)
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="@(1 + Model.Properties.Count())">
+                                    <div class="row">
+                                        <div class="col-xs-4 col-sm-5 col-md-6 col-lg-8">
+                                            <div class="btn-group" role="group">
+                                                @foreach (var size in Model.PageSizeOption)
+                                                {
+                                                    <button type="submit" name="size" value="@size" onclick="changeSize();" class="btn btn-default @(size == Model.CurrentSize ? " active" : "" )">@size</button>
+                                                }
+                                            </div>
+                                            <input type="hidden" name="size" id="size" value="@Model.CurrentSize" />
+                                        </div>
+                                        <div class="col-xs-8 col-sm-7 col-md-6 col-lg-4">
+                                            <div class="input-group">
+                                                <div class="input-group-btn">
+                                                    @if (Model.CurrentPage > 3)
                                                     {
-                                                        <button type="submit" name="size" value="@size" class="btn btn-default @(size == Model.CurrentSize ? "active" : "")">@size</button>
+                                                        <button type="submit" name="page" value="1" onclick="changePage();" class="btn btn-default" @(Model.CurrentPage == 1 ? " disabled=\"disabled\"" : "" )>1</button>
+                                                        if (Model.CurrentPage > 4)
+                                                        {
+                                                            <button type="button" class="btn btn-default disabled">.</button>
+                                                        }
+                                                    }
+                                                    @for (int i = Model.CurrentPage - 2; i <= Model.CurrentPage + 2; i++)
+                                                    {
+                                                        if (i < 1)
+                                                        {
+                                                            continue;
+                                                        }
+                                                        if (i > Model.TotalPage)
+                                                        {
+                                                            break;
+                                                        }
+                                                        <button type="submit" name="page" value="@i" onclick="changePage();" class="btn btn-default @(Model.CurrentPage == i ? " active" : "" )">@i</button>
+                                                    }
+                                                    @if (Model.CurrentPage < Model.TotalPage - 2)
+                                                    {
+                                                        if (Model.CurrentPage < Model.TotalPage - 3)
+                                                        {
+                                                            <button type="button" class="btn btn-default disabled">.</button>
+                                                        }
+                                                        <button type="submit" name="page" value="@Model.TotalPage" onclick="changePage();" class="btn btn-default" @(Model.CurrentPage == Model.TotalPage ? " disabled=\"disabled\"" : "" )>@Model.TotalPage</button>
                                                     }
                                                 </div>
-                                            </div>
-                                            <div class="col-xs-8 col-sm-7 col-md-6 col-lg-4">
-                                                <div class="input-group">
-                                                    <div class="input-group-btn">
-                                                        @if (Model.CurrentPage > 3)
-                                                        {
-                                                            <button type="submit" name="page" value="1" class="btn btn-default" @(Model.CurrentPage == 1 ? " disabled=\"disabled\"" : "" )>1</button>
-                                                            if (Model.CurrentPage > 4)
-                                                            {
-                                                                <button type="button" class="btn btn-default disabled">.</button>
-                                                            }
-                                                        }
-                                                        @for (int i = Model.CurrentPage - 2; i <= Model.CurrentPage + 2; i++)
-                                                        {
-                                                            if (i < 1)
-                                                            {
-                                                                continue;
-                                                            }
-                                                            if (i > Model.TotalPage)
-                                                            {
-                                                                break;
-                                                            }
-                                                            <button type="submit" name="page" value="@i" class="btn btn-default @(Model.CurrentPage == i ? "active" : "")">@i</button>
-                                                        }
-                                                        @if (Model.CurrentPage < Model.TotalPage - 2)
-                                                        {
-                                                            if (Model.CurrentPage < Model.TotalPage - 3)
-                                                            {
-                                                                <button type="button" class="btn btn-default disabled">.</button>
-                                                            }
-                                                            <button type="submit" name="page" value="1" class="btn btn-default" @(Model.CurrentPage == Model.TotalPage ? " disabled=\"disabled\"" : "" )>6</button>
-                                                        }
-                                                    </div>
-                                                    <input type="text" class="form-control text-center" />
-                                                    <span class="input-group-btn">
-                                                        <button class="btn btn-default" type="button">跳转</button>
-                                                    </span>
-                                                </div>
+                                                <input type="text" class="form-control text-center" />
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" type="button">跳转</button>
+                                                </span>
+                                                <input type="hidden" name="page" id="page" value="@Model.CurrentPage" />
                                             </div>
                                         </div>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </form>
 <div class="modal fade" tabindex="-1" role="dialog" id="dialog">
@@ -172,7 +178,6 @@
                 <p id="dialogContent"></p>
             </div>
             <div class="modal-footer">
-                @*<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>*@
                 <button type="button" class="btn btn-primary">确定</button>
             </div>
         </div>
@@ -247,6 +252,19 @@
                     $('#dialog').modal('show');
                 }
             })
+    }
+
+    function changeSize() {
+        $('#size').prop('disabled', true);
+    }
+
+    function changePage() {
+        $('#page').prop('disabled', true);
+    }
+
+    function checkSearch() {
+        if ($('#searchTag').prop('disabled') == true)
+            $('#searchPanel').find('input').prop('disabled', true);
     }
 
     function gotoCustom(index) {

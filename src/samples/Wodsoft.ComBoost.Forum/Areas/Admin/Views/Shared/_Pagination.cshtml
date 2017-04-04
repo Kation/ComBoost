@@ -1,44 +1,37 @@
 ﻿@model IPagination
-@{
-    string url = ViewContext.Controller.ControllerContext.HttpContext.Request.Url.PathAndQuery;
-    url = Url.SetQueryPath(url, "page");
-}
-<div class="pagination" style="margin-top: 0px; margin-bottom: 0px;">
-    <ul>
-        @if (Model.CurrentPage == 1)
+<div class="input-group">
+    <div class="input-group-btn">
+        @if (Model.CurrentPage > 3)
         {
-            <li class="disabled"><a>&laquo;</a></li>
+            <button type="submit" name="page" value="1" class="btn btn-default" @(Model.CurrentPage == 1 ? " disabled=\"disabled\"" : "" )>1</button>
+            if (Model.CurrentPage > 4)
+            {
+                <button type="button" class="btn btn-default disabled">.</button>
+            }
         }
-        else
+        @for (int i = Model.CurrentPage - 2; i <= Model.CurrentPage + 2; i++)
         {
-            <li><a data-nav="true" href="@Html.Raw(url)1">&laquo;</a></li>
+            if (i < 1)
+            {
+                continue;
+            }
+            if (i > Model.TotalPage)
+            {
+                break;
+            }
+            <button type="submit" name="page" value="@i" class="btn btn-default @(Model.CurrentPage == i ? "active" : "")">@i</button>
         }
-        @{int count = 0;
-            while (count < 5 && Model.CurrentPage - 2 + count <= Model.TotalPage)
+        @if (Model.CurrentPage < Model.TotalPage - 2)
+        {
+            if (Model.CurrentPage < Model.TotalPage - 3)
             {
-                if (Model.CurrentPage - 2 + count < 1)
-                {
-                    count++;
-                    continue;
-                }
-                if (count == 2)
-                {
-                    <li class="active"><a>@Html.Raw(Model.CurrentPage - 2 + count)</a></li>
-                }
-                else
-                {
-                    <li><a data-nav="true" href="@Html.Raw(url + (Model.CurrentPage - 2 + count))">@(Model.CurrentPage - 2 + count)</a></li>
-                }
-                count++;
+                <button type="button" class="btn btn-default disabled">.</button>
             }
-            if (Model.CurrentPage == Model.TotalPage)
-            {
-                <li class="disabled"><a>&raquo;</a></li>
-            }
-            else
-            {
-                <li><a data-nav="true" href="@Html.Raw( url + Model.TotalPage)">&raquo;</a></li>
-            }
+            <button type="submit" name="page" value="1" class="btn btn-default" @(Model.CurrentPage == Model.TotalPage ? " disabled=\"disabled\"" : "" )>6</button>
         }
-    </ul>
+    </div>
+    <input type="text" class="form-control text-center" />
+    <span class="input-group-btn">
+        <button class="btn btn-default" type="button">跳转</button>
+    </span>
 </div>
