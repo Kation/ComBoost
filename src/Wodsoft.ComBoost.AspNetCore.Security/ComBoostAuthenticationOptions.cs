@@ -23,6 +23,7 @@ namespace Wodsoft.ComBoost.Security
             LoginPath = c => loginPath;
             LogoutPath = c => logoutPath;
             //AutomaticChallenge = true;
+            AutoUpdate = c => true;
         }
 
         public ComBoostAuthenticationOptions()
@@ -44,6 +45,8 @@ namespace Wodsoft.ComBoost.Security
         public Func<HttpContext, string> LoginPath { get; set; }
 
         public Func<HttpContext, string> LogoutPath { get; set; }
+
+        public Func<HttpContext, bool> AutoUpdate { get; set; }
     }
 
 

@@ -23,6 +23,20 @@ namespace Wodsoft.ComBoost.Security
             try
             {
                 var ticket = Options.TicketDataFormat.Unprotect(cookieValue, GetTlsTokenBinding());
+                if (ticket.Properties.ExpiresUtc < DateTimeOffset.Now)
+                    return Task.FromResult(AuthenticateResult.Skip());
+                if (Options.AutoUpdate(Context))
+                {
+                    var expireDate = DateTimeOffset.Now.Add(Options.ExpireTime(Context));
+                    ticket.Properties.ExpiresUtc = expireDate;
+                    cookieValue = Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding());
+                    Response.Cookies.Append(Options.CookieName(Context), cookieValue, new CookieOptions
+                    {
+                        Domain = Options.CookieDomain(Context),
+                        Expires = expireDate,
+                        Path = Options.CookiePath(Context)
+                    });
+                }
                 return Task.FromResult(AuthenticateResult.Success(ticket));
             }
             catch (Exception ex)
@@ -33,13 +47,15 @@ namespace Wodsoft.ComBoost.Security
 
         protected override Task HandleSignInAsync(SignInContext context)
         {
-            var ticket = new AuthenticationTicket(context.Principal, null, Options.AuthenticationScheme);
+            var expireDate = DateTimeOffset.Now.Add(Options.ExpireTime(Context));
+
+            var ticket = new AuthenticationTicket(context.Principal, new AuthenticationProperties() { ExpiresUtc = expireDate }, Options.AuthenticationScheme);
             var cookieValue = Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding());
 
             Response.Cookies.Append(Options.CookieName(Context), cookieValue, new CookieOptions
             {
                 Domain = Options.CookieDomain(Context),
-                Expires = new DateTimeOffset(DateTime.Now.Add(Options.ExpireTime(Context))),
+                Expires = expireDate,
                 Path = Options.CookiePath(Context)
             });
             return Task.FromResult(0);
