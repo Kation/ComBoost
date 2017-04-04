@@ -27,7 +27,8 @@ namespace Wodsoft.ComBoost.Security
                     return Task.FromResult(AuthenticateResult.Skip());
                 if (Options.AutoUpdate(Context))
                 {
-                    var expireDate = DateTimeOffset.Now.Add(Options.ExpireTime(Context));
+                    var expireTime = Options.ExpireTime(Context);
+                    var expireDate = expireTime.HasValue ? (DateTimeOffset?)DateTimeOffset.Now.Add(expireTime.Value) : null;
                     ticket.Properties.ExpiresUtc = expireDate;
                     cookieValue = Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding());
                     Response.Cookies.Append(Options.CookieName(Context), cookieValue, new CookieOptions
@@ -47,7 +48,8 @@ namespace Wodsoft.ComBoost.Security
 
         protected override Task HandleSignInAsync(SignInContext context)
         {
-            var expireDate = DateTimeOffset.Now.Add(Options.ExpireTime(Context));
+            var expireTime = Options.ExpireTime(Context);
+            var expireDate = expireTime.HasValue ? (DateTimeOffset?)DateTimeOffset.Now.Add(expireTime.Value) : null;
 
             var ticket = new AuthenticationTicket(context.Principal, new AuthenticationProperties() { ExpiresUtc = expireDate }, Options.AuthenticationScheme);
             var cookieValue = Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding());

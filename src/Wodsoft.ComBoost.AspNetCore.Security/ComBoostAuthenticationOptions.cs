@@ -40,7 +40,7 @@ namespace Wodsoft.ComBoost.Security
 
         public Func<HttpContext, string> CookieName { get; set; }
 
-        public Func<HttpContext, TimeSpan> ExpireTime { get; set; }
+        public Func<HttpContext, TimeSpan?> ExpireTime { get; set; }
 
         public Func<HttpContext, string> LoginPath { get; set; }
 

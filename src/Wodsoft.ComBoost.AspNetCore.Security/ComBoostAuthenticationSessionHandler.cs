@@ -23,6 +23,16 @@ namespace Wodsoft.ComBoost.Security
             try
             {
                 var ticket = Options.TicketDataFormat.Unprotect(ticketData, GetTlsTokenBinding());
+                if (ticket.Properties.ExpiresUtc < DateTimeOffset.Now)
+                    return Task.FromResult(AuthenticateResult.Skip());
+                if (Options.AutoUpdate(Context))
+                {
+                    var expireTime = Options.ExpireTime(Context);
+                    var expireDate = expireTime.HasValue ? (DateTimeOffset?)DateTimeOffset.Now.Add(expireTime.Value) : null;
+                    ticket.Properties.ExpiresUtc = expireDate;
+                    ticketData = Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding());
+                    Context.Session.SetString(Options.CookieName(Context), ticketData);
+                }
                 return Task.FromResult(AuthenticateResult.Success(ticket));
             }
             catch (Exception ex)
@@ -33,7 +43,9 @@ namespace Wodsoft.ComBoost.Security
 
         protected override Task HandleSignInAsync(SignInContext context)
         {
-            var ticket = new AuthenticationTicket(context.Principal, null, Options.AuthenticationScheme);
+            var expireTime = Options.ExpireTime(Context);
+            var expireDate = expireTime.HasValue ? (DateTimeOffset?)DateTimeOffset.Now.Add(expireTime.Value) : null;
+            var ticket = new AuthenticationTicket(context.Principal, new AuthenticationProperties() { ExpiresUtc = expireDate }, Options.AuthenticationScheme);
             var ticketValue = Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding());
             Context.Session.SetString(Options.CookieName(Context), ticketValue);
 #if NET451
