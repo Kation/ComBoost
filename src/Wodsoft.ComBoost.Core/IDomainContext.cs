@@ -21,6 +21,14 @@ namespace Wodsoft.ComBoost
         /// </summary>
         dynamic DataBag { get; }
 
+        /// <summary>
+        /// 获取领域服务筛选器。
+        /// </summary>
+        IList<IDomainServiceFilter> Filter { get; }
+
+        /// <summary>
+        /// 获取领域服务选项。
+        /// </summary>
         IDomainServiceOptions Options { get; }
     }
 }

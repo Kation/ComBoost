@@ -64,8 +64,21 @@ namespace Wodsoft.ComBoost
             }).ToArray();
         }
 
+        public void Done()
+        {
+            IsCompleted = true;
+        }
+
+        public void Done(object result)
+        {
+            Result = result;
+            IsCompleted = true;
+        }
+
         public object Result { get; internal set; }
 
         public bool IsAborted { get { return DomainContext.ServiceAborted.IsCancellationRequested; } }
+
+        public bool IsCompleted { get; private set; }
     }
 }
