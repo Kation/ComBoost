@@ -11,7 +11,6 @@ namespace Wodsoft.ComBoost.Data.Entity
     /// 实现了IEntity接口的实体基类。
     /// </summary>
     public abstract class EntityBase<T> : IEntity
-        where T : struct
     {
         /// <summary>
         /// 获取或设置创建日期。
