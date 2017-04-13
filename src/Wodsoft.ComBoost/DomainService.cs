@@ -181,5 +181,18 @@ namespace Wodsoft.ComBoost
             foreach (var filter in context.DomainContext.Filter)
                 await filter.OnExceptionThrowingAsync(context, exception);
         }
+
+        protected virtual async Task RaiseAsyncEvent(DomainServiceAsyncEvent eventHandle)
+        {
+            foreach (var item in eventHandle.GetInvocationList().Cast<DomainServiceAsyncEvent>())
+                await item(Context);
+        }
+
+        protected virtual async Task RaiseAsyncEvent<TArgs>(DomainServiceAsyncEvent<TArgs> eventHandle, TArgs e)
+            where TArgs : EventArgs
+        {
+            foreach (var item in eventHandle.GetInvocationList().Cast<DomainServiceAsyncEvent<TArgs>>())
+                await item(Context, e);
+        }
     }
 }
