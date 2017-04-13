@@ -45,7 +45,7 @@ namespace Wodsoft.ComBoost
         void AddExtensionFilter(Func<Type, Type, bool> extensionFilter);
 
         /// <summary>
-        /// 添加领域筛选器选择器。
+        /// 添加领域过滤器选择器。
         /// </summary>
         /// <param name="serviceFilterSelector">领域筛选器选择器。传入领域服务类型，返回领域服务筛选器，可为空。</param>
         void AddServiceFilterSelector(Func<Type, IDomainServiceFilter> serviceFilterSelector);

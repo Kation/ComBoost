@@ -106,9 +106,9 @@ namespace Wodsoft.ComBoost
         }
 
         /// <summary>
-        /// 添加全局领域服务筛选器。
+        /// 添加全局领域服务过滤器。
         /// </summary>
-        /// <typeparam name="TFilter">筛选器类型。</typeparam>
+        /// <typeparam name="TFilter">过滤器类型。</typeparam>
         /// <param name="domainProvider">领域服务提供器。</param>
         public static void AddGlobalFilter<TFilter>(this IDomainServiceProvider domainProvider)
             where TFilter : IDomainServiceFilter, new()
@@ -117,10 +117,10 @@ namespace Wodsoft.ComBoost
         }
 
         /// <summary>
-        /// 添加领域服务筛选器。
+        /// 添加领域服务过滤器。
         /// </summary>
         /// <typeparam name="TService">领域服务类型。</typeparam>
-        /// <typeparam name="TFilter">筛选器类型。</typeparam>
+        /// <typeparam name="TFilter">过滤器类型。</typeparam>
         /// <param name="domainProvider">领域服务提供器。</param>
         public static void AddServiceFilter<TService,TFilter>(this IDomainServiceProvider domainProvider)
             where TService : IDomainService
