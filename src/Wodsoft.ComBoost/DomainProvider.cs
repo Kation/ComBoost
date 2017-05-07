@@ -15,6 +15,7 @@ namespace Wodsoft.ComBoost
         private ConcurrentDictionary<Type, IDomainService> _Cache;
         private List<Func<Type, Type>> _ServiceSelectors, _ExtensionSelectors;
         private List<Func<Type, Type, bool>> _ExtensionFilters;
+        private List<Func<Type, IDomainServiceFilter>> _ServiceFilterSelectors;
 
         public DomainProvider(IServiceProvider serviceProvider)
         {
@@ -26,6 +27,7 @@ namespace Wodsoft.ComBoost
             _ServiceSelectors = new List<Func<Type, Type>>();
             _ExtensionSelectors = new List<Func<Type, Type>>();
             _ExtensionFilters = new List<Func<Type, Type, bool>>();
+            _ServiceFilterSelectors = new List<Func<Type, IDomainServiceFilter>>();
         }
 
         public virtual TService GetService<TService>() where TService : IDomainService
@@ -53,6 +55,9 @@ namespace Wodsoft.ComBoost
                     service.Executing += extension.OnExecutingAsync;
                     service.Executed += extension.OnExecutedAsync;
                 }
+                var filters = _ServiceFilterSelectors.Select(t => t(type)).Where(t => t != null).ToArray();
+                foreach (var filter in filters)
+                    service.Filters.Add(filter);
                 return service;
             });
             return (TService)service;
@@ -93,6 +98,13 @@ namespace Wodsoft.ComBoost
             if (extensionFilter == null)
                 throw new ArgumentNullException(nameof(extensionFilter));
             _ExtensionFilters.Add(extensionFilter);
+        }
+
+        public void AddServiceFilterSelector(Func<Type, IDomainServiceFilter> serviceFilterSelector)
+        {
+            if (serviceFilterSelector == null)
+                throw new ArgumentNullException(nameof(serviceFilterSelector));
+            _ServiceFilterSelectors.Add(serviceFilterSelector);
         }
     }
 }

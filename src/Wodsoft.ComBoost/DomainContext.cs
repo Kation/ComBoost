@@ -18,6 +18,7 @@ namespace Wodsoft.ComBoost
             if (cancellationToken == null)
                 throw new ArgumentNullException(nameof(cancellationToken));
             _ServiceProvider = serviceProvider;
+            Filter = new List<IDomainServiceFilter>();
         }
 
         private dynamic _DataBag;
@@ -43,6 +44,8 @@ namespace Wodsoft.ComBoost
                 return _Options;
             }
         }
+
+        public IList<IDomainServiceFilter> Filter { get; private set; }
 
         public virtual object GetService(Type serviceType)
         {

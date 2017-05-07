@@ -48,7 +48,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityQuery != null)
             {
                 var e = new EntityQueryEventArgs<T>(queryable);
-                await EntityQuery(Context, e);
+                await RaiseAsyncEvent(EntityQuery, e);
                 queryable = e.Queryable;
             }
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
@@ -73,7 +73,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityCreateModelCreated != null)
             {
                 EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
-                await EntityCreateModelCreated(Context, arg);
+                await RaiseAsyncEvent(EntityCreateModelCreated, arg);
                 model = arg.Model;
             }
             return model;
@@ -103,7 +103,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityEditModelCreated != null)
             {
                 EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
-                await EntityEditModelCreated(Context, arg);
+                await RaiseAsyncEvent(EntityEditModelCreated, arg);
                 model = arg.Model;
             }
             return model;
@@ -150,7 +150,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityPreUpdate != null)
             {
                 var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
-                await EntityPreUpdate(Context, arg);
+                await RaiseAsyncEvent(EntityPreUpdate, arg);
                 properties = arg.Properties;
             }
             foreach (var property in properties)
@@ -160,7 +160,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityUpdated != null)
             {
                 var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
-                await EntityUpdated(Context, arg);
+                await RaiseAsyncEvent(EntityUpdated, arg);
             }
             model.IsSuccess = model.ErrorMessage.Count == 0;
             model.Result = entity;
@@ -192,7 +192,7 @@ namespace Wodsoft.ComBoost.Data
                 if (EntityPropertyUpdate != null)
                 {
                     var arg = new EntityPropertyUpdateEventArgs<T>(entity, valueProvider, property, value);
-                    await EntityPropertyUpdate(Context, arg);
+                    await RaiseAsyncEvent(EntityPropertyUpdate, arg);
                     handled = arg.IsHandled;
                 }
             }
@@ -229,7 +229,7 @@ namespace Wodsoft.ComBoost.Data
             if (EntityRemove != null)
             {
                 var e = new EntityRemoveEventArgs<T>(entity);
-                await EntityRemove(Context, e);
+                await RaiseAsyncEvent(EntityRemove, e);
                 if (e.IsCanceled)
                     return;
             }
@@ -257,15 +257,15 @@ namespace Wodsoft.ComBoost.Data
                 throw new EntityNotFoundException(typeof(T), index);
             var model = new EntityEditModel<T>(entity);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            if (EntityDetail != null)
+            if (EntityDetailModelCreated != null)
             {
                 var e = new EntityDetailEventArgs<T>(entity, (IPropertyMetadata[])model.Properties);
-                await EntityDetail(Context, e);
+                await RaiseAsyncEvent(EntityDetailModelCreated, e);
                 model.Properties = e.Properties;
             }
             return model;
         }
 
-        public event DomainServiceAsyncEvent<EntityDetailEventArgs<T>> EntityDetail;
+        public event DomainServiceAsyncEvent<EntityDetailEventArgs<T>> EntityDetailModelCreated;
     }
 }

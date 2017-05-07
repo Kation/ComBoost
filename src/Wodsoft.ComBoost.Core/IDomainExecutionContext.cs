@@ -39,6 +39,17 @@ namespace Wodsoft.ComBoost
         object GetParameterValue(ParameterInfo parameter);
 
         /// <summary>
+        /// 结束执行。
+        /// </summary>
+        void Done();
+
+        /// <summary>
+        /// 结束执行。
+        /// </summary>
+        /// <param name="result">执行结果。</param>
+        void Done(object result);
+
+        /// <summary>
         /// 获取执行结果。
         /// </summary>
         object Result { get; }

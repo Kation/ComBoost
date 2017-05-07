@@ -97,10 +97,36 @@ namespace Wodsoft.ComBoost
         /// <typeparam name="TExtension"></typeparam>
         /// <param name="domainProvider"></param>
         public static void RemoveExtension<TService, TExtension>(this IDomainServiceProvider domainProvider)
+            where TService : IDomainService
+            where TExtension : IDomainExtension
         {
             if (domainProvider == null)
                 throw new ArgumentNullException(nameof(domainProvider));
             domainProvider.AddExtensionFilter((service, extension) => service == typeof(TService) && extension == typeof(TExtension) ? false : true);
+        }
+
+        /// <summary>
+        /// 添加全局领域服务过滤器。
+        /// </summary>
+        /// <typeparam name="TFilter">过滤器类型。</typeparam>
+        /// <param name="domainProvider">领域服务提供器。</param>
+        public static void AddGlobalFilter<TFilter>(this IDomainServiceProvider domainProvider)
+            where TFilter : IDomainServiceFilter, new()
+        {
+            domainProvider.AddServiceFilterSelector(t => new TFilter());
+        }
+
+        /// <summary>
+        /// 添加领域服务过滤器。
+        /// </summary>
+        /// <typeparam name="TService">领域服务类型。</typeparam>
+        /// <typeparam name="TFilter">过滤器类型。</typeparam>
+        /// <param name="domainProvider">领域服务提供器。</param>
+        public static void AddServiceFilter<TService,TFilter>(this IDomainServiceProvider domainProvider)
+            where TService : IDomainService
+            where TFilter : IDomainServiceFilter, new()
+        {
+            domainProvider.AddServiceFilterSelector(t =>  new TFilter());
         }
     }
 }

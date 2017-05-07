@@ -17,6 +17,11 @@ namespace Wodsoft.ComBoost
         IDomainExecutionContext Context { get; }
 
         /// <summary>
+        /// 获取领域服务过滤器列表。
+        /// </summary>
+        IList<IDomainServiceFilter> Filters { get; }
+
+        /// <summary>
         /// 调用执行领域方法。
         /// </summary>
         /// <param name="domainContext">领域上下文。</param>
