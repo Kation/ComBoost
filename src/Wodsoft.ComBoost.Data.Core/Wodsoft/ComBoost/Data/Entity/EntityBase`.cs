@@ -54,8 +54,10 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         public virtual void OnCreateCompleted()
         {
-            CreateDate = DateTime.Now;
-            EditDate = CreateDate;
+            if (CreateDate == DateTime.MinValue)
+                CreateDate = DateTime.Now;
+            if (EditDate == DateTime.MinValue)
+                EditDate = DateTime.Now;
         }
 
         /// <summary>

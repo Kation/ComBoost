@@ -14,7 +14,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         public override void OnCreateCompleted()
         {
             base.OnCreateCompleted();
-            Index = Guid.NewGuid();
+            if (Index == Guid.Empty)
+                Index = Guid.NewGuid();
         }
 
         /// <summary>
