@@ -31,9 +31,19 @@ namespace Wodsoft.ComBoost
             if (!authentication.Identity.IsAuthenticated)
                 throw new UnauthorizedAccessException("用户未登录。");
             if (Roles.Length > 0)
-                foreach (var role in Roles)
-                    if (!authentication.IsInDynamicRole(role))
-                        throw new UnauthorizedAccessException("用户没有“" + role + "”的权限。");
+                if (Mode == AuthenticationRequiredMode.All)
+                {
+                    foreach (var role in Roles)
+                        if (!authentication.IsInRole(role))
+                            throw new UnauthorizedAccessException("用户没有“" + role + "”的权限。");
+                }
+                else
+                {
+                    foreach (var role in Roles)
+                        if (authentication.IsInRole(role))
+                            return Task.FromResult(0);
+                    throw new UnauthorizedAccessException("用户没有" + string.Join("，", "“" + Roles + "”") + "权限。");
+                }
             return Task.FromResult(0);
         }
     }
