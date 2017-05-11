@@ -28,6 +28,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public DatabaseContext(DbContext context)
         {
+            AsyncQueryableExtensions.Context = AsyncQueryable.Default;
             _CachedEntityContext = new Dictionary<Type, object>();
             ((IObjectContextAdapter)context).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
             InnerContext = context;

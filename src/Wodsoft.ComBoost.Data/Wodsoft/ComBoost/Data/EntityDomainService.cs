@@ -53,7 +53,7 @@ namespace Wodsoft.ComBoost.Data
             }
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            model.Items = await context.ToArrayAsync(queryable);
+            model.Items = await queryable.ToArrayAsync();
             return model;
         }
 
