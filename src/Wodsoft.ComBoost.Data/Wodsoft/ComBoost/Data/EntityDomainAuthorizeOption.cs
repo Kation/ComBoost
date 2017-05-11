@@ -9,12 +9,13 @@ namespace Wodsoft.ComBoost.Data
 {
     public class EntityDomainAuthorizeOption
     {
+        public static readonly EntityDomainAuthorizeOption Anonymous = new EntityAnonymousAuthorizeOption();
         public static readonly EntityDomainAuthorizeOption Empty = new EntityDomainAuthorizeOption();
-        public static readonly EntityDomainActionAuthorizeOption View = new EntityDomainActionAuthorizeOption(metadata => metadata.ViewRoles, metadata => metadata.ViewProperties);
-        public static readonly EntityDomainActionAuthorizeOption Create = new EntityDomainActionAuthorizeOption(metadata => metadata.AddRoles, metadata => metadata.CreateProperties);
-        public static readonly EntityDomainActionAuthorizeOption Edit = new EntityDomainActionAuthorizeOption(metadata => metadata.EditRoles, metadata => metadata.EditProperties);
-        public static readonly EntityDomainActionAuthorizeOption Remove = new EntityDomainActionAuthorizeOption(metadata => metadata.RemoveRoles, metadata => new IPropertyMetadata[0]);
-        public static readonly EntityDomainActionAuthorizeOption Detail = new EntityDomainActionAuthorizeOption(metadata => metadata.ViewRoles, metadata => metadata.DetailProperties);
+        public static readonly EntityDomainAuthorizeOption View = new EntityDomainActionAuthorizeOption(metadata => metadata.ViewRoles, metadata => metadata.ViewProperties);
+        public static readonly EntityDomainAuthorizeOption Create = new EntityDomainActionAuthorizeOption(metadata => metadata.AddRoles, metadata => metadata.CreateProperties);
+        public static readonly EntityDomainAuthorizeOption Edit = new EntityDomainActionAuthorizeOption(metadata => metadata.EditRoles, metadata => metadata.EditProperties);
+        public static readonly EntityDomainAuthorizeOption Remove = new EntityDomainActionAuthorizeOption(metadata => metadata.RemoveRoles, metadata => new IPropertyMetadata[0]);
+        public static readonly EntityDomainAuthorizeOption Detail = new EntityDomainActionAuthorizeOption(metadata => metadata.ViewRoles, metadata => metadata.DetailProperties);
 
         public virtual void Validate(IEntityMetadata metadata, IAuthentication authentication)
         {
@@ -71,5 +72,10 @@ namespace Wodsoft.ComBoost.Data
                    return t.ViewRoles.Any(r => authentication.IsInRole(r));
            });
         }
+    }
+
+    public class EntityAnonymousAuthorizeOption : EntityDomainAuthorizeOption
+    {
+        public override void Validate(IEntityMetadata metadata, IAuthentication authentication) { }
     }
 }
