@@ -71,7 +71,7 @@ namespace Wodsoft.ComBoost.Forum
                 provider.AddGenericDefinitionExtension(typeof(EntityDomainService<>), typeof(EntitySearchExtension<>));
                 provider.AddGenericDefinitionExtension(typeof(EntityDomainService<>), typeof(EntityPagerExtension<>));
                 provider.AddGenericDefinitionExtension(typeof(EntityDomainService<>), typeof(EntityPasswordExtension<>));
-                provider.AddGenericDefinitionExtension(typeof(EntityDomainService<>), typeof(ImageExtension<>));
+                provider.AddGenericDefinitionExtension(typeof(EntityDomainService<>), typeof(ImageExtension<>));                
                 provider.AddForumExtensions();
                 return provider;
             });
