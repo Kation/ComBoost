@@ -114,6 +114,7 @@ namespace Wodsoft.ComBoost.Mvc
                 _Values[name] = value;
             else
                 _Values.Add(name, value);
+            _Keys = null;
         }
 
         bool Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.ContainsPrefix(string prefix)
@@ -159,6 +160,7 @@ namespace Wodsoft.ComBoost.Mvc
                     return _Keys;
 
                 List<string> keys = new List<string>();
+                keys.AddRange(_Values.Keys);
                 keys.AddRange(ActionContext.HttpContext.Request.Query.Keys);
                 if (ActionContext.HttpContext.Request.HasFormContentType)
                 {
