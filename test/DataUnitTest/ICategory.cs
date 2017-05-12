@@ -6,6 +6,7 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace DataUnitTest
 {
+    [EntityInterface]
     public interface ICategory : IEntity
     {
         string Name { get; set; }

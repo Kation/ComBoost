@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using Microsoft.EntityFrameworkCore;
+//using Microsoft.EntityFrameworkCore;
+//using QueryableExtensions = Wodsoft.ComBoost.Data.Entity.AsyncQueryableExtensions;
 
 namespace DataUnitTest
 {
@@ -33,60 +34,33 @@ namespace DataUnitTest
         [Fact]
         public async Task ReferenceTest()
         {
-            DataContext context = new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase().Options);
-            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            var category = new Category();
-            category.Index = Guid.NewGuid();
+            var serviceProvider = DataCommon.GetServiceProvider();
+            var database = serviceProvider.GetService<IDatabaseContext>();
+            var categoryContext = database.GetContext<Category>();
+            var category = categoryContext.Create();
             category.Name = "Test";
-            context.Category.Add(category);
-            var user = new User();
-            user.Index = Guid.NewGuid();
+            categoryContext.Add(category);
+            var userContext = database.GetContext<User>();
+            var user = userContext.Create();
             user.Username = "TestUser";
-            context.User.Add(user);
-            await context.SaveChangesAsync();
+            userContext.Add(user);
+            await database.SaveAsync();
 
-            context = new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase().Options);
-            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            user = await context.User.FirstOrDefaultAsync();
-            category = await context.Category.FirstOrDefaultAsync();
+            database = serviceProvider.GetService<IDatabaseContext>();
+            userContext = database.GetContext<User>();
+            user = await userContext.FirstOrDefaultAsync(userContext.Query());
+            categoryContext = database.GetContext<Category>();
+            category = await categoryContext.FirstOrDefaultAsync(categoryContext.Query());
             user.Category = category;
-            context.User.Update(user);
-            var refCategory = context.Entry(user).Reference(t => t.Category);
+            userContext.Update(user);
+            var refCategory = ((DatabaseContext)database).InnerContext.Entry(user).Reference(t => t.Category);
             //var proCategory = ((DatabaseContext)database).InnerContext.Entry(user).Property(t => t.Category);
-            await context.SaveChangesAsync();
+            await database.SaveAsync();
 
-            context = new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase().Options);
-            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            user = await context.User.Include(t => t.Category).FirstOrDefaultAsync();
+            database = serviceProvider.GetService<IDatabaseContext>();
+            userContext = database.GetContext<User>();
+            user = await userContext.FirstOrDefaultAsync(userContext.Include(userContext.Query(), t => t.Category));
             Assert.NotNull(user.Category);
-
-            //var serviceProvider = DataCommon.GetServiceProvider();
-            //var database = serviceProvider.GetService<IDatabaseContext>();
-            //var categoryContext = database.GetContext<Category>();
-            //var category = categoryContext.Create();
-            //category.Name = "Test";
-            //categoryContext.Add(category);
-            //var userContext = database.GetContext<User>();
-            //var user = userContext.Create();
-            //user.Username = "TestUser";
-            //userContext.Add(user);
-            //await database.SaveAsync();
-
-            //database = serviceProvider.GetService<IDatabaseContext>();
-            //userContext = database.GetContext<User>();
-            //user = await userContext.FirstOrDefaultAsync(userContext.Query());
-            //categoryContext = database.GetContext<Category>();
-            //category = await categoryContext.FirstOrDefaultAsync(categoryContext.Query());
-            //user.Category = category;
-            //userContext.Update(user);
-            //var refCategory = ((DatabaseContext)database).InnerContext.Entry(user).Reference(t => t.Category);
-            ////var proCategory = ((DatabaseContext)database).InnerContext.Entry(user).Property(t => t.Category);
-            //await database.SaveAsync();
-
-            //database = serviceProvider.GetService<IDatabaseContext>();
-            //userContext = database.GetContext<User>();
-            //user = await userContext.FirstOrDefaultAsync(userContext.Include(userContext.Query(), t=>t.Category));
-            //Assert.NotNull(user.Category);
         }
 
         [Fact]
@@ -142,6 +116,7 @@ namespace DataUnitTest
             Assert.Equal("TestUser", users[0].Username);
         }
 
+        [Fact]
         public async Task OrderTest()
         {
             var serviceProvider = DataCommon.GetServiceProvider();
