@@ -138,19 +138,19 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
         public Task<TSource> LastAsync<TSource>(IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return System.Data.Entity.QueryableExtensions.LastAsync(source, cancellationToken);
+            throw new NotSupportedException();
         }
         public Task<TSource> LastAsync<TSource>(IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return System.Data.Entity.QueryableExtensions.LastAsync(source, predicate, cancellationToken);
+            throw new NotSupportedException();
         }
         public Task<TSource> LastOrDefaultAsync<TSource>(IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return System.Data.Entity.QueryableExtensions.LastOrDefaultAsync(source, cancellationToken);
+            throw new NotSupportedException();
         }
         public Task<TSource> LastOrDefaultAsync<TSource>(IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return System.Data.Entity.QueryableExtensions.LastOrDefaultAsync(source, predicate, cancellationToken);
+            throw new NotSupportedException();
         }
         public Task<long> LongCountAsync<TSource>(IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
