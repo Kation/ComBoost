@@ -1,0 +1,17 @@
+{
+  "version": "3.0.0-alpha15",
+
+  "dependencies": {
+    "Microsoft.Extensions.Configuration": "1.1.2",
+    "Microsoft.Extensions.Configuration.Json": "1.1.2",
+    "Microsoft.Extensions.DependencyInjection": "1.1.1",
+    "Wodsoft.ComBoost": "[3.0.0-alpha15,4.0.0)",
+    "Wodsoft.ComBoost.Security": "[3.0.0-alpha15,4.0.0)"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    }
+  }
+}
