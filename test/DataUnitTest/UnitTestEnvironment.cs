@@ -7,15 +7,18 @@ using Wodsoft.ComBoost.Mock;
 using Microsoft.EntityFrameworkCore;
 using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Security;
+using Wodsoft.ComBoost;
 
 namespace DataUnitTest
 {
     public class UnitTestEnvironment : MockEnvironment
     {
+        private string _DatabaseName = Guid.NewGuid().ToString();
+
         protected override void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<DbContext, DataContext>(serviceProvider =>
-            new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase().Options.WithExtension(new ComBoostOptionExtension())));
+            new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase(_DatabaseName).Options.WithExtension(new ComBoostOptionExtension())));
             services.AddScoped<IDatabaseContext, DatabaseContext>();
             services.AddTransient<ISecurityProvider, MockSecurityProvider<Admin>>();
             base.ConfigureServices(services);

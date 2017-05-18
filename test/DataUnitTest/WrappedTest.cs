@@ -15,26 +15,30 @@ namespace DataUnitTest
         [Fact]
         public async Task AddAndRemoveTest()
         {
-            var serviceProvider = DataCommon.GetServiceProvider();
-            var database = serviceProvider.GetService<IDatabaseContext>();
-            var categoryContext = database.GetWrappedContext<ICategory>();
-            var userContext = database.GetWrappedContext<IUser>();
-            Assert.Equal(0, await categoryContext.CountAsync(categoryContext.Query()));
-            var category = categoryContext.Create();
-            category.Name = "Test";
-            categoryContext.Add(category);
-            await database.SaveAsync();
+            UnitTestEnvironment env = new UnitTestEnvironment();
+            using (var scope = env.GetServiceScope())
+            {
+                var serviceProvider = scope.ServiceProvider;
+                var database = serviceProvider.GetService<IDatabaseContext>();
+                var categoryContext = database.GetWrappedContext<ICategory>();
+                var userContext = database.GetWrappedContext<IUser>();
+                Assert.Equal(0, await categoryContext.CountAsync(categoryContext.Query()));
+                var category = categoryContext.Create();
+                category.Name = "Test";
+                categoryContext.Add(category);
+                await database.SaveAsync();
 
-            var user = userContext.Create();
-            user.Username = "TestUser";
-            user.Category = category;
-            userContext.Add(user);
-            await database.SaveAsync();
+                var user = userContext.Create();
+                user.Username = "TestUser";
+                user.Category = category;
+                userContext.Add(user);
+                await database.SaveAsync();
 
-            Assert.Equal(1, await userContext.CountAsync(userContext.Query().Where(t => t.Category.Name == "Test")));
+                Assert.Equal(1, await userContext.CountAsync(userContext.Query().Where(t => t.Category.Name == "Test")));
 
-            user = await userContext.GetAsync(user.Index);
-            Assert.NotNull(user);
+                user = await userContext.GetAsync(user.Index);
+                Assert.NotNull(user);
+            }
         }
     }
 }
