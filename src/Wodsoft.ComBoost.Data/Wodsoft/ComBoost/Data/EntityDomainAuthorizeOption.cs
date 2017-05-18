@@ -67,9 +67,9 @@ namespace Wodsoft.ComBoost.Data
                if (!t.AllowAnonymous && !authentication.Identity.IsAuthenticated)
                    return false;
                if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                   return t.ViewRoles.All(r => authentication.IsInRole(r));
+                   return RolesSelector(metadata).All(r => authentication.IsInRole(r));
                else
-                   return t.ViewRoles.Any(r => authentication.IsInRole(r));
+                   return RolesSelector(metadata).Any(r => authentication.IsInRole(r));
            });
         }
     }
