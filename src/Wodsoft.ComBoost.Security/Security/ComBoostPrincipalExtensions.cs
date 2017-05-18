@@ -32,15 +32,10 @@ namespace Wodsoft.ComBoost.Security
                 throw new ArgumentNullException(nameof(principal));
             if (role == null)
                 throw new ArgumentNullException(nameof(role));
-            if (!principal.Identity.IsAuthenticated)
-                return false;
             ComBoostPrincipal comboostPrincipal = principal as ComBoostPrincipal;
             if (comboostPrincipal == null)
                 return false;
-            var roles = comboostPrincipal.FindAll(t => t.Type == ClaimTypes.Role);
-            if (roles.Any(t => t.Value == comboostPrincipal.SecurityProvider.ConvertRoleToString(role)))
-                return true;
-            return false;
+            return comboostPrincipal.IsInStaticRole(role);
         }
 
         public static bool IsInDynamicRole(this IPrincipal principal, object role)
@@ -49,13 +44,23 @@ namespace Wodsoft.ComBoost.Security
                 throw new ArgumentNullException(nameof(principal));
             if (role == null)
                 throw new ArgumentNullException(nameof(role));
-            if (!principal.Identity.IsAuthenticated)
-                return false;
             ComBoostPrincipal comboostPrincipal = principal as ComBoostPrincipal;
             if (comboostPrincipal == null)
                 return false;
-            string id = comboostPrincipal.FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
-            return comboostPrincipal.SecurityProvider.GetPermissionAsync(id).Result.IsInRole(role);
+            return comboostPrincipal.IsInDynamicRole(role);
+        }
+
+        public static bool IsInRole(this IPrincipal principal, object role)
+        {
+            if (principal == null)
+                throw new ArgumentNullException(nameof(principal));
+            if (role == null)
+                throw new ArgumentNullException(nameof(role));
+            ComBoostPrincipal comboostPrincipal = principal as ComBoostPrincipal;
+            if (comboostPrincipal == null)
+                return false;
+            return comboostPrincipal.IsInRole(role);
+
         }
     }
 }

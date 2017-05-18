@@ -24,14 +24,36 @@ namespace Wodsoft.ComBoost.Security
             string id = ((ClaimsIdentity)Identity).FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
             return (T)SecurityProvider.GetPermissionAsync(id).Result;
         }
+        
+        public bool IsInStaticRole(object role)
+        {
+            if (role == null)
+                throw new ArgumentNullException(nameof(role));
+            if (!Identity.IsAuthenticated)
+                return false;
+            var roles = FindAll(t => t.Type == ClaimTypes.Role);
+            if (roles.Any(t => t.Value == SecurityProvider.ConvertRoleToString(role)))
+                return true;
+            return false;
+        }
+
+        public bool IsInDynamicRole(object role)
+        {
+            if (role == null)
+                throw new ArgumentNullException(nameof(role));
+            if (!Identity.IsAuthenticated)
+                return false;
+            string id = FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
+            return SecurityProvider.GetPermissionAsync(id).Result.IsInRole(role);
+        }
 
         public bool IsInRole(object role)
         {
             if (!Identity.IsAuthenticated)
                 return false;
-            if (this.IsInStaticRole(role))
+            if (IsInStaticRole(role))
                 return true;
-            return this.IsInDynamicRole(role);
+            return IsInDynamicRole(role);
         }
     }
 }
