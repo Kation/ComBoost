@@ -47,7 +47,7 @@ namespace Wodsoft.ComBoost.Forum
             services.AddSession();
             services.AddMvc(options =>
             {
-                options.AddComBoostMvcOptions();
+                options.AddComBoostMvcDataOptions();
             });
             services.AddComBoostMvcAuthentication();
 

@@ -25,9 +25,14 @@ namespace Wodsoft.ComBoost.Forum.Entity
         [Required]
         public virtual string Name { get; set; }
 
+        [Hide]
+        [Column("BoardIndex")]
+        public virtual Guid BoardId { get; set; }
+        private Board _Board;
         [Display(Name = "所属板块", Order = 0)]
         [Required]
-        public virtual Board Board { get; set; }
+        [ForeignKey("BoardId")]
+        public virtual Board Board { get { return _Board; } set { _Board = value; BoardId = value != null ? value.Index : Guid.Empty; } }
 
         [Display(Name = "图标", Order = 30)]
         [CustomDataType(CustomDataType.Image)]

@@ -28,7 +28,7 @@ namespace Wodsoft.ComBoost.Forum.Domain
         {
             username = username.ToLower();
             var memberContext = DatabaseContext.GetWrappedContext<IMember>();
-            var item = await memberContext.Query().SingleOrDefaultAsync(t => t.Username.ToLower() == username);
+            var item = await memberContext.SingleOrDefaultAsync(memberContext.Query().Where(t => t.Username.ToLower() == username));
             return item;
         }
 
