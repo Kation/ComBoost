@@ -8,11 +8,17 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Wodsoft.ComBoost.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ComBoostMvcExtensions
     {
+        public static void AddComBoostMvcOptions(this MvcOptions options)
+        {
+            options.ModelBinderProviders.Add(new SelectedFileBinderProvider());
+        }
+
         public static void AddComBoostMvcAuthentication(this IServiceCollection serviceCollection)
         {
             if (serviceCollection == null)
