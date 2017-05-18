@@ -1,0 +1,27 @@
+﻿{
+  "title": "Wodsoft.ComBoost.AspNetCore",
+  "version": "3.0.0-alpha15",
+  "authors": [ "Kation" ],
+  "description": "ComBoost用于AspNet Core的领域模块。",
+  "packOptions": {
+    "owners": [ "Kation" ],
+    "summary": "ComBoost用于AspNet Core的领域模块。",
+    "tags": [ "ComBoost" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Kation/ComBoost"
+    },
+    "releaseNotes": "Alpha测试版，请勿用于正式环境。"
+  },
+  "dependencies": {
+    "Wodsoft.ComBoost": "[3.0.0-alpha15,4.0.0)",
+    "Microsoft.AspNetCore.Http.Abstractions": "1.1.2"
+  },
+
+  "frameworks": {
+    "netstandard1.3": {
+      "imports": "dnxcore50"
+    },
+    "net451": {}
+  }
+}
