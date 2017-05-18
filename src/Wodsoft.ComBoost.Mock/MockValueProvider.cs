@@ -73,5 +73,10 @@ namespace Wodsoft.ComBoost.Mock
             }
             return value;
         }
+
+        public bool ContainsKey(string name)
+        {
+            return _Values.ContainsKey(name);
+        }
     }
 }
