@@ -12,78 +12,37 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Internal;
 using System.Collections;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
+using Wodsoft.ComBoost.AspNetCore;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class MvcValueProvider : IValueProvider, Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider
+    public class MvcValueProvider : HttpValueProvider, Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider
     {
         private Dictionary<string, object> _Values;
         private IModelBinderFactory _ModelBinderFactory;
         private IModelMetadataProvider _ModelMetadataProvider;
 
         public MvcValueProvider(ActionContext actionContext)
+            : base(actionContext.HttpContext)
         {
             ActionContext = actionContext;
             _Values = new Dictionary<string, object>();
             _ModelBinderFactory = actionContext.HttpContext.RequestServices.GetRequiredService<IModelBinderFactory>();
             _ModelMetadataProvider = actionContext.HttpContext.RequestServices.GetRequiredService<IModelMetadataProvider>();
+
+            ValueSelectors.Insert(0, new HttpRouteValueValueSelector(HttpContext));
+            ValueSelectors.Add(new HttpRouteDataTokenValueSelector(HttpContext));
         }
 
         public ActionContext ActionContext { get; private set; }
-        
-        public object GetValue(string name)
-        {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
-            if (_Values.ContainsKey(name))
-                return _Values[name];
-            StringValues value = ActionContext.HttpContext.Request.Query[name];
-            if (value == StringValues.Empty)
-                value = ActionContext.HttpContext.Request.Form[name];
-            if (value == StringValues.Empty)
-                return ActionContext.RouteData.Values[name] ?? ActionContext.HttpContext.Request.Headers[name];
-            else
-                return value;
-        }
 
-        public object GetValue(string name, Type valueType)
+        public override object GetValue(string name, Type valueType)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
-            if (valueType == null)
-                throw new ArgumentNullException(nameof(valueType));
-            object value;
-            if (_Values.TryGetValue(name.ToLower(), out value))
-                if (valueType.IsAssignableFrom(value.GetType()))
-                    return value;
-                else
-                    return ModelBindingHelper.ConvertTo(value, valueType, System.Globalization.CultureInfo.CurrentUICulture);
-            if (valueType == typeof(ISelectedFile))
-            {
-                var file = ActionContext.HttpContext.Request.Form.Files.GetFile(name);
-                if (file == null)
-                    return null;
-                return new SelectedFile(file);
-            }
-            else if (valueType == typeof(ISelectedFile[]))
-            {
-                var files = ActionContext.HttpContext.Request.Form.Files.GetFiles(name);
-                if (files == null)
-                    return null;
-                return files.Select(t => new SelectedFile(t)).ToArray();
-            }
-            else if (valueType == typeof(Stream) && name == "$request")
-                return ActionContext.HttpContext.Request.Body;
+            if (valueType == typeof(Stream) && name == "$request")
+                return HttpContext.Request.Body;
             else if (valueType == typeof(Stream) && name == "$response")
-                return ActionContext.HttpContext.Response.Body;
-            else if (valueType == typeof(string))
-            {
-                StringValues values = ((Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider)this).GetValue(name).Values;
-                if (values == StringValues.Empty)
-                    return null;
-                else
-                    return (string)values;
-            }
+                return HttpContext.Response.Body;
+            
             ModelBinderFactoryContext context = new ModelBinderFactoryContext();
             context.BindingInfo = new BindingInfo() { BinderModelName = name, BindingSource = BindingSource.ModelBinding };
             context.CacheToken = name + "_" + valueType.Name;
@@ -92,29 +51,22 @@ namespace Wodsoft.ComBoost.Mvc
             var binder = _ModelBinderFactory.CreateBinder(context);
             var bindingContext = DefaultModelBindingContext.CreateBindingContext(ActionContext, this, context.Metadata, context.BindingInfo, name);
             binder.BindModelAsync(bindingContext).Wait();
-            return bindingContext.Result.Model;
+            object value = bindingContext.Result.Model;
+            if (value != null)
+                return value;
+
+            return base.GetValue(name, valueType);
         }
 
-        public object GetValue(Type valueType)
+        protected override object GetValueCore(string name)
         {
-            if (valueType == typeof(Uri))
-                return new Uri(ActionContext.HttpContext.Request.Scheme + "://" + ActionContext.HttpContext.Request.Host.Value + ActionContext.HttpContext.Request.Path.Value + ActionContext.HttpContext.Request.QueryString.Value);
-            else if (valueType == typeof(Stream))
-                return ActionContext.HttpContext.Request.Body;
-            else
-                throw new NotSupportedException();
+            return base.GetValueCore(name);
         }
 
-        public void SetValue(string name, object value)
+        protected override object ConvertValue(object value, Type targetType)
         {
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
-            name = name.ToLower();
-            if (_Values.ContainsKey(name))
-                _Values[name] = value;
-            else
-                _Values.Add(name, value);
-            _Keys = null;
+
+            return base.ConvertValue(value, targetType);
         }
 
         bool Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.ContainsPrefix(string prefix)
@@ -124,55 +76,13 @@ namespace Wodsoft.ComBoost.Mvc
 
         ValueProviderResult Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.GetValue(string key)
         {
-            if (ActionContext.HttpContext.Request.Query.ContainsKey(key))
-            {
-                var value = ActionContext.HttpContext.Request.Query[key];
-                if (value == StringValues.Empty)
-                    value = "";
-                return new ValueProviderResult(value);
-            }
-            if (ActionContext.HttpContext.Request.HasFormContentType && ActionContext.HttpContext.Request.Form.ContainsKey(key))
-            {
-                var value = ActionContext.HttpContext.Request.Form[key];
-                if (value == StringValues.Empty)
-                    value = "";
-                return new ValueProviderResult(value);
-            }
-            if (ActionContext.HttpContext.Request.Headers.ContainsKey(key))
-            {
-                var value = ActionContext.HttpContext.Request.Headers[key];
-                if (value == StringValues.Empty)
-                    value = "";
-                return new ValueProviderResult(value);
-            }
-            var result = ActionContext.RouteData.Values[key];
-            if (result == null)
+            object value = GetValueCore(key);
+            if (value is string)
+                return new ValueProviderResult((string)value);
+            else if (value is StringValues)
+                return new ValueProviderResult((StringValues)value);
+            else
                 return ValueProviderResult.None;
-            return new ValueProviderResult(result.ToString());
-        }
-
-        private System.Collections.ObjectModel.ReadOnlyCollection<string> _Keys;
-        public ICollection<string> Keys
-        {
-            get
-            {
-                if (_Keys != null)
-                    return _Keys;
-
-                List<string> keys = new List<string>();
-                keys.AddRange(_Values.Keys);
-                keys.AddRange(ActionContext.HttpContext.Request.Query.Keys);
-                if (ActionContext.HttpContext.Request.HasFormContentType)
-                {
-                    keys.AddRange(ActionContext.HttpContext.Request.Form.Keys);
-                    keys.AddRange(ActionContext.HttpContext.Request.Form.Files.Select(t => t.Name));
-                }
-                keys.AddRange(ActionContext.RouteData.Values.Keys);
-                keys.AddRange(ActionContext.HttpContext.Request.Headers.Keys);
-                keys.AddRange(ActionContext.RouteData.DataTokens.Keys);
-                _Keys = new System.Collections.ObjectModel.ReadOnlyCollection<string>(keys.Distinct().ToList());
-                return _Keys;
-            }
         }
     }
 }

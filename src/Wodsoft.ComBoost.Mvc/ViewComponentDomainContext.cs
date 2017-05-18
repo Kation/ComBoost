@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Wodsoft.ComBoost.AspNetCore;
 
 namespace Wodsoft.ComBoost.Mvc
 {
@@ -19,7 +20,7 @@ namespace Wodsoft.ComBoost.Mvc
         public ViewComponent ViewComponent { get; private set; }
 
         private MvcValueProvider _ValueProvider;
-        protected override MvcValueProvider GetValueProvider()
+        protected override HttpValueProvider GetValueProvider()
         {
             if (_ValueProvider == null)
             {
@@ -28,13 +29,6 @@ namespace Wodsoft.ComBoost.Mvc
                     _ValueProvider.SetValue(arg.Key, arg.Value);
             }
             return _ValueProvider;
-        }
-
-        public override object GetService(Type serviceType)
-        {
-            if (serviceType == typeof(IValueProvider))
-                return ValueProvider;
-            return base.GetService(serviceType);
         }
     }
 }

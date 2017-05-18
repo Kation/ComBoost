@@ -10,14 +10,6 @@ namespace Wodsoft.ComBoost.Mvc
     {
         public ControllerDomainContext(Controller controller) : base(controller.ControllerContext)
         {
-        }
-
-        private MvcValueProvider _ValueProvider;
-        protected override MvcValueProvider GetValueProvider()
-        {
-            if (_ValueProvider == null)
-                _ValueProvider = new Mvc.MvcValueProvider(ActionContext);
-            return _ValueProvider;
-        }
+        }        
     }
 }

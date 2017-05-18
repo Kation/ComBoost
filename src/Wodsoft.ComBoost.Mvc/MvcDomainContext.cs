@@ -6,30 +6,26 @@ using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
+using Wodsoft.ComBoost.AspNetCore;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public abstract class MvcDomainContext : DomainContext
+    public abstract class MvcDomainContext : HttpDomainContext
     {
         public MvcDomainContext(ActionContext actionContext)
-            : base(actionContext.HttpContext.RequestServices, actionContext.HttpContext.RequestAborted)
+            : base(actionContext.HttpContext)
         {
-            if (actionContext == null)
-                throw new ArgumentNullException(nameof(actionContext));
             ActionContext = actionContext;
         }
 
         public ActionContext ActionContext { get; private set; }
 
-        protected abstract MvcValueProvider GetValueProvider();
-
-        public MvcValueProvider ValueProvider { get { return GetValueProvider(); } }
-
-        public override object GetService(Type serviceType)
+        private MvcValueProvider _ValueProvider;
+        protected override HttpValueProvider GetValueProvider()
         {
-            if (serviceType == typeof(IValueProvider))
-                return ValueProvider;
-            return base.GetService(serviceType);
+            if (_ValueProvider == null)
+                _ValueProvider = new MvcValueProvider(ActionContext);
+            return _ValueProvider;
         }
     }
 }
