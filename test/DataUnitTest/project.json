@@ -4,17 +4,17 @@
   "dependencies": {
     "Wodsoft.ComBoost.EntityFrameworkCore": "3.0.0-*",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
-    "Microsoft.NETCore.App": {
-      "version": "1.1.1",
-      "type": "platform"
-    },
-    "NETStandard.Library": "1.6.1",
-    "Microsoft.EntityFrameworkCore.InMemory": "1.1.1",
-    "Microsoft.EntityFrameworkCore.SqlServer": "1.1.1",
     "Microsoft.EntityFrameworkCore.Tools": "1.1.1",
     "xunit": "2.2.0",
     "Wodsoft.ComBoost.Mock": "3.0.0-*",
-    "Wodsoft.ComBoost.Data": "3.0.0-*"
+    "Wodsoft.ComBoost.Data": "3.0.0-*",
+    "Microsoft.EntityFrameworkCore.InMemory": "1.1.2",
+    "Microsoft.EntityFrameworkCore.SqlServer": "1.1.2",
+    "Microsoft.NETCore.App": {
+      "version": "1.1.2",
+      "type": "platform"
+    },
+    "NETStandard.Library": "1.6.1"
   },
   "testRunner": "xunit",
   "frameworks": {

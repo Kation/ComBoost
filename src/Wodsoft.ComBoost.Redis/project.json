@@ -1,6 +1,6 @@
-﻿{
+{
   "title": "Wodsoft.ComBoost.Redis",
-  "version": "3.0.0-alpha15",
+  "version": "3.0.0-alpha16",
   "authors": [ "Kation" ],
   "description": "ComBoost Redis分布式缓存，支持缓存与信号量。",
   "packOptions": {
@@ -14,8 +14,8 @@
     "releaseNotes": "Alpha测试版，请勿用于正式环境。"
   },
   "dependencies": {
-    "Wodsoft.ComBoost.Core": "[3.0.0-alpha15,4.0.0)",
-    "StackExchange.Redis": "1.1.608"
+    "Wodsoft.ComBoost.Core": "[3.0.0-alpha16,4.0.0)",
+    "StackExchange.Redis": "1.2.3"
   },
 
   "frameworks": {
