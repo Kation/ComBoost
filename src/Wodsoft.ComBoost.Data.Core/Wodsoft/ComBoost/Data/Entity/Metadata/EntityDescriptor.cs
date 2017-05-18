@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -77,14 +78,14 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             return GetMetadata(typeof(TEntity));
         }
 
-        private Dictionary<Type, IEntityMetadata> _Metadata;
+        private ConcurrentDictionary<Type, IEntityMetadata> _Metadata;
 
         /// <summary>
         /// 实例化实体解释器。
         /// </summary>
         public EntityDescriptor()
         {
-            _Metadata = new Dictionary<Type, IEntityMetadata>();
+            _Metadata = new ConcurrentDictionary<Type, IEntityMetadata>();
         }
 
         IEntityMetadata IEntityDescriptor.GetMetadata(Type type)
@@ -93,19 +94,19 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 type = type.GetTypeInfo().BaseType;
             if (!typeof(IEntity).IsAssignableFrom(type))
                 throw new NotSupportedException("该类型没有继承IEntity接口。");
-            if (!_Metadata.ContainsKey(type))
+            IEntityMetadata metadata = _Metadata.GetOrAdd(type, s =>
             {
                 var metadataField = type.GetField("Metadata", BindingFlags.Static | BindingFlags.Public);
-                IEntityMetadata metadata;
+                IEntityMetadata m;
                 if (metadataField != null)
-                    metadata = (IEntityMetadata)metadataField.GetValue(null);
+                    m = (IEntityMetadata)metadataField.GetValue(null);
                 else
-                    metadata = new ClrEntityMetadata(type);
-                _Metadata.Add(type, metadata);
+                    m = new ClrEntityMetadata(type);
                 foreach (var interfaceType in type.GetInterfaces().Where(t => t != typeof(IEntity) && t.GetTypeInfo().GetCustomAttribute<EntityInterfaceAttribute>() != null && typeof(IEntity).IsAssignableFrom(t)))
-                    _Metadata.Add(interfaceType, metadata);
-            }
-            return _Metadata[type];
+                    _Metadata.TryAdd(interfaceType, m);
+                return m;
+            });
+            return metadata;
         }
 
         /// <summary>
