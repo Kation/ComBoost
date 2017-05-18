@@ -173,7 +173,7 @@ namespace Wodsoft.ComBoost.Data
         protected virtual async Task UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
         {
             bool handled = false;
-            bool hasValue = valueProvider.Keys.Contains(property.ClrName);
+            bool hasValue = valueProvider.ContainsKey(property.ClrName);
             object value;
             if (hasValue)
             {
