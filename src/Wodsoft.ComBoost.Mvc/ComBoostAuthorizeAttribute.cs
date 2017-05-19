@@ -41,7 +41,11 @@ namespace Wodsoft.ComBoost.Mvc
         {
             var options = context.HttpContext.RequestServices.GetRequiredService<ComBoostAuthenticationOptions>();
             var loginUrl = options.LoginPath(context.HttpContext);
-            loginUrl = context.HttpContext.Request.PathBase.Add(loginUrl) + "?returlUrl=" + Uri.EscapeDataString(context.HttpContext.Request.Path);
+            loginUrl = context.HttpContext.Request.PathBase.Add(loginUrl);
+            if (loginUrl.Contains("?"))
+                loginUrl += "&returlUrl=" + Uri.EscapeDataString(context.HttpContext.Request.Path);
+            else
+                loginUrl += "?returlUrl=" + Uri.EscapeDataString(context.HttpContext.Request.Path);
             return new RedirectResult(loginUrl);
         }
     }
