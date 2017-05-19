@@ -35,14 +35,14 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         public ActionContext ActionContext { get; private set; }
-
+        
         public override object GetValue(string name, Type valueType)
         {
             if (valueType == typeof(Stream) && name == "$request")
                 return HttpContext.Request.Body;
             else if (valueType == typeof(Stream) && name == "$response")
                 return HttpContext.Response.Body;
-            
+
             ModelBinderFactoryContext context = new ModelBinderFactoryContext();
             context.BindingInfo = new BindingInfo() { BinderModelName = name, BindingSource = BindingSource.ModelBinding };
             context.CacheToken = name + "_" + valueType.Name;
@@ -51,9 +51,8 @@ namespace Wodsoft.ComBoost.Mvc
             var binder = _ModelBinderFactory.CreateBinder(context);
             var bindingContext = DefaultModelBindingContext.CreateBindingContext(ActionContext, this, context.Metadata, context.BindingInfo, name);
             binder.BindModelAsync(bindingContext).Wait();
-            object value = bindingContext.Result.Model;
-            if (value != null)
-                return value;
+            if (bindingContext.Result.IsModelSet)
+                return bindingContext.Result.Model;
 
             return base.GetValue(name, valueType);
         }
@@ -71,7 +70,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         bool Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.ContainsPrefix(string prefix)
         {
-            return false;
+            return Keys.Any(t => t == prefix || t.StartsWith(prefix + ".") || t.StartsWith(prefix + "["));
         }
 
         ValueProviderResult Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.GetValue(string key)
