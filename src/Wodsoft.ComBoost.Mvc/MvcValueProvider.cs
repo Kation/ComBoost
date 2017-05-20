@@ -35,8 +35,8 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         public ActionContext ActionContext { get; private set; }
-        
-        public override object GetValue(string name, Type valueType)
+
+        protected override object GetHttpValue(string name, Type valueType)
         {
             if (valueType == typeof(Stream) && name == "$request")
                 return HttpContext.Request.Body;
@@ -53,19 +53,7 @@ namespace Wodsoft.ComBoost.Mvc
             binder.BindModelAsync(bindingContext).Wait();
             if (bindingContext.Result.IsModelSet)
                 return bindingContext.Result.Model;
-
-            return base.GetValue(name, valueType);
-        }
-
-        protected override object GetValueCore(string name)
-        {
-            return base.GetValueCore(name);
-        }
-
-        protected override object ConvertValue(object value, Type targetType)
-        {
-
-            return base.ConvertValue(value, targetType);
+            return null;
         }
 
         bool Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.ContainsPrefix(string prefix)
@@ -75,7 +63,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         ValueProviderResult Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.GetValue(string key)
         {
-            object value = GetValueCore(key);
+            object value = GetHttpValueCore(key);
             if (value is string)
                 return new ValueProviderResult((string)value);
             else if (value is StringValues)

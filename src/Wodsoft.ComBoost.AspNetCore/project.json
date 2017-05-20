@@ -1,6 +1,6 @@
 ﻿{
   "title": "Wodsoft.ComBoost.AspNetCore",
-  "version": "3.0.0-alpha16",
+  "version": "3.0.0-alpha16-2",
   "authors": [ "Kation" ],
   "description": "ComBoost用于AspNet Core的领域模块。",
   "packOptions": {

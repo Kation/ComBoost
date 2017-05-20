@@ -66,21 +66,32 @@ namespace Wodsoft.ComBoost.AspNetCore
                 throw new ArgumentNullException(nameof(name));
             if (valueType == null)
                 throw new ArgumentNullException(nameof(valueType));
-            object value = GetValueCore(name);
+            object value = GetValueCore(name, valueType);
+            if (value == null || !valueType.IsAssignableFrom(value.GetType()))
+                return null;
+            return value;
+        }
+
+        protected virtual object GetValueCore(string name, Type valueType)
+        {
+            if (_Values.ContainsKey(IgnoreCase ? name.ToLower() : name))
+                return _Values[IgnoreCase ? name.ToLower() : name];
+            return GetHttpValue(name, valueType);
+        }
+
+        protected virtual object GetHttpValue(string name, Type valueType)
+        {
+            object value = GetHttpValueCore(name);
             if (value == null)
                 return null;
             return ConvertValue(value, valueType);
         }
 
-        protected virtual object GetValueCore(string name)
+        protected virtual object GetHttpValueCore(string name)
         {
-            if (_Values.ContainsKey(IgnoreCase ? name.ToLower() : name))
-                return _Values[IgnoreCase ? name.ToLower() : name];
             foreach (var selector in ValueSelectors)
-            {
                 if (selector.ContainsKey(name))
                     return selector.GetValue(name);
-            }
             return null;
         }
 
@@ -101,7 +112,12 @@ namespace Wodsoft.ComBoost.AspNetCore
 
             var converter = TypeDescriptor.GetConverter(targetType);
             if (!converter.CanConvertFrom(valueType))
-                throw new InvalidCastException("值类型“" + valueType.Name + "”不能转换为目标类型“" + targetType.Name + "”。");
+            {
+                if (valueType == typeof(StringValues) && converter.CanConvertFrom(typeof(string)))
+                    value = (string)(StringValues)value;
+                else
+                    throw new InvalidCastException("值类型“" + valueType.Name + "”不能转换为目标类型“" + targetType.Name + "”。");
+            }
             return converter.ConvertFrom(value);
         }
 

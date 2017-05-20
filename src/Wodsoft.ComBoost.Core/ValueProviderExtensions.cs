@@ -49,10 +49,10 @@ namespace Wodsoft.ComBoost
         /// <returns>返回值。</returns>
         public static T GetRequiredValue<T>(this IValueProvider valueProvider, string name)
         {
-            T value = valueProvider.GetValue<T>(name);
+            object value = valueProvider.GetValue(name, typeof(T));
             if (value == null)
                 throw new ArgumentException("找不到所需值。", name);
-            return value;
+            return (T)value;
         }        
     }
 }

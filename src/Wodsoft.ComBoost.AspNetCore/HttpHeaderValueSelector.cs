@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
-    public class HttpHeaderValueSelector : HttpValueSelector
+    public class HttpHeaderValueSelector : HttpStringValuesSelector
     {
         public HttpHeaderValueSelector(HttpContext httpContext) : base(httpContext)
         { }
@@ -16,7 +17,7 @@ namespace Wodsoft.ComBoost.AspNetCore
             return HttpContext.Request.Headers.Keys.ToArray();
         }
 
-        protected override object GetValueCore(string key)
+        protected override StringValues GetStringValue(string key)
         {
             return HttpContext.Request.Headers[key];
         }
