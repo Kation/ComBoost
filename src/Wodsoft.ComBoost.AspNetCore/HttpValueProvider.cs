@@ -28,6 +28,10 @@ namespace Wodsoft.ComBoost.AspNetCore
                 ValueSelectors.Add(new HttpFormValueSelector(httpContext));
                 ValueSelectors.Add(new HttpFormFileValueSelector(httpContext));
             }
+            else if (httpContext.Request.Headers["content-type"].ToString().Contains("application/json"))
+            {
+                ValueSelectors.Add(new HttpJsonValueSelector(httpContext));
+            }
             ValueSelectors.Add(new HttpHeaderValueSelector(httpContext));
         }
 

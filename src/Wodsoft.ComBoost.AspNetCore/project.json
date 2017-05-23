@@ -1,4 +1,4 @@
-﻿{
+{
   "title": "Wodsoft.ComBoost.AspNetCore",
   "version": "3.0.0-alpha16-2",
   "authors": [ "Kation" ],
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "Wodsoft.ComBoost": "[3.0.0-alpha16,4.0.0)",
+    "Newtonsoft.Json": "10.0.2",
     "Microsoft.AspNetCore.Http.Abstractions": "1.1.2"
   },
 
