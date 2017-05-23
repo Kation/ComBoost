@@ -50,9 +50,16 @@ namespace Wodsoft.ComBoost.Mvc
 
             var binder = _ModelBinderFactory.CreateBinder(context);
             var bindingContext = DefaultModelBindingContext.CreateBindingContext(ActionContext, this, context.Metadata, context.BindingInfo, name);
-            binder.BindModelAsync(bindingContext).Wait();
-            if (bindingContext.Result.IsModelSet)
-                return bindingContext.Result.Model;
+            try
+            {
+                binder.BindModelAsync(bindingContext).Wait();
+                if (bindingContext.Result.IsModelSet)
+                    return bindingContext.Result.Model;
+            }
+            catch
+            {
+
+            }
             return null;
         }
 
