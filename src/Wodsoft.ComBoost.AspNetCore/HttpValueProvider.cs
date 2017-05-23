@@ -111,6 +111,8 @@ namespace Wodsoft.ComBoost.AspNetCore
                 return ((IReadOnlyList<IFormFile>)value).Select(t => new SelectedFile(t)).ToArray();
 
             var converter = TypeDescriptor.GetConverter(targetType);
+            if (converter == null)
+                throw new InvalidCastException("值类型“" + valueType.Name + "”不能转换为目标类型“" + targetType.Name + "”。");
             if (!converter.CanConvertFrom(valueType))
             {
                 if (valueType == typeof(StringValues) && converter.CanConvertFrom(typeof(string)))

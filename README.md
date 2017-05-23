@@ -8,7 +8,7 @@ ComBoost 3.0基于.Net Core框架进行开发
 项目包含程序集：
 * Wodsoft.ComBoost  
 包含领域服务的一些基础接口实现，例如DomainContext，DomainService，DomainProvider等。用于领域服务项目。
-* Wodsoft.ComBoost.AspNetCore 
+* Wodsoft.ComBoost.AspNetCore  
 包含基于AspNetCore的Http领域上下文实现。
 * Wodsoft.ComBoost.AspNetCore.Security  
 包含Asp.Net Core的身份认证模块功能，方便开发者进行身份验证。用于非Mvc网站项目，一般不直接引用。

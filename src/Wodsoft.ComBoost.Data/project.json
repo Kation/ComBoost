@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.Data",
-  "version": "3.0.0-alpha16",
+  "version": "3.0.0-alpha16-2",
   "authors": [ "Kation" ],
   "description": "ComBoost实体模块。",
   "packOptions": {
