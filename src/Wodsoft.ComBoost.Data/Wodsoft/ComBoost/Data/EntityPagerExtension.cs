@@ -42,6 +42,7 @@ namespace Wodsoft.ComBoost.Data
                 model.CurrentSize = context.DomainContext.DataBag.Size;
                 model.TotalPage = context.DomainContext.DataBag.TotalPage;
                 model.PageSizeOption = EntityPagerExtension.PageSizeOptions;
+                model.TotalCount = context.DomainContext.DataBag.TotalCount;
             }
 #if NET451
             return Task.FromResult(0);
@@ -65,6 +66,7 @@ namespace Wodsoft.ComBoost.Data
             e.Queryable = e.Queryable.Skip((page - 1) * size).Take(size);
             context.DomainContext.DataBag.Page = page;
             context.DomainContext.DataBag.Size = size;
+            context.DomainContext.DataBag.TotalCount = count;
             context.DomainContext.DataBag.TotalPage = (int)Math.Ceiling((count / (double)size));
         }
     }

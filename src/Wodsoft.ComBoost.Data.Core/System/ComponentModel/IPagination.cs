@@ -30,5 +30,10 @@ namespace System.ComponentModel
         /// Get the items per page.
         /// </summary>
         int CurrentSize { get; }
+
+        /// <summary>
+        /// 获取总记录数。
+        /// </summary>
+        int TotalCount { get; }
     }
 }

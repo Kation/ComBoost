@@ -121,6 +121,8 @@ namespace System.ComponentModel
 
         IEntity[] IEntityViewModel.Items { get { return Items.Cast<IEntity>().ToArray(); } }
 
+        public int TotalCount { get; set; }
+
         /// <summary>
         /// Set the current page.
         /// </summary>

@@ -69,5 +69,10 @@ namespace System.ComponentModel
         /// Get or set the current number of items per page.
         /// </summary>
         public int CurrentSize { get; set; }
+
+        /// <summary>
+        /// 获取或设置总记录数。
+        /// </summary>
+        public int TotalCount { get; set; }
     }
 }
