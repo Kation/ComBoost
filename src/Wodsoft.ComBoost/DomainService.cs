@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.ExceptionServices;
 #if NET451
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
@@ -97,7 +98,8 @@ namespace Wodsoft.ComBoost
                 await OnFilterThrowing(context, methodFilters, ex);
                 if (context.IsCompleted)
                     return;
-                throw ex;
+                ExceptionDispatchInfo.Capture(ex).Throw();
+                throw;
             }
             finally
             {
@@ -143,7 +145,8 @@ namespace Wodsoft.ComBoost
                 await OnFilterThrowing(context, methodFilters, ex);
                 if (context.IsCompleted)
                     return (T)context.Result;
-                throw ex;
+                ExceptionDispatchInfo.Capture(ex).Throw();
+                throw;
             }
             finally
             {
