@@ -136,11 +136,14 @@ namespace Wodsoft.ComBoost.Data
                     throw new EntityNotFoundException(typeof(T), index);
             }
             var result = await UpdateCore(valueProvider, auth, entity, authorizeOption.GetProperties(Metadata, auth).ToArray());
-            if (isNew)
-                context.Add(entity);
-            else
-                context.Update(entity);
-            await database.SaveAsync();
+            if (result.IsSuccess)
+            {
+                if (isNew)
+                    context.Add(entity);
+                else
+                    context.Update(entity);
+                await database.SaveAsync();
+            }
             return result;
         }
 
@@ -155,9 +158,16 @@ namespace Wodsoft.ComBoost.Data
             }
             foreach (var property in properties)
             {
-                await UpdateProperty(valueProvider, entity, property);
+                try
+                {
+                    await UpdateProperty(valueProvider, entity, property);
+                }
+                catch (ArgumentException ex)
+                {
+                    model.ErrorMessage.Add(property, ex.Message);
+                }
             }
-            if (EntityUpdated != null)
+            if (model.ErrorMessage.Count == 0 && EntityUpdated != null)
             {
                 var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
                 await RaiseAsyncEvent(EntityUpdated, arg);

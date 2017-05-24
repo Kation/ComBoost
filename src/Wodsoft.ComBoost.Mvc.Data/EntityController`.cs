@@ -16,16 +16,27 @@ namespace Wodsoft.ComBoost.Mvc
     public class EntityController<T> : EntityController, IHaveEntityMetadata
         where T : class, IEntity, new()
     {
-        public override void OnActionExecuting(ActionExecutingContext context)
+        private EntityDomainService<T> _EntityService;
+        protected EntityDomainService<T> EntityService
         {
-            base.OnActionExecuting(context);
-            EntityService = GetEntityDomainService();
-            Metadata = EntityDescriptor.GetMetadata<T>();
+            get
+            {
+                if (_EntityService == null)
+                    _EntityService = GetEntityDomainService();
+                return _EntityService;
+            }
         }
 
-        protected EntityDomainService<T> EntityService { get; private set; }
-
-        public IEntityMetadata Metadata { get; private set; }
+        private IEntityMetadata _Metadata;
+        public IEntityMetadata Metadata
+        {
+            get
+            {
+                if (_Metadata == null)
+                    _Metadata = EntityDescriptor.GetMetadata<T>();
+                return _Metadata;
+            }
+        }
 
         [HttpGet]
         [EntityAuthorize]
