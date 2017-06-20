@@ -27,7 +27,7 @@ namespace Wodsoft.ComBoost.Redis
                 throw new ArgumentNullException(nameof(name));
             if (valueType == null)
                 throw new ArgumentNullException(nameof(valueType));
-            var data = await _Database.KeyDumpAsync(name);
+            byte[] data = await _Database.StringGetAsync(name);
             if (data == null)
                 return null;
             var seralizer = _SerializerProvider.GetSerializer(valueType);
@@ -50,7 +50,7 @@ namespace Wodsoft.ComBoost.Redis
             var stream = new MemoryStream();
             seralizer.Serialize(stream, value);
             var data = stream.ToArray();
-            await _Database.KeyRestoreAsync(name, data, expireTime);
+            await _Database.StringSetAsync(name, data, expireTime);
         }
     }
 }
