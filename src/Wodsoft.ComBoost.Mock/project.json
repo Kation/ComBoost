@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.Mock",
-  "version": "3.0.0-alpha17",
+  "version": "3.0.0-alpha17-2",
   "authors": [ "Kation" ],
   "description": "ComBoost用于单元测试的模拟模块。",
   "packOptions": {

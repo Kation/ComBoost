@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Security;
 
@@ -8,7 +9,6 @@ namespace Wodsoft.ComBoost.Mock
 {
     public class MockAuthenticationProvider : IAuthenticationProvider
     {
-        private IPermission _CurrentPermission;
         private ComBoostPrincipal _CurrentPrincipal;
         private ISecurityProvider _SecurityProvider;
 
@@ -27,7 +27,12 @@ namespace Wodsoft.ComBoost.Mock
         {
             if (permission == null)
                 throw new ArgumentNullException(nameof(permission));
-            _CurrentPermission = permission;
+            _CurrentPrincipal = new ComBoostPrincipal(_SecurityProvider);
+            ClaimsIdentity identity = new ClaimsIdentity("ComBoostAuthentication", ClaimTypes.Name, ClaimTypes.Role);
+            identity.AddClaims(permission.GetStaticRoles().Select(t => new Claim(ClaimTypes.Role, _SecurityProvider.ConvertRoleToString(t))));
+            identity.AddClaim(new Claim(ClaimTypes.Name, permission.Name));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, permission.Identity));
+            _CurrentPrincipal.AddIdentity(identity);
             return Task.CompletedTask;
         }
 
@@ -36,13 +41,18 @@ namespace Wodsoft.ComBoost.Mock
             var permission = await _SecurityProvider.GetPermissionAsync(properties);
             if (permission == null)
                 return false;
-            _CurrentPermission = permission;
+            _CurrentPrincipal = new ComBoostPrincipal(_SecurityProvider);
+            ClaimsIdentity identity = new ClaimsIdentity("ComBoostAuthentication", ClaimTypes.Name, ClaimTypes.Role);
+            identity.AddClaims(permission.GetStaticRoles().Select(t => new Claim(ClaimTypes.Role, _SecurityProvider.ConvertRoleToString(t))));
+            identity.AddClaim(new Claim(ClaimTypes.Name, permission.Name));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, permission.Identity));
+            _CurrentPrincipal.AddIdentity(identity);
             return true;
         }
 
         public Task SignOutAsync()
         {
-            _CurrentPermission = null;
+            _CurrentPrincipal = new ComBoostPrincipal(_SecurityProvider);
             return Task.CompletedTask;
         }
     }

@@ -28,6 +28,8 @@ namespace Wodsoft.ComBoost.Mock
 
             var service = collection.BuildServiceProvider();
             ServiceProvider = service;
+
+            _Initialized = true;
         }
 
         public virtual IConfigurationBuilder InitializeCore()
