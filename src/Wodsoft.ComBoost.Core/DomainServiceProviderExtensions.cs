@@ -111,7 +111,7 @@ namespace Wodsoft.ComBoost
         /// <typeparam name="TFilter">过滤器类型。</typeparam>
         /// <param name="domainProvider">领域服务提供器。</param>
         public static void AddGlobalFilter<TFilter>(this IDomainServiceProvider domainProvider)
-            where TFilter : IDomainServiceFilter, new()
+            where TFilter : class, IDomainServiceFilter, new()
         {
             domainProvider.AddServiceFilterSelector(t => new TFilter());
         }
@@ -122,11 +122,11 @@ namespace Wodsoft.ComBoost
         /// <typeparam name="TService">领域服务类型。</typeparam>
         /// <typeparam name="TFilter">过滤器类型。</typeparam>
         /// <param name="domainProvider">领域服务提供器。</param>
-        public static void AddServiceFilter<TService,TFilter>(this IDomainServiceProvider domainProvider)
+        public static void AddServiceFilter<TService, TFilter>(this IDomainServiceProvider domainProvider)
             where TService : IDomainService
-            where TFilter : IDomainServiceFilter, new()
+            where TFilter : class, IDomainServiceFilter, new()
         {
-            domainProvider.AddServiceFilterSelector(t =>  new TFilter());
+            domainProvider.AddServiceFilterSelector(t => typeof(TService).IsAssignableFrom(t) ? new TFilter() : null);
         }
     }
 }

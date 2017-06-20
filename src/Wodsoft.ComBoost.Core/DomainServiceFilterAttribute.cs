@@ -18,7 +18,11 @@ namespace Wodsoft.ComBoost
         /// <returns>异步任务。</returns>
         public virtual Task OnExecutingAsync(IDomainExecutionContext context)
         {
+#if NET451
             return Task.FromResult(0);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         /// <summary>
@@ -28,7 +32,11 @@ namespace Wodsoft.ComBoost
         /// <returns>异步任务。</returns>
         public virtual Task OnExecutedAsync(IDomainExecutionContext context)
         {
+#if NET451
             return Task.FromResult(0);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         /// <summary>
@@ -39,7 +47,11 @@ namespace Wodsoft.ComBoost
         /// <returns>异步任务。</returns>
         public Task OnExceptionThrowingAsync(IDomainExecutionContext context, Exception exception)
         {
+#if NET451
             return Task.FromResult(0);
+#else
+            return Task.CompletedTask;
+#endif
         }
     }
 }
