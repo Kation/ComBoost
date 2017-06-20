@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.Mvc",
-  "version": "3.0.0-alpha17",
+  "version": "3.0.0-alpha17-3",
   "authors": [ "Kation" ],
   "description": "ComBoost用于AspNetCore的Mvc模块。",
   "packOptions": {

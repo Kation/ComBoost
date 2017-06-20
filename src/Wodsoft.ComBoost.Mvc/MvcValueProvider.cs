@@ -42,6 +42,8 @@ namespace Wodsoft.ComBoost.Mvc
                 return HttpContext.Request.Body;
             else if (valueType == typeof(Stream) && name == "$response")
                 return HttpContext.Response.Body;
+            else if (valueType == typeof(ISelectedFile) || valueType == typeof(ISelectedFile[]))
+                return base.GetHttpValue(name, valueType);
 
             ModelBinderFactoryContext context = new ModelBinderFactoryContext();
             context.BindingInfo = new BindingInfo() { BinderModelName = name, BindingSource = BindingSource.ModelBinding };
@@ -65,6 +67,8 @@ namespace Wodsoft.ComBoost.Mvc
 
         bool Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.ContainsPrefix(string prefix)
         {
+            if (IgnoreCase)
+                prefix = prefix.ToLower();
             return Keys.Any(t => t == prefix || t.StartsWith(prefix + ".") || t.StartsWith(prefix + "["));
         }
 
