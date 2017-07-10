@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Security;
 
@@ -38,12 +39,20 @@ namespace Wodsoft.ComBoost.Mock
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
             return builder;
         }
-        
+
+        public async Task Run(Func<IServiceProvider, Task> action)
+        {
+            using (var scope = GetServiceScope())
+            {
+                await action(scope.ServiceProvider);
+            }
+        }
+
         public IServiceScope GetServiceScope()
         {
             if (!_Initialized)
                 Initialize();
-            return ServiceProvider.CreateScope();
+            return new MockServiceScope(SynchronizationContext.Current, ServiceProvider.CreateScope());
         }
 
         protected IConfigurationRoot Configuration { get; private set; }
@@ -65,6 +74,27 @@ namespace Wodsoft.ComBoost.Mock
         protected virtual void ConfigureDomainService(IDomainServiceProvider domainProvider)
         {
 
+        }
+
+        protected class MockServiceScope : IServiceScope
+        {
+            public MockServiceScope(SynchronizationContext synchronizationContext, IServiceScope serviceScope)
+            {
+                _SynchronizationContext = synchronizationContext;
+                _ServiceScope = serviceScope;
+                SynchronizationContext.SetSynchronizationContext(synchronizationContext?.CreateCopy() ?? new SynchronizationContext());
+            }
+
+            private SynchronizationContext _SynchronizationContext;
+            private IServiceScope _ServiceScope;
+
+            public IServiceProvider ServiceProvider { get { return _ServiceScope.ServiceProvider; } }
+
+            public void Dispose()
+            {
+                SynchronizationContext.SetSynchronizationContext(_SynchronizationContext);
+                _ServiceScope.Dispose();
+            }
         }
     }
 }
