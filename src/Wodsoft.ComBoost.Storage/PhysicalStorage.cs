@@ -41,7 +41,7 @@ namespace Wodsoft.ComBoost
             path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             path = Path.Combine(_Options.Root, path);
             if (!File.Exists(path))
-                return null;
+                return Task.FromResult<Stream>(null);
             return Task.FromResult<Stream>(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
 
