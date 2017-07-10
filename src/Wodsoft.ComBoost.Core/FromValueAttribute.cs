@@ -17,13 +17,22 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 实例化值提供器来源特性。
         /// </summary>
-        public FromValueAttribute() { IsRequired = true; }
+        public FromValueAttribute() : this(true) { }
 
         /// <summary>
         /// 实例化值提供器来源特性。
         /// </summary>
         /// <param name="isRequired">是否必须存在值。</param>
         public FromValueAttribute(bool isRequired) { IsRequired = isRequired; }
+
+        /// <summary>
+        /// 实例化值提供器来源特性。
+        /// </summary>
+        /// <param name="defaultValue">默认值。</param>
+        public FromValueAttribute(object defaultValue) : this(false)
+        {
+            DefaultValue = defaultValue;
+        }
 
         /// <summary>
         /// 自定义来源名称。
