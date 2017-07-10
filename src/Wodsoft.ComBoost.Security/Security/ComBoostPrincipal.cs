@@ -21,7 +21,7 @@ namespace Wodsoft.ComBoost.Security
         {
             if (!Identity.IsAuthenticated)
                 return default(T);
-            string id = ((ClaimsIdentity)Identity).FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
+            string id = FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
             return (T)SecurityProvider.GetPermissionAsync(id).Result;
         }
         
@@ -54,6 +54,16 @@ namespace Wodsoft.ComBoost.Security
             if (IsInStaticRole(role))
                 return true;
             return IsInDynamicRole(role);
+        }
+
+        public string GetUserId()
+        {
+            return FindFirst(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
+        }
+
+        public string GetUserName()
+        {
+            return FindFirst(t => t.Type == ClaimTypes.Name)?.Value;
         }
     }
 }

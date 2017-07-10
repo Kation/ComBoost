@@ -10,5 +10,9 @@ namespace Wodsoft.ComBoost.Security
         bool IsInRole(object role);
 
         T GetUser<T>();
+
+        string GetUserId();
+
+        string GetUserName();
     }
 }

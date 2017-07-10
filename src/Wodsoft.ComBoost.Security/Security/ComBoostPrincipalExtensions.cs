@@ -21,7 +21,7 @@ namespace Wodsoft.ComBoost.Security
             ComBoostPrincipal comboostPrincipal = principal as ComBoostPrincipal;
             if (comboostPrincipal == null)
                 return default(TPermission);
-            string identity = comboostPrincipal.Claims.First(t => t.Type == ClaimTypes.NameIdentifier).Value;
+            string identity = comboostPrincipal.FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
             var permission = await comboostPrincipal.SecurityProvider.GetPermissionAsync(identity);
             return (TPermission)permission;
         }
