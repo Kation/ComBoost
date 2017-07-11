@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.Core",
-  "version": "3.0.0-alpha17",
+  "version": "3.0.0-alpha18",
   "authors": [ "Kation" ],
   "description": "ComBoost框架核心。",
   "packOptions": {
@@ -25,8 +25,6 @@
         "System.Dynamic.Runtime": "4.3.0",
         "NETStandard.Library": "1.6.1"
       }
-    },
-    "net451": {
     }
   },
   "buildOptions": {

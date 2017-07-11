@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.Mock",
-  "version": "3.0.0-alpha17-2",
+  "version": "3.0.0-alpha18",
   "authors": [ "Kation" ],
   "description": "ComBoost用于单元测试的模拟模块。",
   "packOptions": {
@@ -17,13 +17,16 @@
     "Microsoft.Extensions.Configuration": "1.1.2",
     "Microsoft.Extensions.Configuration.Json": "1.1.2",
     "Microsoft.Extensions.DependencyInjection": "1.1.1",
-    "Wodsoft.ComBoost": "[3.0.0-alpha17,4.0.0)",
-    "Wodsoft.ComBoost.Security": "[3.0.0-alpha17,4.0.0)"
+    "Wodsoft.ComBoost": "[3.0.0-alpha18,4.0.0)",
+    "Wodsoft.ComBoost.Security": "[3.0.0-alpha18,4.0.0)"
   },
 
   "frameworks": {
     "netstandard1.6": {
       "imports": "dnxcore50"
+    },
+    "net461": {
+
     }
   }
 }

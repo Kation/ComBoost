@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.Security",
-  "version": "3.0.0-alpha17",
+  "version": "3.0.0-alpha18",
   "authors": [ "Kation" ],
   "description": "ComBoost安全模块。",
   "packOptions": {
@@ -20,10 +20,9 @@
         "System.Security.Claims": "4.3.0",
         "System.Security.Principal": "4.3.0"
       }
-    },
-    "net451": {}
+    }
   },
   "dependencies": {
-    "Wodsoft.ComBoost.Core": "[3.0.0-alpha17,4.0.0)"
+    "Wodsoft.ComBoost.Core": "[3.0.0-alpha18,4.0.0)"
   }
 }
