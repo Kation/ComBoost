@@ -29,8 +29,9 @@ namespace Wodsoft.ComBoost.Data.Entity
         public DatabaseContext(DbContext context)
         {
             AsyncQueryableExtensions.Context = AsyncQueryable.Default;
+            DatabaseContextAccessor.Context = this;
             _CachedEntityContext = new Dictionary<Type, object>();
-            ((IObjectContextAdapter)context).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
+            //((IObjectContextAdapter)context).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
             InnerContext = context;
             context.Configuration.AutoDetectChangesEnabled = false;
             SupportTypes = _CachedSupportTypes.GetOrAdd(context.GetType(), type =>
@@ -42,22 +43,22 @@ namespace Wodsoft.ComBoost.Data.Entity
             });
         }
 
-        private void ObjectContext_ObjectMaterialized(object sender, System.Data.Entity.Core.Objects.ObjectMaterializedEventArgs e)
-        {
-            IEntity entity = e.Entity as IEntity;
-            if (entity == null)
-                return;
-            object context;
-            Type type = e.Entity.GetType();
-            if (_CachedEntityContext.ContainsKey(type))
-                context = _CachedEntityContext[type];
-            else
-            {
-                context = this.GetDynamicContext(type);
-                _CachedEntityContext.Add(type, context);
-            }
-            entity.EntityContext = (IEntityQueryContext<IEntity>)context;
-        }
+        //private void ObjectContext_ObjectMaterialized(object sender, System.Data.Entity.Core.Objects.ObjectMaterializedEventArgs e)
+        //{
+        //    IEntity entity = e.Entity as IEntity;
+        //    if (entity == null)
+        //        return;
+        //    object context;
+        //    Type type = e.Entity.GetType();
+        //    if (_CachedEntityContext.ContainsKey(type))
+        //        context = _CachedEntityContext[type];
+        //    else
+        //    {
+        //        context = this.GetDynamicContext(type);
+        //        _CachedEntityContext.Add(type, context);
+        //    }
+        //    entity.EntityContext = (IEntityQueryContext<IEntity>)context;
+        //}
 
         public Task<int> SaveAsync()
         {

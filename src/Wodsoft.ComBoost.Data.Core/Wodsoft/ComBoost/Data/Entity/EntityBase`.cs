@@ -80,7 +80,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         public virtual void OnEditing() { }
 
-        IEntityQueryContext<IEntity> IEntity.EntityContext { get; set; }
+        //IEntityQueryContext<IEntity> IEntity.EntityContext { get; set; }
 
         bool IEntity.IsNewCreated { get { return IsNewCreated; } }
         /// <summary>

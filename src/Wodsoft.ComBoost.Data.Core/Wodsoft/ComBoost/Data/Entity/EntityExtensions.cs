@@ -20,7 +20,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             where TSource : IEntity
             where T : IEntity
         {
-            return source.EntityContext.Database.LoadAsync(source, expression);
+            return DatabaseContextAccessor.Context.LoadAsync(source, expression);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             where TSource : IEntity
             where T : IEntity
         {
-            return source.EntityContext.Database.LoadAsync(source, expression);
+            return DatabaseContextAccessor.Context.LoadAsync(source, expression);
         }
     }
 }

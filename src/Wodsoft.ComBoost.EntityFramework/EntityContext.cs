@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         public T Create()
         {
             var item = new T();
-            item.EntityContext = this;
+            //item.EntityContext = this;
             item.OnCreating();
             return item;
         }

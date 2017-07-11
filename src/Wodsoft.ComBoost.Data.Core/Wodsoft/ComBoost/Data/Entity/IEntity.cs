@@ -54,10 +54,10 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         bool IsEditAllowed { get; }
 
-        /// <summary>
-        /// 获取或设置相关的实体查询上下文。
-        /// </summary>
-        IEntityQueryContext<IEntity> EntityContext { get; set; }
+        ///// <summary>
+        ///// 获取或设置相关的实体查询上下文。
+        ///// </summary>
+        //IEntityQueryContext<IEntity> EntityContext { get; set; }
 
         /// <summary>
         /// 获取是否是新创建的实体。

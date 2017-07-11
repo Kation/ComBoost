@@ -28,8 +28,11 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public DatabaseContext(DbContext context)
         {
+            var executionContext = System.Threading.ExecutionContext.Capture();
+            DatabaseContextAccessor.Context = this;
             AsyncQueryableExtensions.Context = AsyncQueryable.Default;
-            context.GetService<CurrentDatabaseContext>().Context = this;
+            //AsyncQueryableExtensions.Context = AsyncQueryable.Default;
+            //context.GetService<CurrentDatabaseContext>().Context = this;
             _CachedEntityContext = new Dictionary<Type, object>();
             InnerContext = context;
             context.ChangeTracker.AutoDetectChangesEnabled = false;

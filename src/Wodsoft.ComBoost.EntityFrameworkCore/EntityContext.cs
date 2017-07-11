@@ -61,7 +61,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         public T Create()
         {
             var item = new T();
-            item.EntityContext = this;
+            //item.EntityContext = this;
             item.OnCreating();
             return item;
         }
@@ -95,7 +95,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             item.OnEditCompleted();
             DbSet.Update(item);
-            Database.InnerContext.Entry<T>(item);
         }
 
         public void UpdateRange(IEnumerable<T> items)
