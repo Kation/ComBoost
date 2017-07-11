@@ -7,8 +7,6 @@
     "Wodsoft.ComBoost.Forum.Domain": "1.0.0-*",
     "Wodsoft.ComBoost.Mvc.Data": "3.0.0-*",
     "Wodsoft.ComBoost.Storage": "3.0.0-*",
-    //"Microsoft.EntityFrameworkCore.Design": "1.1.0",
-    //"Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.1.0",
     "BundlerMinifier.Core": "2.4.337",
     "Microsoft.AspNetCore.Diagnostics": "1.1.2",
@@ -18,16 +16,13 @@
     "Microsoft.AspNetCore.Session": "1.1.2",
     "Microsoft.AspNetCore.StaticFiles": "1.1.2",
     "Microsoft.EntityFrameworkCore": "1.1.2",
+    "Microsoft.EntityFrameworkCore.InMemory": "1.1.2",
     "Microsoft.EntityFrameworkCore.SqlServer": "1.1.2",
     "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.1.2",
     "Microsoft.Extensions.Configuration.Json": "1.1.2",
     "Microsoft.Extensions.Logging": "1.1.2",
     "Microsoft.Extensions.Logging.Console": "1.1.2",
-    "Microsoft.Extensions.Logging.Debug": "1.1.2",
-    "Microsoft.NETCore.App": {
-      "version": "1.1.2",
-      "type": "platform"
-    }
+    "Microsoft.Extensions.Logging.Debug": "1.1.2"
   },
   "tools": {
     "Microsoft.AspNetCore.Razor.Tools": "1.1.0-preview4-final",
@@ -40,7 +35,16 @@
       "imports": [
         "dotnet5.6",
         "portable-net45+win8+wpa81"
-      ]
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.1.2",
+          "type": "platform"
+        }
+      }
+    },
+    "net461": {
+
     }
   },
   "buildOptions": {

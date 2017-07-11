@@ -52,9 +52,9 @@ namespace Wodsoft.ComBoost.Forum
             services.AddComBoostMvcAuthentication();
 
             services.AddScoped<DbContext, DataContext>(serviceProvider =>
-                //new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase()
-                new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext"))
-                .Options.WithExtension(new ComBoostOptionExtension())));
+                new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase()
+                //new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext"))
+                .Options));
             services.AddScoped<IDatabaseContext, DatabaseContext>();
             services.AddScoped<ISecurityProvider, ForumSecurityProvider>();
             services.AddScoped<IAuthenticationProvider, ComBoostAuthenticationProvider>();
@@ -92,6 +92,8 @@ namespace Wodsoft.ComBoost.Forum
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+            
+            app.UseComBoost();
 
             app.UseStaticFiles();
 

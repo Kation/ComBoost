@@ -3,7 +3,7 @@
   "description": "Wodsoft.ComBoost.Forum.Domain Class Library",
   "authors": [ "Kation" ],
   "frameworks": {
-    "netstandard1.6": {
+    "netstandard1.3": {
       "imports": "",
       "dependencies": {
         "Wodsoft.ComBoost.Forum.Core": "1.0.0-*",

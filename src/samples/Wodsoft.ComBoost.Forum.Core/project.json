@@ -3,7 +3,7 @@
   "description": "Wodsoft.ComBoost.Forum.Core Class Library",
   "authors": [ "Kation" ],
   "frameworks": {
-    "netstandard1.6": {
+    "netstandard1.3": {
       "imports": "",
       "dependencies": {
       }

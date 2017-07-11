@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,12 +11,23 @@ namespace Wodsoft.ComBoost.Forum.Domain
 {
     public class ForumSecurityProvider : GeneralSecurityProvider
     {
-        public ForumSecurityProvider(IDatabaseContext databaseContext)
+        public ForumSecurityProvider(IServiceProvider serviceProvider)
         {
-            DatabaseContext = databaseContext;
+            _ServiceProvider = serviceProvider;
         }
 
-        public IDatabaseContext DatabaseContext { get; private set; }
+        private IServiceProvider _ServiceProvider;
+
+        private IDatabaseContext _DatabaseContext;
+        public IDatabaseContext DatabaseContext
+        {
+            get
+            {
+                if (_DatabaseContext == null)
+                    _DatabaseContext = _ServiceProvider.GetRequiredService<IDatabaseContext>();
+                return _DatabaseContext;
+            }
+        }
 
         protected override async Task<IPermission> GetPermissionByIdentity(string identity)
         {
