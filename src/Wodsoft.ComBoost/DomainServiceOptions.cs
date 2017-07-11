@@ -29,5 +29,10 @@ namespace Wodsoft.ComBoost
             _Local.TryGetValue(optionType, out option);
             return option;
         }
+
+        public virtual void RemoveOption(Type optionType)
+        {
+            _Local.Remove(optionType);
+        }
     }
 }

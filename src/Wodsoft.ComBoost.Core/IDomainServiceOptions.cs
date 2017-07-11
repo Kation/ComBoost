@@ -23,5 +23,11 @@ namespace Wodsoft.ComBoost
         /// <param name="optionType">选项类型。</param>
         /// <returns>返回选项。</returns>
         object GetOption(Type optionType);
+
+        /// <summary>
+        /// 移除选项。
+        /// </summary>
+        /// <param name="optionType">选项类型。</param>
+        void RemoveOption(Type optionType);
     }
 }
