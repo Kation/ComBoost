@@ -48,12 +48,12 @@ namespace Wodsoft.ComBoost.Data
 
             IQueryable<T> queryable = e.Queryable;
 
-            var keys = valueProvider.Keys.Where(t => t.StartsWith("Search.")).Select(t => t.Substring(7).Split('.')).GroupBy(t => t[0], t => t.Length == 1 ? "" : "." + t[1]).ToArray();
+            var keys = valueProvider.Keys.Where(t => t.StartsWith("Search.", StringComparison.OrdinalIgnoreCase)).Select(t => t.Substring(7).Split('.')).GroupBy(t => t[0], t => t.Length == 1 ? "" : "." + t[1]).ToArray();
             for (int i = 0; i < keys.Length; i++)
             {
                 string propertyName = keys[i].Key;
-                IPropertyMetadata property = Service.Metadata.GetProperty(propertyName);
-                if (property == null || !property.Searchable)
+                IPropertyMetadata property = Service.Metadata.SearchProperties.FirstOrDefault(t => t.ClrName.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
+                if (property == null)
                     continue;
                 EntitySearchItem searchItem = new EntitySearchItem();
                 string[] options = keys[i].ToArray();
@@ -63,7 +63,7 @@ namespace Wodsoft.ComBoost.Data
                     case CustomDataType.DateTime:
                         for (int a = 0; a < options.Length; a++)
                         {
-                            if (options[a] == ".Start")
+                            if (options[a].Equals(".Start", StringComparison.OrdinalIgnoreCase))
                             {
                                 DateTime start;
                                 if (!DateTime.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]), out start))
@@ -72,7 +72,7 @@ namespace Wodsoft.ComBoost.Data
                                 ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
                                 queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(Expression.GreaterThanOrEqual(Expression.Property(parameter, property.ClrName), Expression.Constant(start)), parameter));
                             }
-                            else if (options[a] == ".End")
+                            else if (options[a].Equals(".End", StringComparison.OrdinalIgnoreCase))
                             {
                                 DateTime end;
                                 if (!DateTime.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]), out end))
@@ -102,7 +102,7 @@ namespace Wodsoft.ComBoost.Data
                     case CustomDataType.Number:
                         for (int a = 0; a < options.Length; a++)
                         {
-                            if (options[a] == ".Start")
+                            if (options[a].Equals(".Start", StringComparison.OrdinalIgnoreCase))
                             {
                                 double start;
                                 if (!double.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]), out start))
@@ -111,7 +111,7 @@ namespace Wodsoft.ComBoost.Data
                                 ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
                                 queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(Expression.GreaterThanOrEqual(Expression.Property(parameter, property.ClrName), Expression.Constant(start)), parameter));
                             }
-                            else if (options[a] == ".End")
+                            else if (options[a].Equals(".End", StringComparison.OrdinalIgnoreCase))
                             {
                                 double end;
                                 if (!double.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]), out end))
