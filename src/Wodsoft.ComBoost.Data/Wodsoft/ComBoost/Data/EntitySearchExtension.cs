@@ -40,11 +40,7 @@ namespace Wodsoft.ComBoost.Data
 
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
             if (!valueProvider.GetValue<bool>("Search"))
-#if NET451
-            return Task.FromResult(0);
-#else
                 return Task.CompletedTask;
-#endif
 
             IQueryable<T> queryable = e.Queryable;
 
@@ -167,11 +163,7 @@ namespace Wodsoft.ComBoost.Data
             }
 
             context.DomainContext.DataBag.SearchItem = searchItems.ToArray();
-#if NET451
-            return Task.FromResult(0);
-#else
             return Task.CompletedTask;
-#endif
         }
     }
 }

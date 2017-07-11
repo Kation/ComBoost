@@ -8,31 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.ExceptionServices;
-#if NET451
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Messaging;
-#endif
 
 namespace Wodsoft.ComBoost
 {
     public class DomainService : IDomainService
     {
-#if NET451
-        private static readonly string LogicalDataKey = "__IDomainExecutionContext_Current__" + AppDomain.CurrentDomain.Id;
-
-        public IDomainExecutionContext Context
-        {
-            get
-            {
-                var handle = CallContext.LogicalGetData(LogicalDataKey) as ObjectHandle;
-                return handle?.Unwrap() as IDomainExecutionContext;
-            }
-            private set
-            {
-                CallContext.LogicalSetData(LogicalDataKey, new ObjectHandle(value));
-            }
-        }
-#else
         private AsyncLocal<IDomainExecutionContext> _ExecutionContext;
 
         public DomainService()
@@ -54,7 +34,6 @@ namespace Wodsoft.ComBoost
                 _ExecutionContext.Value = value;
             }
         }
-#endif
 
         public IList<IDomainServiceFilter> Filters { get; private set; }
 

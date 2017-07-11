@@ -48,21 +48,13 @@ namespace Wodsoft.ComBoost.Security
             var ticket = new AuthenticationTicket(context.Principal, new AuthenticationProperties() { ExpiresUtc = expireDate }, Options.AuthenticationScheme);
             var ticketValue = Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding());
             Context.Session.SetString(Options.CookieName(Context), ticketValue);
-#if NET451
-            return Task.FromResult(0);
-#else
             return Task.CompletedTask;
-#endif
         }
 
         protected override Task HandleSignOutAsync(SignOutContext context)
         {
             Context.Session.Remove(Options.CookieName(Context));
-#if NET451
-            return Task.FromResult(0);
-#else
             return Task.CompletedTask;
-#endif
         }
 
         protected virtual string GetTlsTokenBinding()

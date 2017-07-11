@@ -44,11 +44,7 @@ namespace Wodsoft.ComBoost.Data
 //                model.PageSizeOption = EntityPagerExtension.PageSizeOptions;
 //                model.TotalCount = context.DomainContext.DataBag.TotalCount;
 //            }
-//#if NET451
-//            return Task.FromResult(0);
-//#else
 //            return Task.CompletedTask;
-//#endif
 //        }
 
         private Task Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
@@ -65,11 +61,7 @@ namespace Wodsoft.ComBoost.Data
             option.CurrentSize = size;
             option.PageSizeOption = EntityPagerExtension.PageSizeOptions;
             context.DomainContext.Options.SetOption(option);
-#if NET451
-            return Task.FromResult(0);
-#else
             return Task.CompletedTask;
-#endif
             //var databaseContext = context.DomainContext.GetRequiredService<IDatabaseContext>();
             //var entityContext = databaseContext.GetContext<T>();
             //var count = await entityContext.CountAsync(e.Queryable);
