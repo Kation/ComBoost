@@ -29,7 +29,7 @@ namespace System.ComponentModel
                 if (value == null)
                     throw new ArgumentNullException("value");
                 _Queryable = value;
-                UpdateTotalPage();
+                //UpdateTotalPage();
                 CurrentPage = 1;
             }
         }
@@ -60,8 +60,8 @@ namespace System.ComponentModel
             PageSizeOption = Pagination.DefaultPageSizeOption;
             Metadata = EntityDescriptor.GetMetadata<TEntity>();
             Queryable = queryable;
-            UpdateTotalPage();
-            SetPage(page);
+            //UpdateTotalPage();
+            //SetPage(page);
         }
 
         /// <summary>
@@ -147,12 +147,12 @@ namespace System.ComponentModel
             CurrentSize = size;
             if (CurrentPage != 1)
                 SetPage(1);
-            UpdateTotalPage();
         }
 
         /// <summary>
         /// Update total page.
         /// </summary>
+        [Obsolete("请使用UpdateTotalPageAsync。")]
         public virtual void UpdateTotalPage()
         {
             int total = Queryable.Count();
@@ -164,9 +164,30 @@ namespace System.ComponentModel
         /// <summary>
         /// Update items of current page.
         /// </summary>
+        [Obsolete("请使用UpdateItemsAsync。")]
         public virtual void UpdateItems()
         {
             Items = Queryable.Skip((CurrentPage - 1) * CurrentSize).Take(CurrentSize).ToArray();
+        }
+
+        public Task UpdateTotalPageAsync()
+        {
+            return Queryable.CountAsync().ContinueWith(new Action<Task<int>>(t =>
+            {
+                int total = t.Result;
+                TotalCount = total;
+                TotalPage = (int)Math.Ceiling(total / (double)CurrentSize);
+                if (TotalPage == 0)
+                    TotalPage = 1;
+            }));
+        }
+
+        public Task UpdateItemsAsync()
+        {
+            return Queryable.Skip((CurrentPage - 1) * CurrentSize).Take(CurrentSize).ToArrayAsync().ContinueWith(new Action<Task<TEntity[]>>(t =>
+            {
+                Items = t.Result;
+            }));
         }
     }
 }

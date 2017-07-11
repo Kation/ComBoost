@@ -63,12 +63,24 @@ namespace System.ComponentModel
         /// <summary>
         /// Update total page.
         /// </summary>
+        [Obsolete("请使用UpdateTotalPageAsync。")]
         void UpdateTotalPage();
+
+        /// <summary>
+        /// Update total page.
+        /// </summary>
+        Task UpdateTotalPageAsync();
 
         /// <summary>
         /// Update items of current page.
         /// </summary>
+        [Obsolete("请使用UpdateItemsAsync。")]
         void UpdateItems();
+
+        /// <summary>
+        /// Update items of current page.
+        /// </summary>
+        Task UpdateItemsAsync();
     }
 
     /// <summary>

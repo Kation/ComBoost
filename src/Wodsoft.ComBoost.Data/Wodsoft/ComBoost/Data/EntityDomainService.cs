@@ -53,7 +53,15 @@ namespace Wodsoft.ComBoost.Data
             }
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            model.Items = await queryable.ToArrayAsync();
+            EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
+            if (pagerOption != null)
+            {
+                model.CurrentSize = pagerOption.CurrentSize;
+                model.CurrentPage = pagerOption.CurrentPage;
+                model.PageSizeOption = pagerOption.PageSizeOption;
+            }
+            await model.UpdateTotalPageAsync();
+            await model.UpdateItemsAsync();
             return model;
         }
 
