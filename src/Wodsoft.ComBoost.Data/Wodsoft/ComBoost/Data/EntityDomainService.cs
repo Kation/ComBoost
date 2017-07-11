@@ -57,7 +57,7 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public event DomainServiceAsyncEvent<EntityQueryEventArgs<T>> EntityQuery;
+        public event DomainServiceAsyncEventHandler<EntityQueryEventArgs<T>> EntityQuery;
 
         public virtual async Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -79,7 +79,7 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public event DomainServiceAsyncEvent<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated;
+        public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated;
 
         public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -109,7 +109,7 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public event DomainServiceAsyncEvent<EntityModelCreatedEventArgs<T>> EntityEditModelCreated;
+        public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityEditModelCreated;
 
         public virtual async Task<IEntityUpdateModel<T>> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -177,8 +177,8 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public event DomainServiceAsyncEvent<EntityUpdateEventArgs<T>> EntityPreUpdate;
-        public event DomainServiceAsyncEvent<EntityUpdateEventArgs<T>> EntityUpdated;
+        public event DomainServiceAsyncEventHandler<EntityUpdateEventArgs<T>> EntityPreUpdate;
+        public event DomainServiceAsyncEventHandler<EntityUpdateEventArgs<T>> EntityUpdated;
 
         protected virtual async Task UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
         {
@@ -223,7 +223,7 @@ namespace Wodsoft.ComBoost.Data
             }
         }
 
-        public event DomainServiceAsyncEvent<EntityPropertyUpdateEventArgs<T>> EntityPropertyUpdate;
+        public event DomainServiceAsyncEventHandler<EntityPropertyUpdateEventArgs<T>> EntityPropertyUpdate;
 
         public virtual async Task Remove([FromService] IDatabaseContext database, [FromService]IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -247,7 +247,7 @@ namespace Wodsoft.ComBoost.Data
             await database.SaveAsync();
         }
 
-        public event DomainServiceAsyncEvent<EntityRemoveEventArgs<T>> EntityRemove;
+        public event DomainServiceAsyncEventHandler<EntityRemoveEventArgs<T>> EntityRemove;
 
         public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -276,6 +276,6 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public event DomainServiceAsyncEvent<EntityDetailEventArgs<T>> EntityDetailModelCreated;
+        public event DomainServiceAsyncEventHandler<EntityDetailEventArgs<T>> EntityDetailModelCreated;
     }
 }

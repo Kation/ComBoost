@@ -63,7 +63,6 @@ namespace Wodsoft.ComBoost
         public event DomainExecuteEvent Executed;
         public event DomainExecuteEvent Executing;
 
-
         public async Task ExecuteAsync(IDomainContext domainContext, MethodInfo method)
         {
             if (domainContext == null)
@@ -131,7 +130,9 @@ namespace Wodsoft.ComBoost
                     await Executing(context);
                 if (context.IsCompleted)
                     return (T)context.Result;
+                var synchronizationContext = SynchronizationContext.Current;
                 var result = await (Task<T>)method.Invoke(this, context.ParameterValues);
+                SynchronizationContext.SetSynchronizationContext(synchronizationContext);
                 context.Result = result;
                 if (Executed != null)
                     await Executed(context);
@@ -185,16 +186,29 @@ namespace Wodsoft.ComBoost
                 await filter.OnExceptionThrowingAsync(context, exception);
         }
 
-        protected virtual async Task RaiseAsyncEvent(DomainServiceAsyncEvent eventHandle)
+        protected virtual void RaiseEvent(DomainServiceEventHandler eventHandle)
         {
-            foreach (var item in eventHandle.GetInvocationList().Cast<DomainServiceAsyncEvent>())
+            foreach (var item in eventHandle.GetInvocationList().Cast<DomainServiceEventHandler>())
+                item(Context);
+        }
+
+        protected virtual void RaiseEvent<TArgs>(DomainServiceEventHandler<TArgs> eventHandle, TArgs e)
+            where TArgs : EventArgs
+        {
+            foreach (var item in eventHandle.GetInvocationList().Cast<DomainServiceEventHandler<TArgs>>())
+                item(Context, e);
+        }
+
+        protected virtual async Task RaiseAsyncEvent(DomainServiceAsyncEventHandler eventHandle)
+        {
+            foreach (var item in eventHandle.GetInvocationList().Cast<DomainServiceAsyncEventHandler>())
                 await item(Context);
         }
 
-        protected virtual async Task RaiseAsyncEvent<TArgs>(DomainServiceAsyncEvent<TArgs> eventHandle, TArgs e)
+        protected virtual async Task RaiseAsyncEvent<TArgs>(DomainServiceAsyncEventHandler<TArgs> eventHandle, TArgs e)
             where TArgs : EventArgs
         {
-            foreach (var item in eventHandle.GetInvocationList().Cast<DomainServiceAsyncEvent<TArgs>>())
+            foreach (var item in eventHandle.GetInvocationList().Cast<DomainServiceAsyncEventHandler<TArgs>>())
                 await item(Context, e);
         }
     }
