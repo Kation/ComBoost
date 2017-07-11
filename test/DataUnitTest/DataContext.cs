@@ -11,8 +11,7 @@ namespace DataUnitTest
     {
         public static DataContext Create()
         {
-            var builder = new DbContextOptionsBuilder<DataContext>();
-            builder.UseInMemoryDatabase().Options.WithExtension(new ComBoostOptionExtension());
+            var builder = new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase();
             return new DataContext(builder.Options);
         }
 

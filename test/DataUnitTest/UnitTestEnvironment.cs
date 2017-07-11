@@ -18,7 +18,7 @@ namespace DataUnitTest
         protected override void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<DbContext, DataContext>(serviceProvider =>
-            new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase(_DatabaseName).Options.WithExtension(new ComBoostOptionExtension())));
+            new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase(_DatabaseName).Options));
             services.AddScoped<IDatabaseContext, DatabaseContext>();
             services.AddTransient<ISecurityProvider, MockSecurityProvider<Admin>>();
             base.ConfigureServices(services);
