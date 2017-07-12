@@ -48,7 +48,7 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(domainContext));
             if (method == null)
                 throw new ArgumentNullException(nameof(method));
-            if (method.DeclaringType != GetType())
+            if (!method.DeclaringType.IsAssignableFrom(GetType()))
                 throw new ArgumentException("该方法不是此领域服务的方法。");
             IDomainServiceFilter[] methodFilters = _FilterCache.GetOrAdd(method, t => t.GetCustomAttributes<DomainServiceFilterAttribute>().ToArray()).ToArray();
             var accessor = domainContext.GetRequiredService<IDomainServiceAccessor>();
@@ -92,7 +92,7 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(domainContext));
             if (method == null)
                 throw new ArgumentNullException(nameof(method));
-            if (method.DeclaringType != GetType())
+            if (!method.DeclaringType.IsAssignableFrom(GetType()))
                 throw new ArgumentException("该方法不是此领域服务的方法。");
             IDomainServiceFilter[] methodFilters = _FilterCache.GetOrAdd(method, t => t.GetCustomAttributes<DomainServiceFilterAttribute>().ToArray());
             var accessor = domainContext.GetRequiredService<IDomainServiceAccessor>();
