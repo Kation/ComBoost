@@ -59,7 +59,7 @@ namespace Wodsoft.ComBoost
             CacheEntry entry;
             if (!_Entries.TryGetValue(name, out entry))
                 return _NullTask;
-            if (DateTime.Now < entry.ExpiredDate)
+            if (DateTime.Now > entry.ExpiredDate)
             {
                 _Entries.TryRemove(name, out entry);
                 return _NullTask;
@@ -75,7 +75,7 @@ namespace Wodsoft.ComBoost
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
             CacheEntry entry = new CacheEntry();
-            var serializer= SerializerProvider.GetSerializer(value.GetType());
+            var serializer = SerializerProvider.GetSerializer(value.GetType());
             MemoryStream stream = new MemoryStream();
             serializer.Serialize(stream, value);
             entry.Value = stream.ToArray();
