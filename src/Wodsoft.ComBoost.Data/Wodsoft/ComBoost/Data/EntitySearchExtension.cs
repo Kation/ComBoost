@@ -137,16 +137,32 @@ namespace Wodsoft.ComBoost.Data
                         else if (property.CustomType == "Entity")
                         {
                             searchItem.Contains = valueProvider.GetValue<string>("Search." + keys[i].Key);
+                            if (searchItem.Contains == null)
+                                continue;
+                            var isId = valueProvider.GetValue<bool?>("Search." + keys[i].Key + ".Id");
                             ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
-                            Expression expression = Expression.Property(Expression.Property(parameter, property.ClrName), EntityDescriptor.GetMetadata(property.ClrType).DisplayProperty.ClrName);
-                            expression = Expression.Call(expression, typeof(string).GetMethod("Contains"), Expression.Constant(searchItem.Contains));
-                            queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(expression, parameter));
+                            if (isId.HasValue && isId.Value)
+                            {
+                                var keyProperty = EntityDescriptor.GetMetadata(property.ClrType).KeyProperty;
+                                var id = keyProperty.Converter.ConvertFrom(searchItem.Contains);
+                                Expression expression = Expression.Property(Expression.Property(parameter, property.ClrName), keyProperty.ClrName);
+                                expression = Expression.Equal(expression, Expression.Constant(id));
+                                queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(expression, parameter));
+                            }
+                            else
+                            {
+                                Expression expression = Expression.Property(Expression.Property(parameter, property.ClrName), EntityDescriptor.GetMetadata(property.ClrType).DisplayProperty.ClrName);
+                                expression = Expression.Call(expression, typeof(string).GetMethod("Contains"), Expression.Constant(searchItem.Contains));
+                                queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(expression, parameter));
+                            }
                         }
                         break;
                     default:
                         if (property.ClrType == typeof(string))
                         {
                             searchItem.Contains = valueProvider.GetValue<string>("Search." + keys[i].Key);
+                            if (searchItem.Contains == null)
+                                continue;
                             ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
                             Expression expression = Expression.Property(parameter, property.ClrName);
                             expression = Expression.Call(expression, typeof(string).GetMethod("Contains"), Expression.Constant(searchItem.Contains));
