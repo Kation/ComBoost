@@ -17,14 +17,22 @@ namespace Wodsoft.ComBoost.Security
 
         public ISecurityProvider SecurityProvider { get; private set; }
 
-        public T GetUser<T>()
+        public T GetUser<T>() where T : class
         {
             if (!Identity.IsAuthenticated)
-                return default(T);
+                return null;
             string id = FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
             return (T)SecurityProvider.GetPermissionAsync(id).Result;
         }
-        
+
+        public Task<T> GetUserAsync<T>() where T : class
+        {
+            if (!Identity.IsAuthenticated)
+                return Task.FromResult<T>(null);
+            string id = FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
+            return SecurityProvider.GetPermissionAsync(id).ContinueWith(t => (T)t.Result);
+        }
+
         public bool IsInStaticRole(object role)
         {
             if (role == null)

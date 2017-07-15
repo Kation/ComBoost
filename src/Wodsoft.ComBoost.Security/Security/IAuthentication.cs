@@ -9,7 +9,9 @@ namespace Wodsoft.ComBoost.Security
     {
         bool IsInRole(object role);
 
-        T GetUser<T>();
+        T GetUser<T>() where T : class;
+
+        Task<T> GetUserAsync<T>() where T : class;
 
         string GetUserId();
 
