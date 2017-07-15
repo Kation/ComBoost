@@ -29,15 +29,16 @@ namespace Wodsoft.ComBoost.Mock
         public MockIdentity Identity { get; private set; }
         IIdentity IPrincipal.Identity { get { return Identity; } }
 
-        public T GetUser<T>()
+        public T GetUser<T>() where T : class
         {
-            if (UserId != null)
-            {
-                var permission = SecurityProvider.GetPermissionAsync(UserId).Result;
-                if (permission != null)
-                    return (T)permission;
-            }
-            return default(T);
+            if (UserId == null)
+                return null;
+            return SecurityProvider.GetPermissionAsync(UserId).Result as T;
+        }
+
+        public Task<T> GetUserAsync<T>() where T : class
+        {
+            return SecurityProvider.GetPermissionAsync(UserId).ContinueWith(t => t.Result as T);
         }
 
         public bool IsInRole(string role)

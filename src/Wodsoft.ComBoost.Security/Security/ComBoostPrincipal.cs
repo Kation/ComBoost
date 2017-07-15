@@ -22,7 +22,7 @@ namespace Wodsoft.ComBoost.Security
             if (!Identity.IsAuthenticated)
                 return null;
             string id = FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
-            return (T)SecurityProvider.GetPermissionAsync(id).Result;
+            return SecurityProvider.GetPermissionAsync(id).Result as T;
         }
 
         public Task<T> GetUserAsync<T>() where T : class
@@ -30,7 +30,7 @@ namespace Wodsoft.ComBoost.Security
             if (!Identity.IsAuthenticated)
                 return Task.FromResult<T>(null);
             string id = FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
-            return SecurityProvider.GetPermissionAsync(id).ContinueWith(t => (T)t.Result);
+            return SecurityProvider.GetPermissionAsync(id).ContinueWith(t => t.Result as T);
         }
 
         public bool IsInStaticRole(object role)
