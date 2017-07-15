@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -58,7 +59,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             _CachedEntityContext.Add(typeof(T), context);
             return context;
         }
-        
+
         Task<TResult> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
         {
             if (entity == null)
@@ -70,7 +71,12 @@ namespace Wodsoft.ComBoost.Data.Entity
                 return Task.FromResult(result);
             string propertyName = GetPropertyName(expression);
             var entry = InnerContext.Entry((object)entity);
-            var property = entry.Metadata.FindNavigation(propertyName).ForeignKey.Properties[0];
+            var foreignKey = entry.Metadata.FindNavigation(propertyName).ForeignKey;
+            IPropertyBase property;
+            if (foreignKey.DeclaringEntityType.ClrType != entry.Metadata.ClrType)
+                property = entry.Metadata.FindNavigation(propertyName).ForeignKey.PrincipalKey.Properties[0];
+            else
+                property = entry.Metadata.FindNavigation(propertyName).ForeignKey.Properties[0];
             var infrastructure = entry.GetInfrastructure();
             var key = infrastructure.GetCurrentValue(property);
             if (key == null)
@@ -121,7 +127,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new NotSupportedException("不支持的路径。");
             return memberExpression.Member.Name;
         }
-        
+
         public Task<int> ExecuteNonQueryAsync(string sql, params object[] parameters)
         {
             throw new NotSupportedException();
