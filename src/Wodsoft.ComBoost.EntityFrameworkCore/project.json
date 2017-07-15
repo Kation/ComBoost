@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.EntityFrameworkCore",
-  "version": "3.0.0-alpha18",
+  "version": "3.0.0-alpha19",
   "authors": [ "Kation" ],
   "description": "ComBoost用于EntityFrameworkCore实现的实体模块。",
   "packOptions": {
@@ -20,6 +20,6 @@
   },
   "dependencies": {
     "Microsoft.EntityFrameworkCore.Relational": "1.1.2",
-    "Wodsoft.ComBoost.Data.Core": "[3.0.0-alpha18,4.0.0)"
+    "Wodsoft.ComBoost.Data.Core": "[3.0.0-alpha19,4.0.0)"
   }
 }
