@@ -14,6 +14,8 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 注册同步事件。
         /// </summary>
+        /// <param name="name">事件名称。</param>
+        /// <param name="ownerType">所有者类型。</param>
         /// <returns></returns>
         public static DomainServiceEventRoute RegisterEvent(string name, Type ownerType)
         {
@@ -25,6 +27,8 @@ namespace Wodsoft.ComBoost
         /// 注册同步事件。
         /// </summary>
         /// <typeparam name="T">事件参数类型。</typeparam>
+        /// <param name="name">事件名称。</param>
+        /// <param name="ownerType">所有者类型。</param>
         /// <returns></returns>
         public static DomainServiceEventRoute RegisterEvent<T>(string name, Type ownerType)
             where T : EventArgs
@@ -36,6 +40,8 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 注册异步事件。
         /// </summary>
+        /// <param name="name">事件名称。</param>
+        /// <param name="ownerType">所有者类型。</param>
         /// <returns></returns>
         public static DomainServiceEventRoute RegisterAsyncEvent(string name, Type ownerType)
         {
@@ -47,12 +53,30 @@ namespace Wodsoft.ComBoost
         /// 注册异步事件。
         /// </summary>
         /// <typeparam name="T">事件参数类型。</typeparam>
+        /// <param name="name">事件名称。</param>
+        /// <param name="ownerType">所有者类型。</param>
         /// <returns></returns>
         public static DomainServiceEventRoute RegisterAsyncEvent<T>(string name, Type ownerType)
             where T : EventArgs
         {
             DomainServiceEventRoute route = new DomainServiceEventRoute(name, ownerType, typeof(DomainServiceAsyncEventHandler<T>));
             return route;
+        }
+
+        /// <summary>
+        /// 重载事件。
+        /// </summary>
+        /// <param name="route">事件路由。</param>
+        /// <param name="ownerType">所有者类型。</param>
+        /// <returns></returns>
+        public static DomainServiceEventRoute OverrideEvent(DomainServiceEventRoute route, Type ownerType)
+        {
+            if (route == null)
+                throw new ArgumentNullException(nameof(route));
+            if (ownerType == null)
+                throw new ArgumentNullException(nameof(ownerType));
+            DomainServiceEventRoute newRoute = new DomainServiceEventRoute(route, ownerType);
+            return newRoute;
         }
 
         private DomainServiceEventRoute(string name, Type ownerType, Type handlerType)
@@ -69,6 +93,11 @@ namespace Wodsoft.ComBoost
             DomainServiceEventManager.GlobalEventManager.RegisterEventRoute(this);
         }
 
+        private DomainServiceEventRoute(DomainServiceEventRoute parentRoute, Type ownerType) : this(parentRoute.Name, ownerType, parentRoute.HandlerType)
+        {
+            ParentRoute = parentRoute;
+        }
+        
         /// <summary>
         /// 获取事件名称。
         /// </summary>
@@ -83,6 +112,11 @@ namespace Wodsoft.ComBoost
         /// 获取事件委托类型。
         /// </summary>
         public Type HandlerType { get; private set; }
+
+        /// <summary>
+        /// 获取父级路由。
+        /// </summary>
+        public DomainServiceEventRoute ParentRoute { get; private set; }
 
         /// <summary>
         /// 获取路由名称。 

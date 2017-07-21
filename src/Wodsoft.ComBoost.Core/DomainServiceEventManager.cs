@@ -281,6 +281,8 @@ namespace Wodsoft.ComBoost
                 return;
             foreach (var item in d.GetInvocationList().Cast<DomainServiceEventHandler>())
                 item(context);
+            if (route.ParentRoute != null)
+                RaiseEvent(route.ParentRoute, context);
         }
 
         /// <summary>
@@ -303,6 +305,8 @@ namespace Wodsoft.ComBoost
                 return;
             foreach (var item in d.GetInvocationList().Cast<DomainServiceEventHandler<T>>())
                 item(context, eventArgs);
+            if (route.ParentRoute != null)
+                RaiseEvent(route.ParentRoute, context, eventArgs);
         }
 
         /// <summary>
@@ -323,6 +327,8 @@ namespace Wodsoft.ComBoost
                 return;
             foreach (var item in d.GetInvocationList().Cast<DomainServiceAsyncEventHandler>())
                 await item(context);
+            if (route.ParentRoute != null)
+                await RaiseAsyncEvent(route.ParentRoute, context);
         }
 
         /// <summary>
@@ -345,6 +351,8 @@ namespace Wodsoft.ComBoost
                 return;
             foreach (var item in d.GetInvocationList().Cast<DomainServiceAsyncEventHandler<T>>())
                 await item(context, eventArgs);
+            if (route.ParentRoute != null)
+                await RaiseAsyncEvent(route.ParentRoute, context, eventArgs);
         }
 
         #endregion 
