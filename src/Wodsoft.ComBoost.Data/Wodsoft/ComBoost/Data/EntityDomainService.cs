@@ -45,12 +45,9 @@ namespace Wodsoft.ComBoost.Data
                 queryable = context.Include(queryable, propertyMetadata.ClrName);
             }
             queryable = context.Order(queryable);
-            if (EntityQuery != null)
-            {
-                var e = new EntityQueryEventArgs<T>(queryable);
-                await RaiseAsyncEvent(EntityQuery, e);
-                queryable = e.Queryable;
-            }
+            var e = new EntityQueryEventArgs<T>(queryable);
+            await RaiseAsyncEvent(EntityQueryEvent, e);
+            queryable = e.Queryable;
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
             EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
@@ -65,7 +62,8 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public event DomainServiceAsyncEventHandler<EntityQueryEventArgs<T>> EntityQuery;
+        public static readonly DomainServiceEventRoute EntityQueryEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityQueryEventArgs<T>>();
+        public event DomainServiceAsyncEventHandler<EntityQueryEventArgs<T>> EntityQuery { add { AddAsyncEventHandler(EntityQueryEvent, value); } remove { RemoveAsyncEventHandler(EntityQueryEvent, value); } }
 
         public virtual async Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -78,16 +76,14 @@ namespace Wodsoft.ComBoost.Data
             item.OnCreating();
             EntityEditModel<T> model = new EntityEditModel<T>(item);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            if (EntityCreateModelCreated != null)
-            {
-                EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
-                await RaiseAsyncEvent(EntityCreateModelCreated, arg);
-                model = arg.Model;
-            }
+            EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
+            await RaiseAsyncEvent(EntityCreateModelCreatedEvent, arg);
+            model = arg.Model;
             return model;
         }
 
-        public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated;
+        public static readonly DomainServiceEventRoute EntityCreateModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>();
+        public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated { add { AddAsyncEventHandler(EntityCreateModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityCreateModelCreatedEvent, value); } }
 
         public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -108,16 +104,14 @@ namespace Wodsoft.ComBoost.Data
             entity.OnEditing();
             var model = new EntityEditModel<T>(entity);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            if (EntityEditModelCreated != null)
-            {
-                EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
-                await RaiseAsyncEvent(EntityEditModelCreated, arg);
-                model = arg.Model;
-            }
+            EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
+            await RaiseAsyncEvent(EntityEditModelCreatedEvent, arg);
+            model = arg.Model;
             return model;
         }
 
-        public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityEditModelCreated;
+        public static readonly DomainServiceEventRoute EntityEditModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>();
+        public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityEditModelCreated { add { AddAsyncEventHandler(EntityEditModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityEditModelCreatedEvent, value); } }
 
         public virtual async Task<IEntityUpdateModel<T>> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -158,10 +152,9 @@ namespace Wodsoft.ComBoost.Data
         protected virtual async Task<EntityUpdateModel<T>> UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, IPropertyMetadata[] properties)
         {
             var model = new EntityUpdateModel<T>();
-            if (EntityPreUpdate != null)
             {
                 var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
-                await RaiseAsyncEvent(EntityPreUpdate, arg);
+                await RaiseAsyncEvent(EntityPreUpdateEvent, arg);
                 properties = arg.Properties;
             }
             foreach (var property in properties)
@@ -175,18 +168,20 @@ namespace Wodsoft.ComBoost.Data
                     model.ErrorMessage.Add(property, ex.Message);
                 }
             }
-            if (model.ErrorMessage.Count == 0 && EntityUpdated != null)
+            if (model.ErrorMessage.Count == 0)
             {
                 var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
-                await RaiseAsyncEvent(EntityUpdated, arg);
+                await RaiseAsyncEvent(EntityUpdatedEvent, arg);
             }
             model.IsSuccess = model.ErrorMessage.Count == 0;
             model.Result = entity;
             return model;
         }
 
-        public event DomainServiceAsyncEventHandler<EntityUpdateEventArgs<T>> EntityPreUpdate;
-        public event DomainServiceAsyncEventHandler<EntityUpdateEventArgs<T>> EntityUpdated;
+        public static readonly DomainServiceEventRoute EntityPreUpdateEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityUpdateEventArgs<T>>();
+        public static readonly DomainServiceEventRoute EntityUpdatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityUpdateEventArgs<T>>();
+        public event DomainServiceAsyncEventHandler<EntityUpdateEventArgs<T>> EntityPreUpdate { add { AddAsyncEventHandler(EntityPreUpdateEvent, value); } remove { RemoveAsyncEventHandler(EntityPreUpdateEvent, value); } }
+        public event DomainServiceAsyncEventHandler<EntityUpdateEventArgs<T>> EntityUpdated { add { AddAsyncEventHandler(EntityUpdatedEvent, value); } remove { RemoveAsyncEventHandler(EntityUpdatedEvent, value); } }
 
         protected virtual async Task UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
         {
@@ -207,12 +202,9 @@ namespace Wodsoft.ComBoost.Data
                 {
                     value = valueProvider.GetValue(property.ClrName, property.ClrType);
                 }
-                if (EntityPropertyUpdate != null)
-                {
-                    var arg = new EntityPropertyUpdateEventArgs<T>(entity, valueProvider, property, value);
-                    await RaiseAsyncEvent(EntityPropertyUpdate, arg);
-                    handled = arg.IsHandled;
-                }
+                var arg = new EntityPropertyUpdateEventArgs<T>(entity, valueProvider, property, value);
+                await RaiseAsyncEvent(EntityPropertyUpdateEvent, arg);
+                handled = arg.IsHandled;
             }
             else
                 value = property.GetValue(entity);
@@ -231,7 +223,8 @@ namespace Wodsoft.ComBoost.Data
             }
         }
 
-        public event DomainServiceAsyncEventHandler<EntityPropertyUpdateEventArgs<T>> EntityPropertyUpdate;
+        public static readonly DomainServiceEventRoute EntityPropertyUpdateEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityPropertyUpdateEventArgs<T>>();
+        public event DomainServiceAsyncEventHandler<EntityPropertyUpdateEventArgs<T>> EntityPropertyUpdate { add { AddAsyncEventHandler(EntityPropertyUpdateEvent, value); } remove { RemoveAsyncEventHandler(EntityPropertyUpdateEvent, value); } }
 
         public virtual async Task Remove([FromService] IDatabaseContext database, [FromService]IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -244,18 +237,16 @@ namespace Wodsoft.ComBoost.Data
             T entity = await context.GetAsync(index);
             if (entity == null)
                 throw new EntityNotFoundException(typeof(T), index);
-            if (EntityRemove != null)
-            {
-                var e = new EntityRemoveEventArgs<T>(entity);
-                await RaiseAsyncEvent(EntityRemove, e);
-                if (e.IsCanceled)
-                    return;
-            }
+            var e = new EntityRemoveEventArgs<T>(entity);
+            await RaiseAsyncEvent(EntityRemoveEvent, e);
+            if (e.IsCanceled)
+                return;
             context.Remove(entity);
             await database.SaveAsync();
         }
 
-        public event DomainServiceAsyncEventHandler<EntityRemoveEventArgs<T>> EntityRemove;
+        public static readonly DomainServiceEventRoute EntityRemoveEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityRemoveEventArgs<T>>();
+        public event DomainServiceAsyncEventHandler<EntityRemoveEventArgs<T>> EntityRemove { add { AddAsyncEventHandler(EntityRemoveEvent, value); } remove { RemoveAsyncEventHandler(EntityRemoveEvent, value); } }
 
         public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -275,15 +266,13 @@ namespace Wodsoft.ComBoost.Data
                 throw new EntityNotFoundException(typeof(T), index);
             var model = new EntityEditModel<T>(entity);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            if (EntityDetailModelCreated != null)
-            {
-                var e = new EntityDetailEventArgs<T>(entity, (IPropertyMetadata[])model.Properties);
-                await RaiseAsyncEvent(EntityDetailModelCreated, e);
-                model.Properties = e.Properties;
-            }
+            var e = new EntityDetailEventArgs<T>(entity, (IPropertyMetadata[])model.Properties);
+            await RaiseAsyncEvent(EntityDetailModelCreatedEvent, e);
+            model.Properties = e.Properties;
             return model;
         }
 
-        public event DomainServiceAsyncEventHandler<EntityDetailEventArgs<T>> EntityDetailModelCreated;
+        public static readonly DomainServiceEventRoute EntityDetailModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityRemoveEventArgs<T>>();
+        public event DomainServiceAsyncEventHandler<EntityDetailEventArgs<T>> EntityDetailModelCreated { add { AddAsyncEventHandler(EntityDetailModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityDetailModelCreatedEvent, value); } }
     }
 }

@@ -40,17 +40,11 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 领域方法执行前事件。
         /// </summary>
-        event DomainExecuteEvent Executing;
+        event DomainServiceAsyncEventHandler Executing;
+
         /// <summary>
         /// 领域方法执行后事件。
         /// </summary>
-        event DomainExecuteEvent Executed;
+        event DomainServiceAsyncEventHandler Executed;
     }
-
-    /// <summary>
-    /// 领域执行事件委托。
-    /// </summary>
-    /// <param name="context">领域执行上下文。</param>
-    /// <returns>返回异步任务。</returns>
-    public delegate Task DomainExecuteEvent(IDomainExecutionContext context);
 }
