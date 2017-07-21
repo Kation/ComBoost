@@ -8,7 +8,7 @@ namespace DataUnitTest
 {
     public class EventDomainService : DomainService
     {
-        public static readonly DomainServiceEventRoute SyncOperatorEvent = DomainServiceEventRoute.RegisterEvent<OperatorEventArgs>();
+        public static readonly DomainServiceEventRoute SyncOperatorEvent = DomainServiceEventRoute.RegisterEvent<OperatorEventArgs>("SyncOperator", typeof(EventDomainService));
         public event DomainServiceEventHandler<OperatorEventArgs> SyncOperator { add { AddEventHandler(SyncOperatorEvent, value); } remove { RemoveEventHandler(SyncOperatorEvent, value); } }
 
         public Task<double> SyncEventTest([FromValue]double value)

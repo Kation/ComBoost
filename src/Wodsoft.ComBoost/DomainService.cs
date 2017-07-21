@@ -39,8 +39,8 @@ namespace Wodsoft.ComBoost
 
         private ConcurrentDictionary<MethodInfo, IDomainServiceFilter[]> _FilterCache = new ConcurrentDictionary<MethodInfo, IDomainServiceFilter[]>();
 
-        public static readonly DomainServiceEventRoute ExecutedEvent = DomainServiceEventRoute.RegisterAsyncEvent();
-        public static readonly DomainServiceEventRoute ExecutingEvent = DomainServiceEventRoute.RegisterAsyncEvent();
+        public static readonly DomainServiceEventRoute ExecutedEvent = DomainServiceEventRoute.RegisterAsyncEvent("Executed", typeof(DomainService));
+        public static readonly DomainServiceEventRoute ExecutingEvent = DomainServiceEventRoute.RegisterAsyncEvent("Executing", typeof(DomainService));
         public event DomainServiceAsyncEventHandler Executed { add { AddAsyncEventHandler(ExecutedEvent, value); } remove { RemoveAsyncEventHandler(ExecutedEvent, value); } }
         public event DomainServiceAsyncEventHandler Executing { add { AddAsyncEventHandler(ExecutingEvent, value); } remove { RemoveAsyncEventHandler(ExecutingEvent, value); } }
 

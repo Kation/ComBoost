@@ -62,7 +62,7 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public static readonly DomainServiceEventRoute EntityQueryEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityQueryEventArgs<T>>();
+        public static readonly DomainServiceEventRoute EntityQueryEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityQueryEventArgs<T>>("EntityQuery", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityQueryEventArgs<T>> EntityQuery { add { AddAsyncEventHandler(EntityQueryEvent, value); } remove { RemoveAsyncEventHandler(EntityQueryEvent, value); } }
 
         public virtual async Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
@@ -82,7 +82,7 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public static readonly DomainServiceEventRoute EntityCreateModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>();
+        public static readonly DomainServiceEventRoute EntityCreateModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>("EntityCreateModelCreated", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated { add { AddAsyncEventHandler(EntityCreateModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityCreateModelCreatedEvent, value); } }
 
         public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
@@ -110,7 +110,7 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public static readonly DomainServiceEventRoute EntityEditModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>();
+        public static readonly DomainServiceEventRoute EntityEditModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>("EntityEditModelCreated", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityEditModelCreated { add { AddAsyncEventHandler(EntityEditModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityEditModelCreatedEvent, value); } }
 
         public virtual async Task<IEntityUpdateModel<T>> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
@@ -178,8 +178,8 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public static readonly DomainServiceEventRoute EntityPreUpdateEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityUpdateEventArgs<T>>();
-        public static readonly DomainServiceEventRoute EntityUpdatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityUpdateEventArgs<T>>();
+        public static readonly DomainServiceEventRoute EntityPreUpdateEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityUpdateEventArgs<T>>("EntityPreUpdate", typeof(EntityDomainService<T>));
+        public static readonly DomainServiceEventRoute EntityUpdatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityUpdateEventArgs<T>>("EntityUpdated", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityUpdateEventArgs<T>> EntityPreUpdate { add { AddAsyncEventHandler(EntityPreUpdateEvent, value); } remove { RemoveAsyncEventHandler(EntityPreUpdateEvent, value); } }
         public event DomainServiceAsyncEventHandler<EntityUpdateEventArgs<T>> EntityUpdated { add { AddAsyncEventHandler(EntityUpdatedEvent, value); } remove { RemoveAsyncEventHandler(EntityUpdatedEvent, value); } }
 
@@ -223,7 +223,7 @@ namespace Wodsoft.ComBoost.Data
             }
         }
 
-        public static readonly DomainServiceEventRoute EntityPropertyUpdateEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityPropertyUpdateEventArgs<T>>();
+        public static readonly DomainServiceEventRoute EntityPropertyUpdateEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityPropertyUpdateEventArgs<T>>("EntityPropertyUpdate", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityPropertyUpdateEventArgs<T>> EntityPropertyUpdate { add { AddAsyncEventHandler(EntityPropertyUpdateEvent, value); } remove { RemoveAsyncEventHandler(EntityPropertyUpdateEvent, value); } }
 
         public virtual async Task Remove([FromService] IDatabaseContext database, [FromService]IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
@@ -245,7 +245,7 @@ namespace Wodsoft.ComBoost.Data
             await database.SaveAsync();
         }
 
-        public static readonly DomainServiceEventRoute EntityRemoveEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityRemoveEventArgs<T>>();
+        public static readonly DomainServiceEventRoute EntityRemoveEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityRemoveEventArgs<T>>("EntityRemove", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityRemoveEventArgs<T>> EntityRemove { add { AddAsyncEventHandler(EntityRemoveEvent, value); } remove { RemoveAsyncEventHandler(EntityRemoveEvent, value); } }
 
         public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
@@ -272,7 +272,7 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        public static readonly DomainServiceEventRoute EntityDetailModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityRemoveEventArgs<T>>();
+        public static readonly DomainServiceEventRoute EntityDetailModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityRemoveEventArgs<T>>("EntityDetailModelCreated", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityDetailEventArgs<T>> EntityDetailModelCreated { add { AddAsyncEventHandler(EntityDetailModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityDetailModelCreatedEvent, value); } }
     }
 }
