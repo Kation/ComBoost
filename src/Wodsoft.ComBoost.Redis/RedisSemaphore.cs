@@ -22,7 +22,7 @@ namespace Wodsoft.ComBoost.Redis
             if (expireTime.TotalMilliseconds <= 0)
                 throw new ArgumentOutOfRangeException(nameof(expireTime), "超时时间不能小于零。");
             _Database = database;
-            _Key = key;
+            _Key = "__ComBoostSemaphore_" + key;
             _ExpireTime = expireTime;
         }
 
