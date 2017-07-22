@@ -93,11 +93,16 @@ namespace Wodsoft.ComBoost
             DomainServiceEventManager.GlobalEventManager.RegisterEventRoute(this);
         }
 
-        private DomainServiceEventRoute(DomainServiceEventRoute parentRoute, Type ownerType) : this(parentRoute.Name, ownerType, parentRoute.HandlerType)
+        private DomainServiceEventRoute(string name, Type ownerType, Type handlerType, DomainServiceAsyncEventMode mode) : this(name, ownerType, handlerType)
+        {
+            AsyncMode = mode;
+        }
+
+        private DomainServiceEventRoute(DomainServiceEventRoute parentRoute, Type ownerType) : this(parentRoute.Name, ownerType, parentRoute.HandlerType, parentRoute.AsyncMode)
         {
             ParentRoute = parentRoute;
         }
-        
+
         /// <summary>
         /// 获取事件名称。
         /// </summary>
@@ -117,6 +122,11 @@ namespace Wodsoft.ComBoost
         /// 获取父级路由。
         /// </summary>
         public DomainServiceEventRoute ParentRoute { get; private set; }
+
+        /// <summary>
+        /// 获取事件异步模式。
+        /// </summary>
+        public DomainServiceAsyncEventMode AsyncMode { get; private set; }
 
         /// <summary>
         /// 获取路由名称。 

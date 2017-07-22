@@ -326,7 +326,12 @@ namespace Wodsoft.ComBoost
             if (d == null)
                 return;
             foreach (var item in d.GetInvocationList().Cast<DomainServiceAsyncEventHandler>())
-                await item(context);
+                if (route.AsyncMode == DomainServiceAsyncEventMode.Async)
+                    await item(context);
+                else
+                {
+                    Task itemTask = item(context);
+                }
             if (route.ParentRoute != null)
                 await RaiseAsyncEvent(route.ParentRoute, context);
         }
@@ -350,7 +355,12 @@ namespace Wodsoft.ComBoost
             if (d == null)
                 return;
             foreach (var item in d.GetInvocationList().Cast<DomainServiceAsyncEventHandler<T>>())
-                await item(context, eventArgs);
+                if (route.AsyncMode == DomainServiceAsyncEventMode.Async)
+                    await item(context, eventArgs);
+                else
+                {
+                    Task itemTask = item(context, eventArgs);
+                }
             if (route.ParentRoute != null)
                 await RaiseAsyncEvent(route.ParentRoute, context, eventArgs);
         }
