@@ -266,13 +266,12 @@ namespace Wodsoft.ComBoost.Data
                 throw new EntityNotFoundException(typeof(T), index);
             var model = new EntityEditModel<T>(entity);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            var e = new EntityDetailEventArgs<T>(entity, (IPropertyMetadata[])model.Properties);
+            var e = new EntityModelCreatedEventArgs<T>(model);
             await RaiseAsyncEvent(EntityDetailModelCreatedEvent, e);
-            model.Properties = e.Properties;
             return model;
         }
 
-        public static readonly DomainServiceEventRoute EntityDetailModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityRemoveEventArgs<T>>("EntityDetailModelCreated", typeof(EntityDomainService<T>));
-        public event DomainServiceAsyncEventHandler<EntityDetailEventArgs<T>> EntityDetailModelCreated { add { AddAsyncEventHandler(EntityDetailModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityDetailModelCreatedEvent, value); } }
+        public static readonly DomainServiceEventRoute EntityDetailModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>("EntityDetailModelCreated", typeof(EntityDomainService<T>));
+        public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityDetailModelCreated { add { AddAsyncEventHandler(EntityDetailModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityDetailModelCreatedEvent, value); } }
     }
 }
