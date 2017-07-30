@@ -27,6 +27,13 @@ namespace Wodsoft.ComBoost
         Task<Stream> GetAsync(string path);
 
         /// <summary>
+        /// 获取文件。
+        /// </summary>
+        /// <param name="path">文件路径。</param>
+        /// <returns>返回文件。</returns>
+        Task<IStorageFile> GetFileAsync(string path);
+
+        /// <summary>
         /// 删除文件。
         /// </summary>
         /// <param name="path">文件路径。</param>

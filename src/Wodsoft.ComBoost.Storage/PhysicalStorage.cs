@@ -45,6 +45,19 @@ namespace Wodsoft.ComBoost
             return Task.FromResult<Stream>(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
 
+        public Task<IStorageFile> GetFileAsync(string path)
+        {
+            string originPath = path;
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+            path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            path = Path.Combine(_Options.Root, path);
+            if (!File.Exists(path))
+                return Task.FromResult<IStorageFile>(null);
+            FileInfo info = new FileInfo(path);
+            return Task.FromResult<IStorageFile>(new PhysicalStorageFile(info, originPath));
+        }
+
         public async Task<string> PutAsync(Stream stream, string filename)
         {
             if (stream == null)
