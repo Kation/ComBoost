@@ -220,23 +220,90 @@ namespace Wodsoft.ComBoost
 
         private static ConcurrentDictionary<Type, ConcurrentDictionary<string, MethodInfo>> _MethodCache = new ConcurrentDictionary<Type, ConcurrentDictionary<string, MethodInfo>>();
 
+        /// <summary>
+        /// 异步执行领域方法。
+        /// </summary>
+        /// <param name="domainService">领域服务。</param>
+        /// <param name="domainContext">领域上下文。</param>
+        /// <param name="method">方法体名称。</param>
+        /// <returns>异步任务。</returns>
         public static Task ExecuteAsync(this IDomainService domainService, IDomainContext domainContext, string method)
         {
             if (domainService == null)
                 throw new ArgumentNullException(nameof(domainService));
+            if (domainContext == null)
+                throw new ArgumentNullException(nameof(domainContext));
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
             var type = domainService.GetType();
             ConcurrentDictionary<string, MethodInfo> cache = _MethodCache.GetOrAdd(type, t => new ConcurrentDictionary<string, MethodInfo>());
             MethodInfo methodInfo = cache.GetOrAdd(method, t => type.GetMethod(method));
             return domainService.ExecuteAsync(domainContext, methodInfo);
         }
 
+        /// <summary>
+        /// 异步执行领域方法。
+        /// </summary>
+        /// <typeparam name="TResult">返回类型。</typeparam>
+        /// <param name="domainService">领域服务。</param>
+        /// <param name="domainContext">领域上下文。</param>
+        /// <param name="method">方法体名称。</param>
+        /// <returns>异步任务。</returns>
         public static Task<TResult> ExecuteAsync<TResult>(this IDomainService domainService, IDomainContext domainContext, string method)
         {
             if (domainService == null)
                 throw new ArgumentNullException(nameof(domainService));
+            if (domainContext == null)
+                throw new ArgumentNullException(nameof(domainContext));
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
             var type = domainService.GetType();
             ConcurrentDictionary<string, MethodInfo> cache = _MethodCache.GetOrAdd(type, t => new ConcurrentDictionary<string, MethodInfo>());
             MethodInfo methodInfo = cache.GetOrAdd(method, t => type.GetMethod(method));
+            return domainService.ExecuteAsync<TResult>(domainContext, methodInfo);
+        }
+
+        /// <summary>
+        /// 异步执行领域泛型方法。
+        /// </summary>
+        /// <param name="domainService">领域服务。</param>
+        /// <param name="domainContext">领域上下文。</param>
+        /// <param name="method">方法体名称。</param>
+        /// <param name="typeArguments">泛型类型参数。</param>
+        /// <returns>异步任务。</returns>
+        public static Task ExecuteAsync(this IDomainService domainService, IDomainContext domainContext, string method, params Type[] typeArguments)
+        {
+            if (domainService == null)
+                throw new ArgumentNullException(nameof(domainService));
+            if (domainContext == null)
+                throw new ArgumentNullException(nameof(domainContext));
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
+            var type = domainService.GetType();
+            MethodInfo methodInfo = type.GetMethod(method).MakeGenericMethod(typeArguments);
+            return domainService.ExecuteAsync(domainContext, methodInfo);
+        }
+
+
+        /// <summary>
+        /// 异步执行领域泛型方法。
+        /// </summary>
+        /// <typeparam name="TResult">返回类型。</typeparam>
+        /// <param name="domainService">领域服务。</param>
+        /// <param name="domainContext">领域上下文。</param>
+        /// <param name="method">方法体名称。</param>
+        /// <param name="typeArguments">泛型类型参数。</param>
+        /// <returns>异步任务。</returns>
+        public static Task<TResult> ExecuteAsync<TResult>(this IDomainService domainService, IDomainContext domainContext, string method, params Type[] typeArguments)
+        {
+            if (domainService == null)
+                throw new ArgumentNullException(nameof(domainService));
+            if (domainContext == null)
+                throw new ArgumentNullException(nameof(domainContext));
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
+            var type = domainService.GetType();
+            MethodInfo methodInfo = type.GetMethod(method).MakeGenericMethod(typeArguments);
             return domainService.ExecuteAsync<TResult>(domainContext, methodInfo);
         }
     }
