@@ -41,7 +41,7 @@ namespace Wodsoft.ComBoost
                 if (parameter.HasDefaultValue)
                     service = parameter.DefaultValue;
                 else if (IsRequired)
-                    throw new ArgumentNullException(parameter.Name, "获取" + parameter.ParameterType.Name + "服务为空。");
+                    throw new DomainServiceException(new ArgumentNullException(parameter.Name, "获取" + parameter.ParameterType.Name + "服务为空。"));
             return service;
         }
     }

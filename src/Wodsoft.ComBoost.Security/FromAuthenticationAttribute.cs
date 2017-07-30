@@ -16,7 +16,7 @@ namespace Wodsoft.ComBoost
             IAuthenticationProvider provider = executionContext.DomainContext.GetRequiredService<IAuthenticationProvider>();
             var user = typeof(IAuthentication).GetMethod("GetUser").MakeGenericMethod(parameter.ParameterType).Invoke(provider.GetAuthentication(), new object[0]);
             if (user == null)
-                throw new ArgumentNullException(parameter.Name, "获取" + parameter.ParameterType.Name + "身份验证为空。");
+                throw new DomainServiceException(new ArgumentNullException(parameter.Name, "获取" + parameter.ParameterType.Name + "身份验证为空。"));
             return user;
         }
     }

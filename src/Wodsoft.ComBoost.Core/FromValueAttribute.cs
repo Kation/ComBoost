@@ -63,7 +63,7 @@ namespace Wodsoft.ComBoost
                 if (DefaultValue != null || parameter.HasDefaultValue)
                     value = DefaultValue ?? parameter.DefaultValue;
                 else if (IsRequired)
-                    throw new ArgumentNullException(parameter.Name, "获取" + (Name ?? parameter.Name) + "的值为空。");
+                    throw new DomainServiceException(new ArgumentNullException(parameter.Name, "获取" + (Name ?? parameter.Name) + "的值为空。"));
             return value;
         }
     }

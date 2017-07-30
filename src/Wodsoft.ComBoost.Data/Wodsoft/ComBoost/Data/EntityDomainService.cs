@@ -100,7 +100,7 @@ namespace Wodsoft.ComBoost.Data
             }
             T entity = await context.GetAsync(queryable, index);
             if (entity == null)
-                throw new EntityNotFoundException(typeof(T), index);
+                throw new DomainServiceException(new EntityNotFoundException(typeof(T), index));
             entity.OnEditing();
             var model = new EntityEditModel<T>(entity);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
@@ -135,7 +135,7 @@ namespace Wodsoft.ComBoost.Data
             {
                 entity = await context.GetAsync(index);
                 if (entity == null)
-                    throw new EntityNotFoundException(typeof(T), index);
+                    throw new DomainServiceException(new EntityNotFoundException(typeof(T), index));
             }
             var result = await UpdateCore(valueProvider, auth, entity, authorizeOption.GetProperties(Metadata, auth).ToArray());
             if (result.IsSuccess)
@@ -217,7 +217,7 @@ namespace Wodsoft.ComBoost.Data
                 validationContext.DisplayName = property.Name;
                 var error = property.GetAttributes<ValidationAttribute>().Select(t => t.GetValidationResult(value, validationContext)).Where(t => t != ValidationResult.Success).ToArray();
                 if (error.Length > 0)
-                    throw new ArgumentException(string.Join("，", error.Select(t => t.ErrorMessage)));
+                    throw new DomainServiceException(new ArgumentException(string.Join("，", error.Select(t => t.ErrorMessage))));
                 if (hasValue)
                     property.SetValue(entity, value);
             }
@@ -236,7 +236,7 @@ namespace Wodsoft.ComBoost.Data
             var context = database.GetContext<T>();
             T entity = await context.GetAsync(index);
             if (entity == null)
-                throw new EntityNotFoundException(typeof(T), index);
+                throw new DomainServiceException(new EntityNotFoundException(typeof(T), index));
             var e = new EntityRemoveEventArgs<T>(entity);
             await RaiseAsyncEvent(EntityRemoveEvent, e);
             if (e.IsCanceled)
@@ -263,7 +263,7 @@ namespace Wodsoft.ComBoost.Data
             }
             T entity = await context.GetAsync(queryable, index);
             if (entity == null)
-                throw new EntityNotFoundException(typeof(T), index);
+                throw new DomainServiceException(new EntityNotFoundException(typeof(T), index));
             var model = new EntityEditModel<T>(entity);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
             var e = new EntityModelCreatedEventArgs<T>(model);

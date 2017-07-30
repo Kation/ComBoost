@@ -46,7 +46,7 @@ namespace Wodsoft.ComBoost
         {
             int index = Array.IndexOf(_Parameters, parameter);
             if (index == -1)
-                throw new ArgumentException("该参数不数据当前执行上下文。", nameof(parameter));
+                throw new ArgumentException("该参数不属于当前执行上下文。", nameof(parameter));
             return _ParameterValues[index];
         }
 
