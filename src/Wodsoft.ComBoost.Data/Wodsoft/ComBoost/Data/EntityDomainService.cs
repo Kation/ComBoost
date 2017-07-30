@@ -66,6 +66,31 @@ namespace Wodsoft.ComBoost.Data
         public static readonly DomainServiceEventRoute EntityQueryEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityQueryEventArgs<T>>("EntityQuery", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityQueryEventArgs<T>> EntityQuery { add { AddAsyncEventHandler(EntityQueryEvent, value); } remove { RemoveAsyncEventHandler(EntityQueryEvent, value); } }
 
+        public virtual async Task<IEntityViewModel<TViewModel>> ListViewModel<TViewModel>([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption, [FromOptions(true)]EntityQuerySelectOption<T, TViewModel> selectOption)
+        {
+            var auth = authenticationProvider.GetAuthentication();
+            if (authorizeOption == null)
+                authorizeOption = EntityDomainAuthorizeOption.View;
+            authorizeOption.Validate(Metadata, auth);
+            var context = database.GetContext<T>();
+            var queryable = context.Query();
+            var e = new EntityQueryEventArgs<T>(queryable);
+            await RaiseAsyncEvent(EntityQueryEvent, e);
+            queryable = e.Queryable;
+            var convertQueryable = selectOption.Select(queryable);
+            EntityViewModel<TViewModel> model = new EntityViewModel<TViewModel>(convertQueryable);
+            EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
+            if (pagerOption != null)
+            {
+                model.CurrentSize = pagerOption.CurrentSize;
+                model.CurrentPage = pagerOption.CurrentPage;
+                model.PageSizeOption = pagerOption.PageSizeOption;
+            }
+            await model.UpdateTotalPageAsync();
+            await model.UpdateItemsAsync();
+            return model;
+        }
+
         public virtual async Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             var auth = authenticationProvider.GetAuthentication();
