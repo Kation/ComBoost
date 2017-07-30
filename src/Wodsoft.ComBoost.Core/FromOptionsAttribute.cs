@@ -14,6 +14,29 @@ namespace Wodsoft.ComBoost
     public class FromOptionsAttribute : FromAttribute
     {
         /// <summary>
+        /// 实例化选项来源。
+        /// 默认为非必需值。
+        /// </summary>
+        public FromOptionsAttribute() : this(false)
+        {
+
+        }
+
+        /// <summary>
+        /// 实例化选项来源。
+        /// </summary>
+        /// <param name="isRequired">值是否为必需。</param>
+        public FromOptionsAttribute(bool isRequired)
+        {
+            IsRequired = isRequired;
+        }
+
+        /// <summary>
+        /// 获取是否为必需值。
+        /// </summary>
+        public bool IsRequired { get; private set; }
+
+        /// <summary>
         /// 获取值。
         /// </summary>
         /// <param name="executionContext">领域执行上下文。</param>
@@ -22,8 +45,8 @@ namespace Wodsoft.ComBoost
         public override object GetValue(IDomainExecutionContext executionContext, ParameterInfo parameter)
         {
             var option = executionContext.DomainContext.Options.GetOption(parameter.ParameterType);
-            //if (option == null)
-            //    throw new ArgumentNullException(parameter.Name, "获取" + parameter.ParameterType.Name + "选项为空。");
+            if (option == null && IsRequired)
+                throw new ArgumentNullException(parameter.Name, "获取" + parameter.ParameterType.Name + "选项为空。");
             return option;
         }
     }
