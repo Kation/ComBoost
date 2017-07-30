@@ -10,15 +10,14 @@ namespace System.ComponentModel
     /// <summary>
     /// Entity view model.
     /// </summary>
-    /// <typeparam name="TEntity">Type of entity.</typeparam>
-    public class EntityViewModel<TEntity> : NotifyBase, IEntityViewModel<TEntity>, IEntityViewModel, IPagination
-        where TEntity : IEntity
+    /// <typeparam name="T">Type of model.</typeparam>
+    public class EntityViewModel<T> : NotifyBase, IEntityViewModel<T>, IEntityViewModel, IPagination
     {
-        private IQueryable<TEntity> _Queryable;
+        private IQueryable<T> _Queryable;
         /// <summary>
         /// Get the queryable of entity.
         /// </summary>
-        public IQueryable<TEntity> Queryable
+        public IQueryable<T> Queryable
         {
             get
             {
@@ -38,7 +37,7 @@ namespace System.ComponentModel
         /// Initialize entity view model.
         /// </summary>
         /// <param name="queryable">Queryable of entity.</param>
-        public EntityViewModel(IQueryable<TEntity> queryable) : this(queryable, 1, Pagination.DefaultPageSize) { }
+        public EntityViewModel(IQueryable<T> queryable) : this(queryable, 1, Pagination.DefaultPageSize) { }
 
         /// <summary>
         /// Initialize entity view model.
@@ -46,7 +45,7 @@ namespace System.ComponentModel
         /// <param name="queryable">Queryable of entity.</param>
         /// <param name="page">Current page.</param>
         /// <param name="size">Current page size.</param>
-        public EntityViewModel(IQueryable<TEntity> queryable, int page, int size)
+        public EntityViewModel(IQueryable<T> queryable, int page, int size)
         {
             if (queryable == null)
                 throw new ArgumentNullException("queryable");
@@ -58,7 +57,7 @@ namespace System.ComponentModel
             ItemButtons = new IEntityViewButton[0];
             CurrentSize = size;
             PageSizeOption = Pagination.DefaultPageSizeOption;
-            Metadata = EntityDescriptor.GetMetadata<TEntity>();
+            Metadata = EntityDescriptor.GetMetadata<T>();
             Queryable = queryable;
             //UpdateTotalPage();
             //SetPage(page);
@@ -117,7 +116,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the items of current page.
         /// </summary>
-        public TEntity[] Items { get { return (TEntity[])GetValue(); } set { SetValue(value); } }
+        public T[] Items { get { return (T[])GetValue(); } set { SetValue(value); } }
 
         IEntity[] IEntityViewModel.Items { get { return Items.Cast<IEntity>().ToArray(); } }
 
@@ -184,7 +183,7 @@ namespace System.ComponentModel
 
         public Task UpdateItemsAsync()
         {
-            return Queryable.Skip((CurrentPage - 1) * CurrentSize).Take(CurrentSize).ToArrayAsync().ContinueWith(new Action<Task<TEntity[]>>(t =>
+            return Linq.Queryable.Skip<T>(Queryable, (int)((CurrentPage - 1) * CurrentSize)).Take(CurrentSize).ToArrayAsync().ContinueWith((Action<Task<T[]>>)new Action<Task<T[]>>((Task<T[]> t) =>
             {
                 Items = t.Result;
             }));

@@ -86,18 +86,17 @@ namespace System.ComponentModel
     /// <summary>
     /// Entity view model interface.
     /// </summary>
-    /// <typeparam name="TEntity">Type of entity.</typeparam>
-    public interface IEntityViewModel<out TEntity> : IEntityViewModel
-        where TEntity : IEntity
+    /// <typeparam name="T">Type of model.</typeparam>
+    public interface IEntityViewModel<out T> : IEntityViewModel
     {
         /// <summary>
         /// Get the queryable object of entity.
         /// </summary>
-        IQueryable<TEntity> Queryable { get; }
+        IQueryable<T> Queryable { get; }
 
         /// <summary>
         /// Get the items of current page.
         /// </summary>
-        new TEntity[] Items { get; }
+        new T[] Items { get; }
     }
 }
