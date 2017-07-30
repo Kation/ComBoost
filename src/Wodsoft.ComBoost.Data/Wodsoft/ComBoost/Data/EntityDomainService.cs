@@ -44,10 +44,11 @@ namespace Wodsoft.ComBoost.Data
             {
                 queryable = context.Include(queryable, propertyMetadata.ClrName);
             }
-            queryable = context.Order(queryable);
             var e = new EntityQueryEventArgs<T>(queryable);
             await RaiseAsyncEvent(EntityQueryEvent, e);
             queryable = e.Queryable;
+            if (!e.IsOrdered)
+                queryable = context.Order(queryable);
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
             EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
