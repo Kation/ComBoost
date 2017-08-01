@@ -61,6 +61,8 @@ namespace Wodsoft.ComBoost.Forum
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IDomainServiceAccessor, DomainServiceAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddSingleton<ICacheProvider, MemoryCacheProvider>();
+            services.AddSingleton<ISerializerProvider, AspNetCore.JsonSerializerProvider>();
             services.AddScoped<IStorageProvider, PhysicalStorageProvider>(t =>
             {
                 return new PhysicalStorageProvider(PhysicalStorageOptions.CreateDefault(_Env.ContentRootPath + System.IO.Path.DirectorySeparatorChar + "Uploads"));
