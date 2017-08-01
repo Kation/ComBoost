@@ -80,7 +80,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             var infrastructure = entry.GetInfrastructure();
             var key = infrastructure.GetCurrentValue(property);
             if (key == null)
-                return null;
+                return Task.FromResult(result);
             var context = this.GetWrappedContext<TResult>();
             return context.GetAsync(key);
         }
