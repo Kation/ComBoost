@@ -1,6 +1,6 @@
 {
   "title": "Wodsoft.ComBoost.Core",
-  "version": "3.0.0-alpha20",
+  "version": "3.0.0-alpha21",
   "authors": [ "Kation" ],
   "description": "ComBoost框架核心。",
   "packOptions": {
