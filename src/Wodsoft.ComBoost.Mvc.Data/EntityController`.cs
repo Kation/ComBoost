@@ -42,7 +42,7 @@ namespace Wodsoft.ComBoost.Mvc
         [EntityAuthorize]
         public virtual async Task<IActionResult> Index()
         {
-            var context = CreateDomainContext();
+            var context = CreateIndexContext();
             try
             {
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel<T>>(context, EntityService.List);
@@ -61,11 +61,16 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        protected virtual ControllerDomainContext CreateIndexContext()
+        {
+            return CreateDomainContext();
+        }
+
         [HttpGet]
         [EntityAuthorize]
         public virtual async Task<IActionResult> Create()
         {
-            var context = CreateDomainContext();
+            var context = CreateCreateContext();
             try
             {
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Create);
@@ -82,11 +87,16 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        protected virtual ControllerDomainContext CreateCreateContext()
+        {
+            return CreateDomainContext();
+        }
+
         [HttpGet]
         [EntityAuthorize]
         public virtual async Task<IActionResult> Edit()
         {
-            var context = CreateDomainContext();
+            var context = CreateEditContext();
             try
             {
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Edit);
@@ -107,11 +117,16 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        protected virtual ControllerDomainContext CreateEditContext()
+        {
+            return CreateDomainContext();
+        }
+
         [HttpGet]
         [EntityAuthorize]
         public virtual async Task<IActionResult> Detail()
         {
-            var context = CreateDomainContext();
+            var context = CreateDetailContext();
             try
             {
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Detail);
@@ -131,12 +146,17 @@ namespace Wodsoft.ComBoost.Mvc
                 return StatusCode(404, ex.Message);
             }
         }
+        
+        protected virtual ControllerDomainContext CreateDetailContext()
+        {
+            return CreateDomainContext();
+        }
 
         [HttpPost]
         [EntityAuthorize]
         public virtual async Task<IActionResult> Remove()
         {
-            var context = CreateDomainContext();
+            var context = CreateRemoveContext();
             try
             {
                 await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption>(context, EntityService.Remove);
@@ -152,11 +172,16 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        protected virtual ControllerDomainContext CreateRemoveContext()
+        {
+            return CreateDomainContext();
+        }
+
         [HttpPost]
         [EntityAuthorize]
         public virtual async Task<IActionResult> Update()
         {
-            var context = CreateDomainContext();
+            var context = CreateUpdateContext();
             try
             {
                 var result = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityUpdateModel<T>>(context, EntityService.Update);
@@ -181,11 +206,16 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        protected virtual ControllerDomainContext CreateUpdateContext()
+        {
+            return CreateDomainContext();
+        }
+
         [HttpGet]
         [EntityAuthorize]
         public virtual async Task<IActionResult> Selector()
         {
-            var context = CreateDomainContext();
+            var context = CreateSelectorContext();
             try
             {
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel<T>>(context, EntityService.List);
@@ -202,11 +232,16 @@ namespace Wodsoft.ComBoost.Mvc
             }
         }
 
+        protected virtual ControllerDomainContext CreateSelectorContext()
+        {
+            return CreateDomainContext();
+        }
+
         [HttpGet]
         [EntityAuthorize]
         public virtual async Task<IActionResult> MultipleSelector()
         {
-            var context = CreateDomainContext();
+            var context = CreateMultipleSelectorContext();
             try
             {
                 var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel<T>>(context, EntityService.List);
@@ -221,6 +256,11 @@ namespace Wodsoft.ComBoost.Mvc
             {
                 return StatusCode(401, ex.Message);
             }
+        }
+
+        protected virtual ControllerDomainContext CreateMultipleSelectorContext()
+        {
+            return CreateDomainContext();
         }
 
         protected virtual EntityDomainService<T> GetEntityDomainService()
