@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Wodsoft.ComBoost.Forum.Domain Class Library</Description>
+    <Authors>Kation</Authors>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <AssemblyName>Wodsoft.ComBoost.Forum.Domain</AssemblyName>
+    <PackageId>Wodsoft.ComBoost.Forum.Domain</PackageId>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <PackageTargetFallback>$(PackageTargetFallback);</PackageTargetFallback>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <ProjectReference Include="..\Wodsoft.ComBoost.Forum.Core\Wodsoft.ComBoost.Forum.Core.csproj" />
+    <ProjectReference Include="..\..\Wodsoft.ComBoost.Security\Wodsoft.ComBoost.Security.csproj" />
+    <ProjectReference Include="..\..\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.csproj" />
+    <ProjectReference Include="..\..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj" />
+  </ItemGroup>
+
+</Project>

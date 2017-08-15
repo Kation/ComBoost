@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Wodsoft.ComBoost.Forum.Core Class Library</Description>
+    <Authors>Kation</Authors>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <AssemblyName>Wodsoft.ComBoost.Forum.Core</AssemblyName>
+    <PackageId>Wodsoft.ComBoost.Forum.Core</PackageId>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <PackageTargetFallback>$(PackageTargetFallback);</PackageTargetFallback>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Wodsoft.ComBoost.Data.Core\Wodsoft.ComBoost.Data.Core.csproj" />
+  </ItemGroup>
+
+</Project>

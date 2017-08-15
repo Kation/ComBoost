@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>ComBoost框架基础。</Description>
+    <AssemblyTitle>Wodsoft.ComBoost</AssemblyTitle>
+    <VersionPrefix>3.0.0-alpha21</VersionPrefix>
+    <Authors>Kation</Authors>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <AssemblyName>Wodsoft.ComBoost</AssemblyName>
+    <PackageId>Wodsoft.ComBoost</PackageId>
+    <PackageTags>ComBoost</PackageTags>
+    <PackageReleaseNotes>Alpha测试版，请勿用于正式环境。</PackageReleaseNotes>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Kation/ComBoost</RepositoryUrl>
+    <PackageTargetFallback>$(PackageTargetFallback);</PackageTargetFallback>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.Core\Wodsoft.ComBoost.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>

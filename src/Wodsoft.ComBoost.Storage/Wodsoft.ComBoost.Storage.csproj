@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>ComBoost框架储存服务。</Description>
+    <AssemblyTitle>Wodsoft.ComBoost.Storage</AssemblyTitle>
+    <VersionPrefix>3.0.0-alpha21</VersionPrefix>
+    <Authors>Kation</Authors>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <AssemblyName>Wodsoft.ComBoost.Storage</AssemblyName>
+    <PackageId>Wodsoft.ComBoost.Storage</PackageId>
+    <PackageTags>ComBoost</PackageTags>
+    <PackageReleaseNotes>Alpha测试版，请勿用于正式环境。</PackageReleaseNotes>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Kation/ComBoost</RepositoryUrl>
+    <PackageTargetFallback>$(PackageTargetFallback);</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.Core\Wodsoft.ComBoost.Core.csproj" />
+  </ItemGroup>
+
+</Project>

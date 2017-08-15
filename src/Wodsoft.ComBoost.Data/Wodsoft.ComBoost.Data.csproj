@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>ComBoost实体模块。</Description>
+    <AssemblyTitle>Wodsoft.ComBoost.Data</AssemblyTitle>
+    <VersionPrefix>3.0.0-alpha21</VersionPrefix>
+    <Authors>Kation</Authors>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <AssemblyName>Wodsoft.ComBoost.Data</AssemblyName>
+    <PackageId>Wodsoft.ComBoost.Data</PackageId>
+    <PackageTags>ComBoost</PackageTags>
+    <PackageReleaseNotes>Alpha测试版，请勿用于正式环境。</PackageReleaseNotes>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Kation/ComBoost</RepositoryUrl>
+    <PackageTargetFallback>$(PackageTargetFallback);</PackageTargetFallback>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.Data.Core\Wodsoft.ComBoost.Data.Core.csproj" />
+    <ProjectReference Include="..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj" />
+  </ItemGroup>
+
+</Project>

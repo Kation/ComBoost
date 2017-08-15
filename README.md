@@ -18,7 +18,7 @@ ComBoost 3.0基于.Net Core框架进行开发
 包含实体领域服务。用于网站项目。
 * Wodsoft.ComBoost.Data.Core  
 包含实体领域的接口定义、基础实现与通用扩展方法等。用于实体层项目。
-* Wodsoft.ComBoost.EntityFramework
+* Wodsoft.ComBoost.EntityFramework  
 包含Entity Framework 6.x的实现。用于网站项目。
 * Wodsoft.ComBoost.EntityFrameworkCore  
 包含Entity Framework Core 1.x 的实现。用于网站项目。

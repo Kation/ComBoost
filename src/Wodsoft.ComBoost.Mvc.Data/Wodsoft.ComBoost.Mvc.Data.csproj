@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>ComBoost用于AspNetCore Mvc的实体模块。</Description>
+    <AssemblyTitle>Wodsoft.ComBoost.Mvc.Data</AssemblyTitle>
+    <VersionPrefix>3.0.0-alpha21</VersionPrefix>
+    <Authors>Kation</Authors>
+    <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
+    <AssemblyName>Wodsoft.ComBoost.Mvc.Data</AssemblyName>
+    <PackageId>Wodsoft.ComBoost.Mvc.Data</PackageId>
+    <PackageTags>ComBoost</PackageTags>
+    <PackageReleaseNotes>Alpha测试版，请勿用于正式环境。</PackageReleaseNotes>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Kation/ComBoost</RepositoryUrl>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8+wpa81</PackageTargetFallback>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.csproj" />
+    <ProjectReference Include="..\Wodsoft.ComBoost.Mvc\Wodsoft.ComBoost.Mvc.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>
