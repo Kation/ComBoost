@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Wodsoft.ComBoost.EntityFramework")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("ComBoost用于EntityFrameworkCore实现的实体模块。")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Wodsoft")]
 [assembly: AssemblyProduct("Wodsoft.ComBoost.EntityFramework")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCopyright("Copyright © Wodsoft 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

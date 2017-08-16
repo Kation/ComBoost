@@ -3,13 +3,14 @@
   <PropertyGroup>
     <Description>ComBoost框架基础。</Description>
     <AssemblyTitle>Wodsoft.ComBoost</AssemblyTitle>
-    <VersionPrefix>3.0.0-alpha21</VersionPrefix>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <Authors>Kation</Authors>
     <TargetFramework>netstandard1.3</TargetFramework>
     <AssemblyName>Wodsoft.ComBoost</AssemblyName>
     <PackageId>Wodsoft.ComBoost</PackageId>
     <PackageTags>ComBoost</PackageTags>
-    <PackageReleaseNotes>Alpha测试版，请勿用于正式环境。</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Kation/ComBoost</RepositoryUrl>
     <PackageTargetFallback>$(PackageTargetFallback);</PackageTargetFallback>

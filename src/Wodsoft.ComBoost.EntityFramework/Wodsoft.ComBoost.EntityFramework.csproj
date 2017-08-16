@@ -3,18 +3,20 @@
   <PropertyGroup>
     <Description>ComBoost用于EntityFramework实现的实体模块。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.EntityFramework</AssemblyTitle>
-    <VersionPrefix>3.0.0-alpha21</VersionPrefix>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <Authors>Kation</Authors>
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>Wodsoft.ComBoost.EntityFramework</AssemblyName>
     <PackageId>Wodsoft.ComBoost.EntityFramework</PackageId>
     <PackageTags>ComBoost</PackageTags>
-    <PackageReleaseNotes>Alpha测试版，请勿用于正式环境。</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Kation/ComBoost</RepositoryUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Copyright>Copyright © Wodsoft 2016</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

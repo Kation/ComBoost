@@ -3,19 +3,22 @@
   <PropertyGroup>
     <Description>ComBoost用于AspNet Core的领域模块。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.AspNetCore</AssemblyTitle>
-    <VersionPrefix>3.0.0-alpha21</VersionPrefix>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <Authors>Kation</Authors>
     <TargetFramework>netstandard1.3</TargetFramework>
     <AssemblyName>Wodsoft.ComBoost.AspNetCore</AssemblyName>
     <PackageId>Wodsoft.ComBoost.AspNetCore</PackageId>
     <PackageTags>ComBoost</PackageTags>
-    <PackageReleaseNotes>Alpha测试版，请勿用于正式环境。</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Kation/ComBoost</RepositoryUrl>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Copyright>Copyright © Wodsoft 2016</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
