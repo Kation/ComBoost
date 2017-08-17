@@ -14,5 +14,10 @@ namespace Wodsoft.ComBoost.Mock
                 _Cache = new Mock.MockCache();
             return _Cache;
         }
+
+        public ICache GetCache(string name)
+        {
+            throw new NotSupportedException();
+        }
     }
 }
