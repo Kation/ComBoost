@@ -25,6 +25,11 @@ namespace Wodsoft.ComBoost
                 _Cache = new MemoryCache(SerializerProvider);
             return _Cache;
         }
+
+        public ICache GetCache(string name)
+        {
+            throw new NotSupportedException();
+        }
     }
 
     public class MemoryCache : ICache
