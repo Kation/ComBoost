@@ -43,16 +43,16 @@ namespace System.ComponentModel.DataAnnotations
                 type = type.GetTypeInfo().BaseType;
             var databaseContext = validationContext.GetRequiredService<IDatabaseContext>();
             var entityContext = databaseContext.GetDynamicContext(type);
-            if (value is string && IsCaseSensitive)
+            if (value is string && !IsCaseSensitive)
                 value = ((string)value).ToLower();
             ParameterExpression parameter = Expression.Parameter(type);
             IEntityMetadata metadata = EntityDescriptor.GetMetadata(type);
             Expression left = Expression.NotEqual(Expression.Property(parameter, metadata.KeyProperty.ClrName), Expression.Constant(metadata.KeyProperty.GetValue(entity)));
             Expression right;
             if (value is string && IsCaseSensitive)
-                right = Expression.Equal(Expression.Call(Expression.Property(parameter, validationContext.MemberName), typeof(string).GetMethod("ToLower")), Expression.Constant(value));
-            else
                 right = Expression.Equal(Expression.Property(parameter, validationContext.MemberName), Expression.Constant(value));
+            else
+                right = Expression.Equal(Expression.Call(Expression.Property(parameter, validationContext.MemberName), typeof(string).GetMethod("ToLower")), Expression.Constant(value)); 
             Expression expression = Expression.And(left, right);
             expression = Expression.Lambda(typeof(Func<,>).MakeGenericType(type, typeof(bool)), expression, parameter);
             dynamic where = _QWhereMethod.MakeGenericMethod(type).Invoke(null, new[] { entityContext.Query(), expression });
