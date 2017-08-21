@@ -11,6 +11,7 @@ using Wodsoft.ComBoost.Forum.Core;
 using Wodsoft.ComBoost.Data;
 using System.ComponentModel;
 using Wodsoft.ComBoost.Forum.Entity;
+using System.Runtime.ExceptionServices;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -28,13 +29,17 @@ namespace Wodsoft.ComBoost.Forum.Controllers
                 threadResult = await threadDomain.ExecuteAsync<IEntityEditModel<Thread>>(context, "Detail");
                 ViewBag.Thread = threadResult.Item;
             }
-            catch (ArgumentException ex)
+            catch (DomainServiceException ex)
             {
-                return NotFound();
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return NotFound();
+                if (ex.InnerException is ArgumentException)
+                    return StatusCode(400, ex.InnerException.Message);
+                else if (ex.InnerException is EntityNotFoundException)
+                    return NotFound();
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
             var postDomain = DomainProvider.GetService<EntityDomainService<Post>>();
             IEntityViewModel<Post> postResult = await postDomain.ExecuteAsync<IEntityViewModel<Post>>(context, "List");
@@ -54,9 +59,17 @@ namespace Wodsoft.ComBoost.Forum.Controllers
                 var postUpdateModel = await postDomain.ExecuteAsync<IEntityUpdateModel<Post>>(context, "Update");
                 return RedirectToAction("Index", new { id = threadUpdateModel.Result.Index });
             }
-            catch (ArgumentNullException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(400, ex.Message);
+                if (ex.InnerException is ArgumentException)
+                    return StatusCode(400, ex.InnerException.Message);
+                else if (ex.InnerException is ArgumentNullException)
+                    return NotFound();
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
             catch (Exception ex)
             {
@@ -75,9 +88,17 @@ namespace Wodsoft.ComBoost.Forum.Controllers
                 threadResult = await threadDomain.ExecuteAsync<IEntityEditModel<Thread>>(context, "Detail");
                 return View(threadResult.Item);
             }
-            catch (EntityNotFoundException ex)
+            catch (DomainServiceException ex)
             {
-                return NotFound();
+                if (ex.InnerException is ArgumentException)
+                    return StatusCode(400, ex.InnerException.Message);
+                else if (ex.InnerException is ArgumentNullException)
+                    return NotFound();
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
         }
     }

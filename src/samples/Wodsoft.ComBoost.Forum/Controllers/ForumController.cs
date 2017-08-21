@@ -8,6 +8,7 @@ using Wodsoft.ComBoost.Forum.Entity;
 using Wodsoft.ComBoost.Data;
 using Wodsoft.ComBoost.Data.Entity;
 using System.ComponentModel;
+using System.Runtime.ExceptionServices;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -25,13 +26,17 @@ namespace Wodsoft.ComBoost.Forum.Controllers
                 forumResult = await forumDomain.ExecuteAsync<IEntityEditModel<Entity.Forum>>(context, "Detail");
                 ViewBag.Forum = forumResult.Item;
             }
-            catch (ArgumentException ex)
+            catch (DomainServiceException ex)
             {
-                return NotFound();
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return NotFound();
+                if (ex.InnerException is ArgumentException)
+                    return StatusCode(400, ex.InnerException.Message);
+                else if (ex.InnerException is EntityNotFoundException)
+                    return NotFound();
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
             var threadDomain = DomainProvider.GetService<EntityDomainService<Thread>>();
             IEntityViewModel<Thread> threadResult = await threadDomain.ExecuteAsync<IEntityViewModel<Thread>>(context, "List");
@@ -48,13 +53,17 @@ namespace Wodsoft.ComBoost.Forum.Controllers
                 forumResult = await forumDomain.ExecuteAsync<IEntityEditModel<Entity.Forum>>(context, "Detail");
                 ViewBag.Forum = forumResult.Item;
             }
-            catch (ArgumentException ex)
+            catch (DomainServiceException ex)
             {
-                return NotFound();
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return NotFound();
+                if (ex.InnerException is ArgumentException)
+                    return StatusCode(400, ex.InnerException.Message);
+                else if (ex.InnerException is EntityNotFoundException)
+                    return NotFound();
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
             var threadDomain = DomainProvider.GetService<EntityDomainService<Thread>>();
             IEntityEditModel<Thread> threadResult = await threadDomain.ExecuteAsync<IEntityEditModel<Thread>>(context, "Create");

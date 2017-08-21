@@ -7,6 +7,7 @@ using Wodsoft.ComBoost.Mvc;
 using Wodsoft.ComBoost.Forum.Domain;
 using Wodsoft.ComBoost.Security;
 using Wodsoft.ComBoost.Data.Entity;
+using System.Runtime.ExceptionServices;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -32,9 +33,15 @@ namespace Wodsoft.ComBoost.Forum.Controllers
             {
                 await memberDomain.ExecuteAsync<IAuthenticationProvider, string, string>(context, memberDomain.SignIn);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(401, ex.Message);
+                if (ex.InnerException is UnauthorizedAccessException)
+                    return StatusCode(401, ex.InnerException.Message);
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
             return StatusCode(200);
         }
@@ -57,9 +64,15 @@ namespace Wodsoft.ComBoost.Forum.Controllers
             {
                 await memberDomain.ExecuteAsync(context, "SignUp");
             }
-            catch (ArgumentException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(400, ex.Message);
+                if (ex.InnerException is ArgumentException)
+                    return StatusCode(401, ex.InnerException.Message);
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
             return StatusCode(200);
         }
