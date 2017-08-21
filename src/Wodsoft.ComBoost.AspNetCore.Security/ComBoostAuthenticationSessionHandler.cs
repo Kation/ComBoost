@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,21 +9,30 @@ using Microsoft.AspNetCore.Http.Features.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Text.Encodings.Web;
 
 namespace Wodsoft.ComBoost.Security
 {
-    public class ComBoostAuthenticationSessionHandler : AuthenticationHandler<ComBoostAuthenticationOptions>
+    public class ComBoostAuthenticationSessionHandler : AuthenticationHandler<ComBoostAuthenticationOptions>,
+        IAuthenticationSignInHandler,
+        IAuthenticationSignOutHandler
     {
+        protected ComBoostAuthenticationSessionHandler(IOptionsMonitor<ComBoostAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        {
+        }
+
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             var ticketData = Context.Session.GetString(Options.CookieName(Context));
             if (ticketData == null)
-                return Task.FromResult(AuthenticateResult.Skip());
+                return Task.FromResult(AuthenticateResult.NoResult());
             try
             {
                 var ticket = Options.TicketDataFormat.Unprotect(ticketData, GetTlsTokenBinding());
                 if (ticket.Properties.ExpiresUtc < DateTimeOffset.Now)
-                    return Task.FromResult(AuthenticateResult.Skip());
+                    return Task.FromResult(AuthenticateResult.NoResult());
                 if (Options.AutoUpdate(Context))
                 {
                     var expireTime = Options.ExpireTime(Context);
@@ -41,17 +49,17 @@ namespace Wodsoft.ComBoost.Security
             }
         }
 
-        protected override Task HandleSignInAsync(SignInContext context)
+        public virtual Task SignInAsync(ClaimsPrincipal user, AuthenticationProperties properties)
         {
             var expireTime = Options.ExpireTime(Context);
             var expireDate = expireTime.HasValue ? (DateTimeOffset?)DateTimeOffset.Now.Add(expireTime.Value) : null;
-            var ticket = new AuthenticationTicket(context.Principal, new AuthenticationProperties() { ExpiresUtc = expireDate }, Options.AuthenticationScheme);
+            var ticket = new AuthenticationTicket(user, new AuthenticationProperties() { ExpiresUtc = expireDate }, "ComBoost");
             var ticketValue = Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding());
             Context.Session.SetString(Options.CookieName(Context), ticketValue);
             return Task.CompletedTask;
         }
 
-        protected override Task HandleSignOutAsync(SignOutContext context)
+        public virtual Task SignOutAsync(AuthenticationProperties properties)
         {
             Context.Session.Remove(Options.CookieName(Context));
             return Task.CompletedTask;

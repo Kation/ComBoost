@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace Wodsoft.ComBoost.Security
         {
             var authentication = Context.User as ComBoostPrincipal;
             if (authentication == null)
-                throw new NotSupportedException("当前环境找不到身份验证对象。");
+                return new ComBoostAnonymousPrincipal();
             return authentication;
         }
 
@@ -48,12 +49,12 @@ namespace Wodsoft.ComBoost.Security
             identity.AddClaim(new Claim(ClaimTypes.Name, permission.Name));
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, permission.Identity));
             principal.AddIdentity(identity);
-            return Context.Authentication.SignInAsync("ComBoost", principal);
+            return Context.SignInAsync("ComBoost", principal);
         }
 
         public Task SignOutAsync()
         {
-            return Context.Authentication.SignOutAsync("ComBoost");
+            return Context.SignOutAsync("ComBoost");
         }
     }
 }

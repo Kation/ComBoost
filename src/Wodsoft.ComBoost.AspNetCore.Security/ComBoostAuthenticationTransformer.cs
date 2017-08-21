@@ -8,14 +8,20 @@ using System.Security.Claims;
 
 namespace Wodsoft.ComBoost.Security
 {
-    public class ComBoostAuthenticationTransformer : IClaimsTransformer
+    public class ComBoostAuthenticationTransformer : IClaimsTransformation
     {
-        public Task<ClaimsPrincipal> TransformAsync(ClaimsTransformationContext context)
+        public ComBoostAuthenticationTransformer(ISecurityProvider securityProvider)
         {
-            var securityProvider = context.Context.RequestServices.GetRequiredService<ISecurityProvider>();
-            ClaimsPrincipal principal = new ComBoostPrincipal(securityProvider);
-            principal.AddIdentities(context.Principal.Identities);
-            return Task.FromResult(principal);
+            SecurityProvider = securityProvider ?? throw new ArgumentNullException(nameof(securityProvider));
+        }
+
+        public ISecurityProvider SecurityProvider { get; private set; }
+
+        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+        {
+            ClaimsPrincipal newPrincipal = new ComBoostPrincipal(SecurityProvider);
+            newPrincipal.AddIdentities(principal.Identities);
+            return Task.FromResult(newPrincipal);
         }
     }
 }

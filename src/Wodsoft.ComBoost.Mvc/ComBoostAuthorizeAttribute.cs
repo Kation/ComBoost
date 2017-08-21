@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.Features.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Wodsoft.ComBoost.Mvc
 {
@@ -39,7 +40,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         protected virtual RedirectResult GetLoginUrl(FilterContext context)
         {
-            var options = context.HttpContext.RequestServices.GetRequiredService<ComBoostAuthenticationOptions>();
+            var options = context.HttpContext.RequestServices.GetRequiredService<IOptionsMonitor<ComBoostAuthenticationOptions>>().Get("ComBoost");
             var loginUrl = options.LoginPath(context.HttpContext);
             loginUrl = context.HttpContext.Request.PathBase.Add(loginUrl);
             if (loginUrl.Contains("?"))

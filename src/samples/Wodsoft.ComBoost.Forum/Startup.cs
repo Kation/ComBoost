@@ -49,10 +49,10 @@ namespace Wodsoft.ComBoost.Forum
             {
                 options.AddComBoostMvcDataOptions();
             });
-            services.AddComBoostMvcAuthentication();
+            services.AddComBoostMvcAuthentication<ComBoostAuthenticationCookieHandler>();
 
             services.AddScoped<DbContext, DataContext>(serviceProvider =>
-                new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase()
+                new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase("Test")
                 //new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlServer(Configuration.GetConnectionString("DataContext"))
                 .Options));
             services.AddScoped<IDatabaseContext, DatabaseContext>();
@@ -87,21 +87,19 @@ namespace Wodsoft.ComBoost.Forum
 
             if (env.IsDevelopment())
             {
-                app.UseBrowserLink();
+                //app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            
-            app.UseComBoost();
 
             app.UseStaticFiles();
 
             app.UseSession();
-
-            //app.UseComBoostAuthentication();
+            
+            app.UseComBoost();
 
             app.UseComBoostMvc(routes =>
             {
