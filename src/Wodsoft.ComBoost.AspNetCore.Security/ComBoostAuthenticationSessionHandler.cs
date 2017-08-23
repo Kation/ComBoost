@@ -19,7 +19,7 @@ namespace Wodsoft.ComBoost.Security
         IAuthenticationSignInHandler,
         IAuthenticationSignOutHandler
     {
-        protected ComBoostAuthenticationSessionHandler(IOptionsMonitor<ComBoostAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        public ComBoostAuthenticationSessionHandler(IOptionsMonitor<ComBoostAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
         }
 
