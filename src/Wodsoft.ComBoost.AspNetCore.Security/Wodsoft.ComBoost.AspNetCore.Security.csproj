@@ -1,24 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <Description>ComBoost用于AspNet Core的安全模块。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.AspNetCore.Security</AssemblyTitle>
-    <VersionPrefix>3.0.0</VersionPrefix>
-    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-    <Authors>Kation</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Wodsoft.ComBoost.AspNetCore.Security</AssemblyName>
-    <PackageId>Wodsoft.ComBoost.AspNetCore.Security</PackageId>
-    <PackageTags>ComBoost</PackageTags>
-    <PackageReleaseNotes></PackageReleaseNotes>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/Kation/ComBoost</RepositoryUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Copyright>Copyright © Wodsoft 2016</Copyright>
     <RootNamespace>Wodsoft.ComBoost.Security</RootNamespace>
   </PropertyGroup>
+  <Import Project="../../common.props" />
 
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Security\Wodsoft.ComBoost.Security.csproj" />

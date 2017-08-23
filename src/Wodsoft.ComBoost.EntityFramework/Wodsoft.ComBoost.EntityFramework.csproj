@@ -1,23 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <Description>ComBoost用于EntityFramework实现的实体模块。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.EntityFramework</AssemblyTitle>
-    <VersionPrefix>3.0.0</VersionPrefix>
-    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-    <Authors>Kation</Authors>
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>Wodsoft.ComBoost.EntityFramework</AssemblyName>
-    <PackageId>Wodsoft.ComBoost.EntityFramework</PackageId>
-    <PackageTags>ComBoost</PackageTags>
-    <PackageReleaseNotes></PackageReleaseNotes>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/Kation/ComBoost</RepositoryUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Copyright>Copyright © Wodsoft 2016</Copyright>
+    <RootNamespace>Wodsoft.ComBoost.Data.Entity</RootNamespace>
   </PropertyGroup>
+  <Import Project="../../common.props" />
 
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Data.Core\Wodsoft.ComBoost.Data.Core.csproj" />
@@ -26,11 +18,6 @@
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.1.3" />
     <PackageReference Include="System.Interactive.Async" Version="3.1.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
 </Project>
