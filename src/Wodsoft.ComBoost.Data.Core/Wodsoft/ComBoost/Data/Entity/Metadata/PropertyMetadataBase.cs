@@ -232,7 +232,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             if (authentication == null)
                 throw new ArgumentNullException("authentication");
             AllowAnonymous = authentication.AllowAnonymous;
-            EditRoles = new ReadOnlyCollection<object>(authentication.AddRolesRequired);
+            AddRoles = new ReadOnlyCollection<object>(authentication.AddRolesRequired);
             EditRoles = new ReadOnlyCollection<object>(authentication.EditRolesRequired);
             ViewRoles = new ReadOnlyCollection<object>(authentication.ViewRolesRequired);
             AuthenticationRequiredMode = authentication.Mode;
