@@ -84,7 +84,11 @@ namespace Wodsoft.ComBoost.Security
             IAuthentication authentication = principal as IAuthentication;
             if (authentication == null)
                 return false;
-            return authentication.IsInRole(role);
+            if (!principal.Identity.IsAuthenticated)
+                return false;
+            if (authentication.IsInStaticRole(role))
+                return true;
+            return authentication.IsInDynamicRole(role);
 
         }
     }

@@ -7,8 +7,10 @@ namespace Wodsoft.ComBoost.Security
 {
     public interface IAuthentication : System.Security.Principal.IPrincipal
     {
-        bool IsInRole(object role);
+        bool IsInStaticRole(object role);
 
+        bool IsInDynamicRole(object role);
+        
         T GetUser<T>() where T : class;
 
         Task<T> GetUserAsync<T>() where T : class;

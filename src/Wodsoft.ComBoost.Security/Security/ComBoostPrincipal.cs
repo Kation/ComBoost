@@ -54,16 +54,7 @@ namespace Wodsoft.ComBoost.Security
             string id = FindFirst(t => t.Type == ClaimTypes.NameIdentifier).Value;
             return SecurityProvider.GetPermissionAsync(id).Result.IsInRole(role);
         }
-
-        public bool IsInRole(object role)
-        {
-            if (!Identity.IsAuthenticated)
-                return false;
-            if (IsInStaticRole(role))
-                return true;
-            return IsInDynamicRole(role);
-        }
-
+        
         public string GetUserId()
         {
             return FindFirst(t => t.Type == ClaimTypes.NameIdentifier)?.Value;
