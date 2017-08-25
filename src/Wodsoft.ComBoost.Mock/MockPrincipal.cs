@@ -56,6 +56,26 @@ namespace Wodsoft.ComBoost.Mock
             return false;
         }
 
+        public bool IsInStaticRole(object role)
+        {
+            if (UserId != null)
+            {
+                var permission = SecurityProvider.GetPermissionAsync(UserId).Result;
+                return permission.IsInRole(role);
+            }
+            return false;
+        }
+
+        public bool IsInDynamicRole(object role)
+        {
+            if (UserId != null)
+            {
+                var permission = SecurityProvider.GetPermissionAsync(UserId).Result;
+                return permission.IsInRole(role);
+            }
+            return false;
+        }
+
         public string GetUserId()
         {
             return UserId;

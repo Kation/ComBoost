@@ -30,12 +30,22 @@ namespace Wodsoft.ComBoost.Security
             return null;
         }
 
+        public bool IsInDynamicRole(object role)
+        {
+            return false;
+        }
+
         public bool IsInRole(object role)
         {
             return false;
         }
 
         public bool IsInRole(string role)
+        {
+            return false;
+        }
+
+        public bool IsInStaticRole(object role)
         {
             return false;
         }
