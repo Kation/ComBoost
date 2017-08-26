@@ -48,6 +48,7 @@ namespace Wodsoft.ComBoost.AspNetCore
             var text = JsonConvert.SerializeObject(value, Type, Settings);
             var writer = new StreamWriter(stream);
             writer.Write(text);
+            writer.Close();
         }
     }
 }
