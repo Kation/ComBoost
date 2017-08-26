@@ -56,7 +56,7 @@ namespace Wodsoft.ComBoost
             {
                 var from = t.GetCustomAttribute<FromAttribute>();
                 if (from == null)
-                    throw new NotSupportedException(string.Format("不能解析的参数，{0}的{1}。", _Method.DeclaringType.FullName, _Method.Name));
+                    throw new NotSupportedException(string.Format("不能解析的参数，{0}的{1}。", _Method.DeclaringType.FullName, t.Name));
                 var value = from.GetValue(this, t);
                 if (value == null && t.HasDefaultValue)
                     value = t.DefaultValue;
