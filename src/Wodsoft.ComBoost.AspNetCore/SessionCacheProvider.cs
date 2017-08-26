@@ -82,7 +82,7 @@ namespace Wodsoft.ComBoost.AspNetCore
                 throw new ArgumentNullException(nameof(value));
             var type = typeof(CacheItem<>).MakeGenericType(value.GetType());
             dynamic item = Activator.CreateInstance(type);
-            item.Value = value;
+            type.GetProperty("Value").SetValue(item, value);
             if (expireTime.HasValue)
                 item.ExpiredDate = DateTime.Now.Add(expireTime.Value);
             var stream = new MemoryStream();
