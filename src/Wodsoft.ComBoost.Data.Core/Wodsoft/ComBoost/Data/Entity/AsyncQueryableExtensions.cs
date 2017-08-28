@@ -401,7 +401,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
             Type type = source.GetType();
-            if (type.GetGenericTypeDefinition() == typeof(WrappedQueryable<,>))
+            if (source is IWrappedQueryable)
             {
                 var args = type.GetGenericArguments();
                 var method = UnwrapMethod.MakeGenericMethod(args);

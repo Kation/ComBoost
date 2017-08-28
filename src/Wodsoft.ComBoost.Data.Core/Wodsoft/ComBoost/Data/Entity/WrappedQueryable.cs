@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class WrappedQueryable<T, M> : IQueryable<T>
+    public class WrappedQueryable<T, M> : IQueryable<T>, IWrappedQueryable
         where T : IEntity
         where M : IEntity, T
     {
@@ -25,7 +25,6 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public Expression Expression { get; private set; }
 
-
         public WrappedQueryableProvider<T, M> Provider { get; private set; }
 
         System.Linq.IQueryProvider IQueryable.Provider { get { return Provider; } }
@@ -40,4 +39,16 @@ namespace Wodsoft.ComBoost.Data.Entity
             return new WrappedEnumerator<T, M>(Provider.InnerQueryProvider.CreateQuery<M>(Expression).GetEnumerator());
         }
     }
+
+    public class WrappedOrderedQueryable<T, M> : WrappedQueryable<T, M>, IOrderedQueryable<T>
+        where T : IEntity
+        where M : IEntity, T
+    {
+        public WrappedOrderedQueryable(WrappedQueryableProvider<T, M> provider, Expression expression)
+            : base(provider, expression)
+        {
+        }
+    }
+
+    internal interface IWrappedQueryable { }
 }
