@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Wodsoft.ComBoost
 {
     /// <summary>
-    /// 领域服务筛选器特性。
+    /// 领域服务过滤器特性。
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     public abstract class DomainServiceFilterAttribute : Attribute, IDomainServiceFilter

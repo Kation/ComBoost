@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Wodsoft.ComBoost
 {
     /// <summary>
-    /// 领域服务筛选器。
+    /// 领域服务过滤器。
     /// </summary>
     public interface IDomainServiceFilter
     {
