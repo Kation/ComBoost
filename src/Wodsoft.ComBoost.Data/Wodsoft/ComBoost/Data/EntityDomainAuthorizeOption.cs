@@ -20,7 +20,7 @@ namespace Wodsoft.ComBoost.Data
         public virtual void Validate(IEntityMetadata metadata, IAuthentication authentication)
         {
             if (!metadata.AllowAnonymous && !authentication.Identity.IsAuthenticated)
-                throw new UnauthorizedAccessException("未登录。");
+                throw new DomainServiceException(new UnauthorizedAccessException("未登录。"));
         }
 
         public virtual IEnumerable<IPropertyMetadata> GetProperties(IEntityMetadata metadata, IAuthentication authentication)
@@ -58,12 +58,12 @@ namespace Wodsoft.ComBoost.Data
             if (metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
             {
                 if (EntityRolesSelector(metadata).Any(t => !authentication.IsInRole(t)))
-                    throw new UnauthorizedAccessException("权限不足。");
+                    throw new DomainServiceException(new UnauthorizedAccessException("权限不足。"));
             }
             else
             {
                 if (EntityRolesSelector(metadata).All(t => !authentication.IsInRole(t)))
-                    throw new UnauthorizedAccessException("权限不足。");
+                    throw new DomainServiceException(new UnauthorizedAccessException("权限不足。"));
             }
         }
 
