@@ -44,7 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
-            services.AddSingleton<IClaimsTransformation, ComBoostAuthenticationTransformer>();
+            services.AddScoped<IClaimsTransformation, ComBoostAuthenticationTransformer>();
             var builder = services.AddAuthentication(o =>
             {
                 o.DefaultAuthenticateScheme = "ComBoost";
