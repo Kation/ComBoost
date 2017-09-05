@@ -39,15 +39,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         public void Add(T item)
         {
             item.OnCreateCompleted();
-            foreach (var nav in Database.InnerContext.Model.FindEntityType(typeof(T)).GetNavigations())
-            {
-                var entity = nav.GetGetter().GetClrValue(item) as IEntity;
-                if (entity == null)
-                    continue;
-                var entry = Database.InnerContext.Entry(entity);
-                if (entry.State == EntityState.Detached && !entity.IsNewCreated)
-                    entry.State = EntityState.Unchanged;
-            }
             DbSet.Add(item);
         }
 
@@ -61,7 +52,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         public T Create()
         {
             var item = new T();
-            //item.EntityContext = this;
             item.OnCreating();
             return item;
         }
