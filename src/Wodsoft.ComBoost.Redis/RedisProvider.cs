@@ -8,25 +8,29 @@ namespace Wodsoft.ComBoost.Redis
 {
     public class RedisProvider : ICacheProvider, ISemaphoreProvider
     {
-        private ConnectionMultiplexer _Conn;
         private ISerializerProvider _SerializerProvider;
 
-        public RedisProvider(string connectionAddress, ISerializerProvider serializerProvider)
+        public RedisProvider(string connectionAddress, ISerializerProvider serializerProvider, int database = -1)
         {
             if (connectionAddress == null)
                 throw new ArgumentNullException(nameof(connectionAddress));
             if (serializerProvider == null)
                 throw new ArgumentNullException(nameof(serializerProvider));
-            _Conn = ConnectionMultiplexer.Connect(connectionAddress);
+            Connection = ConnectionMultiplexer.Connect(connectionAddress);
             _SerializerProvider = serializerProvider;
             LockerTimeout = TimeSpan.FromMinutes(15);
+            Datbase = database;
         }
 
         public TimeSpan LockerTimeout { get; set; }
 
+        public ConnectionMultiplexer Connection { get; private set; }
+
+        public int Database { get; private set; }
+
         public ICache GetCache()
         {
-            return new RedisCache(_Conn.GetDatabase(), _SerializerProvider);
+            return new RedisCache(Connection.GetDatabase(Database), _SerializerProvider);
         }
 
         public ICache GetCache(string name)
