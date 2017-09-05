@@ -19,7 +19,7 @@ namespace Wodsoft.ComBoost.Redis
             Connection = ConnectionMultiplexer.Connect(connectionAddress);
             _SerializerProvider = serializerProvider;
             LockerTimeout = TimeSpan.FromMinutes(15);
-            Datbase = database;
+            Database = database;
         }
 
         public TimeSpan LockerTimeout { get; set; }
@@ -40,7 +40,7 @@ namespace Wodsoft.ComBoost.Redis
 
         public ISemaphore GetSemaphore(string name)
         {
-            return new RedisSemaphore(_Conn.GetDatabase(), name, LockerTimeout);
+            return new RedisSemaphore(Connection.GetDatabase(), name, LockerTimeout);
         }
     }
 }
