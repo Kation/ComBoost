@@ -8,7 +8,7 @@
     if (Model.Metadata.ClrType.GetTypeInfo().GetCustomAttribute<FlagsAttribute>() == null)
     {
         var field = enumType.GetField(Enum.GetName(enumType, Model.Value));
-        var name = field.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? field.Name;
+        var name = field.GetCustomAttribute<DisplayAttribute>()?.Name ?? field.Name;
         <span>@name</span>
     }
     else
@@ -16,7 +16,7 @@
         var items = Enum.GetNames(enumType).Select(t =>
         {
             var field = enumType.GetField(t);
-            var name = field.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? t;
+            var name = field.GetCustomAttribute<DisplayAttribute>()?.Name ?? t;
             var value = (int)field.GetValue(null);
             return new { Name = name, Value = value };
         }).ToArray();
