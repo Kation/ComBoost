@@ -31,7 +31,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public void AddRange(IEnumerable<T> items)
         {
-            InnerContext.AddRange((IEnumerable<M>)items);
+            InnerContext.AddRange(items.Cast<M>());
         }
 
         public Task<int> CountAsync(IQueryable<T> query)
@@ -72,7 +72,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public void RemoveRange(IEnumerable<T> items)
         {
-            InnerContext.RemoveRange((IEnumerable<M>)items);
+            InnerContext.RemoveRange(items.Cast<M>());
         }
 
         public async Task<T> SingleAsync(IQueryable<T> query)
@@ -102,7 +102,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public void UpdateRange(IEnumerable<T> items)
         {
-            InnerContext.UpdateRange((IEnumerable<M>)items);
+            InnerContext.UpdateRange(items.Cast<M>());
         }
 
         public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
