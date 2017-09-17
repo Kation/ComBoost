@@ -60,29 +60,31 @@ namespace Wodsoft.ComBoost.Data.Entity
             return context;
         }
 
-        Task<TResult> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
+        async Task<TResult> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
             if (expression == null)
                 throw new ArgumentNullException(nameof(expression));
-            TResult result = expression.Compile()(entity);
-            if (result != null)
-                return Task.FromResult(result);
             string propertyName = GetPropertyName(expression);
             var entry = InnerContext.Entry((object)entity);
-            var foreignKey = entry.Metadata.FindNavigation(propertyName).ForeignKey;
-            IPropertyBase property;
-            if (foreignKey.DeclaringEntityType.ClrType != entry.Metadata.ClrType)
-                property = entry.Metadata.FindNavigation(propertyName).ForeignKey.PrincipalKey.Properties[0];
-            else
-                property = entry.Metadata.FindNavigation(propertyName).ForeignKey.Properties[0];
-            var infrastructure = entry.GetInfrastructure();
-            var key = infrastructure.GetCurrentValue(property);
-            if (key == null)
-                return Task.FromResult(result);
-            var context = this.GetWrappedContext<TResult>();
-            return context.GetAsync(key);
+            var reference = entry.Reference(propertyName);
+            if (!reference.IsLoaded)
+                await reference.LoadAsync();
+            TResult result = expression.Compile()(entity);
+            return result;
+            //var foreignKey = entry.Metadata.FindNavigation(propertyName).ForeignKey;
+            //IPropertyBase property;
+            //if (foreignKey.DeclaringEntityType.ClrType != entry.Metadata.ClrType)
+            //    property = entry.Metadata.FindNavigation(propertyName).ForeignKey.PrincipalKey.Properties[0];
+            //else
+            //    property = entry.Metadata.FindNavigation(propertyName).ForeignKey.Properties[0];
+            //var infrastructure = entry.GetInfrastructure();
+            //var key = infrastructure.GetCurrentValue(property);
+            //if (key == null)
+            //    return result;
+            //var context = this.GetWrappedContext<TResult>();
+            //result = await context.GetAsync(key);
         }
 
         async Task<IQueryableCollection<TResult>> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
