@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Wodsoft.ComBoost
 {
-    public class DomainContext : IDomainContext
+    public abstract class DomainContext : IDomainContext
     {
         private IServiceProvider _ServiceProvider;
 

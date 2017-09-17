@@ -62,7 +62,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             if (typeof(IEntity).IsAssignableFrom(node.Expression.Type) && node.Expression.Type.GetTypeInfo().IsInterface)
             {
-                var type = EntityDescriptor.GetMetadata(node.Expression.Type).Type;
+                Type type;
+                if (node.Expression.Type == _T)
+                    type = _M;
+                else
+                    type = EntityDescriptor.GetMetadata(node.Expression.Type).Type;
                 return Expression.MakeMemberAccess(Visit(node.Expression), type.GetMember(node.Member.Name, BindingFlags.Instance | BindingFlags.Public)[0]);
             }
             else if (node.Expression is ConstantExpression && node.Expression.Type.Name.Contains("<>"))
