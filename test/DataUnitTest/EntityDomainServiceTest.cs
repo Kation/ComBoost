@@ -39,7 +39,7 @@ namespace DataUnitTest
                 MockController controller = new MockController(sp);
                 var model = await controller.ExecuteAsync<EntityDomainService<User>, IEntityEditModel<User>>(context =>
                 {
-                    context.ValueProvider.SetValue("id", id);
+                    context.ValueProvider.SetValue("Index", id);
                 }, "Detail");
                 Assert.Equal(username, model.Item.Username);
             });

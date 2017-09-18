@@ -16,10 +16,9 @@ namespace DataUnitTest
         public async Task AddAndRemoveTest()
         {
             UnitTestEnvironment env = new UnitTestEnvironment();
-            using (var scope = env.GetServiceScope())
+            await env.Run(async sp =>
             {
-                var serviceProvider = scope.ServiceProvider;
-                var database = serviceProvider.GetService<IDatabaseContext>();
+                var database = sp.GetService<IDatabaseContext>();
                 var categoryContext = database.GetWrappedContext<ICategory>();
                 var userContext = database.GetWrappedContext<IUser>();
                 Assert.Equal(0, await categoryContext.CountAsync(categoryContext.Query()));
@@ -38,7 +37,7 @@ namespace DataUnitTest
 
                 user = await userContext.GetAsync(user.Index);
                 Assert.NotNull(user);
-            }
+            });
         }
     }
 }
