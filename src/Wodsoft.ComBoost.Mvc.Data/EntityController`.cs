@@ -279,5 +279,12 @@ namespace Wodsoft.ComBoost.Mvc
                 return true;
             return json < html;
         }
+
+        protected override ControllerDomainContext CreateDomainContext()
+        {
+            var context = base.CreateDomainContext();
+            context.ValueProvider.SetAlias("id", "index");
+            return context;
+        }
     }
 }

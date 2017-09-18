@@ -113,7 +113,7 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
-            object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
+            object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
             var auth = authenticationProvider.GetAuthentication();
             if (authorizeOption == null)
                 authorizeOption = EntityDomainAuthorizeOption.Edit;
@@ -141,7 +141,7 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task<IEntityUpdateModel<T>> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
-            object index = valueProvider.GetValue("id", Metadata.KeyProperty.ClrType);
+            object index = valueProvider.GetValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
             var context = database.GetContext<T>();
             bool isNew = index == null || (Metadata.KeyProperty.ClrType.GetTypeInfo().IsValueType ? index.Equals(Activator.CreateInstance(Metadata.KeyProperty.ClrType)) : false);
             var auth = authenticationProvider.GetAuthentication();
@@ -254,7 +254,7 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task Remove([FromService] IDatabaseContext database, [FromService]IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
-            object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
+            object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
             var auth = authenticationProvider.GetAuthentication();
             if (authorizeOption == null)
                 authorizeOption = EntityDomainAuthorizeOption.Remove;
@@ -276,7 +276,7 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
-            object index = valueProvider.GetRequiredValue("id", Metadata.KeyProperty.ClrType);
+            object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
             var auth = authenticationProvider.GetAuthentication();
             if (authorizeOption == null)
                 authorizeOption = EntityDomainAuthorizeOption.Detail;

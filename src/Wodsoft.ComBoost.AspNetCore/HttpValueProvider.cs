@@ -10,15 +10,17 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
-    public class HttpValueProvider : IValueProvider
+    public class HttpValueProvider : IConfigurableValueProvider
     {
         private Dictionary<string, object> _Values;
+        private Dictionary<string, string> _Alias;
 
         public HttpValueProvider(HttpContext httpContext)
         {
             if (httpContext == null)
                 throw new ArgumentNullException(nameof(httpContext));
             _Values = new Dictionary<string, object>();
+            _Alias = new Dictionary<string, string>();
             ValueSelectors = new List<HttpValueSelector>();
             HttpContext = httpContext;
             IgnoreCase = true;
@@ -42,13 +44,13 @@ namespace Wodsoft.ComBoost.AspNetCore
         public bool IgnoreCase { get; set; }
 
         private ReadOnlyCollection<string> _Keys;
-        public ICollection<string> Keys
+        public IReadOnlyCollection<string> Keys
         {
             get
             {
                 if (_Keys == null)
                 {
-                    var keys = ValueSelectors.SelectMany(t => t.GetKeys()).Concat(_Values.Keys);
+                    var keys = ValueSelectors.SelectMany(t => t.GetKeys()).Concat(_Values.Keys).Concat(_Alias.Keys);
                     if (IgnoreCase)
                         keys = keys.Select(t => t.ToLower());
                     _Keys = new ReadOnlyCollection<string>(keys.Distinct().ToList());
@@ -70,6 +72,16 @@ namespace Wodsoft.ComBoost.AspNetCore
                 throw new ArgumentNullException(nameof(name));
             if (valueType == null)
                 throw new ArgumentNullException(nameof(valueType));
+            if (IgnoreCase)
+            {
+                if (_Alias.TryGetValue(name.ToLower(), out string aliasName))
+                    name = aliasName;
+            }
+            else
+            {
+                if (_Alias.TryGetValue(name, out string aliasName))
+                    name = aliasName;
+            }
             object value = GetValueCore(name, valueType);
             if (value == null || !valueType.IsAssignableFrom(value.GetType()))
                 return null;
@@ -137,6 +149,24 @@ namespace Wodsoft.ComBoost.AspNetCore
                 _Values[name] = value;
             else
                 _Values.Add(name, value);
+            _Keys = null;
+        }
+
+        /// <summary>
+        /// 设置别名。
+        /// </summary>
+        /// <param name="name">名称。</param>
+        /// <param name="aliasName">别名。</param>
+        public void SetAlias(string name, string aliasName)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            if (aliasName == null)
+                throw new ArgumentNullException(nameof(aliasName));
+            if (IgnoreCase)
+                _Alias[aliasName.ToLower()] = name.ToLower();
+            else
+                _Alias[aliasName] = name;
             _Keys = null;
         }
     }

@@ -18,10 +18,5 @@ namespace Wodsoft.ComBoost.Mock
         {
             valueProvider.SetValue("$request", stream);            
         }
-
-        public static void SetRequestUri(this MockValueProvider valueProvider, Uri uri)
-        {
-            valueProvider.SetValue(uri);
-        }
     }
 }

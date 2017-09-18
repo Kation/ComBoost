@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -7,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Mock
 {
-    public class MockValueProvider : IValueProvider
+    public class MockValueProvider : IConfigurableValueProvider
     {
         private Dictionary<string, object> _Values;
-        private Dictionary<Type, object> _TypeValues;
+        private Dictionary<string, string> _Alias;
 
         public MockValueProvider()
         {
             _Values = new Dictionary<string, object>();
-            _TypeValues = new Dictionary<Type, object>();
+            _Alias = new Dictionary<string, string>();
         }
 
         public void SetValue(string key, object value)
@@ -25,39 +26,31 @@ namespace Wodsoft.ComBoost.Mock
                 _Values.Remove(key);
                 return;
             }
-            if (_Values.ContainsKey(key))                
+            if (_Values.ContainsKey(key))
                 _Values[key] = value;
             else
                 _Values.Add(key, value);
         }
 
-        public void SetValue<T>(T value)
-        {
-            Type type = typeof(T);
-            if (value == null)
-            {
-                _TypeValues.Remove(type);
-                return;
-            }
-            if (_TypeValues.ContainsKey(type))
-                _TypeValues[type] = value;
-            else
-                _TypeValues.Add(type, value);
-        }
 
-        public ICollection<string> Keys { get { return _Values.Keys; } }
+        private ReadOnlyCollection<string> _Keys;
+        public IReadOnlyCollection<string> Keys
+        {
+            get
+            {
+                if (_Keys == null)
+                {
+                    var keys = _Values.Keys.Concat(_Alias.Keys);
+                    _Keys = new ReadOnlyCollection<string>(keys.Distinct().ToList());
+                }
+                return _Keys;
+            }
+        }
 
         public object GetValue(string name)
         {
             if (_Values.ContainsKey(name))
                 return _Values[name];
-            return null;
-        }
-
-        public object GetValue(Type valueType)
-        {
-            if (_TypeValues.ContainsKey(valueType))
-                return _TypeValues[valueType];
             return null;
         }
 
@@ -77,6 +70,15 @@ namespace Wodsoft.ComBoost.Mock
         public bool ContainsKey(string name)
         {
             return _Values.ContainsKey(name);
+        }
+
+        public void SetAlias(string name, string aliasName)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            if (aliasName == null)
+                throw new ArgumentNullException(nameof(aliasName));
+            _Alias[aliasName] = name;
         }
     }
 }
