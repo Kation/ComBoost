@@ -18,11 +18,7 @@ namespace Wodsoft.ComBoost.AspNetCore
 
         public Task Invoke(HttpContext httpContext)
         {
-            if (SynchronizationContext.Current == null)
-            {
-                var context = new SynchronizationContext();
-                SynchronizationContext.SetSynchronizationContext(context);
-            }
+            RequestScope.Current = new RequestScope();
             return _Next(httpContext);
         }
     }
@@ -35,7 +31,7 @@ namespace Microsoft.AspNetCore.Builder
         public static void UseComBoost(this IApplicationBuilder app)
         {
             if (app == null)
-                throw new ArgumentNullException(nameof(app));            
+                throw new ArgumentNullException(nameof(app));
             app.UseMiddleware<Wodsoft.ComBoost.AspNetCore.ComBoostMiddleware>();
         }
     }

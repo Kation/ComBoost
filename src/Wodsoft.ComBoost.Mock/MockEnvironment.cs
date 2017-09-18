@@ -44,6 +44,7 @@ namespace Wodsoft.ComBoost.Mock
         {
             using (var scope = GetServiceScope())
             {
+                RequestScope.Current = new RequestScope();
                 await action(scope.ServiceProvider);
             }
         }
