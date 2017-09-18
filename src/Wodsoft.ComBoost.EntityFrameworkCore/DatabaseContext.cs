@@ -67,7 +67,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             var entry = InnerContext.Entry((object)entity);
             var reference = entry.Reference(propertyName);
             if (!reference.IsLoaded)
+            {
+                if (entry.State == EntityState.Detached)
+                    entry.State = EntityState.Unchanged;
                 await reference.LoadAsync();
+            }
             TResult result = expression.Compile()(entity);
             return result;
         }
