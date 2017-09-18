@@ -26,14 +26,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         public DbContext InnerContext { get; private set; }
 
         public IEnumerable<Type> SupportTypes { get; private set; }
-
+        
         public DatabaseContext(DbContext context)
         {
-            var executionContext = System.Threading.ExecutionContext.Capture();
             DatabaseContextAccessor.Context = this;
             AsyncQueryableExtensions.Context = AsyncQueryable.Default;
-            //AsyncQueryableExtensions.Context = AsyncQueryable.Default;
-            //context.GetService<CurrentDatabaseContext>().Context = this;
             _CachedEntityContext = new Dictionary<Type, object>();
             InnerContext = context;
             context.ChangeTracker.AutoDetectChangesEnabled = false;
@@ -86,6 +83,8 @@ namespace Wodsoft.ComBoost.Data.Entity
             var reference = entry.Collection(propertyName);
             var property = entry.Metadata.FindNavigation(propertyName);
             var context = this.GetWrappedContext<TResult>();
+            if (entry.State == EntityState.Detached)
+                entry.State = EntityState.Unchanged;
             var queryable = (IQueryable<TResult>)reference.Query();
             var count = await queryable.CountAsync();
             return new ComBoostEntityCollection<TResult>(entry, context, property, queryable, count);

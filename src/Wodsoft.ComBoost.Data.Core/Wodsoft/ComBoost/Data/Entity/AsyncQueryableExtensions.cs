@@ -10,33 +10,13 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public static class AsyncQueryableExtensions
     {
-        private static AsyncLocal<ContextEntry> _Context = new AsyncLocal<ContextEntry>(e =>
-        {
-            if (e.ThreadContextChanged)
-            {
-                var context = SynchronizationContext.Current;
-                if (e.PreviousValue != null && context == e.PreviousValue.Context)
-                    _Context.Value = e.PreviousValue;
-            }
-        });
         public static IAsyncQueryable Context
         {
-            get { return _Context.Value?.Value; }
+            get { return RequestScope.Current.Get<IAsyncQueryable>("__IAsyncQueryable"); }
             set
             {
-                _Context.Value = new ContextEntry
-                {
-                    Value = value,
-                    Context = SynchronizationContext.Current
-                };
+                RequestScope.Current["__IAsyncQueryable"] = value;
             }
-        }
-
-        private class ContextEntry
-        {
-            public IAsyncQueryable Value;
-
-            public SynchronizationContext Context;
         }
 
         public static Task<bool> AllAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))

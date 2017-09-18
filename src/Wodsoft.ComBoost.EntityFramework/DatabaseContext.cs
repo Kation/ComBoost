@@ -31,7 +31,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             AsyncQueryableExtensions.Context = AsyncQueryable.Default;
             DatabaseContextAccessor.Context = this;
             _CachedEntityContext = new Dictionary<Type, object>();
-            //((IObjectContextAdapter)context).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
             InnerContext = context;
             context.Configuration.AutoDetectChangesEnabled = false;
             SupportTypes = _CachedSupportTypes.GetOrAdd(context.GetType(), type =>
