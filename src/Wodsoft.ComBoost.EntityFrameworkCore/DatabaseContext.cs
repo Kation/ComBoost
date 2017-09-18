@@ -73,18 +73,6 @@ namespace Wodsoft.ComBoost.Data.Entity
                 await reference.LoadAsync();
             TResult result = expression.Compile()(entity);
             return result;
-            //var foreignKey = entry.Metadata.FindNavigation(propertyName).ForeignKey;
-            //IPropertyBase property;
-            //if (foreignKey.DeclaringEntityType.ClrType != entry.Metadata.ClrType)
-            //    property = entry.Metadata.FindNavigation(propertyName).ForeignKey.PrincipalKey.Properties[0];
-            //else
-            //    property = entry.Metadata.FindNavigation(propertyName).ForeignKey.Properties[0];
-            //var infrastructure = entry.GetInfrastructure();
-            //var key = infrastructure.GetCurrentValue(property);
-            //if (key == null)
-            //    return result;
-            //var context = this.GetWrappedContext<TResult>();
-            //result = await context.GetAsync(key);
         }
 
         async Task<IQueryableCollection<TResult>> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
@@ -95,27 +83,11 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new ArgumentNullException(nameof(expression));
             string propertyName = GetPropertyName(expression);
             var entry = InnerContext.Entry((object)entity);
+            var reference = entry.Collection(propertyName);
             var property = entry.Metadata.FindNavigation(propertyName);
-            var inverseProperty = property.FindInverse();
-            var parameterExpression = Expression.Parameter(typeof(TResult));
-            Expression propertyExpression = Expression.Property(parameterExpression, inverseProperty.Name);
-            if (inverseProperty.IsCollection())
-            {
-                var whereP = Expression.Parameter(typeof(TSource));
-                var equalE = Expression.Equal(Expression.Property(whereP, "Index"), Expression.Constant(entity.Index));
-                var lambdaE = Expression.Lambda<Func<TSource, bool>>(equalE, whereP);
-                propertyExpression = Expression.Call(typeof(Queryable).GetMethod("Any", new Type[] { typeof(IQueryable<TSource>), typeof(Expression<Func<TSource, bool>>) }), propertyExpression, lambdaE);
-            }
-            else
-                propertyExpression = Expression.Property(propertyExpression, "Index");
-            var equalExpression = Expression.Equal(propertyExpression, Expression.Constant(entity.Index));
-            var lambdaExpression = Expression.Lambda<Func<TResult, bool>>(equalExpression, parameterExpression);
-
-            //entry.GetInfrastructure().AddToCollectionSnapshot()
-
             var context = this.GetWrappedContext<TResult>();
-            var queryable = context.Query().Where(lambdaExpression);
-            var count = await context.CountAsync(queryable);
+            var queryable = (IQueryable<TResult>)reference.Query();
+            var count = await queryable.CountAsync();
             return new ComBoostEntityCollection<TResult>(entry, context, property, queryable, count);
         }
 

@@ -43,23 +43,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             });
         }
 
-        //private void ObjectContext_ObjectMaterialized(object sender, System.Data.Entity.Core.Objects.ObjectMaterializedEventArgs e)
-        //{
-        //    IEntity entity = e.Entity as IEntity;
-        //    if (entity == null)
-        //        return;
-        //    object context;
-        //    Type type = e.Entity.GetType();
-        //    if (_CachedEntityContext.ContainsKey(type))
-        //        context = _CachedEntityContext[type];
-        //    else
-        //    {
-        //        context = this.GetDynamicContext(type);
-        //        _CachedEntityContext.Add(type, context);
-        //    }
-        //    entity.EntityContext = (IEntityQueryContext<IEntity>)context;
-        //}
-
         public Task<int> SaveAsync()
         {
             return InnerContext.SaveChangesAsync();
@@ -80,16 +63,11 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new ArgumentNullException(nameof(entity));
             if (expression == null)
                 throw new ArgumentNullException(nameof(expression));
-            //TResult result = expression.Compile()(entity);
-            //if (result != null)
-            //    return result;
             string propertyName = GetPropertyName(expression);
             var entry = InnerContext.Entry((object)entity);
             var property = entry.Reference(propertyName);
-            if (property.IsLoaded)
-                return (TResult)property.CurrentValue;
-            //var infrastructure = entry.GetInfrastructure();
-            await property.LoadAsync();
+            if (!property.IsLoaded)
+                await property.LoadAsync();
             return (TResult)property.CurrentValue;
         }
 
@@ -103,7 +81,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             var entry = InnerContext.Entry((object)entity);
             var property = entry.Collection(propertyName);
             IQueryable<TResult> queryable = (IQueryable<TResult>)property.Query();
-
             var context = this.GetWrappedContext<TResult>();
             var count = await context.CountAsync(queryable);
             return new ComBoostEntityCollection<TResult>(entry, context, property, queryable, count);
