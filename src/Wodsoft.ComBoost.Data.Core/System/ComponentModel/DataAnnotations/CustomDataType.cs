@@ -6,88 +6,88 @@ using System.Text;
 namespace System.ComponentModel.DataAnnotations
 {
     /// <summary>
-    /// Custom data type.
+    /// 自定义数据类型。
     /// </summary>
     public enum CustomDataType
     {
         /// <summary>
-        /// Default.
+        /// 默认。
         /// </summary>
         Default = 0,
         /// <summary>
-        /// Date and time.
+        /// 日期与时间。
         /// </summary>
         DateTime = 1,
         /// <summary>
-        /// Date only.
+        /// 仅日期。
         /// </summary>
         Date = 2,
         /// <summary>
-        /// Time only(Timespan).
+        /// 仅时间（Timespan）。
         /// </summary>
         Time = 3,
         /// <summary>
-        /// Sex.
+        /// 性别。
         /// </summary>
-        Sex = 4,
+        Gender = 4,
         /// <summary>
-        /// Phone number.
+        /// 电话号码。
         /// </summary>
         PhoneNumber = 5,
         /// <summary>
-        /// Currency.
+        /// 货币。
         /// </summary>
         Currency = 6,
         /// <summary>
-        /// Single-line text.
+        /// 单行文本。
         /// </summary>
         Text = 7,
         /// <summary>
-        /// Html content.
+        /// Html内容。
         /// </summary>
         Html = 8,
         /// <summary>
-        /// Multiline text.
+        /// 多行文本。
         /// </summary>
         MultilineText = 9,
         /// <summary>
-        /// Email address.
+        /// 电子邮箱地址。
         /// </summary>
         EmailAddress = 10,
         /// <summary>
-        /// Password.
+        /// 密码。
         /// </summary>
         Password = 11,
         /// <summary>
-        /// Url address.
+        /// Url地址。
         /// </summary>
         Url = 12,
         /// <summary>
-        /// Image url address.
+        /// 图片地址。
         /// </summary>
         ImageUrl = 13,
         /// <summary>
-        /// Boolean.
+        /// 是否。
         /// </summary>
         Boolean = 14,
         /// <summary>
-        /// Integer.
+        /// 整数。
         /// </summary>
         Integer = 15,
         /// <summary>
-        /// Number.
+        /// 数字。
         /// </summary>
         Number = 16,
         /// <summary>
-        /// Image data.
+        /// 图片。
         /// </summary>
         Image = 17,
         /// <summary>
-        /// File data.
+        /// 文件。
         /// </summary>
         File = 18,
         /// <summary>
-        /// Define in Custom property.
+        /// 其它自定义类型。
         /// </summary>
         Other = 19,
     }

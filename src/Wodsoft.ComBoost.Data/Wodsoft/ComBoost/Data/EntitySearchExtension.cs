@@ -82,7 +82,7 @@ namespace Wodsoft.ComBoost.Data
                         }
                         break;
                     case CustomDataType.Boolean:
-                    case CustomDataType.Sex:
+                    case CustomDataType.Gender:
                         if (options[0] == "")
                         {
                             bool result;
