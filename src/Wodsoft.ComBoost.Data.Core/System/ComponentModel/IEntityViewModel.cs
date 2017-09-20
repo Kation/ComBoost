@@ -9,14 +9,14 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 namespace System.ComponentModel
 {
     /// <summary>
-    /// Entity view model interface.
+    /// 实体视图模型接口。
     /// </summary>
-    public interface IEntityViewModel : IPagination
+    public interface IEntityViewModel : IViewModel
     {
         /// <summary>
         /// Get the items of current page.
         /// </summary>
-        IEntity[] Items { get; }
+        new IEntity[] Items { get; }
 
         /// <summary>
         /// Get the metadata of entity.
@@ -27,17 +27,7 @@ namespace System.ComponentModel
         /// Get the viewlist headers.
         /// </summary>
         IEnumerable<IPropertyMetadata> Properties { get; }
-
-        /// <summary>
-        /// Get the view buttons.
-        /// </summary>
-        IViewButton[] ViewButtons { get; }
-
-        /// <summary>
-        /// Get the item buttons.
-        /// </summary>
-        IEntityViewButton[] ItemButtons { get; }
-
+        
         /// <summary>
         /// Get the parent models.
         /// </summary>
@@ -47,56 +37,27 @@ namespace System.ComponentModel
         /// Get the search items.
         /// </summary>
         EntitySearchItem[] SearchItem { get; }
-
-        /// <summary>
-        /// Set the current page.
-        /// </summary>
-        /// <param name="page">Page to navigate.</param>
-        void SetPage(int page);
         
-        /// <summary>
-        /// Set the items per page.
-        /// </summary>
-        /// <param name="size">A number that how many items show on page.</param>
-        void SetSize(int size);
-
         /// <summary>
         /// Update total page.
         /// </summary>
         [Obsolete("请使用UpdateTotalPageAsync。")]
         void UpdateTotalPage();
-
-        /// <summary>
-        /// Update total page.
-        /// </summary>
-        Task UpdateTotalPageAsync();
-
+        
         /// <summary>
         /// Update items of current page.
         /// </summary>
         [Obsolete("请使用UpdateItemsAsync。")]
-        void UpdateItems();
-
-        /// <summary>
-        /// Update items of current page.
-        /// </summary>
-        Task UpdateItemsAsync();
+        void UpdateItems();        
     }
 
     /// <summary>
-    /// Entity view model interface.
+    /// 实体视图模型接口。
     /// </summary>
-    /// <typeparam name="T">Type of model.</typeparam>
-    public interface IEntityViewModel<out T> : IEntityViewModel
+    /// <typeparam name="T">实体类型。</typeparam>
+    public interface IEntityViewModel<out T> : IEntityViewModel, IViewModel<T>
+        where T : class, IEntity, new()
     {
-        /// <summary>
-        /// Get the queryable object of entity.
-        /// </summary>
-        IQueryable<T> Queryable { get; }
 
-        /// <summary>
-        /// Get the items of current page.
-        /// </summary>
-        new T[] Items { get; }
     }
 }

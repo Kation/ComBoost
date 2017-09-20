@@ -13,19 +13,15 @@ namespace Wodsoft.ComBoost.Mvc
     /// Mvc item button.
     /// Use for mvc viewlist page.
     /// </summary>
-    public class EntityViewButton : ViewButton, IEntityViewButton
+    public class ItemButton : ViewButton, IItemButton
     {
         /// <summary>
         /// Get or set the link delegate.
         /// </summary>
         public MvcEntityItemButtonLinkDelegate GetLink { get; set; }
-        
-        /// <summary>
-        /// Set the target of button.
-        /// </summary>
-        /// <param name="provider">Service provider.</param>
-        /// <param name="entity">Dependency entity.</param>
-        public void SetTarget(IServiceProvider provider, IEntity entity)
+
+        /// <inheritdoc />
+        public void SetTarget(IServiceProvider provider, object item)
         {            
             if (GetLink == null)
                 return;
@@ -33,7 +29,7 @@ namespace Wodsoft.ComBoost.Mvc
                 throw new NotSupportedException();
             var accessor = provider.GetService<Microsoft.AspNetCore.Mvc.Infrastructure.IActionContextAccessor>();
             var urlHelper = provider.GetService<Microsoft.AspNetCore.Mvc.Routing.IUrlHelperFactory>().GetUrlHelper(accessor.ActionContext);
-            Target = GetLink(urlHelper, entity);
+            Target = GetLink(urlHelper, item);
         }
         
         void IViewButton.SetTarget(IServiceProvider provider)
@@ -46,7 +42,7 @@ namespace Wodsoft.ComBoost.Mvc
     /// Mvc entity button link delegate.
     /// </summary>
     /// <param name="url">Mvc url helper.</param>
-    /// <param name="entity">Dependency entity.</param>
+    /// <param name="item">Dependency entity.</param>
     /// <returns>Return url link.</returns>
-    public delegate string MvcEntityItemButtonLinkDelegate(IUrlHelper url, IEntity entity);
+    public delegate string MvcEntityItemButtonLinkDelegate(IUrlHelper url, object item);
 }

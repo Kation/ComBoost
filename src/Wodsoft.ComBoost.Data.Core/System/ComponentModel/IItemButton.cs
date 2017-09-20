@@ -8,15 +8,15 @@ using Wodsoft.ComBoost.Data.Entity;
 namespace System.ComponentModel
 {
     /// <summary>
-    /// Entity viewlist button.
+    /// 内容项按钮。
     /// </summary>
-    public interface IEntityViewButton : IViewButton
+    public interface IItemButton : IViewButton
     {
         /// <summary>
         /// Set the target of button.
         /// </summary>
         /// <param name="provider">Service provider.</param>
-        /// <param name="entity">Dependency entity.</param>
-        void SetTarget(IServiceProvider provider, IEntity entity);
+        /// <param name="item">Dependency entity.</param>
+        void SetTarget(IServiceProvider provider, object item);
     }
 }
