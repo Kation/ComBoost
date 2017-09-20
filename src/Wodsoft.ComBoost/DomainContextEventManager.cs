@@ -8,9 +8,16 @@ namespace Wodsoft.ComBoost
     public class DomainContextEventManager : DomainServiceEventManager
     {
         private Dictionary<DomainServiceEventRoute, Delegate> _Events;
+        private DomainServiceEventManager _Parent;
         public DomainContextEventManager()
         {
             _Events = new Dictionary<DomainServiceEventRoute, Delegate>();
+        }
+
+        public DomainContextEventManager(DomainServiceEventManager parentManager)
+            : this()
+        {
+            _Parent = parentManager;
         }
 
         public override void RegisterEventRoute(DomainServiceEventRoute route)
@@ -37,25 +44,29 @@ namespace Wodsoft.ComBoost
         public override void RaiseEvent(DomainServiceEventRoute route, IDomainExecutionContext context)
         {
             base.RaiseEvent(route, context);
-            DomainContextEventManager.GlobalEventManager.RaiseEvent(route, context);
+            if (_Parent != null)
+                _Parent.RaiseEvent(route, context);
         }
 
         public override void RaiseEvent<T>(DomainServiceEventRoute route, IDomainExecutionContext context, T eventArgs)
         {
             base.RaiseEvent<T>(route, context, eventArgs);
-            DomainContextEventManager.GlobalEventManager.RaiseEvent(route, context, eventArgs);
+            if (_Parent != null)
+                _Parent.RaiseEvent(route, context, eventArgs);
         }
 
         public override async Task RaiseAsyncEvent(DomainServiceEventRoute route, IDomainExecutionContext context)
         {
             await base.RaiseAsyncEvent(route, context);
-            await DomainContextEventManager.GlobalEventManager.RaiseAsyncEvent(route, context);
+            if (_Parent != null)
+                await _Parent.RaiseAsyncEvent(route, context);
         }
 
         public override async Task RaiseAsyncEvent<T>(DomainServiceEventRoute route, IDomainExecutionContext context, T eventArgs)
         {
             await base.RaiseAsyncEvent<T>(route, context, eventArgs);
-            await DomainContextEventManager.GlobalEventManager.RaiseAsyncEvent(route, context, eventArgs);
+            if (_Parent != null)
+                await _Parent.RaiseAsyncEvent(route, context, eventArgs);
         }
     }
 }
