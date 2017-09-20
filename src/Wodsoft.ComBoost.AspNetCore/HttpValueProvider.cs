@@ -72,17 +72,9 @@ namespace Wodsoft.ComBoost.AspNetCore
                 throw new ArgumentNullException(nameof(name));
             if (valueType == null)
                 throw new ArgumentNullException(nameof(valueType));
-            if (IgnoreCase)
-            {
-                if (_Alias.TryGetValue(name.ToLower(), out string aliasName))
-                    name = aliasName;
-            }
-            else
-            {
-                if (_Alias.TryGetValue(name, out string aliasName))
-                    name = aliasName;
-            }
             object value = GetValueCore(name, valueType);
+            if (value == null && _Alias.TryGetValue(IgnoreCase ? name.ToLower() : name, out string alias))
+                value = GetValueCore(alias, valueType);
             if (value == null || !valueType.IsAssignableFrom(value.GetType()))
                 return null;
             return value;

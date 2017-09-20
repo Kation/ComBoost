@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost
             }
         }
 
-        public virtual object GetValue(string name)
+        protected virtual object GetValue(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -64,9 +64,15 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(name));
             if (valueType == null)
                 throw new ArgumentNullException(nameof(valueType));
-            if (_Alias.TryGetValue(name, out string aliasName))
-                name = aliasName;
+            
             object value = GetValue(name);
+            if (value == null)
+            {
+                if (!_Alias.TryGetValue(name, out string aliasName))
+                    return null;
+                name = aliasName;
+                value = GetValue(name);
+            }
             if (value == null)
                 return null;
             if (!valueType.IsAssignableFrom(value.GetType()))

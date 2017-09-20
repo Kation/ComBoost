@@ -11,12 +11,10 @@ namespace Wodsoft.ComBoost.Mock
     public class MockValueProvider : EmptyValueProvider
     {
         private Dictionary<string, object> _Values;
-        private Dictionary<string, string> _Alias;
 
         public MockValueProvider()
         {
             _Values = new Dictionary<string, object>();
-            _Alias = new Dictionary<string, string>();
             IgnoreCase = false;
         }
 
@@ -38,7 +36,7 @@ namespace Wodsoft.ComBoost.Mock
             }
         }
 
-        public override object GetValue(string name)
+        protected override object GetValue(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
