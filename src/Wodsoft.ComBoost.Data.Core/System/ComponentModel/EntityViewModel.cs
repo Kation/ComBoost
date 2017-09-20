@@ -50,9 +50,7 @@ namespace System.ComponentModel
         /// Get or set the search items.
         /// </summary>
         public EntitySearchItem[] SearchItem { get; set; }
-        
-        IEntity[] IEntityViewModel.Items { get { return Items; } }
-        
+                
         /// <summary>
         /// Update total page.
         /// </summary>

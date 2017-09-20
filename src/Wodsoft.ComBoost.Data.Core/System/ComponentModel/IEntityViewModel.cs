@@ -14,11 +14,6 @@ namespace System.ComponentModel
     public interface IEntityViewModel : IViewModel
     {
         /// <summary>
-        /// Get the items of current page.
-        /// </summary>
-        new IEntity[] Items { get; }
-
-        /// <summary>
         /// Get the metadata of entity.
         /// </summary>
         IEntityMetadata Metadata { get; }
