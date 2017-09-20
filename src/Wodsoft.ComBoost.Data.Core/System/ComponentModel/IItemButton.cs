@@ -13,10 +13,10 @@ namespace System.ComponentModel
     public interface IItemButton : IViewButton
     {
         /// <summary>
-        /// Set the target of button.
+        /// 设置目标按钮。
         /// </summary>
-        /// <param name="provider">Service provider.</param>
-        /// <param name="item">Dependency entity.</param>
+        /// <param name="provider">服务提供器。</param>
+        /// <param name="item">目标项。</param>
         void SetTarget(IServiceProvider provider, object item);
     }
 }

@@ -52,13 +52,13 @@ namespace Wodsoft.ComBoost.Data
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
             EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
+            await model.UpdateTotalPageAsync();
             if (pagerOption != null)
             {
                 model.CurrentSize = pagerOption.CurrentSize;
                 model.CurrentPage = pagerOption.CurrentPage;
                 model.PageSizeOption = pagerOption.PageSizeOption;
             }
-            await model.UpdateTotalPageAsync();
             await model.UpdateItemsAsync();
             return model;
         }
@@ -66,7 +66,8 @@ namespace Wodsoft.ComBoost.Data
         public static readonly DomainServiceEventRoute EntityQueryEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityQueryEventArgs<T>>("EntityQuery", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityQueryEventArgs<T>> EntityQuery { add { AddAsyncEventHandler(EntityQueryEvent, value); } remove { RemoveAsyncEventHandler(EntityQueryEvent, value); } }
 
-        public virtual async Task<IEntityViewModel<TViewModel>> ListViewModel<TViewModel>([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption, [FromOptions(true)]EntityQuerySelectOption<T, TViewModel> selectOption)
+        public virtual async Task<IViewModel<TViewModel>> ListViewModel<TViewModel>([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption, [FromOptions(true)]EntityQuerySelectOption<T, TViewModel> selectOption)
+            where TViewModel : class
         {
             var auth = authenticationProvider.GetAuthentication();
             if (authorizeOption == null)
@@ -78,7 +79,8 @@ namespace Wodsoft.ComBoost.Data
             await RaiseAsyncEvent(EntityQueryEvent, e);
             queryable = e.Queryable;
             var convertQueryable = selectOption.Select(queryable);
-            EntityViewModel<TViewModel> model = new EntityViewModel<TViewModel>(convertQueryable);
+            ViewModel<TViewModel> model = new ViewModel<TViewModel>(convertQueryable);
+            await model.UpdateTotalPageAsync();
             EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
             if (pagerOption != null)
             {
@@ -86,7 +88,6 @@ namespace Wodsoft.ComBoost.Data
                 model.CurrentPage = pagerOption.CurrentPage;
                 model.PageSizeOption = pagerOption.PageSizeOption;
             }
-            await model.UpdateTotalPageAsync();
             await model.UpdateItemsAsync();
             return model;
         }
