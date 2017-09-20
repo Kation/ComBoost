@@ -89,7 +89,7 @@
                             </tr>
                         </thead>
                         <tbody id="listview">
-                            @foreach (var item in Model.Items)
+                            @foreach (IEntity item in Model.Items)
                             {
                                 <tr data-id="@item.Index" data-remove="@item.IsRemoveAllowed" data-edit="@item.IsEditAllowed" @Html.Raw(string.Join(" ", Model.ItemButtons.Where(t => { t.SetTarget(Context.RequestServices, item); return t.Target != null; }).Select(t => " data-b-" + Array.IndexOf(Model.ItemButtons, t) + "=\" " + t.Target.ToString() + "\" ")))>
                                     <td class="text-center">
