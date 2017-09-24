@@ -33,16 +33,35 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IEntityMetadata Metadata { get; private set; }
 
+        protected void SetUnchangeProperties(T item)
+        {
+            var entry = Database.InnerContext.Entry(item);
+            foreach (var property in Metadata.Properties.Where(t => typeof(IEntity).IsAssignableFrom(t.ClrType)))
+            {
+                var reference = entry.Reference(property.ClrName);
+                if (reference.CurrentValue != null)
+                {
+                    var target = Database.InnerContext.Entry(reference.CurrentValue);
+                    if (target.State == EntityState.Detached)
+                        target.State = EntityState.Unchanged;
+                }
+            }
+        }
+
         public void Add(T item)
         {
             item.OnCreateCompleted();
+            SetUnchangeProperties(item);
             DbSet.Add(item);
         }
 
         public void AddRange(IEnumerable<T> items)
         {
             foreach (var item in items)
+            {
                 item.OnCreateCompleted();
+                SetUnchangeProperties(item);
+            }
             DbSet.AddRange(items);
         }
 
@@ -82,18 +101,14 @@ namespace Wodsoft.ComBoost.Data.Entity
         public void Update(T item)
         {
             item.OnEditCompleted();
-            DbSet.Attach(item);
+            SetUnchangeProperties(item);
             Database.InnerContext.Entry(item).State = EntityState.Modified;
         }
 
         public void UpdateRange(IEnumerable<T> items)
         {
             foreach (var item in items)
-            {
-                item.OnEditCompleted();
-                DbSet.Attach(item);
-                Database.InnerContext.Entry(item).State = EntityState.Modified;
-            }
+                Update(item);
         }
 
         public Task<T> SingleOrDefaultAsync(IQueryable<T> query)

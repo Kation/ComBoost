@@ -36,16 +36,29 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IEntityMetadata Metadata { get; private set; }
 
+        protected void SetUnchangeProperties(T item)
+        {
+            foreach (var reference in Database.InnerContext.Entry(item).References)
+            {
+                if (reference.CurrentValue != null && reference.TargetEntry.State == EntityState.Detached)
+                    reference.TargetEntry.State = EntityState.Unchanged;
+            }
+        }
+
         public void Add(T item)
         {
             item.OnCreateCompleted();
+            SetUnchangeProperties(item);
             DbSet.Add(item);
         }
 
         public void AddRange(IEnumerable<T> items)
         {
             foreach (var item in items)
+            {
                 item.OnCreateCompleted();
+                SetUnchangeProperties(item);
+            }
             DbSet.AddRange(items);
         }
 
@@ -84,13 +97,17 @@ namespace Wodsoft.ComBoost.Data.Entity
         public void Update(T item)
         {
             item.OnEditCompleted();
+            SetUnchangeProperties(item);
             DbSet.Update(item);
         }
 
         public void UpdateRange(IEnumerable<T> items)
         {
             foreach (var item in items)
+            {
                 item.OnEditCompleted();
+                SetUnchangeProperties(item);
+            }
             DbSet.UpdateRange(items);
         }
 
