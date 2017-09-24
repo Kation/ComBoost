@@ -32,6 +32,29 @@ namespace DataUnitTest
                 await database.SaveAsync();
                 Assert.Equal(0, await categoryContext.CountAsync(categoryContext.Query()));
             });
+            await env.Run(async sp =>
+            {
+                var database = sp.GetService<IDatabaseContext>();
+                var categoryContext = database.GetContext<Category>();
+                Assert.Equal(0, await categoryContext.CountAsync(categoryContext.Query()));
+                var category = categoryContext.Create();
+                category.Name = "Parent";
+                categoryContext.Add(category);
+                await database.SaveAsync();
+            });
+            await env.Run(async sp =>
+            {
+                var database = sp.GetService<IDatabaseContext>();
+                var categoryContext = database.GetContext<Category>();
+                Assert.Equal(1, await categoryContext.CountAsync(categoryContext.Query()));
+                var parent = await categoryContext.Query().FirstOrDefaultAsync(t => t.Name == "Parent");
+                var category = categoryContext.Create();
+                category.Name = "Test";
+                category.Parent = parent;
+                categoryContext.Add(category);
+                await database.SaveAsync();
+                Assert.Equal(2, await categoryContext.CountAsync(categoryContext.Query()));
+            });
         }
 
         [Fact]

@@ -11,6 +11,10 @@ namespace DataUnitTest
         public virtual string Name { get; set; }
 
         public virtual ICollection<User> Users { get; set; }
+
+        public Guid? ParentId { get; set; }
+        private Category _Parent;
+        public virtual Category Parent { get { return _Parent; } set { _Parent = value; ParentId = value?.Index; } }
         
         ICollection<IUser> ICategory.Users
         {
