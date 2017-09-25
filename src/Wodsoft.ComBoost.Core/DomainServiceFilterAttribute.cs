@@ -37,7 +37,7 @@ namespace Wodsoft.ComBoost
         /// <param name="context">领域执行上下文。</param>
         /// <param name="exception">异常内容。</param>
         /// <returns>异步任务。</returns>
-        public Task OnExceptionThrowingAsync(IDomainExecutionContext context, Exception exception)
+        public virtual Task OnExceptionThrowingAsync(IDomainExecutionContext context, Exception exception)
         {
             return Task.CompletedTask;
         }
