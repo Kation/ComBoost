@@ -1,0 +1,120 @@
+﻿@model IEntityViewModel<Post>
+@{
+    Thread thread = ViewBag.Thread;
+    ViewBag.Title = thread.Title + " - " + thread.Forum.Name;
+    var replies = await thread.LoadAsync(t => t.Replies);
+}
+<link href="~/lib/editor.md/css/editormd.css" rel="stylesheet" />
+<style>
+    .postTable tr > td:first-child {
+        width: 160px;
+        background-color: rgb(242,242,242);
+    }
+
+    .postTable tr td:first-child {
+        border-bottom: 4px solid rgb(228,228,228);
+    }
+
+    .postTable tr td {
+        border-bottom: 4px solid rgb(242,242,242);
+    }
+
+    .postTable .postTitle {
+        border-bottom: 1px solid rgb(242,242,242);
+        padding: 2px 7px 7px 7px;
+    }
+</style>
+<ol class="breadcrumb">
+    <li><a asp-controller="Home" asp-action="Index">论坛</a></li>
+    <li><a href="@Html.Raw(Url.Action("Index", "Forum", new { id = thread.Forum.Index }))">@thread.Forum.Name</a></li>
+    <li class="active">@thread.Title</li>
+</ol>
+<table class="table postTable">
+    <thead>
+        <tr>
+            <td class="text-center" style="vertical-align: middle;">
+                <small>回复：@replies.Count | 查看：0</small>
+            </td>
+            <td>
+                <strong style="font-size: 20px; padding-left: 7px;">@thread.Title</strong>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>
+                    <div class="postTitle">
+                        @item.Member.Username
+                    </div>
+                </td>
+                <td>
+                    <div class="postTitle">
+                        <small>发表于 @(item.CreateDate.ToString("yyyy-MM-dd HH:mm:ss"))</small>
+                    </div>
+                    <div class="postContent" id="C_@item.Index">
+                        <textarea style="display: none">@Html.Raw(item.Content)</textarea>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="row">
+    <div class="col-xs-8">
+        <a class="btn btn-info" href="@Html.Raw(Url.Action("Index", "Forum", new { id = thread.Forum.Index }))">回复</a>
+    </div>
+    <div class="col-xs-4 text-right">
+        <a class="btn btn-default" href="@Html.Raw(Url.Action("Index", "Forum", new { id = thread.Forum.Index }))"><span class="glyphicon glyphicon-triangle-left"></span> 返回列表</a>
+    </div>
+</div>
+@if (User.Identity.IsAuthenticated)
+{
+    <br />
+    <table class="table" style="border-top: 4px solid rgb(242,242,242);">
+        <tr>
+            <td style="width: 160px; background-color: rgb(242,242,242);"></td>
+            <td>
+                <form action="@Html.Raw(Url.Action("Create", "Post"))" method="post">
+                    <input type="hidden" name="Thread" value="@thread.Index" />
+                    <input type="hidden" name="id" value="@Guid.Empty" />
+                    <div id="content">
+                        <textarea class="form-control" name="content" style="display:none;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-info">发表回复</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+}
+@section scripts{
+    <script src="~/lib/editor.md/lib/marked.min.js"></script>
+    <script src="~/lib/editor.md/lib/prettify.min.js"></script>
+    <script src="~/lib/editor.md/lib/raphael.min.js"></script>
+    <script src="~/lib/editor.md/lib/underscore.min.js"></script>
+    <script src="~/lib/editor.md/lib/sequence-diagram.min.js"></script>
+    <script src="~/lib/editor.md/lib/flowchart.min.js"></script>
+    <script src="~/lib/editor.md/lib/jquery.flowchart.min.js"></script>
+    <script src="~/lib/editor.md/src/editormd.js"></script>
+    <script type="text/javascript">
+        $('.postContent').each(function (index, element) {
+            editormd.markdownToHTML($(element).attr('id'), {
+                htmlDecode: "style,script,iframe",  // you can filter tags decode
+            }).find("textarea").remove();;
+        });
+    </script>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script type="text/javascript">
+            $(function () {
+                var editor = editormd("content", {
+                    height: 160,
+                    path: '@Url.Content("~/lib/editor.md/lib/")',
+                    placeholder: '请输入回复内容',
+                    toolbar: false
+                });
+            });
+        </script>
+    }
+}

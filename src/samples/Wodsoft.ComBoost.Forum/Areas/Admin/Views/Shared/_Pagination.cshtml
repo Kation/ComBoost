@@ -1,0 +1,37 @@
+﻿@model IPagination
+<div class="input-group">
+    <div class="input-group-btn">
+        @if (Model.CurrentPage > 3)
+        {
+            <button type="submit" name="page" value="1" class="btn btn-default" @(Model.CurrentPage == 1 ? " disabled=\"disabled\"" : "" )>1</button>
+            if (Model.CurrentPage > 4)
+            {
+                <button type="button" class="btn btn-default disabled">.</button>
+            }
+        }
+        @for (int i = Model.CurrentPage - 2; i <= Model.CurrentPage + 2; i++)
+        {
+            if (i < 1)
+            {
+                continue;
+            }
+            if (i > Model.TotalPage)
+            {
+                break;
+            }
+            <button type="submit" name="page" value="@i" class="btn btn-default @(Model.CurrentPage == i ? "active" : "")">@i</button>
+        }
+        @if (Model.CurrentPage < Model.TotalPage - 2)
+        {
+            if (Model.CurrentPage < Model.TotalPage - 3)
+            {
+                <button type="button" class="btn btn-default disabled">.</button>
+            }
+            <button type="submit" name="page" value="1" class="btn btn-default" @(Model.CurrentPage == Model.TotalPage ? " disabled=\"disabled\"" : "" )>6</button>
+        }
+    </div>
+    <input type="text" class="form-control text-center" />
+    <span class="input-group-btn">
+        <button class="btn btn-default" type="button">跳转</button>
+    </span>
+</div>

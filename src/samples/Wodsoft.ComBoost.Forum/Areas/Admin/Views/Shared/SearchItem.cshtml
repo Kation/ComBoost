@@ -1,0 +1,32 @@
+﻿@model EntitySearchItem
+<p>
+    <a class="alert-link">@Model.Name</a>
+    @if (Model.Contains != null)
+    {
+        <span> 包含 <a class="alert-link">“@Model.Contains”</a></span>
+    }
+    @if (Model.Enum != null)
+    {
+        <span> 等于 <a class="alert-link">“@Model.Enum”</a></span>
+    }
+    @if (Model.Equal.HasValue)
+    {
+        <span> 等于 <a class="alert-link">“@Model.Equal”</a></span>
+    }
+    @if (Model.Lessthan.HasValue)
+    {
+        <span> 小于 <a class="alert-link">“@Model.Lessthan”</a></span>
+    }
+    @if (Model.LessthanDate.HasValue)
+    {
+        <span> 小于 <a class="alert-link">“@Model.LessthanDate”</a></span>
+    }
+    @if (Model.Morethan.HasValue)
+    {
+        <span> 大于 <a class="alert-link">“@Model.Morethan”</a></span>
+    }
+    @if (Model.MorethanDate.HasValue)
+    {
+        <span> 大于 <a class="alert-link">“@Model.MorethanDate”</a></span>
+    }
+</p>

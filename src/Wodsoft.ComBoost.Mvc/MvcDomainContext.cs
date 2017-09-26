@@ -3,45 +3,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
+using Wodsoft.ComBoost.AspNetCore;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class MvcDomainContext : DomainContext
+    public abstract class MvcDomainContext : HttpDomainContext
     {
-        public MvcDomainContext(Controller controller)
+        public MvcDomainContext(ActionContext actionContext)
+            : base(actionContext.HttpContext)
         {
-            if (controller == null)
-                throw new ArgumentNullException(nameof(controller));
-            Controller = controller;
+            ActionContext = actionContext;
         }
 
-        public Controller Controller { get; private set; }
+        public ActionContext ActionContext { get; private set; }
 
-        private ReadableStringProvider _QueryProvider;
-        public ReadableStringProvider QueryProvider
+        private MvcValueProvider _ValueProvider;
+        protected override HttpValueProvider GetValueProvider()
         {
-            get
-            {
-                if (_QueryProvider == null)
-                    _QueryProvider = new ReadableStringProvider(Controller.Request.Query);
-                return _QueryProvider;
-            }
-        }
-
-        private ReadableStringProvider _FormProvider;
-        public ReadableStringProvider FormProvider
-        {
-            get
-            {
-                if (_FormProvider == null)
-                    _FormProvider = new ReadableStringProvider(Controller.Request.Form);
-                return _FormProvider;
-            }
-        }
-
-        public override object GetService(Type serviceType)
-        {
-            return base.GetService(serviceType);
+            if (_ValueProvider == null)
+                _ValueProvider = new MvcValueProvider(ActionContext);
+            return _ValueProvider;
         }
     }
 }

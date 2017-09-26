@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace Wodsoft.ComBoost.Mvc
             get
             {
                 if (_DatabaseContext == null)
-                    _DatabaseContext = Resolver.GetService<IDatabaseContext>();
+                    _DatabaseContext = HttpContext.RequestServices.GetRequiredService<IDatabaseContext>();
                 return _DatabaseContext;
             }
         }

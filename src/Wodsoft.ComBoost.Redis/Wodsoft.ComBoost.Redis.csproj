@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>ComBoost Redis分布式缓存，支持缓存与信号量。</Description>
+    <AssemblyTitle>Wodsoft.ComBoost.Redis</AssemblyTitle>
+    <TargetFrameworks>netstandard1.5;netstandard2.0</TargetFrameworks>
+    <AssemblyName>Wodsoft.ComBoost.Redis</AssemblyName>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>Wodsoft.ComBoost.Redis</RootNamespace>
+  </PropertyGroup>
+  <Import Project="../../common.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.Core\Wodsoft.ComBoost.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
+  </ItemGroup>
+
+</Project>

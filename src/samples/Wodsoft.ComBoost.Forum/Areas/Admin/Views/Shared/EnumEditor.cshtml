@@ -1,0 +1,56 @@
+﻿@model MvcEditorModel
+@{
+    Type enumType = Model.Metadata.ClrType;
+    if (enumType.GetTypeInfo().IsGenericType)
+    {
+        enumType = Model.Metadata.ClrType.GetGenericArguments()[0];
+    }
+    var items = Enum.GetNames(enumType).Select(t =>
+    {
+        var field = enumType.GetField(t);
+        var name = field.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? t;
+        var value = (int)field.GetValue(null);
+        return new { Name = name, Value = value };
+    }).ToArray();
+    enumType = Enum.GetUnderlyingType(Model.Metadata.ClrType);
+}
+@if (Model.Metadata.ClrType.GetTypeInfo().GetCustomAttribute<FlagsAttribute>() == null)
+{
+    <select id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" class="form-control" style="padding-right: 12px;">
+        @if (Model.Metadata.ClrType.GetTypeInfo().IsGenericType)
+        {
+            <option value="" @Html.Raw(Model.Value == null ? " selected=\"selected\"" : "")></option>
+        }
+        @for (int i = 0; i < items.Length; i++)
+        {
+            <option value="@items[i].Value" @Html.Raw((items[i].Value == Convert.ToInt32(Model.Value)) ? " selected=\"selected\"" : "")>@items[i].Name</option>
+        }
+    </select>
+}
+else
+{
+    EnumConverter converter = new EnumConverter(Model.Metadata.ClrType);
+    <div id="@Model.Metadata.ClrName">
+        @for (int i = 0; i < items.Length; i++)
+        {
+            <div class="checkbox-inline">
+                <label><input type="checkbox" value="@items[i].Value" @Html.Raw(((dynamic)Model.Value).HasFlag((Enum)Enum.ToObject(Model.Metadata.ClrType, items[i].Value)) ? " checked=\"checked\"" : "") />@items[i].Name</label>
+            </div>
+        }
+    </div>
+    <input type="hidden" id="@(Model.Metadata.ClrName)_Value" name="@Model.Metadata.ClrName" value="@((int)Model.Value)" />
+    <script type="text/javascript">
+        $(function () {
+            var value = $('#@(Model.Metadata.ClrName)_Value');
+            var checkbox = $('#@Model.Metadata.ClrName').find(':checkbox');
+            checkbox.click(function () {
+                var num = 0;
+                checkbox.each(function (index, element) {
+                    if (element.checked)
+                        num += new Number(element.value);
+                });
+                value.val(num);
+            });
+        })
+    </script>
+}

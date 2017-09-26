@@ -1,0 +1,44 @@
+﻿@model IEntityEditModel<Thread>
+<link href="~/lib/editor.md/css/editormd.css" rel="stylesheet" />
+<ol class="breadcrumb">
+    <li><a asp-controller="Home" asp-action="Index">论坛</a></li>
+    <li><a href="@Html.Raw(Url.Action("Index", "Forum", new { id = Model.Item.Forum.Index }))">@Model.Item.Forum.Name</a></li>
+    <li class="active">发表帖子</li>
+</ol>
+<ul class="nav nav-tabs">
+    <li role="presentation" class="active"><a href="#">发表帖子</a></li>
+</ul>
+<br />
+<form class="form-horizontal" method="post" action="@Url.Action("Create", "Thread")">
+    <input type="hidden" name="Forum" value="@Model.Item.Forum.Index" />
+    <input type="hidden" name="id" value="@Model.Item.Index" />
+    <div class="form-group">
+        <div class="col-xs-12 col-md-6">
+            <input type="text" class="form-control" id="title" name="title" maxlength="20" placeholder="请输入标题" />
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-12">
+            <div id="content">
+                <textarea class="form-control" name="content" style="display:none;"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-12">
+            <button type="submit" class="btn btn-success">发表</button>
+        </div>
+    </div>
+</form>
+@section scripts{
+    <script src="~/lib/editor.md/src/editormd.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var editor = editormd("content", {
+                height: 480,
+                path: '@Url.Content("~/lib/editor.md/lib/")',
+                placeholder: '请输入帖子内容'
+            });
+        });
+    </script>
+}

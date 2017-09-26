@@ -1,0 +1,32 @@
+﻿@model MvcEditorModel
+@{
+    Type enumType = Model.Metadata.ClrType;
+    if (enumType.GetTypeInfo().IsGenericType)
+    {
+        enumType = Model.Metadata.ClrType.GetGenericArguments()[0];
+    }
+    if (Model.Metadata.ClrType.GetTypeInfo().GetCustomAttribute<FlagsAttribute>() == null)
+    {
+        var field = enumType.GetField(Enum.GetName(enumType, Model.Value));
+        var name = field.GetCustomAttribute<DisplayAttribute>()?.Name ?? field.Name;
+        <span>@name</span>
+    }
+    else
+    {
+        var items = Enum.GetNames(enumType).Select(t =>
+        {
+            var field = enumType.GetField(t);
+            var name = field.GetCustomAttribute<DisplayAttribute>()?.Name ?? t;
+            var value = (int)field.GetValue(null);
+            return new { Name = name, Value = value };
+        }).ToArray();
+        enumType = Enum.GetUnderlyingType(Model.Metadata.ClrType);
+        foreach (var item in items)
+        {
+            if (((dynamic)Model.Value).HasFlag((Enum)Enum.ToObject(Model.Metadata.ClrType, item.Value)))
+            {
+                <span>@item.Name</span>
+            }
+        }
+    }
+}

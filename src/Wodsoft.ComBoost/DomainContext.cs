@@ -1,24 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Wodsoft.ComBoost
 {
-    public class DomainContext : IDomainContext
+    public abstract class DomainContext : IDomainContext
     {
         private IServiceProvider _ServiceProvider;
-        private IDomainService _DomainService;
 
-        public DomainContext(IDomainService domainService, IServiceProvider serviceProvider)
+        public DomainContext(IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
-            if (domainService == null)
-                throw new ArgumentNullException(nameof(domainService));
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
-            _DomainService = domainService;
+            if (cancellationToken == null)
+                throw new ArgumentNullException(nameof(cancellationToken));
             _ServiceProvider = serviceProvider;
+            Filter = new List<IDomainServiceFilter>();
+            EventManager = new DomainContextEventManager(DomainServiceEventManager.GlobalEventManager);
         }
 
         private dynamic _DataBag;
@@ -27,20 +28,27 @@ namespace Wodsoft.ComBoost
             get
             {
                 if (_DataBag == null)
-                    _DataBag = new System.Dynamic.ExpandoObject();
+                    _DataBag = new DomainContextDataBag();
                 return _DataBag;
             }
         }
 
-        public virtual object Result { get; set; }
-        
-        public IDomainService Domain
+        public CancellationToken ServiceAborted { get; private set; }
+
+        private IDomainServiceOptions _Options;
+        public virtual IDomainServiceOptions Options
         {
             get
             {
-                return _DomainService;
+                if (_Options == null)
+                    _Options = new DomainServiceOptions();
+                return _Options;
             }
         }
+
+        public IList<IDomainServiceFilter> Filter { get; private set; }
+
+        public DomainServiceEventManager EventManager { get; private set; }
 
         public virtual object GetService(Type serviceType)
         {

@@ -1,0 +1,11 @@
+﻿@model MvcEditorModel
+<input type="number" class="form-control" id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" value="@Model.Value" step="any" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")/>
+<script type="text/javascript">
+    $('#@Model.Metadata.ClrName').change(function () {
+        var number = new Number($(this).val());
+        if (isNaN(number)) {
+            $(this).val(0);
+            return;
+        }
+    });
+</script>

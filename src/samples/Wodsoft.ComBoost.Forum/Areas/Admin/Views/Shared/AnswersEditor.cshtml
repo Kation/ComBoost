@@ -1,0 +1,63 @@
+﻿@model MvcEditorModel
+
+<div id="optiosInput">
+    @{
+        if (Model.Value != null)
+        {
+            var options = Model.Value.ToString().Split(',');
+            var i = 0;
+            foreach (var item in options)
+            {
+                if (i == 0)
+                {
+                    <p><input type="text" class="form-control" name="@Model.Metadata.ClrName" value="@item" /></p>
+                }
+                else
+                {
+                    var tempId = Guid.NewGuid();
+                    <p id="@tempId">
+
+                    <input type="text" class="form-control" name="@Model.Metadata.ClrName" value="@item" />
+                    <a href="javascript:removeOptions('@tempId');" >移除</a>
+                </p>
+                }
+                i++;
+            }
+        }
+        else
+        {
+            <p><input type="text" class="form-control" name="@Model.Metadata.ClrName" value="@Model.Value" /></p>
+        }
+    }
+</div>
+<a href="javascript:addOptions()">增加选项</a>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    function addOptions() {
+        var inputCount = $("#optiosInput").find("input");
+        if (inputCount.length >= 4) {
+            alert("达到上限了");
+        }
+        else {
+            var tempId = inputCount.length + 1;
+            var html = "<p id='" + tempId + "'><input type='text' class='form-control' name=\"@Model.Metadata.ClrName\" value='' /><a  href=\"javascript:removeOptions('" + tempId + "');\" style='float: right;position: relative; top:-30px;right: -58px;'>移除</a></p>";
+            $("#optiosInput").append(html);
+        }
+
+    }
+    function removeOptions(id) {
+        //alert(id);
+        $("#" + id).remove();
+
+    }
+</script>

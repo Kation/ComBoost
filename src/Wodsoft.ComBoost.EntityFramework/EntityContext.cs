@@ -1,101 +1,163 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
+using Wodsoft.ComBoost.Data.Entity.Metadata;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Data.Entity;
+using System.ComponentModel;
 
-namespace Wodsoft.ComBoost.EntityFramework
+namespace Wodsoft.ComBoost.Data.Entity
 {
     public class EntityContext<T> : IEntityContext<T>
-        where T : class, new()
+        where T : class, IEntity, new()
     {
         public EntityContext(DatabaseContext database, DbSet<T> dbset)
         {
-
+            if (database == null)
+                throw new ArgumentNullException(nameof(database));
+            if (dbset == null)
+                throw new ArgumentNullException(nameof(dbset));
+            Database = database;
+            DbSet = dbset;
+            Metadata = EntityDescriptor.GetMetadata<T>();
         }
 
-        public IDatabaseContext Database
+        public DbSet<T> DbSet { get; private set; }
+
+        public DatabaseContext Database { get; private set; }
+
+        IDatabaseContext IEntityQueryContext<T>.Database { get { return Database; } }
+
+        public IEntityMetadata Metadata { get; private set; }
+
+        protected void SetUnchangeProperties(T item)
         {
-            get
+            var entry = Database.InnerContext.Entry(item);
+            foreach (var property in Metadata.Properties.Where(t => typeof(IEntity).IsAssignableFrom(t.ClrType)))
             {
-                throw new NotImplementedException();
+                var reference = entry.Reference(property.ClrName);
+                if (reference.CurrentValue != null)
+                {
+                    var target = Database.InnerContext.Entry(reference.CurrentValue);
+                    if (target.State == EntityState.Detached)
+                        target.State = EntityState.Unchanged;
+                }
             }
         }
 
         public void Add(T item)
         {
-            throw new NotImplementedException();
+            item.OnCreateCompleted();
+            SetUnchangeProperties(item);
+            DbSet.Add(item);
         }
 
         public void AddRange(IEnumerable<T> items)
         {
-            throw new NotImplementedException();
+            foreach (var item in items)
+            {
+                item.OnCreateCompleted();
+                SetUnchangeProperties(item);
+            }
+            DbSet.AddRange(items);
         }
 
         public T Create()
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<T> GetAsync(object key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IQueryable<T> InParent(IQueryable<T> query, object[] parentIds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IQueryable<T> InParent(IQueryable<T> query, string path, object id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsNew(T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IOrderedQueryable<T> Order()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IOrderedQueryable<T> Order(IQueryable<T> query)
-        {
-            throw new NotImplementedException();
+            var item = new T();
+            //item.EntityContext = this;
+            item.OnCreating();
+            return item;
         }
 
         public IQueryable<T> Query()
         {
-            throw new NotImplementedException();
+            return DbSet.AsNoTracking();
         }
 
         public void Remove(T item)
         {
-            throw new NotImplementedException();
+            DbSet.Remove(item);
         }
 
         public void RemoveRange(IEnumerable<T> items)
         {
-            throw new NotImplementedException();
+            DbSet.RemoveRange(items);
         }
 
         public Task<T[]> ToArrayAsync(IQueryable<T> query)
         {
-            throw new NotImplementedException();
+            return query.ToArrayAsync();
         }
 
         public Task<List<T>> ToListAsync(IQueryable<T> query)
         {
-            throw new NotImplementedException();
+            return query.ToListAsync();
         }
 
         public void Update(T item)
         {
-            throw new NotImplementedException();
+            item.OnEditCompleted();
+            SetUnchangeProperties(item);
+            Database.InnerContext.Entry(item).State = EntityState.Modified;
+        }
+
+        public void UpdateRange(IEnumerable<T> items)
+        {
+            foreach (var item in items)
+                Update(item);
+        }
+
+        public Task<T> SingleOrDefaultAsync(IQueryable<T> query)
+        {
+            return query.SingleOrDefaultAsync();
+        }
+
+        public Task<T> SingleAsync(IQueryable<T> query)
+        {
+            return query.SingleAsync();
+        }
+
+        public Task<T> FirstOrDefaultAsync(IQueryable<T> query)
+        {
+            return query.FirstOrDefaultAsync();
+        }
+
+        public Task<T> FirstAsync(IQueryable<T> query)
+        {
+            return query.FirstAsync();
+        }
+
+        public Task<int> CountAsync(IQueryable<T> query)
+        {
+            return query.CountAsync();
+        }
+
+        public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
+        {
+            return query.Include(expression);
+        }
+
+        public Task<T> GetAsync(object key)
+        {
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+            if (key.GetType() != Metadata.KeyType)
+                key = TypeDescriptor.GetConverter(Metadata.KeyType).ConvertFrom(key);
+            return DbSet.FindAsync(key);
+        }
+
+        public Task ReloadAsync(T item)
+        {
+            return Database.InnerContext.Entry(item).ReloadAsync();
+        }
+
+        public IQueryable<T> ExecuteQuery(string sql, params object[] parameters)
+        {
+            return DbSet.SqlQuery(sql, parameters).AsNoTracking().AsQueryable();
         }
     }
 }

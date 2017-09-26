@@ -1,0 +1,34 @@
+{
+  "name": "editor.md",
+  "version": "1.5.0",
+  "homepage": "https://github.com/pandao/editor.md",
+  "authors": [
+    "Pandao <pandao@vip.qq.com>"
+  ],
+  "description": "Open source online markdown editor.",
+  "keywords": [
+    "editor.md",
+    "markdown",
+    "editor"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "research",
+    "docs",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "1.5.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.5.0",
+    "commit": "477060c5d6802a32d58898a53b97aea442d88177"
+  },
+  "_source": "https://github.com/pandao/editor.md.git",
+  "_target": "1.5.0",
+  "_originalSource": "editor.md",
+  "_direct": true
+}

@@ -1,0 +1,40 @@
+﻿@model MvcEditorModel
+@{
+    bool? value;
+    if (Model.Value is bool)
+    {
+        value = (bool)Model.Value;
+    }
+    else if (Model.Value is bool?)
+    {
+        value = (bool?)Model.Value;
+    }
+    else if (Model.Value == null)
+    {
+        value = null;
+    }
+    else
+    {
+        throw new NotSupportedException("Boolean editor do not support type \"" + Model.Value.GetType() + "\".");
+    }
+}
+<div id="@Model.Metadata.ClrName">
+    <div class="radio-inline">
+        <label>
+            <input type="radio" name="@Model.Metadata.ClrName" value="true" @Html.Raw(value.HasValue && value.Value ? " checked=\"checked\"" : "") />是
+        </label>
+    </div>
+    <div class="radio-inline">
+        <label>
+            <input type="radio" name="@Model.Metadata.ClrName" value="false" @Html.Raw(value.HasValue && value.Value ? "" : "checked=\"checked\"") />否
+        </label>
+    </div>
+    @if (Model.Value == null || Model.Value is bool==false)
+    {
+        <div class="radio-inline">
+            <label>
+                <input type="radio" name="@Model.Metadata.ClrName" value="false" @Html.Raw(value.HasValue ? "" : "checked=\"checked\"") />Unknown
+            </label>
+        </div>
+    }
+</div>

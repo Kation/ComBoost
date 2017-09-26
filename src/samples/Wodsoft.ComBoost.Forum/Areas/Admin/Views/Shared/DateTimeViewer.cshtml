@@ -1,0 +1,8 @@
+﻿@model MvcEditorModel
+@{
+    DateTime? value = Model.Value as DateTime?;
+}
+@if (value != null)
+{
+    @value.Value.ToString("yyyy-MM-dd HH:mm:ss")
+}

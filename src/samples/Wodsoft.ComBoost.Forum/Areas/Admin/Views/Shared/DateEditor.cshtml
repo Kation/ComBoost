@@ -1,0 +1,32 @@
+﻿@model MvcEditorModel
+@{
+    DateTime? value = Model.Value as DateTime?;
+}
+@*<div class="input-group col-md-4">
+        <input type="date" class="form-control" id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" value="@(value.HasValue ? value.Value.ToLongDateString() : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")/>
+    </div>
+    <script type="text/javascript">
+        $('#@Model.Metadata.ClrName').datepicker();
+    </script>*@
+
+<div class="input-group date col-md-4">
+    <input type="text" class="form-control" id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" value="@(value.HasValue ? value.Value.ToString("yyyy-MM-dd") : "")" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+</div>
+
+<script type="text/javascript">
+    $('#@Model.Metadata.ClrName').datepicker({
+        todayBtn: true,
+        format: 'yyyy年mm月dd日',
+        language: "zh-CN",
+        orientation: "bottom auto",
+        startDate: '@DateTime.Now.AddDays(-1).ToString()', //开始时间，在这时间之前都不可选
+        //calendarWeeks: true,
+        autoclose: true,
+        todayHighlight: true,
+        //beforeShowMonth: function (date) {
+        //    if (date.getMonth() == 8) {
+        //        return false;
+        //    }
+        //},
+    });
+</script>

@@ -1,0 +1,65 @@
+﻿@using System.ComponentModel.DataAnnotations;
+@using System.Reflection;
+@model MvcEditorModel
+@{
+    ValueFilterAttribute attribute = Model.Metadata.GetAttribute<ValueFilterAttribute>();
+}
+<select id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" class="form-control" style="padding-right: 12px;"></select>
+@if (!string.IsNullOrEmpty(attribute.DependencyProperty))
+{
+    <script type="text/javascript">
+        $(function () {
+            var parent = $('#@attribute.DependencyProperty');
+            var dependencyValue = parent.val();
+            if (dependencyValue != null && dependencyValue != '') {
+                $.ajax({
+                    url: '@Url.Action("ValueFilter")',
+                    data: {
+                        property: '@Model.Metadata.ClrName',
+                        value: dependencyValue,
+                        selected: '@Model.Value'
+                    },
+                    type: 'POST',
+                    success: function (result) {
+                        $('#@Model.Metadata.ClrName').html(result);
+                    }
+                })
+            }
+            parent.change(function () {
+                var value = parent.val();
+                if (value == '')
+                    $('#@Model.Metadata.ClrName').empty();
+                else
+                    $.ajax({
+                        url: '@Url.Action("ValueFilter")',
+                        data: {
+                            property: '@Model.Metadata.ClrName',
+                            value: value
+                        },
+                        type: 'POST',
+                        success: function (result) {
+                            $('#@Model.Metadata.ClrName').html(result);
+                        }
+                    })
+            });
+        });
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                url: '@Url.Action("ValueFilter")',
+                data: {
+                    property: '@Model.Metadata.ClrName',
+                    selected: '@Model.Value'
+                },
+                type: 'POST',
+                success: function (result) {
+                    $('#@Model.Metadata.ClrName').html(result);
+                }
+            });
+        });
+    </script>
+}

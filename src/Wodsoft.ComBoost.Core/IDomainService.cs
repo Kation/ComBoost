@@ -6,32 +6,45 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
 {
+    /// <summary>
+    /// 领域服务。
+    /// </summary>
     public interface IDomainService
     {
-        IDomainExecutionContext ExecutionContext { get; }
+        /// <summary>
+        /// 获取领域执行上下文。
+        /// </summary>
+        IDomainExecutionContext Context { get; }
 
-        Task ExecuteAsync(IDomainContext context, MethodInfo method);
-        Task ExecuteAsync(IDomainContext context, Func<Task> method);
-        Task ExecuteAsync<T1>(IDomainContext context, Func<T1, Task> method);
-        Task ExecuteAsync<T1, T2>(IDomainContext context, Func<T1, T2, Task> method);
-        Task ExecuteAsync<T1, T2, T3>(IDomainContext context, Func<T1, T2, T3, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4>(IDomainContext context, Func<T1, T2, T3, T4, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5>(IDomainContext context, Func<T1, T2, T3, T4, T5, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, T7, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, Task> method);
-        Task ExecuteAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(IDomainContext context, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, Task> method);
+        /// <summary>
+        /// 获取领域服务过滤器列表。
+        /// </summary>
+        IList<IDomainServiceFilter> Filters { get; }
 
-        event DomainExecuteEvent Executing;
-        event DomainExecuteEvent Executed;
+        /// <summary>
+        /// 调用执行领域方法。
+        /// </summary>
+        /// <param name="domainContext">领域上下文。</param>
+        /// <param name="method">执行方法信息。</param>
+        /// <returns>返回异步任务。</returns>
+        Task ExecuteAsync(IDomainContext domainContext, MethodInfo method);
+        /// <summary>
+        /// 调用执行领域方法。
+        /// </summary>
+        /// <typeparam name="T">方法返回类型。</typeparam>
+        /// <param name="domainContext">领域上下文。</param>
+        /// <param name="method">执行方法信息。</param>
+        /// <returns>返回异步任务。</returns>
+        Task<T> ExecuteAsync<T>(IDomainContext domainContext, MethodInfo method);
+
+        /// <summary>
+        /// 领域方法执行前事件。
+        /// </summary>
+        event DomainServiceAsyncEventHandler Executing;
+
+        /// <summary>
+        /// 领域方法执行后事件。
+        /// </summary>
+        event DomainServiceAsyncEventHandler Executed;
     }
-
-    public delegate Task DomainExecuteEvent(IDomainExecutionContext context);
 }

@@ -1,0 +1,5 @@
+﻿@model MvcEditorModel
+<div class="input-group">
+    <span class="input-group-addon">@System.Globalization.CultureInfo.CurrentUICulture.NumberFormat.CurrencySymbol</span>
+    <input type="number" class="form-control" id="@Model.Metadata.ClrName" name="@Model.Metadata.ClrName" value="@Model.Value" step="0.01" @Html.Raw(Model.Metadata.IsRequired ? "" : "required=\"required\"")/>
+</div>

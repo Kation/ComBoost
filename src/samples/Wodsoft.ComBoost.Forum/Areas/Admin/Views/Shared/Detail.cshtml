@@ -1,0 +1,36 @@
+﻿@model IEntityEditModel
+@{
+    ViewBag.Title = Model.Metadata.Name + "详情";
+    object area = ViewContext.RouteData.Values["Area"];
+    if (area == null)
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Areas/" + area.ToString() + "/Views/Shared/_Layout.cshtml";
+    }
+}
+<ul class="breadcrumb">
+    <li><a href="@Url.Action("Index", "Home")">首页</a></li>
+    <li><a href="@Html.Raw(Url.Action("Index"))">@Model.Metadata.Name</a></li>
+    <li class="active">详情</li>
+</ul>
+<div class="container-fluid">
+    <form id="form" class="form-horizontal" role="form">
+        @foreach (var property in Model.Properties)
+        {
+            <div class="form-group">
+                <label class="control-label col-xs-2">@property.Name</label>
+                <div class="col-xs-10">
+                    <p class="form-control-static">@Html.Viewer(Model.Item, property, property.GetValue(Model.Item))</p>
+                </div>
+            </div>
+        }
+        <div class="control-group">
+            <div class="controls">
+                <a href="@Html.Raw(Url.Action("Index"))" class="btn btn-default">返回</a>
+            </div>
+        </div>
+    </form>
+</div>
