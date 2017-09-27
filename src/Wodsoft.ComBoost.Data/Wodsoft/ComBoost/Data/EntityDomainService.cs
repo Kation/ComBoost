@@ -52,13 +52,13 @@ namespace Wodsoft.ComBoost.Data
             EntityViewModel<T> model = new EntityViewModel<T>(queryable);
             model.Properties = authorizeOption.GetProperties(Metadata, auth);
             EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
-            await model.UpdateTotalPageAsync();
             if (pagerOption != null)
             {
                 model.CurrentSize = pagerOption.CurrentSize;
                 model.CurrentPage = pagerOption.CurrentPage;
                 model.PageSizeOption = pagerOption.PageSizeOption;
             }
+            await model.UpdateTotalPageAsync();
             await model.UpdateItemsAsync();
             return model;
         }
@@ -80,7 +80,6 @@ namespace Wodsoft.ComBoost.Data
             queryable = e.Queryable;
             var convertQueryable = selectOption.Select(queryable);
             ViewModel<TViewModel> model = new ViewModel<TViewModel>(convertQueryable);
-            await model.UpdateTotalPageAsync();
             EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
             if (pagerOption != null)
             {
@@ -88,6 +87,7 @@ namespace Wodsoft.ComBoost.Data
                 model.CurrentPage = pagerOption.CurrentPage;
                 model.PageSizeOption = pagerOption.PageSizeOption;
             }
+            await model.UpdateTotalPageAsync();
             await model.UpdateItemsAsync();
             return model;
         }
