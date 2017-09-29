@@ -27,6 +27,11 @@ namespace System.ComponentModel
         IItemButton[] ItemButtons { get; }
 
         /// <summary>
+        /// 设置每页显示个数选项。
+        /// </summary>
+        new int[] PageSizeOption { set; }
+
+        /// <summary>
         /// 设置当前页。
         /// </summary>
         /// <param name="page">当前页。</param>
