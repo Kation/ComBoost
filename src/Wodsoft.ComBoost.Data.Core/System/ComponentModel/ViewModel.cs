@@ -29,9 +29,9 @@ namespace System.ComponentModel
         public ViewModel(IQueryable<T> queryable, int page, int size)
         {
             if (page < 1)
-                throw new ArgumentException("Can not less than 1.", "page");
+                throw new ArgumentException("不能小于1。", "page");
             if (size < 1)
-                throw new ArgumentException("Can not less than 1.", "size");
+                throw new ArgumentException("不能小于1。", "size");
             ViewButtons = new IViewButton[0];
             ItemButtons = new IItemButton[0];
             CurrentSize = size;
