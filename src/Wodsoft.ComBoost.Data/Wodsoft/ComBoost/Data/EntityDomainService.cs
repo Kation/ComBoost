@@ -32,6 +32,7 @@ namespace Wodsoft.ComBoost.Data
             Metadata = EntityDescriptor.GetMetadata<T>();
         }
 
+        [OptionRequired(typeof(EntityPagerOption))]
         public virtual async Task<IEntityViewModel<T>> List([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             var auth = authenticationProvider.GetAuthentication();
@@ -66,6 +67,7 @@ namespace Wodsoft.ComBoost.Data
         public static readonly DomainServiceEventRoute EntityQueryEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityQueryEventArgs<T>>("EntityQuery", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityQueryEventArgs<T>> EntityQuery { add { AddAsyncEventHandler(EntityQueryEvent, value); } remove { RemoveAsyncEventHandler(EntityQueryEvent, value); } }
 
+        [OptionRequired(typeof(EntityPagerOption))]
         public virtual async Task<IViewModel<TViewModel>> ListViewModel<TViewModel>([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption, [FromOptions(true)]EntityQuerySelectOption<T, TViewModel> selectOption)
             where TViewModel : class
         {
