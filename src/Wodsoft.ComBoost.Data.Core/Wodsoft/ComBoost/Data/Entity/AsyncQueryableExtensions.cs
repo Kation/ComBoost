@@ -146,8 +146,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
         public static Task<int> CountAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            source = Unwrap(source, out bool isWrapped, out Type[] args);
-            return Context.CountAsync(source, predicate, cancellationToken);
+            source = Unwrap(source.Where(predicate), out bool isWrapped, out Type[] args);
+            return Context.CountAsync(source, cancellationToken);
         }
         public static Task<TSource> FirstAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -156,8 +156,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
         public static Task<TSource> FirstAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            source = Unwrap(source, out bool isWrapped, out Type[] args);
-            return Context.FirstAsync(source, predicate, cancellationToken);
+            source = Unwrap(source.Where(predicate), out bool isWrapped, out Type[] args);
+            return Context.FirstAsync(source, cancellationToken);
         }
         public static Task<TSource> FirstOrDefaultAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -166,8 +166,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
         public static Task<TSource> FirstOrDefaultAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            source = Unwrap(source, out bool isWrapped, out Type[] args);
-            return Context.FirstOrDefaultAsync(source, predicate, cancellationToken);
+            source = Unwrap(source.Where(predicate), out bool isWrapped, out Type[] args);
+            return Context.FirstOrDefaultAsync(source, cancellationToken);
         }
         public static IQueryable<TEntity> Include<TEntity, TProperty>(this IQueryable<TEntity> source, Expression<Func<TEntity, TProperty>> navigationPropertyPath) where TEntity : class
         {
@@ -187,8 +187,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
         public static Task<TSource> LastAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            source = Unwrap(source, out bool isWrapped, out Type[] args);
-            return Context.LastAsync(source, predicate, cancellationToken);
+            source = Unwrap(source.Where(predicate), out bool isWrapped, out Type[] args);
+            return Context.LastAsync(source, cancellationToken);
         }
         public static Task<TSource> LastOrDefaultAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -197,8 +197,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
         public static Task<TSource> LastOrDefaultAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            source = Unwrap(source, out bool isWrapped, out Type[] args);
-            return Context.LastOrDefaultAsync(source, predicate, cancellationToken);
+            source = Unwrap(source.Where(predicate), out bool isWrapped, out Type[] args);
+            return Context.LastOrDefaultAsync(source, cancellationToken);
         }
         public static Task<long> LongCountAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -207,8 +207,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
         public static Task<long> LongCountAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            source = Unwrap(source, out bool isWrapped, out Type[] args);
-            return Context.LongCountAsync(source, predicate, cancellationToken);
+            source = Unwrap(source.Where(predicate), out bool isWrapped, out Type[] args);
+            return Context.LongCountAsync(source, cancellationToken);
         }
         public static Task<TSource> MaxAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -237,8 +237,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
         public static Task<TSource> SingleAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            source = Unwrap(source, out bool isWrapped, out Type[] args);
-            return Context.SingleAsync(source, predicate, cancellationToken);
+            source = Unwrap(source.Where(predicate), out bool isWrapped, out Type[] args);
+            return Context.SingleAsync(source, cancellationToken);
         }
         public static Task<TSource> SingleOrDefaultAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -247,8 +247,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
         public static Task<TSource> SingleOrDefaultAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            source = Unwrap(source, out bool isWrapped, out Type[] args);
-            return Context.SingleOrDefaultAsync(source, predicate, cancellationToken);
+            source = Unwrap(source.Where(predicate), out bool isWrapped, out Type[] args);
+            return Context.SingleOrDefaultAsync(source, cancellationToken);
         }
         public static Task<long?> SumAsync(this IQueryable<long?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -303,16 +303,22 @@ namespace Wodsoft.ComBoost.Data.Entity
         public static Task<long?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, long?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
             source = Unwrap(source, out bool isWrapped, out Type[] args);
+            if (isWrapped)
+                selector = UnwrapExpression(selector, args);
             return Context.SumAsync(source, selector, cancellationToken);
         }
         public static Task<double> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, double>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
             source = Unwrap(source, out bool isWrapped, out Type[] args);
+            if (isWrapped)
+                selector = UnwrapExpression(selector, args);
             return Context.SumAsync(source, selector, cancellationToken);
         }
         public static Task<double?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, double?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
             source = Unwrap(source, out bool isWrapped, out Type[] args);
+            if (isWrapped)
+                selector = UnwrapExpression(selector, args);
             return Context.SumAsync(source, selector, cancellationToken);
         }
         public static Task<long> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, long>> selector, CancellationToken cancellationToken = default(CancellationToken))
@@ -397,6 +403,12 @@ namespace Wodsoft.ComBoost.Data.Entity
             isWrapped = false;
             args = null;
             return source;
+        }
+
+        private static Expression<Func<T, TResult>> UnwrapExpression<T, TResult>(Expression<Func<T, TResult>> expression, Type[] args)
+        {
+            ExpressionWrapper wrapper = new ExpressionWrapper(args[0], args[1]);
+            return (Expression<Func<T, TResult>>)wrapper.Visit(expression);
         }
     }
 }
