@@ -89,7 +89,16 @@ namespace Wodsoft.ComBoost.Security
             if (authentication.IsInStaticRole(role))
                 return true;
             return authentication.IsInDynamicRole(role);
+        }
 
+        public static string GetUserId(this IPrincipal principal)
+        {
+            if (principal == null)
+                throw new ArgumentNullException(nameof(principal));
+            IAuthentication authentication = principal as IAuthentication;
+            if (authentication == null)
+                return null;
+            return authentication.GetUserId();
         }
     }
 }
