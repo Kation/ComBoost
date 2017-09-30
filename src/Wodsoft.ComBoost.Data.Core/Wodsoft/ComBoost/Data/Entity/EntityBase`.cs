@@ -56,7 +56,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (CreateDate == DateTime.MinValue)
                 CreateDate = DateTime.Now;
             if (EditDate == DateTime.MinValue)
-                EditDate = DateTime.Now;
+                EditDate = CreateDate;
         }
 
         /// <summary>
