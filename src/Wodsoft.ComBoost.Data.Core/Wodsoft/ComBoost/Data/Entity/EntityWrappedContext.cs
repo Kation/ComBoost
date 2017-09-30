@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 
@@ -38,13 +39,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             return InnerContext.CountAsync(query.Unwrap<T, M>());
         }
-
-        protected virtual Expression<Func<M, TResult>> WrapExpression<TResult>(Expression<Func<T, TResult>> expression)
-        {
-            ExpressionWrapper<T, M> wrapper = new ExpressionWrapper<T, M>();
-            return (Expression<Func<M, TResult>>)wrapper.Visit(expression);
-        }
-
+        
         public T Create()
         {
             return InnerContext.Create();
@@ -107,8 +102,12 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
         {
-            var newExpression = WrapExpression(expression);
-            return InnerContext.Include(query.Unwrap<T, M>(), newExpression).Wrap<T, M>();
+            ExpressionWrapper<T, M> wrapper = new ExpressionWrapper<T, M>();
+            LambdaExpression newExpression = (LambdaExpression)wrapper.Visit(expression);
+            var propertyType = newExpression.Type.GetGenericArguments()[1];
+            var queryable = query.Unwrap<T, M>();
+            queryable = (IQueryable<M>)InnerContext.GetType().GetMethod("Include").MakeGenericMethod(propertyType).Invoke(InnerContext, new object[] { queryable, newExpression });
+            return queryable.Wrap<T, M>();
         }
 
         public async Task<T> GetAsync(object key)
