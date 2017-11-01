@@ -12,10 +12,20 @@ using Microsoft.Extensions.Options;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class ComBoostAuthorizeAttribute : Attribute, IActionFilter
     {
-        public ComBoostAuthorizeAttribute() { }
+        public ComBoostAuthorizeAttribute() : this(AuthenticationRequiredMode.All, Array.Empty<object>()) { }
+
+        public ComBoostAuthorizeAttribute(AuthenticationRequiredMode mode, params object[] roles)
+        {
+            Mode = mode;
+            Roles = roles;
+        }
+
+        public AuthenticationRequiredMode Mode { get; private set; }
+
+        public object[] Roles { get; private set; }
 
         public virtual void OnActionExecuted(ActionExecutedContext context)
         {
@@ -35,7 +45,16 @@ namespace Wodsoft.ComBoost.Mvc
 
         protected virtual bool AuthorizeCore(FilterContext context, object controller)
         {
-            return context.HttpContext.User.Identity.IsAuthenticated;
+            if (!context.HttpContext.User.Identity.IsAuthenticated)
+                return false;
+            if (Roles.Length == 0)
+                return true;
+            var authenticationProvider = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>();
+            var authentication = authenticationProvider.GetAuthentication();
+            if (Mode == AuthenticationRequiredMode.All)
+                return Roles.All(t => authentication.IsInRole(t));
+            else
+                return Roles.Any(t => authentication.IsInRole(t));
         }
 
         protected virtual RedirectResult GetLoginUrl(FilterContext context)
