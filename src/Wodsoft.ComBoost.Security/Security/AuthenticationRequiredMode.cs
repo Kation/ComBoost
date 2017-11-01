@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 namespace Wodsoft.ComBoost.Security
 {
     /// <summary>
-    /// Authentication required mode.
+    /// 认证需求模式。
     /// </summary>
     public enum AuthenticationRequiredMode
     {
         /// <summary>
-        /// Any role denied will be fail.
+        /// 任何角色拒绝将会失败。
         /// </summary>
         All = 0,
         /// <summary>
-        /// Any role access will be succeed.
+        /// 任何角色通过将会成功。
         /// </summary>
         Any = 1
     }

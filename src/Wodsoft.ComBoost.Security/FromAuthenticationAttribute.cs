@@ -8,9 +8,18 @@ using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost
 {
+    /// <summary>
+    /// 认证信息来源。
+    /// </summary>
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public class FromAuthenticationAttribute : FromAttribute
     {
+        /// <summary>
+        /// 获取值。
+        /// </summary>
+        /// <param name="executionContext">领域执行上下文。</param>
+        /// <param name="parameter">参数信息。</param>
+        /// <returns>返回值。</returns>
         public override object GetValue(IDomainExecutionContext executionContext, ParameterInfo parameter)
         {
             IAuthenticationProvider provider = executionContext.DomainContext.GetRequiredService<IAuthenticationProvider>();
