@@ -90,6 +90,17 @@ namespace Wodsoft.ComBoost
             return Task.CompletedTask;
         }
 
+        public Task<string[]> GetKeysAsync()
+        {
+            return Task.FromResult(_Entries.Keys.ToArray());
+        }
+
+        public Task ClearAsync()
+        {
+            _Entries.Clear();
+            return Task.FromResult(true);
+        }
+
         private class CacheEntry
         {
             public byte[] Value { get; set; }
