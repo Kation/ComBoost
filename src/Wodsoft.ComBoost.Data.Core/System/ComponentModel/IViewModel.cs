@@ -29,7 +29,7 @@ namespace System.ComponentModel
         /// <summary>
         /// 设置每页显示个数选项。
         /// </summary>
-        new int[] PageSizeOption { set; }
+        new int[] PageSizeOption { get; set; }
 
         /// <summary>
         /// 设置当前页。
