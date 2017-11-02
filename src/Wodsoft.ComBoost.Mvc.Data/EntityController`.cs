@@ -227,7 +227,7 @@ namespace Wodsoft.ComBoost.Mvc
                     return StatusCode(401, ex.InnerException.Message);
                 else if (ex.InnerException is EntityNotFoundException)
                     return StatusCode(404, ex.InnerException.Message);
-                else if (ex.InnerException is ArgumentException || ex.InnerException is ArgumentNullException || ex.InnerException. is ArgumentOutOfRangeException)
+                else if (ex.InnerException is ArgumentException || ex.InnerException is ArgumentNullException || ex.InnerException is ArgumentOutOfRangeException)
                     return StatusCode(400, ex.InnerException.Message);
                 else
                 {
