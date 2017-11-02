@@ -12,19 +12,36 @@ using Microsoft.Extensions.Options;
 
 namespace Wodsoft.ComBoost.Mvc
 {
+    /// <summary>
+    /// 权限过滤器。
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class ComBoostAuthorizeAttribute : Attribute, IActionFilter
     {
+        /// <summary>
+        /// 实例化权限过滤器。用于过滤没有登录的用户。
+        /// </summary>
         public ComBoostAuthorizeAttribute() : this(AuthenticationRequiredMode.All, Array.Empty<object>()) { }
 
+        /// <summary>
+        /// 实例化权限过滤器。用于过滤没有角色的用户。
+        /// </summary>
+        /// <param name="mode">认证模式。</param>
+        /// <param name="roles">所需角色。</param>
         public ComBoostAuthorizeAttribute(AuthenticationRequiredMode mode, params object[] roles)
         {
             Mode = mode;
             Roles = roles;
         }
 
+        /// <summary>
+        /// 获取认证模式。
+        /// </summary>
         public AuthenticationRequiredMode Mode { get; private set; }
 
+        /// <summary>
+        /// 获取角色。
+        /// </summary>
         public object[] Roles { get; private set; }
 
         public virtual void OnActionExecuted(ActionExecutedContext context)
@@ -63,9 +80,9 @@ namespace Wodsoft.ComBoost.Mvc
             var loginUrl = options.LoginPath(context.HttpContext);
             loginUrl = context.HttpContext.Request.PathBase.Add(loginUrl);
             if (loginUrl.Contains("?"))
-                loginUrl += "&returlUrl=" + Uri.EscapeDataString(context.HttpContext.Request.Path);
+                loginUrl += "&returlUrl=" + Uri.EscapeDataString(context.HttpContext.Request.Path + context.HttpContext.Request.QueryString);
             else
-                loginUrl += "?returlUrl=" + Uri.EscapeDataString(context.HttpContext.Request.Path);
+                loginUrl += "?returlUrl=" + Uri.EscapeDataString(context.HttpContext.Request.Path + context.HttpContext.Request.QueryString);
             return new RedirectResult(loginUrl);
         }
     }
