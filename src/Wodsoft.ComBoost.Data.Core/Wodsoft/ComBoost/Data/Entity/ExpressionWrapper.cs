@@ -33,7 +33,14 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (lambdaType.IsConstructedGenericType && lambdaType.GetGenericTypeDefinition() == typeof(Func<,>) && lambdaType.GenericTypeArguments[0] == _T)
             {
                 var definition = lambdaType.GetGenericArguments();
-                definition[0] = _M;
+                for (int i = 0; i < definition.Length; i++)
+                {
+                    if (typeof(IEntity).IsAssignableFrom(definition[i]))
+                        if (definition[i] == _T)
+                            definition[i] = _M;
+                        else
+                            definition[i] = EntityDescriptor.GetMetadata(definition[i]).Type;
+                }
                 lambdaType = lambdaType.GetGenericTypeDefinition().MakeGenericType(definition);
                 return Expression.Lambda(lambdaType, Visit(node.Body), _Parameter);
             }
@@ -54,6 +61,23 @@ namespace Wodsoft.ComBoost.Data.Entity
                 if (expression.NodeType == ExpressionType.Convert)
                     expression = ((UnaryExpression)expression).Operand;
                 return Visit(expression);
+            }
+            else if (node.Method.IsGenericMethod)
+            {
+                var args = node.Method.GetGenericArguments();
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (typeof(IEntity).IsAssignableFrom(args[i]))
+                        if (args[i] == _T)
+                            args[i] = _M;
+                        else
+                            args[i] = EntityDescriptor.GetMetadata(args[i]).Type;
+                }
+                var method = node.Method.GetGenericMethodDefinition().MakeGenericMethod(args);
+                if (node.Object == null)
+                    return Expression.Call(method, node.Arguments.Select(t => Visit(t)));
+                else
+                    return Expression.Call(Visit(node.Object), method, node.Arguments.Select(t => Visit(t)));
             }
             return base.VisitMethodCall(node);
         }

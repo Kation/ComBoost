@@ -16,6 +16,12 @@ namespace Wodsoft.ComBoost.Mock
             _Cache = new ConcurrentDictionary<string, MockCacheEntry>();
         }
 
+        public Task ClearAsync()
+        {
+            _Cache.Clear();
+            return Task.CompletedTask;
+        }
+
         public Task<bool> DeleteAsync(string name)
         {
             if (name == null)
@@ -38,6 +44,11 @@ namespace Wodsoft.ComBoost.Mock
                 return Task.FromResult<object>(null);
             }
             return Task.FromResult(entry.Value);
+        }
+
+        public Task<string[]> GetKeysAsync()
+        {
+            throw new NotImplementedException();
         }
 
         public Task SetAsync(string name, object value, TimeSpan? expireTime)

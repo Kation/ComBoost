@@ -35,5 +35,10 @@ namespace Wodsoft.ComBoost.Data.Entity
             var expression = visitor.Visit(wrapped.Expression);
             return provider.InnerQueryProvider.CreateQuery<M>(expression);
         }
+
+        public static bool IsWrapped(this IQueryable queryable)
+        {
+            return queryable is IWrappedQueryable;
+        }
     }
 }

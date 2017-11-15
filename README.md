@@ -9,6 +9,9 @@ ComBoost基于DDD领域驱动设计提供一个分层架构模型。
 
 ![Layered Architecture](doc/images/architecture.png)
 
+## 示例
+* [论坛组件示例](https://github.com/Wodsoft/Wodsoft.Forum)
+
 ## Nuget包
 ComBoost框架分发了以下Nuget包。
 

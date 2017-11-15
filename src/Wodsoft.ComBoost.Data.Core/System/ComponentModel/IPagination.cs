@@ -7,27 +7,27 @@ using System.Threading.Tasks;
 namespace System.ComponentModel
 {
     /// <summary>
-    /// Pagination interface.
+    /// 分页接口。
     /// </summary>
     public interface IPagination
     {
         /// <summary>
-        /// Get the items per page options.
+        /// 获取每页显示个数选项。
         /// </summary>
         int[] PageSizeOption { get; }
 
         /// <summary>
-        /// Get the total page.
+        /// 获取总页数。
         /// </summary>
         int TotalPage { get; }
 
         /// <summary>
-        /// Get the current page.
+        /// 获取当前页数。
         /// </summary>
         int CurrentPage { get; }
 
         /// <summary>
-        /// Get the items per page.
+        /// 获取当前每页显示数量。
         /// </summary>
         int CurrentSize { get; }
 

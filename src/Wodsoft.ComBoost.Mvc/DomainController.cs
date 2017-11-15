@@ -21,5 +21,10 @@ namespace Wodsoft.ComBoost.Mvc
         {
             return new ControllerDomainContext(this);
         }
+
+        protected virtual EmptyDomainContext CreateEmptyDomainContext()
+        {
+            return new EmptyDomainContext(HttpContext.RequestServices, HttpContext.RequestAborted);
+        }
     }
 }

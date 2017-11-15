@@ -32,6 +32,7 @@ namespace Wodsoft.ComBoost.Data
             Metadata = EntityDescriptor.GetMetadata<T>();
         }
 
+        [OptionRequired(typeof(EntityPagerOption))]
         public virtual async Task<IEntityViewModel<T>> List([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             var auth = authenticationProvider.GetAuthentication();
@@ -66,6 +67,7 @@ namespace Wodsoft.ComBoost.Data
         public static readonly DomainServiceEventRoute EntityQueryEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityQueryEventArgs<T>>("EntityQuery", typeof(EntityDomainService<T>));
         public event DomainServiceAsyncEventHandler<EntityQueryEventArgs<T>> EntityQuery { add { AddAsyncEventHandler(EntityQueryEvent, value); } remove { RemoveAsyncEventHandler(EntityQueryEvent, value); } }
 
+        [OptionRequired(typeof(EntityPagerOption))]
         public virtual async Task<IViewModel<TViewModel>> ListViewModel<TViewModel>([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption, [FromOptions(true)]EntityQuerySelectOption<T, TViewModel> selectOption)
             where TViewModel : class
         {
@@ -79,7 +81,7 @@ namespace Wodsoft.ComBoost.Data
             await RaiseAsyncEvent(EntityQueryEvent, e);
             queryable = e.Queryable;
             var convertQueryable = selectOption.Select(queryable);
-            ViewModel<TViewModel> model = new ViewModel<TViewModel>(convertQueryable);
+            ViewModel<TViewModel> model = new ViewModel<TViewModel>(convertQueryable); 
             EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
             if (pagerOption != null)
             {
@@ -190,7 +192,7 @@ namespace Wodsoft.ComBoost.Data
                 {
                     await UpdateProperty(valueProvider, entity, property);
                 }
-                catch (ArgumentException ex)
+                catch (ValidationException ex)
                 {
                     model.ErrorMessage.Add(property, ex.Message);
                 }
@@ -244,7 +246,7 @@ namespace Wodsoft.ComBoost.Data
                 validationContext.DisplayName = property.Name;
                 var error = property.GetAttributes<ValidationAttribute>().Select(t => t.GetValidationResult(value, validationContext)).Where(t => t != ValidationResult.Success).ToArray();
                 if (error.Length > 0)
-                    throw new DomainServiceException(new ArgumentException(string.Join("，", error.Select(t => t.ErrorMessage))));
+                    throw new ValidationException(string.Join("，", error.Select(t => t.ErrorMessage)));
                 if (hasValue)
                     property.SetValue(entity, value);
             }

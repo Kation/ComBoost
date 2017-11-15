@@ -13,12 +13,8 @@ namespace Wodsoft.ComBoost.Redis
         private ISerializerProvider _SerializerProvider;
         public RedisCache(IDatabase database, ISerializerProvider serializerProvider)
         {
-            if (database == null)
-                throw new ArgumentNullException(nameof(database));
-            if (serializerProvider == null)
-                throw new ArgumentNullException(nameof(serializerProvider));
-            _Database = database;
-            _SerializerProvider = serializerProvider;
+            _Database = database ?? throw new ArgumentNullException(nameof(database));
+            _SerializerProvider = serializerProvider ?? throw new ArgumentNullException(nameof(serializerProvider));
         }
 
         public async Task<object> GetAsync(string name, Type valueType)
@@ -51,6 +47,16 @@ namespace Wodsoft.ComBoost.Redis
             seralizer.Serialize(stream, value);
             var data = stream.ToArray();
             await _Database.StringSetAsync(name, data, expireTime);
+        }
+
+        public Task<string[]> GetKeysAsync()
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task ClearAsync()
+        {
+            throw new NotSupportedException();
         }
     }
 }

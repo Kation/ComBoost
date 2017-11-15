@@ -10,6 +10,7 @@ using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.ExceptionServices;
 
 namespace Wodsoft.ComBoost.Mvc
 {
@@ -45,7 +46,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateIndexContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel<T>>(context, EntityService.List);
+                var model = await EntityService.ExecuteList(context);
                 foreach (var button in model.ViewButtons)
                     button.SetTarget(HttpContext.RequestServices);
                 if (IsJsonRequest())
@@ -55,9 +56,15 @@ namespace Wodsoft.ComBoost.Mvc
                 }
                 return View(model);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(401, ex.Message);
+                if (ex.InnerException is UnauthorizedAccessException)
+                    return StatusCode(401, ex.InnerException.Message);
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
         }
 
@@ -73,7 +80,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateCreateContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Create);
+                var model = await EntityService.ExecuteCreate(context);
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Create, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
@@ -81,9 +88,15 @@ namespace Wodsoft.ComBoost.Mvc
                 }
                 return View("Edit", model);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(401, ex.Message);
+                if (ex.InnerException is UnauthorizedAccessException)
+                    return StatusCode(401, ex.InnerException.Message);
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
         }
 
@@ -99,7 +112,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateEditContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Edit);
+                var model = await EntityService.ExecuteEdit(context);
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Edit, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
@@ -107,13 +120,17 @@ namespace Wodsoft.ComBoost.Mvc
                 }
                 return View(model);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(401, ex.Message);
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return StatusCode(404, ex.Message);
+                if (ex.InnerException is UnauthorizedAccessException)
+                    return StatusCode(401, ex.InnerException.Message);
+                else if (ex.InnerException is EntityNotFoundException)
+                    return StatusCode(404, ex.InnerException.Message);
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
         }
 
@@ -129,7 +146,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateDetailContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityEditModel<T>>(context, EntityService.Detail);
+                var model = await EntityService.ExecuteDetail(context);
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Detail, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
@@ -137,16 +154,20 @@ namespace Wodsoft.ComBoost.Mvc
                 }
                 return View(model);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(401, ex.Message);
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return StatusCode(404, ex.Message);
+                if (ex.InnerException is UnauthorizedAccessException)
+                    return StatusCode(401, ex.InnerException.Message);
+                else if (ex.InnerException is EntityNotFoundException)
+                    return StatusCode(404, ex.InnerException.Message);
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
         }
-        
+
         protected virtual ControllerDomainContext CreateDetailContext()
         {
             return CreateDomainContext();
@@ -159,16 +180,20 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateRemoveContext();
             try
             {
-                await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption>(context, EntityService.Remove);
+                await EntityService.ExecuteRemove(context);
                 return StatusCode(200);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(401, ex.Message);
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return StatusCode(404, ex.Message);
+                if (ex.InnerException is UnauthorizedAccessException)
+                    return StatusCode(401, ex.InnerException.Message);
+                else if (ex.InnerException is EntityNotFoundException)
+                    return StatusCode(404, ex.InnerException.Message);
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
         }
 
@@ -184,7 +209,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateUpdateContext();
             try
             {
-                var result = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, IValueProvider, EntityDomainAuthorizeOption, IEntityUpdateModel<T>>(context, EntityService.Update);
+                var result = await EntityService.ExecuteUpdate(context);
                 if (result.IsSuccess)
                     return StatusCode(204);
                 Response.StatusCode = 400;
@@ -196,13 +221,19 @@ namespace Wodsoft.ComBoost.Mvc
                         ErrorMessage = t.Value
                     }));
             }
-            catch (UnauthorizedAccessException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(401, ex.Message);
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return StatusCode(404, ex.Message);
+                if (ex.InnerException is UnauthorizedAccessException)
+                    return StatusCode(401, ex.InnerException.Message);
+                else if (ex.InnerException is EntityNotFoundException)
+                    return StatusCode(404, ex.InnerException.Message);
+                else if (ex.InnerException is ArgumentException || ex.InnerException is ArgumentNullException || ex.InnerException is ArgumentOutOfRangeException)
+                    return StatusCode(400, ex.InnerException.Message);
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
         }
 
@@ -218,7 +249,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateSelectorContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel<T>>(context, EntityService.List);
+                var model = await EntityService.ExecuteList(context);
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
@@ -226,9 +257,15 @@ namespace Wodsoft.ComBoost.Mvc
                 }
                 return View(model);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(401, ex.Message);
+                if (ex.InnerException is UnauthorizedAccessException)
+                    return StatusCode(401, ex.InnerException.Message);
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
         }
 
@@ -244,7 +281,7 @@ namespace Wodsoft.ComBoost.Mvc
             var context = CreateMultipleSelectorContext();
             try
             {
-                var model = await EntityService.ExecuteAsync<IDatabaseContext, IAuthenticationProvider, EntityDomainAuthorizeOption, IEntityViewModel<T>>(context, EntityService.List);
+                var model = await EntityService.ExecuteList(context);
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
@@ -252,9 +289,15 @@ namespace Wodsoft.ComBoost.Mvc
                 }
                 return View(model);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (DomainServiceException ex)
             {
-                return StatusCode(401, ex.Message);
+                if (ex.InnerException is UnauthorizedAccessException)
+                    return StatusCode(401, ex.InnerException.Message);
+                else
+                {
+                    ExceptionDispatchInfo.Capture(ex).Throw();
+                    throw;
+                }
             }
         }
 

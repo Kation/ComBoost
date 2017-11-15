@@ -54,6 +54,19 @@ namespace Wodsoft.ComBoost.AspNetCore
 
         public ISerializerProvider SerializerProvider { get; private set; }
 
+        public Task ClearAsync()
+        {
+            var keys = Session.Keys.Where(t => t.StartsWith(Prefix)).ToArray();
+            foreach (var key in keys)
+                Session.Remove(key);
+            return Task.CompletedTask;
+        }
+
+        public Task<string[]> GetKeysAsync()
+        {
+            return Task.FromResult(Session.Keys.Where(t => t.StartsWith(Prefix)).ToArray());
+        }
+
         public Task<bool> DeleteAsync(string name)
         {
             Session.Remove(Prefix + name);

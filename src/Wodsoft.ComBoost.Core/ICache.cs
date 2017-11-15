@@ -33,5 +33,17 @@ namespace Wodsoft.ComBoost
         /// <param name="expireTime">过期时间。</param>
         /// <returns>返回异步任务。</returns>
         Task SetAsync(string name, object value, TimeSpan? expireTime);
+
+        /// <summary>
+        /// 异步获取所有键名称。
+        /// </summary>
+        /// <returns></returns>
+        Task<string[]> GetKeysAsync();
+
+        /// <summary>
+        /// 异步删除所有缓存。
+        /// </summary>
+        /// <returns></returns>
+        Task ClearAsync();
     }
 }
