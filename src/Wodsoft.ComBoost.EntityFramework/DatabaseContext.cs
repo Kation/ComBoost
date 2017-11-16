@@ -26,8 +26,11 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IEnumerable<Type> SupportTypes { get; private set; }
 
+        public bool TrackEntity { get; set; }
+
         public DatabaseContext(DbContext context)
         {
+            TrackEntity = false;
             AsyncQueryableExtensions.Context = AsyncQueryable.Default;
             DatabaseContextAccessor.Context = this;
             _CachedEntityContext = new Dictionary<Type, object>();
