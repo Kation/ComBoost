@@ -17,16 +17,22 @@ namespace Wodsoft.ComBoost.Mvc
     {
 
         /// <summary>
-        /// Render a property editor.
+        /// 输出一个编辑器。
         /// </summary>
-        /// <typeparam name="TEntity">Type of entity.</typeparam>
-        /// <param name="helper">A html helper.</param>
-        /// <param name="model">Entity model.</param>
-        /// <param name="expression">Expression for property to entity.</param>
+        /// <typeparam name="TEntity">实体类型。</typeparam>
+        /// <param name="helper">Html帮助器。</param>
+        /// <param name="model">实体编辑模型。</param>
+        /// <param name="expression">属性选择表达式。</param>
         /// <returns></returns>
         public static IHtmlContent Editor<TEntity>(this IHtmlHelper helper, IEntityEditModel<TEntity> model, Expression<Func<TEntity, object>> expression)
             where TEntity : class, IEntity, new()
         {
+            if (helper == null)
+                throw new ArgumentNullException(nameof(helper));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+            if (expression == null)
+                throw new ArgumentNullException(nameof(expression));
             if (!(expression.Body is MemberExpression))
                 throw new NotSupportedException();
             MemberExpression memberExpression = (MemberExpression)expression.Body;
@@ -38,14 +44,45 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         /// <summary>
-        /// Render a property editor.
+        /// 输出一个编辑器。
         /// </summary>
-        /// <param name="helper">A html helper.</param>
-        /// <param name="entity">Entity object.</param>
-        /// <param name="property">Property metadata.</param>
+        /// <typeparam name="TEntity">实体类型。</typeparam>
+        /// <typeparam name="TProperty">属性类型。</typeparam>
+        /// <param name="helper">Html帮助器。</param>
+        /// <param name="expression">属性选择表达式。</param>
+        /// <returns></returns>
+        public static IHtmlContent Editor<TEntity,TProperty>(this IHtmlHelper<IEntityEditModel<TEntity>> helper, Expression<Func<TEntity,TProperty>> expression)
+            where TEntity : IEntity
+        {
+            if (helper == null)
+                throw new ArgumentNullException(nameof(helper));
+            if (expression == null)
+                throw new ArgumentNullException(nameof(expression));
+            if (!(expression.Body is MemberExpression))
+                throw new NotSupportedException();
+            MemberExpression memberExpression = (MemberExpression)expression.Body;
+            if (!(memberExpression.Expression is ParameterExpression))
+                throw new NotSupportedException();
+            var value = expression.Compile()(helper.ViewData.Model.Item);
+            var property = helper.ViewData.Model.Metadata.GetProperty(memberExpression.Member.Name);
+            return Editor(helper, helper.ViewData.Model.Item, property, value);
+        }
+
+        /// <summary>
+        /// 输出一个编辑器。
+        /// </summary>
+        /// <param name="helper">Html帮助器。</param>
+        /// <param name="entity">实体对象。</param>
+        /// <param name="property">属性元数据。</param>
         /// <returns></returns>
         public static IHtmlContent Editor(this IHtmlHelper helper, IEntity entity, IPropertyMetadata property)
         {
+            if (helper == null)
+                throw new ArgumentNullException(nameof(helper));
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+            if (property == null)
+                throw new ArgumentNullException(nameof(property));
             if (helper == null)
                 throw new ArgumentNullException("helper");
             if (entity == null)
@@ -56,12 +93,12 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         /// <summary>
-        /// Render a property editor.
+        /// 输出一个编辑器。
         /// </summary>
-        /// <param name="helper">A html helper.</param>
-        /// <param name="entity">Entity object.</param>
-        /// <param name="property">Property metadata.</param>
-        /// <param name="value">Property value.</param>
+        /// <param name="helper">Html帮助器。</param>
+        /// <param name="entity">实体对象。</param>
+        /// <param name="property">属性元数据。</param>
+        /// <param name="value">属性值。</param>
         public static IHtmlContent Editor(this IHtmlHelper helper, IEntity entity, IPropertyMetadata property, object value)
         {
             if (helper == null)
@@ -81,16 +118,22 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         /// <summary>
-        /// Render a property viewer.
+        /// 输出一个查看器。
         /// </summary>
-        /// <typeparam name="TEntity">Type of entity.</typeparam>
-        /// <param name="helper">A html helper.</param>
-        /// <param name="model">Entity model.</param>
-        /// <param name="expression">Expression for property to entity.</param>
+        /// <typeparam name="TEntity">实体类型。</typeparam>
+        /// <param name="helper">Html帮助器。</param>
+        /// <param name="model">实体编辑模型。</param>
+        /// <param name="expression">属性选择表达式。</param>
         /// <returns></returns>
         public static IHtmlContent Viewer<TEntity>(this IHtmlHelper helper, IEntityEditModel<TEntity> model, Expression<Func<TEntity, object>> expression)
             where TEntity : class, IEntity, new()
         {
+            if (helper == null)
+                throw new ArgumentNullException(nameof(helper));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+            if (expression == null)
+                throw new ArgumentNullException(nameof(expression));
             if (!(expression.Body is MemberExpression))
                 throw new NotSupportedException();
             MemberExpression memberExpression = (MemberExpression)expression.Body;
@@ -102,11 +145,36 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         /// <summary>
-        /// Render a property viewer.
+        /// 输出一个查看器。
         /// </summary>
-        /// <param name="helper">A html helper.</param>
-        /// <param name="entity">Entity object.</param>
-        /// <param name="property">Property metadata.</param>
+        /// <typeparam name="TEntity">实体类型。</typeparam>
+        /// <typeparam name="TProperty">属性类型。</typeparam>
+        /// <param name="helper">Html帮助器。</param>
+        /// <param name="expression">属性选择表达式。</param>
+        /// <returns></returns>
+        public static IHtmlContent Viewer<TEntity, TProperty>(this IHtmlHelper<IEntityEditModel<TEntity>> helper, Expression<Func<TEntity, TProperty>> expression)
+            where TEntity : IEntity
+        {
+            if (helper == null)
+                throw new ArgumentNullException(nameof(helper));
+            if (expression == null)
+                throw new ArgumentNullException(nameof(expression));
+            if (!(expression.Body is MemberExpression))
+                throw new NotSupportedException();
+            MemberExpression memberExpression = (MemberExpression)expression.Body;
+            if (!(memberExpression.Expression is ParameterExpression))
+                throw new NotSupportedException();
+            var value = expression.Compile()(helper.ViewData.Model.Item);
+            var property = helper.ViewData.Model.Metadata.GetProperty(memberExpression.Member.Name);
+            return Viewer(helper, helper.ViewData.Model.Item, property, value);
+        }
+
+        /// <summary>
+        /// 输出一个查看器。
+        /// </summary>
+        /// <param name="helper">Html帮助器。</param>
+        /// <param name="entity">实体对象。</param>
+        /// <param name="property">属性元数据。</param>
         /// <returns></returns>
         public static IHtmlContent Viewer(this IHtmlHelper helper, IEntity entity, IPropertyMetadata property)
         {
@@ -120,12 +188,12 @@ namespace Wodsoft.ComBoost.Mvc
         }
 
         /// <summary>
-        /// Render a property viewer.
+        /// 输出一个查看器。
         /// </summary>
-        /// <param name="helper">A html helper.</param>
-        /// <param name="entity">Entity object.</param>
-        /// <param name="property">Property metadata.</param>
-        /// <param name="value">Property value.</param>
+        /// <param name="helper">Html帮助器。</param>
+        /// <param name="entity">实体对象。</param>
+        /// <param name="property">属性元数据。</param>
+        /// <param name="value">属性值。</param>
         public static IHtmlContent Viewer(this IHtmlHelper helper, IEntity entity, IPropertyMetadata property, object value)
         {
             if (helper == null)
@@ -153,6 +221,8 @@ namespace Wodsoft.ComBoost.Mvc
         /// <returns></returns>
         public static EnumItem[] EnumAnalyze(Type type)
         {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
             if (!type.GetTypeInfo().IsEnum)
                 throw new ArgumentException(type.Name + " is not a enum type.");
             if (!_EnumCache.ContainsKey(type))
