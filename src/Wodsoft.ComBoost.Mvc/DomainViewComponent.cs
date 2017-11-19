@@ -7,15 +7,29 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Mvc
 {
+    /// <summary>
+    /// 领域视图组件。
+    /// </summary>
     public abstract class DomainViewComponent : ViewComponent
     {
-        public DomainViewComponent()
+        private IDomainServiceProvider _Provider;
+        /// <summary>
+        /// 获取领域服务提供器。
+        /// </summary>
+        protected IDomainServiceProvider DomainProvider
         {
-            DomainProvider = HttpContext.RequestServices.GetRequiredService<IDomainServiceProvider>();
+            get
+            {
+                if (_Provider == null)
+                    _Provider = HttpContext.RequestServices.GetRequiredService<IDomainServiceProvider>();
+                return _Provider;
+            }
         }
 
-        protected IDomainServiceProvider DomainProvider { get; private set; }
-
+        /// <summary>
+        /// 创建领域上下文。
+        /// </summary>
+        /// <returns></returns>
         protected virtual ViewComponentDomainContext CreateDomainContext()
         {
             return new ViewComponentDomainContext(this);
