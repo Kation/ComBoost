@@ -34,5 +34,14 @@ namespace Wodsoft.ComBoost.Mvc
         {
             return new ViewComponentDomainContext(this);
         }
+
+        /// <summary>
+        /// 创建空领域上下文。
+        /// </summary>
+        /// <returns></returns>
+        protected virtual EmptyDomainContext CreateEmptyContext()
+        {
+            return new EmptyDomainContext(HttpContext.RequestServices, HttpContext.RequestAborted);
+        }
     }
 }
