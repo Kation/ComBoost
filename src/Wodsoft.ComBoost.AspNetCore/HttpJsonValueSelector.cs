@@ -52,6 +52,9 @@ namespace Wodsoft.ComBoost.AspNetCore
                 if (token.HasValues)
                     GetValues(token.Children(), values);
                 else
+                    if (token.Type == JTokenType.Object || token.Type == JTokenType.Array)
+                    values.Add(token.Path.ToLower(), null);
+                else
                     values.Add(token.Path.ToLower(), token.ToObject<string>());
             }
         }
