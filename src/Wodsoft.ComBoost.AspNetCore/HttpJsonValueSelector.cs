@@ -20,12 +20,12 @@ namespace Wodsoft.ComBoost.AspNetCore
         {
             if (_Values == null)
             {
-                JObject jobj;
+                JContainer jobj;
                 try
                 {
                     var reader = new StreamReader(HttpContext.Request.Body);
                     var text = reader.ReadToEnd();
-                    jobj = JsonConvert.DeserializeObject<JObject>(text);
+                    jobj = JsonConvert.DeserializeObject<JContainer>(text);
                 }
                 catch (Exception ex)
                 {
@@ -40,7 +40,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         protected override object GetValueCore(string key)
         {
             string value;
-            if (_Values.TryGetValue(key.ToLower(), out value))
+            if (_Values.TryGetValue(key, out value))
                 return value;
             return null;
         }
@@ -53,9 +53,9 @@ namespace Wodsoft.ComBoost.AspNetCore
                     GetValues(token.Children(), values);
                 else
                     if (token.Type == JTokenType.Object || token.Type == JTokenType.Array)
-                    values.Add(token.Path.ToLower(), null);
+                    values.Add(token.Path, null);
                 else
-                    values.Add(token.Path.ToLower(), token.ToObject<string>());
+                    values.Add(token.Path, token.ToObject<string>());
             }
         }
     }

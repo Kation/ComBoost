@@ -21,7 +21,7 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取存在的键集合。
         /// </summary>
-        IReadOnlyCollection<string> Keys { get; }
+        IValueKeyCollection Keys { get; }
 
         /// <summary>
         /// 返回值提供器是否包含名称。

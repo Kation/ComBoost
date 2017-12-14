@@ -16,7 +16,7 @@ using Wodsoft.ComBoost.AspNetCore;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class MvcValueProvider : HttpValueProvider, Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider
+    public class MvcValueProvider : HttpValueProvider, Microsoft.AspNetCore.Mvc.ModelBinding.IEnumerableValueProvider
     {
         private Dictionary<string, object> _Values;
         private IModelBinderFactory _ModelBinderFactory;
@@ -67,9 +67,16 @@ namespace Wodsoft.ComBoost.Mvc
 
         bool Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.ContainsPrefix(string prefix)
         {
+            if (prefix == "")
+                return true;
             if (IgnoreCase)
                 prefix = prefix.ToLower();
-            return Keys.Any(t => t == prefix || t.StartsWith(prefix + ".") || t.StartsWith(prefix + "["));
+            return Keys.ContainsPrefix(prefix, '.', '[');
+        }
+
+        IDictionary<string, string> IEnumerableValueProvider.GetKeysFromPrefix(string prefix)
+        {
+            return Keys.GetKeysFromPrefix(prefix, '.', '[', ']');
         }
 
         ValueProviderResult Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.GetValue(string key)

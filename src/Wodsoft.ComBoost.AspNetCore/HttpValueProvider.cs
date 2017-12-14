@@ -43,17 +43,15 @@ namespace Wodsoft.ComBoost.AspNetCore
 
         public bool IgnoreCase { get; set; }
 
-        private ReadOnlyCollection<string> _Keys;
-        public IReadOnlyCollection<string> Keys
+        private HttpValueKeyCollection _Keys;
+        public IValueKeyCollection Keys
         {
             get
             {
                 if (_Keys == null)
                 {
                     var keys = ValueSelectors.SelectMany(t => t.GetKeys()).Concat(_Values.Keys).Concat(_Alias.Keys);
-                    if (IgnoreCase)
-                        keys = keys.Select(t => t.ToLower());
-                    _Keys = new ReadOnlyCollection<string>(keys.Distinct().ToList());
+                    _Keys = new HttpValueKeyCollection(keys.Distinct().ToList(), IgnoreCase);
                 }
                 return _Keys;
             }
@@ -63,7 +61,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         {
             if (name == null)
                 throw new ArgumentNullException(name);
-            return Keys.Contains(IgnoreCase ? name.ToLower() : name);
+            return Keys.ContainsKey(name);
         }
 
         public virtual object GetValue(string name, Type valueType)

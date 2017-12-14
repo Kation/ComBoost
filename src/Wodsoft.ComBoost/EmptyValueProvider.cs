@@ -35,15 +35,15 @@ namespace Wodsoft.ComBoost
             _Keys = null;
         }
 
-        private ReadOnlyCollection<string> _Keys;
-        public virtual IReadOnlyCollection<string> Keys
+        private ValueKeyCollection _Keys;
+        public virtual IValueKeyCollection Keys
         {
             get
             {
                 if (_Keys == null)
                 {
                     var keys = _Values.Keys.Concat(_Alias.Keys);
-                    _Keys = new ReadOnlyCollection<string>(keys.Distinct().ToList());
+                    _Keys = new ValueKeyCollection(keys.Distinct().ToList());
                 }
                 return _Keys;
             }
@@ -87,7 +87,7 @@ namespace Wodsoft.ComBoost
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
-            return Keys.Contains(name);
+            return Keys.ContainsKey(name);
         }
 
         public virtual void SetAlias(string name, string aliasName)
