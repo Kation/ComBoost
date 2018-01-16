@@ -13,7 +13,16 @@ namespace Wodsoft.ComBoost.AspNetCore
         public HttpValueKeyCollection(IEnumerable<string> keys, bool ignoreCase) : base(keys)
         {
             if (ignoreCase)
-                lowerKeys = keys.ToDictionary(t => t.ToLower(), t => t);
+            {
+                lowerKeys = new Dictionary<string, string>();
+                foreach (var key in keys)
+                {
+                    var lower = key.ToLower();
+                    if (lowerKeys.ContainsKey(lower))
+                        continue;
+                    lowerKeys.Add(lower, key);
+                }
+            }
         }
 
         public override bool ContainsKey(string key)
