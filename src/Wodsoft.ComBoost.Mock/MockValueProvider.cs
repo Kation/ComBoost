@@ -10,28 +10,20 @@ namespace Wodsoft.ComBoost.Mock
 {
     public class MockValueProvider : EmptyValueProvider
     {
-        private Dictionary<string, object> _Values;
-
         public MockValueProvider()
         {
-            _Values = new Dictionary<string, object>();
             IgnoreCase = false;
         }
 
         public bool IgnoreCase { get; set; }
 
-        private ReadOnlyCollection<string> _Keys;
-        public override IReadOnlyCollection<string> Keys
+        private MockValueKeyCollection _Keys;
+        public override IValueKeyCollection Keys
         {
             get
             {
                 if (_Keys == null)
-                {
-                    IEnumerable<string> keys = base.Keys;
-                    if (IgnoreCase)
-                        keys = keys.Select(t => t.ToLower());
-                    _Keys = new ReadOnlyCollection<string>(keys.Distinct().ToList());
-                }
+                    _Keys = new MockValueKeyCollection(base.Keys, IgnoreCase);
                 return _Keys;
             }
         }
