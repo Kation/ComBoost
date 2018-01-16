@@ -36,7 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
-            AddComBoostAuthentication<T>(services, null);
+            AddComBoostAuthentication<T>(services, o => { });
         }
 
         public static void AddComBoostAuthentication<T>(this IServiceCollection services, Action<ComBoostAuthenticationOptions> configureOptions)
