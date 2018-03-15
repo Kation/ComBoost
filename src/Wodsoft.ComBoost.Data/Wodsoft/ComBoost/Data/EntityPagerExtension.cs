@@ -33,34 +33,48 @@ namespace Wodsoft.ComBoost.Data
             //Service.Executed += Service_Executed;
         }
 
-//        private Task Service_Executed(IDomainExecutionContext context)
-//        {
-//            if (context.Result != null && context.Result is IEntityViewModel)
-//            {
-//                dynamic model = context.Result;
-//                model.CurrentPage = context.DomainContext.DataBag.Page;
-//                model.CurrentSize = context.DomainContext.DataBag.Size;
-//                model.TotalPage = context.DomainContext.DataBag.TotalPage;
-//                model.PageSizeOption = EntityPagerExtension.PageSizeOptions;
-//                model.TotalCount = context.DomainContext.DataBag.TotalCount;
-//            }
-//            return Task.CompletedTask;
-//        }
+        //        private Task Service_Executed(IDomainExecutionContext context)
+        //        {
+        //            if (context.Result != null && context.Result is IEntityViewModel)
+        //            {
+        //                dynamic model = context.Result;
+        //                model.CurrentPage = context.DomainContext.DataBag.Page;
+        //                model.CurrentSize = context.DomainContext.DataBag.Size;
+        //                model.TotalPage = context.DomainContext.DataBag.TotalPage;
+        //                model.PageSizeOption = EntityPagerExtension.PageSizeOptions;
+        //                model.TotalCount = context.DomainContext.DataBag.TotalCount;
+        //            }
+        //            return Task.CompletedTask;
+        //        }
 
         private Task Service_EntityQuery(IDomainExecutionContext context, EntityQueryEventArgs<T> e)
         {
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
-            int page = valueProvider.GetValue<int>("page");
-            if (page == 0)
-                page = 1;
-            int size = valueProvider.GetValue<int>("size");
-            if (size == 0)
-                size = EntityPagerExtension.DefaultPageSize;
-            EntityPagerOption option = new EntityPagerOption();
-            option.CurrentPage = page;
-            option.CurrentSize = size;
-            option.PageSizeOption = EntityPagerExtension.PageSizeOptions;
-            context.DomainContext.Options.SetOption(option);
+            var option = context.DomainContext.Options.GetOption<EntityPagerOption>();
+            if (option == null)
+            {
+                option = new EntityPagerOption();
+                context.DomainContext.Options.SetOption(option);
+            }
+            if (option.CurrentPage == 0)
+            {
+                int page = valueProvider.GetValue<int>("page");
+                if (page == 0)
+                    page = 1;
+                option.CurrentPage = page;
+            }
+            if (option.CurrentSize == 0)
+            {
+                int size = valueProvider.GetValue<int>("size");
+                if (size == 0)
+                    if (option.DefaultSize == 0)
+                        size = EntityPagerExtension.DefaultPageSize;
+                    else
+                        size = option.DefaultSize;
+                option.CurrentSize = size;
+            }
+            if (option.PageSizeOption == null)
+                option.PageSizeOption = EntityPagerExtension.PageSizeOptions;
             return Task.CompletedTask;
             //var databaseContext = context.DomainContext.GetRequiredService<IDatabaseContext>();
             //var entityContext = databaseContext.GetContext<T>();

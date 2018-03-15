@@ -12,6 +12,8 @@ namespace Wodsoft.ComBoost.Data
 
         public int CurrentSize { get; set; }
 
+        public int DefaultSize { get; set; }
+
         public int[] PageSizeOption { get; set; }
     }
 }
