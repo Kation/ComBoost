@@ -9,30 +9,41 @@ using System.IO;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
+    /// <summary>
+    /// HttpJson值选择器。
+    /// </summary>
     public class HttpJsonValueSelector : HttpValueSelector
     {
+        /// <summary>
+        /// 实例化选择器。
+        /// </summary>
+        /// <param name="httpContext">Http上下文。</param>
         public HttpJsonValueSelector(HttpContext httpContext) : base(httpContext)
         {
         }
+
+        /// <summary>
+        /// 获取Json根。
+        /// </summary>
+        public JContainer Root { get; private set; }
 
         private Dictionary<string, string> _Values;
         protected override string[] GetKeysCore()
         {
             if (_Values == null)
             {
-                JContainer jobj;
                 try
                 {
                     var reader = new StreamReader(HttpContext.Request.Body);
                     var text = reader.ReadToEnd();
-                    jobj = JsonConvert.DeserializeObject<JContainer>(text);
+                    Root = JsonConvert.DeserializeObject<JContainer>(text);
                 }
                 catch (Exception ex)
                 {
                     throw new FormatException("解析Json内容失败。", ex);
                 }
                 _Values = new Dictionary<string, string>();
-                GetValues(jobj.Children(), _Values);
+                GetValues(Root.Children(), _Values);
             }
             return _Values.Keys.ToArray();
         }

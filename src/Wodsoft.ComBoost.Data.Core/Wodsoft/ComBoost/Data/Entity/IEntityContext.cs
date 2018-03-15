@@ -65,28 +65,24 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// 异步查找出单个对象。
         /// </summary>
         /// <param name="query">查询对象。</param>
-        /// <param name="expression">表达式。</param>
         /// <returns></returns>
         Task<T> SingleOrDefaultAsync(IQueryable<T> query);
         /// <summary>
         /// 异步查找出单个对象。
         /// </summary>
         /// <param name="query">查询对象。</param>
-        /// <param name="expression">表达式。</param>
         /// <returns></returns>
         Task<T> SingleAsync(IQueryable<T> query);
         /// <summary>
         /// 异步查找出第一个对象。
         /// </summary>
         /// <param name="query">查询对象。</param>
-        /// <param name="expression">表达式。</param>
         /// <returns></returns>
         Task<T> FirstOrDefaultAsync(IQueryable<T> query);
         /// <summary>
         /// 异步查找出第一个对象。
         /// </summary>
         /// <param name="query">查询对象。</param>
-        /// <param name="expression">表达式。</param>
         /// <returns></returns>
         Task<T> FirstAsync(IQueryable<T> query);
         /// <summary>

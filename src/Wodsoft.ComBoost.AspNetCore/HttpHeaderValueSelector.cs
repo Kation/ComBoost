@@ -7,6 +7,9 @@ using Microsoft.Extensions.Primitives;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
+    /// <summary>
+    /// Http头部值选择器。
+    /// </summary>
     public class HttpHeaderValueSelector : HttpStringValuesSelector
     {
         public HttpHeaderValueSelector(HttpContext httpContext) : base(httpContext)

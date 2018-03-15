@@ -1,5 +1,5 @@
 @echo off
-set s_version=""
+set s_version=
 set /p s_version=«Î ‰»Î∞Ê±æ∫≈£∫
 if "%s_version%" neq "" set "s_version=--version-suffix %s_version%"
 if not exist build md build
