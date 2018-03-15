@@ -32,6 +32,13 @@ namespace Wodsoft.ComBoost.Data
             Metadata = EntityDescriptor.GetMetadata<T>();
         }
 
+        /// <summary>
+        /// 实体列表。
+        /// </summary>
+        /// <param name="database">数据库上下文。</param>
+        /// <param name="authenticationProvider">身份认证提供器。</param>
+        /// <param name="authorizeOption">授权选项。</param>
+        /// <returns>实体视图模型。</returns>
         [OptionRequired(typeof(EntityPagerOption))]
         public virtual async Task<IEntityViewModel<T>> List([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
@@ -64,9 +71,24 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
+        /// <summary>
+        /// 实体查询事件路由。
+        /// </summary>
         public static readonly DomainServiceEventRoute EntityQueryEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityQueryEventArgs<T>>("EntityQuery", typeof(EntityDomainService<T>));
+        /// <summary>
+        /// 实体查询事件。
+        /// </summary>
         public event DomainServiceAsyncEventHandler<EntityQueryEventArgs<T>> EntityQuery { add { AddAsyncEventHandler(EntityQueryEvent, value); } remove { RemoveAsyncEventHandler(EntityQueryEvent, value); } }
 
+        /// <summary>
+        /// 自定义视图模型列表。
+        /// </summary>
+        /// <typeparam name="TViewModel">视图模型。</typeparam>
+        /// <param name="database">数据库上下文。</param>
+        /// <param name="authenticationProvider">身份认证提供器。</param>
+        /// <param name="authorizeOption">授权选项。</param>
+        /// <param name="selectOption">实体模型选择选项。</param>
+        /// <returns>自定义视图模型。</returns>
         [OptionRequired(typeof(EntityPagerOption))]
         public virtual async Task<IViewModel<TViewModel>> ListViewModel<TViewModel>([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption, [FromOptions(true)]EntityQuerySelectOption<T, TViewModel> selectOption)
             where TViewModel : class
@@ -94,6 +116,13 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
+        /// <summary>
+        /// 创建实体。
+        /// </summary>
+        /// <param name="database">数据库上下文。</param>
+        /// <param name="authenticationProvider">身份认证提供器。</param>
+        /// <param name="authorizeOption">授权选项。</param>
+        /// <returns>实体编辑模型。</returns>
         public virtual async Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             var auth = authenticationProvider.GetAuthentication();
@@ -111,9 +140,25 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
+        /// <summary>
+        /// 实体模型创建完毕事件路由。
+        /// 这个事件一般在模型创建与赋值完毕后触发。
+        /// </summary>
         public static readonly DomainServiceEventRoute EntityCreateModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>("EntityCreateModelCreated", typeof(EntityDomainService<T>));
+        /// <summary>
+        /// 实体模型创建完毕事件。
+        /// 这个事件一般在模型创建与赋值完毕后触发。
+        /// </summary>
         public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated { add { AddAsyncEventHandler(EntityCreateModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityCreateModelCreatedEvent, value); } }
 
+        /// <summary>
+        /// 编辑实体。
+        /// </summary>
+        /// <param name="database">数据库上下文。</param>
+        /// <param name="authenticationProvider">身份认证提供器。</param>
+        /// <param name="valueProvider">值提供器。</param>
+        /// <param name="authorizeOption">授权选项。</param>
+        /// <returns>实体编辑模型。</returns>
         public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
@@ -139,9 +184,25 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
+        /// <summary>
+        /// 实体编辑模型创建完毕事件路由。
+        /// 这个事件一般在模型创建与赋值完毕后触发。
+        /// </summary>
         public static readonly DomainServiceEventRoute EntityEditModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>("EntityEditModelCreated", typeof(EntityDomainService<T>));
+        /// <summary>
+        /// 实体编辑模型创建完毕事件。
+        /// 这个事件一般在模型创建与赋值完毕后触发。
+        /// </summary>
         public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityEditModelCreated { add { AddAsyncEventHandler(EntityEditModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityEditModelCreatedEvent, value); } }
 
+        /// <summary>
+        /// 更新实体。
+        /// </summary>
+        /// <param name="database">数据库上下文。</param>
+        /// <param name="authenticationProvider">身份认证提供器。</param>
+        /// <param name="valueProvider">值提供器。</param>
+        /// <param name="authorizeOption">授权选项。</param>
+        /// <returns>实体更新模型。</returns>
         public virtual async Task<IEntityUpdateModel<T>> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
         {
             object index = valueProvider.GetValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);

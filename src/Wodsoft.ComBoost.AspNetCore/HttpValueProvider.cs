@@ -10,11 +10,18 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
+    /// <summary>
+    /// Http值提供器。
+    /// </summary>
     public class HttpValueProvider : IConfigurableValueProvider
     {
         private Dictionary<string, object> _Values;
         private Dictionary<string, string> _Alias;
 
+        /// <summary>
+        /// 实例化值提供器。
+        /// </summary>
+        /// <param name="httpContext">Http上下文。</param>
         public HttpValueProvider(HttpContext httpContext)
         {
             if (httpContext == null)
@@ -37,13 +44,25 @@ namespace Wodsoft.ComBoost.AspNetCore
             ValueSelectors.Add(new HttpHeaderValueSelector(httpContext));
         }
 
+        /// <summary>
+        /// 获取Http上下文。
+        /// </summary>
         public HttpContext HttpContext { get; private set; }
 
+        /// <summary>
+        /// 获取值选择器集合。
+        /// </summary>
         public IList<HttpValueSelector> ValueSelectors { get; private set; }
 
+        /// <summary>
+        /// 获取或设置是否忽略大小写。
+        /// </summary>
         public bool IgnoreCase { get; set; }
 
         private HttpValueKeyCollection _Keys;
+        /// <summary>
+        /// 获取存在的键集合。
+        /// </summary>
         public IValueKeyCollection Keys
         {
             get
@@ -57,6 +76,11 @@ namespace Wodsoft.ComBoost.AspNetCore
             }
         }
 
+        /// <summary>
+        /// 判断是否包含键名。
+        /// </summary>
+        /// <param name="name">键名。</param>
+        /// <returns>如果包含返回true，否则返回false。</returns>
         public bool ContainsKey(string name)
         {
             if (name == null)
@@ -64,6 +88,12 @@ namespace Wodsoft.ComBoost.AspNetCore
             return Keys.ContainsKey(name);
         }
 
+        /// <summary>
+        /// 获取值。
+        /// </summary>
+        /// <param name="name">名称。</param>
+        /// <param name="valueType">值类型。</param>
+        /// <returns>返回值。</returns>
         public virtual object GetValue(string name, Type valueType)
         {
             if (name == null)
@@ -78,13 +108,25 @@ namespace Wodsoft.ComBoost.AspNetCore
             return value;
         }
 
+        /// <summary>
+        /// 获取值。
+        /// </summary>
+        /// <param name="name">键名。</param>
+        /// <param name="valueType">值类型。</param>
+        /// <returns>返回值。</returns>
         protected virtual object GetValueCore(string name, Type valueType)
         {
             if (_Values.ContainsKey(IgnoreCase ? name.ToLower() : name))
                 return _Values[IgnoreCase ? name.ToLower() : name];
             return GetHttpValue(name, valueType);
         }
-
+        
+        /// <summary>
+        /// 获取Http值。
+        /// </summary>
+        /// <param name="name">键名。</param>
+        /// <param name="valueType">值类型。</param>
+        /// <returns>返回Http值。</returns>
         protected virtual object GetHttpValue(string name, Type valueType)
         {
             object value = GetHttpValueCore(name);
@@ -93,6 +135,11 @@ namespace Wodsoft.ComBoost.AspNetCore
             return ConvertValue(value, valueType);
         }
 
+        /// <summary>
+        /// 获取Http值。
+        /// </summary>
+        /// <param name="name">键名。</param>
+        /// <returns>返回Http值。</returns>
         protected virtual object GetHttpValueCore(string name)
         {
             foreach (var selector in ValueSelectors)
@@ -101,6 +148,12 @@ namespace Wodsoft.ComBoost.AspNetCore
             return null;
         }
 
+        /// <summary>
+        /// 转换值。
+        /// </summary>
+        /// <param name="value">值。</param>
+        /// <param name="targetType">目标类型。</param>
+        /// <returns>返回转换后的值。</returns>
         protected virtual object ConvertValue(object value, Type targetType)
         {
             var valueType = value.GetType();
@@ -129,6 +182,10 @@ namespace Wodsoft.ComBoost.AspNetCore
             return converter.ConvertFrom(value);
         }
 
+        /// <summary>
+        /// 设置值。
+        /// </summary>
+        /// <param name="name">名称。</param>
         public void SetValue(string name, object value)
         {
             if (name == null)
