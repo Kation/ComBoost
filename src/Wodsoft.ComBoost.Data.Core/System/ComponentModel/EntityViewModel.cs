@@ -12,7 +12,7 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="T">Type of model.</typeparam>
     public class EntityViewModel<T> : ViewModel<T>, IEntityViewModel<T>
-        where T : class, IEntity, new()
+        where T : IEntity
     {
         /// <summary>
         /// Initialize entity view model.

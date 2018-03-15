@@ -12,7 +12,6 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class ViewModel<T> : NotifyBase, IViewModel<T>
-        where T : class
     {
         /// <summary>
         /// 实例化视图模型。

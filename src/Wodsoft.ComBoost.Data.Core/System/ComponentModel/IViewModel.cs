@@ -55,7 +55,6 @@ namespace System.ComponentModel
     }
 
     public interface IViewModel<out T> : IViewModel
-        where T : class
     {
         /// <summary>
         /// 获取当前查询体。

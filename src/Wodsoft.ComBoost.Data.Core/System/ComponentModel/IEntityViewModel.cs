@@ -51,7 +51,7 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="T">实体类型。</typeparam>
     public interface IEntityViewModel<out T> : IEntityViewModel, IViewModel<T>
-        where T : class, IEntity, new()
+        where T : IEntity
     {
 
     }
