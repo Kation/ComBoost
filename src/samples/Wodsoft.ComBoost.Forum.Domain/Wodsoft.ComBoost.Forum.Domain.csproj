@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Wodsoft.ComBoost.Forum.Domain Class Library</Description>
     <Authors>Kation</Authors>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Wodsoft.ComBoost.Forum.Domain</AssemblyName>
     <PackageId>Wodsoft.ComBoost.Forum.Domain</PackageId>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
@@ -15,7 +15,7 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+  <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Forum.Core\Wodsoft.ComBoost.Forum.Core.csproj" />
     <ProjectReference Include="..\..\Wodsoft.ComBoost.Security\Wodsoft.ComBoost.Security.csproj" />
     <ProjectReference Include="..\..\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.csproj" />

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>ComBoost框架储存服务。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.Storage</AssemblyTitle>
-    <TargetFrameworks>netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>Wodsoft.ComBoost.Storage</AssemblyName>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

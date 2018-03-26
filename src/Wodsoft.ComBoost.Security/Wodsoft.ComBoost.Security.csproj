@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>ComBoost安全模块。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.Security</AssemblyTitle>
-    <TargetFrameworks>netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>Wodsoft.ComBoost.Security</AssemblyName>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Wodsoft.ComBoost.Forum.Core Class Library</Description>
     <Authors>Kation</Authors>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Wodsoft.ComBoost.Forum.Core</AssemblyName>
     <PackageId>Wodsoft.ComBoost.Forum.Core</PackageId>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>

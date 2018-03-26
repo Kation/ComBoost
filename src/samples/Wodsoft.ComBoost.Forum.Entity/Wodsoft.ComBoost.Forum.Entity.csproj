@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Wodsoft.ComBoost.Forum.Entity Class Library</Description>
     <Authors>Kation</Authors>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Wodsoft.ComBoost.Forum.Entity</AssemblyName>
     <PackageId>Wodsoft.ComBoost.Forum.Entity</PackageId>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>ComBoost Redis分布式缓存，支持缓存与信号量。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.Redis</AssemblyTitle>
-    <TargetFrameworks>netstandard1.5;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>Wodsoft.ComBoost.Redis</AssemblyName>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
