@@ -24,7 +24,7 @@ namespace Wodsoft.ComBoost.Data
             Service.Executed += Service_Executed;
         }
 
-        private Task Service_Executed(IDomainExecutionContext context)
+        private Task Service_Executed(IDomainExecutionContext context, DomainServiceEventArgs e)
         {
             if (context.DomainContext.DataBag.SearchItem != null && context.Result != null)
             {

@@ -19,7 +19,7 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(cancellationToken));
             _ServiceProvider = serviceProvider;
             Filter = new List<IDomainServiceFilter>();
-            EventManager = new DomainContextEventManager(DomainServiceEventManager.GlobalEventManager);
+            EventManager = new DomainContextEventManager(serviceProvider.GetRequiredService<IDomainServiceEventManager>());
         }
 
         private dynamic _DataBag;

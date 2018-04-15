@@ -14,6 +14,7 @@ namespace Wodsoft.ComBoost
     public class DomainService : IDomainService
     {
         private AsyncLocal<IDomainExecutionContext> _ExecutionContext;
+        private IDomainServiceEventManager _EventManager;
 
         public DomainService()
         {
@@ -39,10 +40,15 @@ namespace Wodsoft.ComBoost
 
         private ConcurrentDictionary<MethodInfo, IDomainServiceFilter[]> _FilterCache = new ConcurrentDictionary<MethodInfo, IDomainServiceFilter[]>();
 
+        public void Initialize(IServiceProvider serviceProvider)
+        {
+            _EventManager = serviceProvider.GetRequiredService<IDomainServiceEventManager>();
+        }
+
         public static readonly DomainServiceEventRoute ExecutedEvent = DomainServiceEventRoute.RegisterAsyncEvent("Executed", typeof(DomainService));
         public static readonly DomainServiceEventRoute ExecutingEvent = DomainServiceEventRoute.RegisterAsyncEvent("Executing", typeof(DomainService));
-        public event DomainServiceAsyncEventHandler Executed { add { AddAsyncEventHandler(ExecutedEvent, value); } remove { RemoveAsyncEventHandler(ExecutedEvent, value); } }
-        public event DomainServiceAsyncEventHandler Executing { add { AddAsyncEventHandler(ExecutingEvent, value); } remove { RemoveAsyncEventHandler(ExecutingEvent, value); } }
+        public event DomainServiceAsyncEventHandler<DomainServiceEventArgs> Executed { add { AddAsyncEventHandler(ExecutedEvent, value); } remove { RemoveAsyncEventHandler(ExecutedEvent, value); } }
+        public event DomainServiceAsyncEventHandler<DomainServiceEventArgs> Executing { add { AddAsyncEventHandler(ExecutingEvent, value); } remove { RemoveAsyncEventHandler(ExecutingEvent, value); } }
 
         public async Task ExecuteAsync(IDomainContext domainContext, MethodInfo method)
         {
@@ -62,13 +68,13 @@ namespace Wodsoft.ComBoost
                 await OnFilterExecuting(context, methodFilters);
                 if (context.IsCompleted)
                     return;
-                await RaiseAsyncEvent(ExecutingEvent);
+                await RaiseAsyncEvent(ExecutingEvent, new DomainServiceEventArgs());
                 if (context.IsCompleted)
                     return;
                 var synchronizationContext = SynchronizationContext.Current;
                 await (Task)method.Invoke(this, context.ParameterValues);
                 SynchronizationContext.SetSynchronizationContext(synchronizationContext);
-                await RaiseAsyncEvent(ExecutedEvent);
+                await RaiseAsyncEvent(ExecutedEvent, new DomainServiceEventArgs());
                 if (context.IsCompleted)
                     return;
                 await OnFilterExecuted(context, methodFilters);
@@ -107,14 +113,14 @@ namespace Wodsoft.ComBoost
                 await OnFilterExecuting(context, methodFilters);
                 if (context.IsCompleted)
                     return (T)context.Result;
-                await RaiseAsyncEvent(ExecutingEvent);
+                await RaiseAsyncEvent(ExecutingEvent, new DomainServiceEventArgs());
                 if (context.IsCompleted)
                     return (T)context.Result;
                 var synchronizationContext = SynchronizationContext.Current;
                 var result = await (Task<T>)method.Invoke(this, context.ParameterValues);
                 SynchronizationContext.SetSynchronizationContext(synchronizationContext);
                 context.Result = result;
-                await RaiseAsyncEvent(ExecutedEvent);
+                await RaiseAsyncEvent(ExecutedEvent, new DomainServiceEventArgs());
                 if (context.IsCompleted)
                     return (T)context.Result;
                 await OnFilterExecuted(context, methodFilters);
@@ -176,30 +182,10 @@ namespace Wodsoft.ComBoost
         /// </summary>
         /// <param name="route">事件路由。</param>
         /// <param name="handler">事件处理器。</param>
-        protected virtual void AddEventHandler(DomainServiceEventRoute route, DomainServiceEventHandler handler)
-        {
-            DomainServiceEventManager.GlobalEventManager.AddEventHandler(route, handler);
-        }
-
-        /// <summary>
-        /// 添加事件处理器。
-        /// </summary>
-        /// <param name="route">事件路由。</param>
-        /// <param name="handler">事件处理器。</param>
         protected virtual void AddEventHandler<T>(DomainServiceEventRoute route, DomainServiceEventHandler<T> handler)
-            where T : EventArgs
+            where T : DomainServiceEventArgs
         {
-            DomainServiceEventManager.GlobalEventManager.AddEventHandler(route, handler);
-        }
-
-        /// <summary>
-        /// 添加事件处理器。
-        /// </summary>
-        /// <param name="route">事件路由。</param>
-        /// <param name="handler">事件处理器。</param>
-        protected virtual void AddAsyncEventHandler(DomainServiceEventRoute route, DomainServiceAsyncEventHandler handler)
-        {
-            DomainServiceEventManager.GlobalEventManager.AddAsyncEventHandler(route, handler);
+            _EventManager.AddEventHandler(route, handler);
         }
 
         /// <summary>
@@ -208,19 +194,9 @@ namespace Wodsoft.ComBoost
         /// <param name="route">事件路由。</param>
         /// <param name="handler">事件处理器。</param>
         protected virtual void AddAsyncEventHandler<T>(DomainServiceEventRoute route, DomainServiceAsyncEventHandler<T> handler)
-            where T : EventArgs
+            where T : DomainServiceEventArgs
         {
-            DomainServiceEventManager.GlobalEventManager.AddAsyncEventHandler(route, handler);
-        }
-
-        /// <summary>
-        /// 移除事件处理器。
-        /// </summary>
-        /// <param name="route">事件路由。</param>
-        /// <param name="handler">事件处理器。</param>
-        protected virtual void RemoveEventHandler(DomainServiceEventRoute route, DomainServiceEventHandler handler)
-        {
-            DomainServiceEventManager.GlobalEventManager.RemoveEventHandler(route, handler);
+            _EventManager.AddAsyncEventHandler(route, handler);
         }
 
         /// <summary>
@@ -229,19 +205,9 @@ namespace Wodsoft.ComBoost
         /// <param name="route">事件路由。</param>
         /// <param name="handler">事件处理器。</param>
         protected virtual void RemoveEventHandler<T>(DomainServiceEventRoute route, DomainServiceEventHandler<T> handler)
-            where T : EventArgs
+            where T : DomainServiceEventArgs
         {
-            DomainServiceEventManager.GlobalEventManager.RemoveEventHandler(route, handler);
-        }
-
-        /// <summary>
-        /// 移除事件处理器。
-        /// </summary>
-        /// <param name="route">事件路由。</param>
-        /// <param name="handler">事件处理器。</param>
-        protected virtual void RemoveAsyncEventHandler(DomainServiceEventRoute route, DomainServiceAsyncEventHandler handler)
-        {
-            DomainServiceEventManager.GlobalEventManager.RemoveAsyncEventHandler(route, handler);
+            _EventManager.RemoveEventHandler(route, handler);
         }
 
         /// <summary>
@@ -250,33 +216,23 @@ namespace Wodsoft.ComBoost
         /// <param name="route">事件路由。</param>
         /// <param name="handler">事件处理器。</param>
         protected virtual void RemoveAsyncEventHandler<T>(DomainServiceEventRoute route, DomainServiceAsyncEventHandler<T> handler)
-            where T : EventArgs
+            where T : DomainServiceEventArgs
         {
-            DomainServiceEventManager.GlobalEventManager.RemoveAsyncEventHandler(route, handler);
+            _EventManager.RemoveAsyncEventHandler(route, handler);
         }
 
         #endregion
 
         #region 引发事件
 
-        protected virtual void RaiseEvent(DomainServiceEventRoute eventRoute)
-        {
-            Context.DomainContext.EventManager.RaiseEvent(eventRoute, Context);
-        }
-
         protected virtual void RaiseEvent<TArgs>(DomainServiceEventRoute eventRoute, TArgs e)
-            where TArgs : EventArgs
+            where TArgs : DomainServiceEventArgs
         {
             Context.DomainContext.EventManager.RaiseEvent(eventRoute, Context, e);
         }
 
-        protected virtual Task RaiseAsyncEvent(DomainServiceEventRoute eventRoute)
-        {
-            return Context.DomainContext.EventManager.RaiseAsyncEvent(eventRoute, Context);
-        }
-
         protected virtual Task RaiseAsyncEvent<TArgs>(DomainServiceEventRoute eventRoute, TArgs e)
-            where TArgs : EventArgs
+            where TArgs : DomainServiceEventArgs
         {
             return Context.DomainContext.EventManager.RaiseAsyncEvent(eventRoute, Context, e);
         }

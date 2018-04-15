@@ -7,7 +7,7 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Data
 {
-    public class EntityModelCreatedEventArgs<T> : EventArgs
+    public class EntityModelCreatedEventArgs<T> : DomainServiceEventArgs
         where T : IEntity
     {
         public EntityModelCreatedEventArgs(EntityEditModel<T> model)

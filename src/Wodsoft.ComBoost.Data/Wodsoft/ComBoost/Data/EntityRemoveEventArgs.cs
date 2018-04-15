@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data
 {
-    public class EntityRemoveEventArgs<T> : EventArgs
+    public class EntityRemoveEventArgs<T> : DomainServiceEventArgs
     {
         public EntityRemoveEventArgs(T entity)
         {

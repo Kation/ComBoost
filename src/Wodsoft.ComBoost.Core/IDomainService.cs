@@ -40,11 +40,17 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 领域方法执行前事件。
         /// </summary>
-        event DomainServiceAsyncEventHandler Executing;
+        event DomainServiceAsyncEventHandler<DomainServiceEventArgs> Executing;
 
         /// <summary>
         /// 领域方法执行后事件。
         /// </summary>
-        event DomainServiceAsyncEventHandler Executed;
+        event DomainServiceAsyncEventHandler<DomainServiceEventArgs> Executed;
+
+        /// <summary>
+        /// 初始化领域服务。
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        void Initialize(IServiceProvider serviceProvider);
     }
 }

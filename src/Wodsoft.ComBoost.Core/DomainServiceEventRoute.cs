@@ -15,11 +15,12 @@ namespace Wodsoft.ComBoost
         /// 注册同步事件。
         /// </summary>
         /// <param name="name">事件名称。</param>
+        /// <param name="strategy">事件策略。</param>
         /// <param name="ownerType">所有者类型。</param>
         /// <returns></returns>
-        public static DomainServiceEventRoute RegisterEvent(string name, Type ownerType)
+        public static DomainServiceEventRoute RegisterEvent(string name, Type ownerType, DomainServiceEventStrategy strategy = DomainServiceEventStrategy.Bubble)
         {
-            DomainServiceEventRoute route = new DomainServiceEventRoute(name, ownerType, typeof(DomainServiceEventHandler));
+            DomainServiceEventRoute route = new DomainServiceEventRoute(name, ownerType, typeof(DomainServiceEventHandler<DomainServiceEventArgs>), strategy);
             return route;
         }
 
@@ -28,12 +29,13 @@ namespace Wodsoft.ComBoost
         /// </summary>
         /// <typeparam name="T">事件参数类型。</typeparam>
         /// <param name="name">事件名称。</param>
+        /// <param name="strategy">事件策略。</param>
         /// <param name="ownerType">所有者类型。</param>
         /// <returns></returns>
-        public static DomainServiceEventRoute RegisterEvent<T>(string name, Type ownerType)
-            where T : EventArgs
+        public static DomainServiceEventRoute RegisterEvent<T>(string name, Type ownerType, DomainServiceEventStrategy strategy = DomainServiceEventStrategy.Bubble)
+            where T : DomainServiceEventArgs
         {
-            DomainServiceEventRoute route = new DomainServiceEventRoute(name, ownerType, typeof(DomainServiceEventHandler<T>));
+            DomainServiceEventRoute route = new DomainServiceEventRoute(name, ownerType, typeof(DomainServiceEventHandler<T>), strategy);
             return route;
         }
 
@@ -41,11 +43,12 @@ namespace Wodsoft.ComBoost
         /// 注册异步事件。
         /// </summary>
         /// <param name="name">事件名称。</param>
+        /// <param name="strategy">事件策略。</param>
         /// <param name="ownerType">所有者类型。</param>
         /// <returns></returns>
-        public static DomainServiceEventRoute RegisterAsyncEvent(string name, Type ownerType)
+        public static DomainServiceEventRoute RegisterAsyncEvent(string name, Type ownerType, DomainServiceEventStrategy strategy = DomainServiceEventStrategy.Bubble)
         {
-            DomainServiceEventRoute route = new DomainServiceEventRoute(name, ownerType, typeof(DomainServiceAsyncEventHandler));
+            DomainServiceEventRoute route = new DomainServiceEventRoute(name, ownerType, typeof(DomainServiceAsyncEventHandler<DomainServiceEventArgs>), strategy);
             return route;
         }
 
@@ -54,12 +57,13 @@ namespace Wodsoft.ComBoost
         /// </summary>
         /// <typeparam name="T">事件参数类型。</typeparam>
         /// <param name="name">事件名称。</param>
+        /// <param name="strategy">事件策略。</param>
         /// <param name="ownerType">所有者类型。</param>
         /// <returns></returns>
-        public static DomainServiceEventRoute RegisterAsyncEvent<T>(string name, Type ownerType)
-            where T : EventArgs
+        public static DomainServiceEventRoute RegisterAsyncEvent<T>(string name, Type ownerType, DomainServiceEventStrategy strategy = DomainServiceEventStrategy.Bubble)
+            where T : DomainServiceEventArgs
         {
-            DomainServiceEventRoute route = new DomainServiceEventRoute(name, ownerType, typeof(DomainServiceAsyncEventHandler<T>));
+            DomainServiceEventRoute route = new DomainServiceEventRoute(name, ownerType, typeof(DomainServiceAsyncEventHandler<T>), strategy);
             return route;
         }
 
@@ -79,7 +83,7 @@ namespace Wodsoft.ComBoost
             return newRoute;
         }
 
-        private DomainServiceEventRoute(string name, Type ownerType, Type handlerType)
+        private DomainServiceEventRoute(string name, Type ownerType, Type handlerType, DomainServiceEventStrategy strategy)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -90,15 +94,10 @@ namespace Wodsoft.ComBoost
             Name = name;
             OwnerType = ownerType;
             HandlerType = handlerType;
-            DomainServiceEventManager.GlobalEventManager.RegisterEventRoute(this);
+            Strategy = strategy;
         }
-
-        private DomainServiceEventRoute(string name, Type ownerType, Type handlerType, DomainServiceAsyncEventMode mode) : this(name, ownerType, handlerType)
-        {
-            AsyncMode = mode;
-        }
-
-        private DomainServiceEventRoute(DomainServiceEventRoute parentRoute, Type ownerType) : this(parentRoute.Name, ownerType, parentRoute.HandlerType, parentRoute.AsyncMode)
+        
+        private DomainServiceEventRoute(DomainServiceEventRoute parentRoute, Type ownerType) : this(parentRoute.Name, ownerType, parentRoute.HandlerType, parentRoute.Strategy)
         {
             ParentRoute = parentRoute;
         }
@@ -122,11 +121,11 @@ namespace Wodsoft.ComBoost
         /// 获取父级路由。
         /// </summary>
         public DomainServiceEventRoute ParentRoute { get; private set; }
-
+        
         /// <summary>
-        /// 获取事件异步模式。
+        /// 获取事件策略。
         /// </summary>
-        public DomainServiceAsyncEventMode AsyncMode { get; private set; }
+        public DomainServiceEventStrategy Strategy { get; private set; }
 
         /// <summary>
         /// 获取路由名称。 

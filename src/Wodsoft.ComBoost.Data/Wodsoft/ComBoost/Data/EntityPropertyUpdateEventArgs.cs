@@ -6,7 +6,7 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace Wodsoft.ComBoost.Data
 {
-    public class EntityPropertyUpdateEventArgs<T> : EventArgs
+    public class EntityPropertyUpdateEventArgs<T> : DomainServiceEventArgs
     {
         public EntityPropertyUpdateEventArgs(T entity, IValueProvider valueProvider, IPropertyMetadata property, object value)
         {

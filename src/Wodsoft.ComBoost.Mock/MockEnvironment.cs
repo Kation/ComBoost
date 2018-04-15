@@ -62,6 +62,7 @@ namespace Wodsoft.ComBoost.Mock
 
         protected virtual void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IDomainServiceEventManager, DomainServiceEventManager>();
             services.AddSingleton<IAuthenticationProvider, MockAuthenticationProvider>();
             services.AddSingleton<IDomainServiceAccessor, DomainServiceAccessor>();
             services.AddSingleton<IDomainServiceProvider, DomainProvider>(t =>

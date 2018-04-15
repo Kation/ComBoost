@@ -21,14 +21,16 @@ namespace Wodsoft.ComBoost
         /// 领域执行前调用方法。
         /// </summary>
         /// <param name="context">领域执行上下文。</param>
+        /// <param name="e">事件参数。</param>
         /// <returns>返回异步任务。</returns>
-        Task OnExecutingAsync(IDomainExecutionContext context);
+        Task OnExecutingAsync(IDomainExecutionContext context, DomainServiceEventArgs e);
 
         /// <summary>
         /// 领域执行后调用方法。
         /// </summary>
         /// <param name="context">领域执行上下文。</param>
+        /// <param name="e">事件参数。</param>
         /// <returns>返回异步任务。</returns>
-        Task OnExecutedAsync(IDomainExecutionContext context);
+        Task OnExecutedAsync(IDomainExecutionContext context, DomainServiceEventArgs e);
     }
 }

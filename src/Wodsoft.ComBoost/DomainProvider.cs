@@ -45,6 +45,7 @@ namespace Wodsoft.ComBoost
                         throw new InvalidOperationException("领域服务选择器返回的类型为空。");
                 }
                 service = (TService)ActivatorUtilities.CreateInstance(_ServiceProvider, type);
+                service.Initialize(_ServiceProvider);
                 Type[] extensions = _ExtensionSelectors.Select(t => t(type)).Where(t => t != null).ToArray();
                 foreach (var extensionType in extensions)
                 {

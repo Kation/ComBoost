@@ -9,13 +9,13 @@ namespace Wodsoft.ComBoost
     {
         public IDomainService DomainService { get; private set; }
 
-        public virtual Task OnExecutedAsync(IDomainExecutionContext context)
+        public virtual Task OnExecutedAsync(IDomainExecutionContext context, DomainServiceEventArgs e)
         {
             DomainService = context.DomainService;
             return Task.FromResult(0);
         }
 
-        public virtual Task OnExecutingAsync(IDomainExecutionContext context)
+        public virtual Task OnExecutingAsync(IDomainExecutionContext context, DomainServiceEventArgs e)
         {
             return Task.FromResult(0);
         }
