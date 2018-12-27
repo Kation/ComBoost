@@ -38,8 +38,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="expression"></param>
         /// <returns></returns>
         Task<TResult> LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
-            where TSource : IEntity
-            where TResult : IEntity;
+            where TSource : class, IEntity
+            where TResult : class, IEntity;
 
         /// <summary>
         /// 加载实体集合。
@@ -50,8 +50,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="expression"></param>
         /// <returns></returns>
         Task<IQueryableCollection<TResult>> LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
-            where TSource : IEntity
-            where TResult : IEntity;
+            where TSource : class, IEntity
+            where TResult : class, IEntity;
         
         /// <summary>
         /// 执行非查询Sql语句。
