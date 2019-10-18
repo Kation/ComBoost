@@ -52,7 +52,7 @@ namespace System.ComponentModel.DataAnnotations
             if (value is string && IsCaseSensitive)
                 right = Expression.Equal(Expression.Property(parameter, validationContext.MemberName), Expression.Constant(value));
             else
-                right = Expression.Equal(Expression.Call(Expression.Property(parameter, validationContext.MemberName), typeof(string).GetMethod("ToLower")), Expression.Constant(value)); 
+                right = Expression.Equal(Expression.Call(Expression.Property(parameter, validationContext.MemberName), typeof(string).GetMethod("ToLower", Array.Empty<Type>())), Expression.Constant(value)); 
             Expression expression = Expression.And(left, right);
             expression = Expression.Lambda(typeof(Func<,>).MakeGenericType(type, typeof(bool)), expression, parameter);
             dynamic where = _QWhereMethod.MakeGenericMethod(type).Invoke(null, new[] { entityContext.Query(), expression });

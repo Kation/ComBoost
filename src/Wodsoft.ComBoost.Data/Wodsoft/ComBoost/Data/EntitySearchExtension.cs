@@ -152,7 +152,7 @@ namespace Wodsoft.ComBoost.Data
                             else
                             {
                                 Expression expression = Expression.Property(Expression.Property(parameter, property.ClrName), EntityDescriptor.GetMetadata(property.ClrType).DisplayProperty.ClrName);
-                                expression = Expression.Call(expression, typeof(string).GetMethod("Contains"), Expression.Constant(searchItem.Contains));
+                                expression = Expression.Call(expression, typeof(string).GetMethod("Contains", new Type[] { typeof(string) }), Expression.Constant(searchItem.Contains));
                                 queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(expression, parameter));
                             }
                         }
@@ -165,7 +165,7 @@ namespace Wodsoft.ComBoost.Data
                                 continue;
                             ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
                             Expression expression = Expression.Property(parameter, property.ClrName);
-                            expression = Expression.Call(expression, typeof(string).GetMethod("Contains"), Expression.Constant(searchItem.Contains));
+                            expression = Expression.Call(expression, typeof(string).GetMethod("Contains", new Type[] { typeof(string) }), Expression.Constant(searchItem.Contains));
                             queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(expression, parameter));
                         }
                         break;
