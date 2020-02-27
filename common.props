@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Product>Wodsoft ComBoost</Product>
     <PackageTags>ComBoost</PackageTags>
-    <VersionPrefix>3.0.5</VersionPrefix>
+    <VersionPrefix>3.0.8</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <VersionSuffix Condition="'$(BuildNumber)' != ''">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
     <Authors>Kation</Authors>
