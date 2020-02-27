@@ -57,12 +57,12 @@ namespace Wodsoft.ComBoost.Data
             base.Validate(metadata, authentication);
             if (metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
             {
-                if (EntityRolesSelector(metadata).Any(t => !authentication.IsInRole(t)))
+                if (EntityRolesSelector(metadata).All(t => !authentication.IsInRole(t)))
                     throw new DomainServiceException(new UnauthorizedAccessException("权限不足。"));
             }
             else
             {
-                if (EntityRolesSelector(metadata).All(t => !authentication.IsInRole(t)))
+                if (EntityRolesSelector(metadata).Any(t => !authentication.IsInRole(t)))
                     throw new DomainServiceException(new UnauthorizedAccessException("权限不足。"));
             }
         }
