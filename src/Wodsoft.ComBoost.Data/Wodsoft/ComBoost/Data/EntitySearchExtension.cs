@@ -100,19 +100,31 @@ namespace Wodsoft.ComBoost.Data
                         {
                             if (options[a].Equals(".Start", StringComparison.OrdinalIgnoreCase))
                             {
-                                double start;
-                                if (!double.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]), out start))
+                                object start;
+                                try
+                                {
+                                    start = TypeDescriptor.GetConverter(property.ClrType).ConvertFromString(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]));
+                                }
+                                catch
+                                {
                                     continue;
-                                searchItem.Morethan = start;
+                                }
+                                searchItem.Morethan = double.Parse(start.ToString());
                                 ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
                                 queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(Expression.GreaterThanOrEqual(Expression.Property(parameter, property.ClrName), Expression.Constant(start)), parameter));
                             }
                             else if (options[a].Equals(".End", StringComparison.OrdinalIgnoreCase))
                             {
-                                double end;
-                                if (!double.TryParse(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]), out end))
+                                object end;
+                                try
+                                {
+                                    end = TypeDescriptor.GetConverter(property.ClrType).ConvertFromString(valueProvider.GetValue<string>("Search." + keys[i].Key + options[a]));
+                                }
+                                catch
+                                {
                                     continue;
-                                searchItem.Lessthan = end;
+                                }
+                                searchItem.Lessthan = double.Parse(end.ToString());
                                 ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
                                 queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(Expression.LessThanOrEqual(Expression.Property(parameter, property.ClrName), Expression.Constant(end)), parameter));
                             }
@@ -155,6 +167,16 @@ namespace Wodsoft.ComBoost.Data
                                 expression = Expression.Call(expression, typeof(string).GetMethod("Contains", new Type[] { typeof(string) }), Expression.Constant(searchItem.Contains));
                                 queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(expression, parameter));
                             }
+                        }
+                        else if (property.ClrType == typeof(string))
+                        {
+                            searchItem.Contains = valueProvider.GetValue<string>("Search." + keys[i].Key);
+                            if (searchItem.Contains == null)
+                                continue;
+                            ParameterExpression parameter = Expression.Parameter(Service.Metadata.Type);
+                            Expression expression = Expression.Property(parameter, property.ClrName);
+                            expression = Expression.Call(expression, typeof(string).GetMethod("Contains", new Type[] { typeof(string) }), Expression.Constant(searchItem.Contains));
+                            queryable = queryable.Where<T>(Expression.Lambda<Func<T, bool>>(expression, parameter));
                         }
                         break;
                     default:
