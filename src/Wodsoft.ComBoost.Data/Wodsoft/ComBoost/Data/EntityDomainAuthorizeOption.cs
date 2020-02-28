@@ -55,14 +55,17 @@ namespace Wodsoft.ComBoost.Data
         public override void Validate(IEntityMetadata metadata, IAuthentication authentication)
         {
             base.Validate(metadata, authentication);
+            var roles = EntityRolesSelector(metadata).ToArray();
+            if (roles.Length == 0)
+                return;
             if (metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
             {
-                if (EntityRolesSelector(metadata).All(t => !authentication.IsInRole(t)))
+                if (roles.All(t => !authentication.IsInRole(t)))
                     throw new DomainServiceException(new UnauthorizedAccessException("权限不足。"));
             }
             else
             {
-                if (EntityRolesSelector(metadata).Any(t => !authentication.IsInRole(t)))
+                if (roles.Any(t => !authentication.IsInRole(t)))
                     throw new DomainServiceException(new UnauthorizedAccessException("权限不足。"));
             }
         }
@@ -73,10 +76,13 @@ namespace Wodsoft.ComBoost.Data
             {
                 if (!t.AllowAnonymous && !authentication.Identity.IsAuthenticated)
                     return false;
+                var roles = PropertyRolesSelector(t).ToArray();
+                if (roles.Length == 0)
+                    return true;
                 if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                    return PropertyRolesSelector(t).All(r => authentication.IsInRole(r));
+                    return roles.All(r => authentication.IsInRole(r));
                 else
-                    return PropertyRolesSelector(t).Any(r => authentication.IsInRole(r));
+                    return roles.Any(r => authentication.IsInRole(r));
             });
         }
     }
