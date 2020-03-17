@@ -17,8 +17,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="expression">导航属性表达式。</param>
         /// <returns>返回导航至的实体。</returns>
         public static Task<T> LoadAsync<TSource, T>(this TSource source, Expression<Func<TSource, T>> expression)
-            where TSource : IEntity
-            where T : IEntity
+            where TSource : class, IEntity
+            where T : class, IEntity
         {
             return DatabaseContextAccessor.Context.LoadAsync(source, expression);
         }
@@ -32,8 +32,8 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="expression">导航属性表达式。</param>
         /// <returns>返回导航至的集合。</returns>
         public static Task<IQueryableCollection<T>> LoadAsync<TSource, T>(this TSource source, Expression<Func<TSource, ICollection<T>>> expression)
-            where TSource : IEntity
-            where T : IEntity
+            where TSource : class, IEntity
+            where T : class, IEntity
         {
             return DatabaseContextAccessor.Context.LoadAsync(source, expression);
         }

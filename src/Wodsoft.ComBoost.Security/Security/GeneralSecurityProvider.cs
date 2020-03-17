@@ -16,6 +16,8 @@ namespace Wodsoft.ComBoost.Security
         {
             if (role == null)
                 throw new ArgumentNullException(nameof(role));
+            if (role is string)
+                return (string)role;
             if (role is IRoleName)
                 return ((IRoleName)role).RoleName;
             Type type = role.GetType();

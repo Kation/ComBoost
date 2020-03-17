@@ -18,6 +18,7 @@ namespace Wodsoft.ComBoost
         public AuthorizeAttribute()
         {
             Roles = new object[0];
+            AllowAnonymous = false;
         }
 
         /// <summary>
@@ -29,40 +30,71 @@ namespace Wodsoft.ComBoost
         {
             Mode = mode;
             Roles = roles;
+            AllowAnonymous = false;
         }
 
         /// <summary>
-        /// 获取权限判断模式。
+        /// 获取或设置权限判断模式。
         /// </summary>
-        public AuthenticationRequiredMode Mode { get; private set; }
+        public AuthenticationRequiredMode Mode { get; set; }
 
         /// <summary>
-        /// 获取需要的角色。
+        /// 获取或设置允许匿名访问。
         /// </summary>
-        public object[] Roles { get; private set; }
+        public bool AllowAnonymous { get; set; }
+
+        /// <summary>
+        /// 获取或设置需要的角色。
+        /// </summary>
+        public object[] Roles { get; set; }
+
+        /// <summary>
+        /// 获取权限。
+        /// </summary>
+        public IAuthentication Authentication { get; private set; }
 
         /// <inheritdoc/>
         public override Task OnExecutingAsync(IDomainExecutionContext context)
         {
             var provider = context.DomainContext.GetService<IAuthenticationProvider>();
-            var authentication = provider.GetAuthentication();
-            if (!authentication.Identity.IsAuthenticated)
-                throw new UnauthorizedAccessException("用户未登录。");
+            Authentication = provider.GetAuthentication();
+            return AuthorizeCore(context);
+        }
+
+        /// <summary>
+        /// 授权。
+        /// </summary>
+        /// <param name="context">领域执行上下文。</param>
+        /// <returns></returns>
+        protected virtual Task AuthorizeCore(IDomainExecutionContext context)
+        {
+            if (!AllowAnonymous && !Authentication.Identity.IsAuthenticated)
+                throw new DomainServiceException(new UnauthorizedAccessException("用户未登录。"));
             if (Roles.Length > 0)
                 if (Mode == AuthenticationRequiredMode.All)
                 {
                     foreach (var role in Roles)
-                        if (!authentication.IsInRole(role))
-                            throw new UnauthorizedAccessException("用户没有“" + role + "”的权限。");
+                        if (!Authentication.IsInRole(role))
+                            throw new DomainServiceException(new UnauthorizedAccessException("用户没有“" + role + "”的权限。"));
                 }
                 else
                 {
                     foreach (var role in Roles)
-                        if (authentication.IsInRole(role))
+                        if (Authentication.IsInRole(role))
                             return Task.FromResult(0);
-                    throw new UnauthorizedAccessException("用户没有" + string.Join("，", "“" + Roles + "”") + "权限。");
+                    throw new DomainServiceException(new UnauthorizedAccessException("用户没有" + string.Join("，", "“" + Roles + "”") + "权限。"));
                 }
             return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// 判断是否拥有权限。
+        /// </summary>
+        /// <param name="role">权限。</param>
+        /// <returns></returns>
+        protected virtual bool IsInRole(object role)
+        {
+            return Authentication.IsInRole(role);
         }
     }
 }

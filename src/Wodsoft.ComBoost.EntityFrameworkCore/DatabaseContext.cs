@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -20,13 +21,13 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         static DatabaseContext()
         {
-            _CachedSupportTypes = new ConcurrentDictionary<Type, IEnumerable<Type>>();            
+            _CachedSupportTypes = new ConcurrentDictionary<Type, IEnumerable<Type>>();
         }
 
         public DbContext InnerContext { get; private set; }
 
         public IEnumerable<Type> SupportTypes { get; private set; }
-        
+
         public bool TrackEntity { get; set; }
 
         public DatabaseContext(DbContext context)
@@ -67,7 +68,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (expression == null)
                 throw new ArgumentNullException(nameof(expression));
             string propertyName = GetPropertyName(expression);
-            var entry = InnerContext.Entry((object)entity);
+            var entry = InnerContext.ChangeTracker.Entries<TSource>().FirstOrDefault(t => t.Entity.Index.Equals(entity.Index));
+            if (entry != null && entry.Entity != entity)
+                entry.CurrentValues.SetValues(entity);
+            else
+                entry = InnerContext.Entry(entity);
             var reference = entry.Reference(propertyName);
             if (!reference.IsLoaded)
             {
@@ -75,8 +80,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                     entry.State = EntityState.Unchanged;
                 await reference.LoadAsync();
             }
-            TResult result = expression.Compile()(entity);
-            return result;
+            return (TResult)reference.CurrentValue;
         }
 
         async Task<IQueryableCollection<TResult>> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
@@ -86,7 +90,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (expression == null)
                 throw new ArgumentNullException(nameof(expression));
             string propertyName = GetPropertyName(expression);
-            var entry = InnerContext.Entry((object)entity);
+            var entry = InnerContext.ChangeTracker.Entries<TSource>().FirstOrDefault(t => t.Entity.Index.Equals(entity.Index));
+            if (entry != null && entry.Entity != entity)
+                entry.CurrentValues.SetValues(entity);
+            else
+                entry = InnerContext.Entry(entity);
             var reference = entry.Collection(propertyName);
             var property = entry.Metadata.FindNavigation(propertyName);
             var context = this.GetWrappedContext<TResult>();
@@ -94,6 +102,8 @@ namespace Wodsoft.ComBoost.Data.Entity
                 entry.State = EntityState.Unchanged;
             var queryable = (IQueryable<TResult>)reference.Query();
             var count = await queryable.CountAsync();
+            if (!TrackEntity)
+                queryable = queryable.AsNoTracking();
             return new ComBoostEntityCollection<TResult>(entry, context, property, queryable, count);
         }
 

@@ -84,6 +84,9 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         protected override Expression VisitMember(MemberExpression node)
         {
+            //静态成员直接返回
+            if (node.Expression == null)
+                return base.VisitMember(node);
             if (typeof(IEntity).IsAssignableFrom(node.Expression.Type) && node.Expression.Type.GetTypeInfo().IsInterface)
             {
                 Type type;
