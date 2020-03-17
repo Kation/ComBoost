@@ -66,11 +66,19 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (expression == null)
                 throw new ArgumentNullException(nameof(expression));
             string propertyName = GetPropertyName(expression);
-            var entry = InnerContext.Entry((object)entity);
-            var property = entry.Reference(propertyName);
-            if (!property.IsLoaded)
-                await property.LoadAsync();
-            return (TResult)property.CurrentValue;
+            var entry = InnerContext.ChangeTracker.Entries<TSource>().FirstOrDefault(t => t.Entity.Index.Equals(entity.Index));
+            if (entry != null && entry.Entity != entity)
+                entry.CurrentValues.SetValues(entity);
+            else
+                entry = InnerContext.Entry(entity);
+            var reference = entry.Reference(propertyName);
+            if (!reference.IsLoaded)
+            {
+                if (entry.State == EntityState.Detached)
+                    entry.State = EntityState.Unchanged;
+                await reference.LoadAsync();
+            }
+            return (TResult)reference.CurrentValue;
         }
 
         async Task<IQueryableCollection<TResult>> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
@@ -80,8 +88,14 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (expression == null)
                 throw new ArgumentNullException(nameof(expression));
             string propertyName = GetPropertyName(expression);
-            var entry = InnerContext.Entry((object)entity);
+            var entry = InnerContext.ChangeTracker.Entries<TSource>().FirstOrDefault(t => t.Entity.Index.Equals(entity.Index));
+            if (entry != null && entry.Entity != entity)
+                entry.CurrentValues.SetValues(entity);
+            else
+                entry = InnerContext.Entry(entity);
             var property = entry.Collection(propertyName);
+            if (entry.State == EntityState.Detached)
+                entry.State = EntityState.Unchanged;
             IQueryable<TResult> queryable = (IQueryable<TResult>)property.Query();
             var context = this.GetWrappedContext<TResult>();
             var count = await context.CountAsync(queryable);

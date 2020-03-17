@@ -52,5 +52,34 @@ namespace DataUnitTest
                 Assert.Equal(category3, user.Category);
             });
         }
+
+        [Fact]
+        public async Task SameKeyTest()
+        {
+            UnitTestEnvironment env = new UnitTestEnvironment();
+            await env.Run(async sp =>
+            {
+                var context = (DataContext)sp.GetRequiredService<Microsoft.EntityFrameworkCore.DbContext>();
+
+                var category = new Category { Index = Guid.NewGuid(), CreateDate = DateTime.Now, EditDate = DateTime.Now, Name = "Test" };
+                context.Category.Add(category);
+
+                var user = new User { Index = Guid.NewGuid(), CreateDate = DateTime.Now, EditDate = DateTime.Now, Category = category, Username = "TestUser" };
+                context.User.Add(user);
+                await context.SaveChangesAsync();
+            });
+            await env.Run(async sp =>
+            {
+                var databaseContext = sp.GetService<Wodsoft.ComBoost.Data.Entity.IDatabaseContext>();
+                var context = (DataContext)((Wodsoft.ComBoost.Data.Entity.DatabaseContext)databaseContext).InnerContext;
+                Assert.Equal(1, await context.Category.CountAsync());
+                var userContext = databaseContext.GetContext<User>();
+                var user1 = await userContext.Query().FirstAsync();
+                var user2 = await userContext.Query().FirstAsync();
+                var category1 = await user1.LoadAsync(t => t.Category);
+                var category2 = await user2.LoadAsync(t => t.Category);
+                await context.SaveChangesAsync();
+            });
+        }
     }
 }
