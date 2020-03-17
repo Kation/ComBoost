@@ -71,7 +71,7 @@ namespace System.ComponentModel
         /// <inheritdoc />
         public IItemButton[] ItemButtons { get; set; }
 
-        object[] IViewModel.Items { get { return Items; } }
+        object[] IViewModel.Items { get { return Items as object[]; } }
 
         /// <inheritdoc />
         public T[] Items { get { return (T[])GetValue(); } set { SetValue(value); } }
