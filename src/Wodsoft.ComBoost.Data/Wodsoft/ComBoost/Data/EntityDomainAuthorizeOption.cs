@@ -60,12 +60,12 @@ namespace Wodsoft.ComBoost.Data
                 return;
             if (metadata.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
             {
-                if (roles.All(t => !authentication.IsInRole(t)))
+                if (roles.Any(t => !authentication.IsInRole(t)))
                     throw new DomainServiceException(new UnauthorizedAccessException("权限不足。"));
             }
             else
             {
-                if (roles.Any(t => !authentication.IsInRole(t)))
+                if (roles.All(t => !authentication.IsInRole(t)))
                     throw new DomainServiceException(new UnauthorizedAccessException("权限不足。"));
             }
         }
@@ -80,9 +80,9 @@ namespace Wodsoft.ComBoost.Data
                 if (roles.Length == 0)
                     return true;
                 if (t.AuthenticationRequiredMode == AuthenticationRequiredMode.All)
-                    return roles.All(r => authentication.IsInRole(r));
-                else
                     return roles.Any(r => authentication.IsInRole(r));
+                else
+                    return roles.All(r => authentication.IsInRole(r));
             });
         }
     }
