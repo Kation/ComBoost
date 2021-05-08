@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>ComBoost用于AspNet Core的安全模块。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.AspNetCore.Security</AssemblyTitle>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
     <AssemblyName>Wodsoft.ComBoost.AspNetCore.Security</AssemblyName>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -15,8 +15,12 @@
     <ProjectReference Include="..\Wodsoft.ComBoost.Security\Wodsoft.ComBoost.Security.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
 </Project>

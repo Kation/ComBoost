@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Data.Entity.Infrastructure;
+using System.Threading;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -76,9 +77,16 @@ namespace Wodsoft.ComBoost.Data.Entity
             return InnerQueryable.GetEnumerator();
         }
 
+#if NET461
         IAsyncEnumerator<T> IAsyncEnumerable<T>.GetEnumerator()
         {
             return ((IAsyncEnumerable<T>)InnerQueryable).GetEnumerator();
         }
+#else
+        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        {
+            return ((IAsyncEnumerable<T>)InnerQueryable).GetAsyncEnumerator();
+        }
+#endif
     }
 }

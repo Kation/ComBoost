@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Threading;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -50,7 +51,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             }
             else
             {
+#if NETSTANDARD_20
                 _Navigation.FindInverse().GetSetter().SetClrValue(item, _Entry.Entity);
+#else
+                _Navigation.FindInverse().PropertyInfo.SetValue(item, _Entry.Entity);
+#endif
             }
             Count++;
         }
@@ -93,7 +98,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             {
                 if (_Inverse.GetGetter().GetClrValue(item) != _Entry.Entity)
                     return false;
+#if NETSTANDARD2_0
                 _Inverse.GetSetter().SetClrValue(item, null);
+#else
+                _Inverse.PropertyInfo.SetValue(item, null);
+#endif
                 if (item.IsNewCreated && _Inverse.FindAnnotation("Required") != null)
                     _Context.Remove(item);
                 else
@@ -108,9 +117,17 @@ namespace Wodsoft.ComBoost.Data.Entity
             return InnerQueryable.GetEnumerator();
         }
 
+#if NETSTANDARD2_0
+
         IAsyncEnumerator<T> IAsyncEnumerable<T>.GetEnumerator()
         {
             return ((IAsyncEnumerable<T>)InnerQueryable).GetEnumerator();
         }
+#else
+        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        {
+            return ((IAsyncEnumerable<T>)InnerQueryable).GetAsyncEnumerator();
+        }
+#endif
     }
 }

@@ -1,14 +1,15 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class PropertyMetadataJsonConverter : JsonConverter
+    public class PropertyMetadataJsonConverter : JsonConverter<IPropertyMetadata>
     {
         public static readonly PropertyMetadataJsonConverter Converter = new PropertyMetadataJsonConverter();
 
@@ -17,35 +18,35 @@ namespace Wodsoft.ComBoost.Mvc
             return typeof(IPropertyMetadata).IsAssignableFrom(objectType);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override IPropertyMetadata Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, IPropertyMetadata value, JsonSerializerOptions options)
         {
-            IPropertyMetadata metadata = (IPropertyMetadata)value;
+            IPropertyMetadata metadata = value;
 
             writer.WriteStartObject();
 
             writer.WritePropertyName("Name");
-            writer.WriteValue(metadata.Name);
+            writer.WriteStringValue(metadata.Name);
             writer.WritePropertyName("ClrName");
-            writer.WriteValue(metadata.ClrName);
+            writer.WriteStringValue(metadata.ClrName);
             writer.WritePropertyName("ShortName");
-            writer.WriteValue(metadata.ShortName);
+            writer.WriteStringValue(metadata.ShortName);
             writer.WritePropertyName("Description");
-            writer.WriteValue(metadata.Description);
+            writer.WriteStringValue(metadata.Description);
             writer.WritePropertyName("Order");
-            writer.WriteValue(metadata.Order);
+            writer.WriteNumberValue(metadata.Order);
             writer.WritePropertyName("Searchable");
-            writer.WriteValue(metadata.Searchable);
+            writer.WriteBooleanValue(metadata.Searchable);
             writer.WritePropertyName("IsRequired");
-            writer.WriteValue(metadata.IsRequired);
+            writer.WriteBooleanValue(metadata.IsRequired);
             writer.WritePropertyName("Type");
-            writer.WriteValue(metadata.Type);
+            JsonSerializer.Serialize(writer, metadata.Type, options);
             writer.WritePropertyName("CustomType");
-            writer.WriteValue(metadata.CustomType);
+            writer.WriteStringValue(metadata.CustomType);
 
             writer.WriteEndObject();
         }

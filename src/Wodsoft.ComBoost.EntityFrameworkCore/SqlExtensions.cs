@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
-using Remotion.Linq.Parsing.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,10 +30,10 @@ namespace Wodsoft.ComBoost.Data.Entity
             {
                 throw new ArgumentException("不支持非Entity Framework Core查询器。");
             }
-
+#if NETSTANDARD2_0
             var queryCompiler = (IQueryCompiler)QueryCompilerField.GetValue(query.Provider);
-            var nodeTypeProvider = (INodeTypeProvider)NodeTypeProviderField.GetValue(queryCompiler);
-            var parser = (IQueryParser)CreateQueryParserMethod.Invoke(queryCompiler, new object[] { nodeTypeProvider });
+            var nodeTypeProvider = (Remotion.Linq.Parsing.Structure.INodeTypeProvider)NodeTypeProviderField.GetValue(queryCompiler);
+            var parser = (Remotion.Linq.Parsing.Structure.IQueryParser)CreateQueryParserMethod.Invoke(queryCompiler, new object[] { nodeTypeProvider });
             var queryModel = parser.GetParsedQuery(query.Expression);
             var database = DataBaseField.GetValue(queryCompiler);
             var queryCompilationContextFactory = ((DatabaseDependencies)DatabaseDependenciesField.GetValue(database)).QueryCompilationContextFactory;
@@ -42,8 +41,20 @@ namespace Wodsoft.ComBoost.Data.Entity
             var modelVisitor = (RelationalQueryModelVisitor)queryCompilationContext.CreateQueryModelVisitor();
             modelVisitor.CreateQueryExecutor<TEntity>(queryModel);
             var sql = modelVisitor.Queries.First().ToString();
+#else
+            var enumerator = query.Provider.Execute<IEnumerable<TEntity>>(query.Expression).GetEnumerator();
+            var relationalCommandCache = enumerator.Private("_relationalCommandCache");
+            var selectExpression = relationalCommandCache.Private<Microsoft.EntityFrameworkCore.Query.SqlExpressions.SelectExpression>("_selectExpression");
+            var factory = relationalCommandCache.Private<IQuerySqlGeneratorFactory>("_querySqlGeneratorFactory");
 
+            var sqlGenerator = factory.Create();
+            var command = sqlGenerator.GetCommand(selectExpression);
+
+            string sql = command.CommandText;
+#endif
             return sql;
         }
+        private static object Private(this object obj, string privateField) => obj?.GetType().GetField(privateField, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(obj);
+        private static T Private<T>(this object obj, string privateField) => (T)obj?.GetType().GetField(privateField, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(obj);
     }
 }

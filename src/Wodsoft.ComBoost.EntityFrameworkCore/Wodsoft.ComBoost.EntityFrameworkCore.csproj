@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>ComBoost用于EntityFrameworkCore实现的实体模块。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.EntityFrameworkCore</AssemblyTitle>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <AssemblyName>Wodsoft.ComBoost.EntityFrameworkCore</AssemblyName>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -17,9 +17,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Data.Core\Wodsoft.ComBoost.Data.Core.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" />
   </ItemGroup>
 
 </Project>

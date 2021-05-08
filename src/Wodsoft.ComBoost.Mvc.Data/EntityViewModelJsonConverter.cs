@@ -1,14 +1,15 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class EntityViewModelJsonConverter : JsonConverter
+    public class EntityViewModelJsonConverter : JsonConverter<IEntityViewModel>
     {
         public static readonly EntityViewModelJsonConverter Converter = new EntityViewModelJsonConverter();
 
@@ -17,41 +18,41 @@ namespace Wodsoft.ComBoost.Mvc
             return typeof(IEntityViewModel).IsAssignableFrom(objectType);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override IEntityViewModel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             throw new NotSupportedException();
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, IEntityViewModel value, JsonSerializerOptions options)
         {
-            IEntityViewModel model = (IEntityViewModel)value;
+            IEntityViewModel model = value;
             writer.WriteStartObject();
 
             writer.WritePropertyName("PageSizeOption");
-            serializer.Serialize(writer, model.PageSizeOption);
+            JsonSerializer.Serialize(writer, model.PageSizeOption, options);
             writer.WritePropertyName("TotalPage");
-            writer.WriteValue(model.TotalPage);
+            writer.WriteNumberValue(model.TotalPage);
             writer.WritePropertyName("CurrentPage");
-            writer.WriteValue(model.CurrentPage);
+            writer.WriteNumberValue(model.CurrentPage);
             writer.WritePropertyName("CurrentSize");
-            writer.WriteValue(model.CurrentSize);
+            writer.WriteNumberValue(model.CurrentSize);
 
             writer.WritePropertyName("ViewButtons");
-            serializer.Serialize(writer, model.ViewButtons);
+            JsonSerializer.Serialize(writer, model.ViewButtons, options);
             writer.WritePropertyName("ItemButtons");
-            serializer.Serialize(writer, model.ItemButtons);
+            JsonSerializer.Serialize(writer, model.ItemButtons, options);
 
             writer.WritePropertyName("Items");
-            serializer.Serialize(writer, model.Items);
+            JsonSerializer.Serialize(writer, model.Items, options);
 
             writer.WritePropertyName("Properties");
-            serializer.Serialize(writer, model.Properties);
+            JsonSerializer.Serialize(writer, model.Properties, options);
 
             writer.WritePropertyName("SearchItem");
-            serializer.Serialize(writer, model.SearchItem);
+            JsonSerializer.Serialize(writer, model.SearchItem, options);
 
             writer.WritePropertyName("Metadata");
-            serializer.Serialize(writer, model.Metadata);
+            JsonSerializer.Serialize(writer, model.Metadata, options);
 
             writer.WriteEndObject();
         }

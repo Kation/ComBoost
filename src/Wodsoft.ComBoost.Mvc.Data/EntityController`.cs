@@ -8,9 +8,9 @@ using Wodsoft.ComBoost.Security;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Newtonsoft.Json;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.ExceptionServices;
+using System.Text.Json;
 
 namespace Wodsoft.ComBoost.Mvc
 {
@@ -52,7 +52,12 @@ namespace Wodsoft.ComBoost.Mvc
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
+                    JsonSerializerOptions options = new JsonSerializerOptions();
+                    options.Converters.Add(entityConverter);
+                    options.Converters.Add(EntityMetadataJsonConverter.Converter);
+                    options.Converters.Add(PropertyMetadataJsonConverter.Converter);
+                    options.Converters.Add(EntityEditModelJsonConverter.Converter);
+                    return Content(JsonSerializer.Serialize(model, options), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View(model);
             }
@@ -84,7 +89,12 @@ namespace Wodsoft.ComBoost.Mvc
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Create, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityEditModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
+                    JsonSerializerOptions options = new JsonSerializerOptions();
+                    options.Converters.Add(entityConverter);
+                    options.Converters.Add(EntityMetadataJsonConverter.Converter);
+                    options.Converters.Add(PropertyMetadataJsonConverter.Converter);
+                    options.Converters.Add(EntityEditModelJsonConverter.Converter);
+                    return Content(JsonSerializer.Serialize(model, options), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View("Edit", model);
             }
@@ -116,7 +126,12 @@ namespace Wodsoft.ComBoost.Mvc
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Edit, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityEditModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
+                    JsonSerializerOptions options = new JsonSerializerOptions();
+                    options.Converters.Add(entityConverter);
+                    options.Converters.Add(EntityMetadataJsonConverter.Converter);
+                    options.Converters.Add(PropertyMetadataJsonConverter.Converter);
+                    options.Converters.Add(EntityEditModelJsonConverter.Converter);
+                    return Content(JsonSerializer.Serialize(model, options), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View(model);
             }
@@ -150,7 +165,12 @@ namespace Wodsoft.ComBoost.Mvc
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Detail, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityEditModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
+                    JsonSerializerOptions options = new JsonSerializerOptions();
+                    options.Converters.Add(entityConverter);
+                    options.Converters.Add(EntityMetadataJsonConverter.Converter);
+                    options.Converters.Add(PropertyMetadataJsonConverter.Converter);
+                    options.Converters.Add(EntityEditModelJsonConverter.Converter);
+                    return Content(JsonSerializer.Serialize(model, options), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View(model);
             }
@@ -253,7 +273,12 @@ namespace Wodsoft.ComBoost.Mvc
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
+                    JsonSerializerOptions options = new JsonSerializerOptions();
+                    options.Converters.Add(entityConverter);
+                    options.Converters.Add(EntityMetadataJsonConverter.Converter);
+                    options.Converters.Add(PropertyMetadataJsonConverter.Converter);
+                    options.Converters.Add(EntityEditModelJsonConverter.Converter);
+                    return Content(JsonSerializer.Serialize(model, options), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View(model);
             }
@@ -285,7 +310,12 @@ namespace Wodsoft.ComBoost.Mvc
                 if (IsJsonRequest())
                 {
                     EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
+                    JsonSerializerOptions options = new JsonSerializerOptions();
+                    options.Converters.Add(entityConverter);
+                    options.Converters.Add(EntityMetadataJsonConverter.Converter);
+                    options.Converters.Add(PropertyMetadataJsonConverter.Converter);
+                    options.Converters.Add(EntityEditModelJsonConverter.Converter);
+                    return Content(JsonSerializer.Serialize(model, options), "application/json", System.Text.Encoding.UTF8);
                 }
                 return View(model);
             }

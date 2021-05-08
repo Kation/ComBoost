@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Security;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Wodsoft.ComBoost.Mvc;
 using Microsoft.AspNetCore.Mvc;
@@ -78,6 +77,7 @@ namespace Microsoft.AspNetCore.Builder
 {
     public static class ComBoostMvcExtensions
     {
+#if NETSTANDARD2_0
         public static void UseComBoostMvc(this IApplicationBuilder app, Action<IRouteBuilder> configureRoutes)
         {
             if (app == null)
@@ -85,14 +85,15 @@ namespace Microsoft.AspNetCore.Builder
 
             var routes = new RouteBuilder(app)
             {
-                DefaultHandler = app.ApplicationServices.GetRequiredService<MvcRouteHandler>(),
+                DefaultHandler = app.ApplicationServices.GetRequiredService<Mvc.Internal.MvcRouteHandler>(),
             };
             configureRoutes(routes);
-            routes.Routes.Insert(0, AttributeRouting.CreateAttributeMegaRoute(app.ApplicationServices));
+            routes.Routes.Insert(0, Mvc.Internal.AttributeRouting.CreateAttributeMegaRoute(app.ApplicationServices));
             var router = routes.Build();
             app.UseMiddleware<ComBoostMvcMiddleware>(router);
             app.UseAuthentication();
             app.UseMvc(configureRoutes);
         }
+#endif
     }
 }

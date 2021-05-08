@@ -1,14 +1,15 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class EntityMetadataJsonConverter : JsonConverter
+    public class EntityMetadataJsonConverter : JsonConverter<IEntityMetadata>
     {
         public static readonly EntityMetadataJsonConverter Converter = new EntityMetadataJsonConverter();
 
@@ -17,22 +18,22 @@ namespace Wodsoft.ComBoost.Mvc
             return typeof(IEntityMetadata).IsAssignableFrom(objectType);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override IEntityMetadata Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, IEntityMetadata value, JsonSerializerOptions options)
         {
             IEntityMetadata metadata = (IEntityMetadata)value;
 
             writer.WriteStartObject();
 
             writer.WritePropertyName("Name");
-            writer.WriteValue(metadata.Name);
+            writer.WriteStringValue(metadata.Name);
 
             writer.WritePropertyName("Key");
-            writer.WriteValue(metadata.KeyProperty.ClrName);
+            writer.WriteStringValue(metadata.KeyProperty.ClrName);
 
             writer.WriteEndObject();
         }

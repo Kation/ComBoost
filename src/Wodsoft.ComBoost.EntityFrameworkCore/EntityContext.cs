@@ -8,7 +8,6 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Extensions;
 using System.Reflection;
 using System.ComponentModel;
 
@@ -150,7 +149,11 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new ArgumentNullException(nameof(key));
             if (key.GetType() != Metadata.KeyType)
                 key = TypeDescriptor.GetConverter(Metadata.KeyType).ConvertFrom(key);
+#if NETSTANDARD2_0
             return DbSet.FindAsync(key);
+#else
+            return DbSet.FindAsync(key).AsTask();
+#endif
         }
 
         public Task ReloadAsync(T item)
@@ -160,7 +163,11 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IQueryable<T> ExecuteQuery(string sql, params object[] parameters)
         {
+#if NETSTANDARD2_0
             return DbSet.FromSql(sql, parameters).AsNoTracking();
+#else
+            return DbSet.FromSqlRaw(sql, parameters).AsNoTracking();
+#endif
         }
     }
 }

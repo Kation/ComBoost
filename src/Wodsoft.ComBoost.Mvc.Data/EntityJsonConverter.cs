@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data;
 using Wodsoft.ComBoost.Data.Entity;
@@ -13,7 +14,7 @@ using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class EntityJsonConverter : JsonConverter
+    public class EntityJsonConverter : JsonConverter<IEntity>
     {
         public EntityJsonConverter(EntityDomainAuthorizeOption option, IAuthentication authentication)
         {
@@ -34,14 +35,15 @@ namespace Wodsoft.ComBoost.Mvc
             return typeof(IEntity).IsAssignableFrom(objectType);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override IEntity Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             throw new NotSupportedException();
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, IEntity value, JsonSerializerOptions options)
         {
-            IEntity entity = (IEntity)value;
+            IEntity entity = value;
+
             var metadata = EntityDescriptor.GetMetadata(value.GetType());
             IPropertyMetadata[] propertyMetadatas = Option.GetProperties(metadata, Authentication).ToArray();
 
@@ -49,7 +51,7 @@ namespace Wodsoft.ComBoost.Mvc
             if (!propertyMetadatas.Contains(metadata.KeyProperty))
             {
                 writer.WritePropertyName(metadata.KeyProperty.ClrName);
-                writer.WriteValue(metadata.KeyProperty.GetValue(entity));
+                JsonSerializer.Serialize(writer, metadata.KeyProperty.GetValue(entity), options);
             }
             foreach (var property in propertyMetadatas)
             {
@@ -63,27 +65,25 @@ namespace Wodsoft.ComBoost.Mvc
                     {
                         var item = (IEntity)propertyValue;
                         writer.WriteStartObject();
-                        writer.WritePropertyName("Index");
-                        writer.WriteValue(item.Index.ToString());
-                        writer.WritePropertyName("Name");
-                        writer.WriteValue(item.ToString());
+                        writer.WriteString("Index", item.Index.ToString());
+                        writer.WriteString("Name", item.ToString());
                         writer.WriteEndObject();
                     }
                     else if (property.CustomType == "Enum")
-                        writer.WriteValue(property.GetValue(entity));
+                        JsonSerializer.Serialize(writer, property.GetValue(entity), options);
                     else if (property.CustomType == "Collection")
                         continue;
                     else
                         throw new NotSupportedException("不支持序列化的属性“" + property.Name + "”");
                 }
                 else
-                    writer.WriteValue(propertyValue);
+                    JsonSerializer.Serialize(writer, propertyValue, options);
             }
 
             writer.WritePropertyName("IsEditAllowed");
-            writer.WriteValue(entity.IsEditAllowed);
+            writer.WriteBooleanValue(entity.IsEditAllowed);
             writer.WritePropertyName("IsRemoveAllowed");
-            writer.WriteValue(entity.IsRemoveAllowed);
+            writer.WriteBooleanValue(entity.IsRemoveAllowed);
 
             writer.WriteEndObject();
         }

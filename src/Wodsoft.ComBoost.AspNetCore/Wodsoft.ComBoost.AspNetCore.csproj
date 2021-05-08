@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>ComBoost用于AspNet Core的领域模块。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.AspNetCore</AssemblyTitle>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
     <AssemblyName>Wodsoft.ComBoost.AspNetCore</AssemblyName>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -14,11 +14,15 @@
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
 </Project>

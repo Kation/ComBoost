@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,9 +11,9 @@ namespace Wodsoft.ComBoost.AspNetCore
     /// </summary>
     public class JsonSerializerProvider : ISerializerProvider
     {
-        public JsonSerializerProvider() : this(new JsonSerializerSettings()) { }
+        public JsonSerializerProvider() : this(new System.Text.Json.JsonSerializerOptions()) { }
 
-        public JsonSerializerProvider(JsonSerializerSettings settings)
+        public JsonSerializerProvider(System.Text.Json.JsonSerializerOptions settings)
         {
             Settings = settings;
         }
@@ -22,7 +21,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// <summary>
         /// 获取Json序列化设置。
         /// </summary>
-        public JsonSerializerSettings Settings { get; private set; }
+        public System.Text.Json.JsonSerializerOptions Settings { get; private set; }
 
         /// <summary>
         /// 获取序列化器。
@@ -40,7 +39,7 @@ namespace Wodsoft.ComBoost.AspNetCore
     /// </summary>
     public class JsonSerializer : ISerializer
     {
-        public JsonSerializer(Type type, JsonSerializerSettings settings)
+        public JsonSerializer(Type type, System.Text.Json.JsonSerializerOptions settings)
         {
             Type = type;
             Settings = settings;
@@ -54,7 +53,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// <summary>
         /// 获取Json序列化设置。
         /// </summary>
-        public JsonSerializerSettings Settings { get; private set; }
+        public System.Text.Json.JsonSerializerOptions Settings { get; private set; }
 
         /// <summary>
         /// 反序列化。
@@ -65,7 +64,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         {
             var reader = new StreamReader(stream);
             var value = reader.ReadToEnd();
-            return JsonConvert.DeserializeObject(value, Type);
+            return System.Text.Json.JsonSerializer.Deserialize(value, Type);
         }
 
         /// <summary>
@@ -75,7 +74,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// <param name="value">要序列化的对象。</param>
         public void Serialize(Stream stream, object value)
         {
-            var text = JsonConvert.SerializeObject(value, Type, Settings);
+            var text = System.Text.Json.JsonSerializer.Serialize(value, Type, Settings);
             var writer = new StreamWriter(stream);
             writer.Write(text);
             writer.Close();
