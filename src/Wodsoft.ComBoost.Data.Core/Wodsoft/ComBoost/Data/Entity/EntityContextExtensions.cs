@@ -40,7 +40,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="query">查询器。</param>
         /// <param name="key">主键。</param>
         /// <returns>返回实体。找不到实体时返回空。</returns>
-        public static Task<T> GetAsync<T>(this IEntityContext<T> context, IQueryable<T> query, object key)
+        public static async Task<T> GetAsync<T>(this IEntityContext<T> context, IAsyncQueryable<T> query, object key)
             where T : IEntity
         {
             if (context == null)
@@ -72,52 +72,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             property = Expression.Property(parameter, propertyInfo);
             Expression expression = Expression.Equal(property, Expression.Constant(key, propertyInfo.PropertyType));
             var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
-            return context.SingleOrDefaultAsync(query.Where(lambda));
-        }
-
-        public static IQueryable<T> Include<T>(this IEntityContext<T> context, IQueryable<T> query, string property)
-            where T : IEntity
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-            if (query == null)
-                throw new ArgumentNullException(nameof(query));
-            if (property == null)
-                throw new ArgumentNullException(nameof(property));
-            var parameter = Expression.Parameter(typeof(T));
-            var expression = Expression.Property(parameter, property);
-            var lambda = Expression.Lambda<Func<T, object>>(expression, parameter);
-            return context.Include(query, lambda);
-        }
-
-        public static IQueryable<T> Include<T>(this IEntityContext<T> context, string property)
-            where T : IEntity
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-            if (property == null)
-                throw new ArgumentNullException(nameof(property));
-            return Include(context, context.Query(), property);
-        }
-
-        public static IQueryable<T> Include<T, TProperty>(this IEntityContext<T> context, IQueryable<T> query, params Expression<Func<T, TProperty>>[] expressions)
-            where T : IEntity
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-            if (query == null)
-                throw new ArgumentNullException(nameof(query));
-            foreach (var expression in expressions)
-                query = context.Include(query, expression);
-            return query;
-        }
-
-        public static IQueryable<T> Include<T, TProperty>(this IEntityContext<T> context, params Expression<Func<T, TProperty>>[] expressions)
-            where T : IEntity
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-            return Include(context, context.Query(), expressions);
+            return await query.Where(lambda).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -125,10 +80,10 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         /// <param name="context">实体上下文。</param>
         /// <returns></returns>
-        public static Task<int> CountAsync<T>(this IEntityContext<T> context)
+        public static ValueTask<int> CountAsync<T>(this IEntityContext<T> context)
             where T : IEntity
         {
-            return context.CountAsync(context.Query());
+            return context.Query().CountAsync();
         }
 
         /// <summary>
@@ -137,7 +92,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <typeparam name="T">实体类型。</typeparam>
         /// <param name="context">实体上下文。</param>
         /// <returns>返回排序后的实体查询。</returns>
-        public static IOrderedQueryable<T> Order<T>(this IEntityContext<T> context)
+        public static IOrderedAsyncQueryable<T> Order<T>(this IEntityContext<T> context)
             where T : IEntity
         {
             if (context == null)
@@ -152,7 +107,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="context">实体上下文。</param>
         /// <param name="query">实体查询。</param>
         /// <returns>返回排序后的实体查询。</returns>
-        public static IOrderedQueryable<T> Order<T>(this IEntityContext<T> context, IQueryable<T> query)
+        public static IOrderedAsyncQueryable<T> Order<T>(this IEntityContext<T> context, IAsyncQueryable<T> query)
             where T : IEntity
         {
             if (context == null)
@@ -168,7 +123,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 return Queryable.OrderBy(query, express);
         }
 
-        public static IQueryable<T> InParent<T>(this IEntityContext<T> context, IQueryable<T> query, string path, object value)
+        public static IAsyncQueryable<T> InParent<T>(this IEntityContext<T> context, IAsyncQueryable<T> query, string path, object value)
             where T : IEntity
         {
             if (context == null)
@@ -206,7 +161,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             return query.Where(express);
         }
 
-        public static IQueryable<T> InParent<T>(this IEntityContext<T> context, IQueryable<T> query, object[] parentIds)
+        public static IAsyncQueryable<T> InParent<T>(this IEntityContext<T> context, IAsyncQueryable<T> query, object[] parentIds)
             where T : IEntity
         {
             if (context == null)

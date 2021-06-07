@@ -59,7 +59,7 @@ namespace System.ComponentModel
         /// <summary>
         /// 获取当前查询体。
         /// </summary>
-        IQueryable<T> Queryable { get; }
+        IAsyncQueryable<T> Queryable { get; }
 
         /// <summary>
         /// 获取内容项。

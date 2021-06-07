@@ -11,8 +11,7 @@ namespace System.ComponentModel
     /// Entity edit model.
     /// </summary>
     /// <typeparam name="TEntity">Type of Entity.</typeparam>
-    public class EntityEditModel<TEntity> : NotifyBase, IEntityEditModel<TEntity>, IEntityEditModel
-        where TEntity : IEntity
+    public class EntityEditModel<TEntity> : EditModel<TEntity>, IEntityEditModel<TEntity>, IEntityEditModel
     {
         /// <summary>
         /// Initialize entity edit model.
@@ -35,15 +34,5 @@ namespace System.ComponentModel
         /// Get or set the metadata of entity.
         /// </summary>
         public IEntityMetadata Metadata { get; set; }
-
-        /// <summary>
-        /// Get or set the properties to edit.
-        /// </summary>
-        public TEntity Item { get { return (TEntity)GetValue(); } set { SetValue(value); } }
-
-        /// <summary>
-        /// Get or set the item to edit.
-        /// </summary>
-        IEntity IEntityEditModel.Item { get { return Item; } }
     }
 }

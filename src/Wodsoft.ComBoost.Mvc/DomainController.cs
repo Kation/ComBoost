@@ -10,12 +10,6 @@ namespace Wodsoft.ComBoost.Mvc
 {
     public class DomainController : Controller
     {
-        protected IDomainServiceProvider DomainProvider { get; private set; }
-        
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            DomainProvider = HttpContext.RequestServices.GetRequiredService<IDomainServiceProvider>();
-        }
 
         protected virtual ControllerDomainContext CreateDomainContext()
         {
@@ -25,6 +19,13 @@ namespace Wodsoft.ComBoost.Mvc
         protected virtual EmptyDomainContext CreateEmptyDomainContext()
         {
             return new EmptyDomainContext(HttpContext.RequestServices, HttpContext.RequestAborted);
+        }
+
+        protected T GetDomainTemplate<T>() where T : IDomainTemplate
+        {
+            var template = HttpContext.RequestServices.GetRequiredService<T>();
+            template.Context = CreateDomainContext();
+            return template;
         }
     }
 }

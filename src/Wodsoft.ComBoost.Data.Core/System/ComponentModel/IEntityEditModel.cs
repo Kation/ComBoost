@@ -11,13 +11,8 @@ namespace System.ComponentModel
     /// <summary>
     /// Entity edit model interface.
     /// </summary>
-    public interface IEntityEditModel
+    public interface IEntityEditModel : IEditModel
     {
-        /// <summary>
-        /// Get or set the item to edit.
-        /// </summary>
-        IEntity Item { get; }
-
         /// <summary>
         /// Get or set the properties to edit.
         /// </summary>
@@ -33,13 +28,8 @@ namespace System.ComponentModel
     /// Entity edit model interface.
     /// </summary>
     /// <typeparam name="TEntity">Type of entity.</typeparam>
-    public interface IEntityEditModel<out TEntity> : IEntityEditModel
-        where TEntity : IEntity
+    public interface IEntityEditModel<out T> : IEntityEditModel, IEditModel<T>
     {
 
-        /// <summary>
-        /// Get or set the properties to edit.
-        /// </summary>
-        new TEntity Item { get; }
     }
 }

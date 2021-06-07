@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost.Mock
         public ICache GetCache()
         {
             if (_Cache == null)
-                _Cache = new Mock.MockCache();
+                _Cache = new ComBoost.Mock.MockCache();
             return _Cache;
         }
 

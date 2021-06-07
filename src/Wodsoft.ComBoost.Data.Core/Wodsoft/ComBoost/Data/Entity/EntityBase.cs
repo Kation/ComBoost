@@ -14,13 +14,13 @@ namespace Wodsoft.ComBoost.Data.Entity
         public override void OnCreateCompleted()
         {
             base.OnCreateCompleted();
-            if (Index == Guid.Empty)
-                Index = Guid.NewGuid();
+            if (Id == Guid.Empty)
+                Id = Guid.NewGuid();
         }
 
         /// <summary>
         /// 获取是否是新创建的实体。
         /// </summary>
-        protected override bool IsNewCreated { get { return Index == Guid.Empty; } }
+        protected override bool IsNewCreated { get { return Id == Guid.Empty; } }
     }
 }

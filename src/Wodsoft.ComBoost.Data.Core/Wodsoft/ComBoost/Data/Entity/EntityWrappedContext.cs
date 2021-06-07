@@ -34,28 +34,13 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             InnerContext.AddRange(items.Cast<M>());
         }
-
-        public Task<int> CountAsync(IQueryable<T> query)
-        {
-            return InnerContext.CountAsync(query.Unwrap<T, M>());
-        }
-        
+                
         public T Create()
         {
             return InnerContext.Create();
         }
 
-        public async Task<T> FirstAsync(IQueryable<T> query)
-        {
-            return await InnerContext.FirstAsync(query.Unwrap<T, M>());
-        }
-
-        public async Task<T> FirstOrDefaultAsync(IQueryable<T> query)
-        {
-            return await InnerContext.FirstOrDefaultAsync(query.Unwrap<T, M>());
-        }
-
-        public IQueryable<T> Query()
+        public IAsyncQueryable<T> Query()
         {
             return InnerContext.Query().Wrap<T, M>();
         }
@@ -70,26 +55,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             InnerContext.RemoveRange(items.Cast<M>());
         }
 
-        public async Task<T> SingleAsync(IQueryable<T> query)
-        {
-            return await InnerContext.SingleAsync(query.Unwrap<T, M>());
-        }
-
-        public async Task<T> SingleOrDefaultAsync(IQueryable<T> query)
-        {
-            return await InnerContext.SingleOrDefaultAsync(query.Unwrap<T, M>());
-        }
-
-        public async Task<T[]> ToArrayAsync(IQueryable<T> query)
-        {
-            return (await InnerContext.ToArrayAsync(query.Unwrap<T, M>())).Cast<T>().ToArray();
-        }
-
-        public async Task<List<T>> ToListAsync(IQueryable<T> query)
-        {
-            return (await InnerContext.ToListAsync(query.Unwrap<T, M>())).Cast<T>().ToList();
-        }
-
         public void Update(T item)
         {
             InnerContext.Update((M)item);
@@ -100,29 +65,14 @@ namespace Wodsoft.ComBoost.Data.Entity
             InnerContext.UpdateRange(items.Cast<M>());
         }
 
-        public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
+        public IAsyncQueryable<T> Include<TProperty>(IAsyncQueryable<T> query, Expression<Func<T, TProperty>> expression)
         {
             ExpressionWrapper<T, M> wrapper = new ExpressionWrapper<T, M>();
             LambdaExpression newExpression = (LambdaExpression)wrapper.Visit(expression);
             var propertyType = newExpression.Type.GetGenericArguments()[1];
             var queryable = query.Unwrap<T, M>();
-            queryable = (IQueryable<M>)InnerContext.GetType().GetMethod("Include").MakeGenericMethod(propertyType).Invoke(InnerContext, new object[] { queryable, newExpression });
+            queryable = (IAsyncQueryable<M>)InnerContext.GetType().GetMethod("Include").MakeGenericMethod(propertyType).Invoke(InnerContext, new object[] { queryable, newExpression });
             return queryable.Wrap<T, M>();
-        }
-
-        public async Task<T> GetAsync(object key)
-        {
-            return (M)await InnerContext.GetAsync(key);
-        }
-
-        public Task ReloadAsync(T item)
-        {
-            return InnerContext.ReloadAsync((M)item);
-        }
-
-        public IQueryable<T> ExecuteQuery(string sql, params object[] parameters)
-        {
-            throw new NotSupportedException();
         }
     }
 }

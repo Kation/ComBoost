@@ -10,30 +10,28 @@ namespace Wodsoft.ComBoost.Data.Entity
     /// <summary>
     /// 实现了IEntity接口的实体基类。
     /// </summary>
-    public abstract class EntityBase<T> : IEntity
+    public abstract class EntityBase<T> : EntityDTOBase, IEntity<T>
     {
         /// <summary>
         /// 获取或设置创建日期。
         /// </summary>
         [Hide]
         [Display(Name = "创建日期", Order = 100)]
-        public virtual DateTime CreateDate { get; set; }
+        public override DateTimeOffset CreationDate { get; set; }
 
         /// <summary>
         /// 获取或设置编辑日期。
         /// </summary>
         [Hide]
         [Display(Name = "编辑日期", Order = 200)]
-        public virtual DateTime EditDate { get; set; }
+        public override DateTimeOffset ModificationDate { get; set; }
 
         /// <summary>
         /// 获取或设置主键Id。
         /// </summary>
         [Hide]
         [Key]
-        public virtual T Index { get; set; }
-
-        object IEntity.Index { get { return Index; } set { Index = (T)value; } }
+        public virtual T Id { get; set; }
 
         /// <summary>
         /// 获取是否允许删除。
@@ -47,16 +45,23 @@ namespace Wodsoft.ComBoost.Data.Entity
         [Hide]
         public virtual bool IsRemoveAllowed { get { return true; } }
 
+        bool IEntity.IsNewCreated { get { return IsNewCreated; } }
+
+        /// <summary>
+        /// 获取是否是新创建的实体。
+        /// </summary>
+        protected abstract bool IsNewCreated { get; }
+
         /// <summary>
         /// 创建完毕。
         /// 通常于向数据库插入之前调用。
         /// </summary>
         public virtual void OnCreateCompleted()
         {
-            if (CreateDate == DateTime.MinValue)
-                CreateDate = DateTime.Now;
-            if (EditDate == DateTime.MinValue)
-                EditDate = CreateDate;
+            if (CreationDate == DateTimeOffset.MinValue)
+                CreationDate = DateTimeOffset.Now;
+            if (ModificationDate == DateTimeOffset.MinValue)
+                ModificationDate = CreationDate;
         }
 
         /// <summary>
@@ -65,7 +70,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         public virtual void OnEditCompleted()
         {
-            EditDate = DateTime.Now;
+            ModificationDate = DateTime.Now;
         }
 
         /// <summary>
@@ -79,14 +84,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// 通常于在用户编辑之前调用。
         /// </summary>
         public virtual void OnEditing() { }
-
-        //IEntityQueryContext<IEntity> IEntity.EntityContext { get; set; }
-
-        bool IEntity.IsNewCreated { get { return IsNewCreated; } }
-        /// <summary>
-        /// 获取是否是新创建的实体。
-        /// </summary>
-        protected abstract bool IsNewCreated { get; }
 
         /// <summary>
         /// 获取实体名称。

@@ -12,34 +12,13 @@ namespace Wodsoft.ComBoost
     public abstract class DomainServiceFilterAttribute : Attribute, IDomainServiceFilter
     {
         /// <summary>
-        /// 异步即将执行时。
+        /// 异步执行。
         /// </summary>
         /// <param name="context">领域执行上下文。</param>
         /// <returns>异步任务。</returns>
-        public virtual Task OnExecutingAsync(IDomainExecutionContext context)
+        public virtual Task OnExecutionAsync(IDomainExecutionContext context, DomainExecutionPipeline next)
         {
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// 异步执行完成时。
-        /// </summary>
-        /// <param name="context">领域执行上下文。</param>
-        /// <returns>异步任务。</returns>
-        public virtual Task OnExecutedAsync(IDomainExecutionContext context)
-        {
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// 异步抛出异常时。
-        /// </summary>
-        /// <param name="context">领域执行上下文。</param>
-        /// <param name="exception">异常内容。</param>
-        /// <returns>异步任务。</returns>
-        public virtual Task OnExceptionThrowingAsync(IDomainExecutionContext context, Exception exception)
-        {
-            return Task.CompletedTask;
+            return next();
         }
     }
 }

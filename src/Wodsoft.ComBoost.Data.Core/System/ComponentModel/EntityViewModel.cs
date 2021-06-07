@@ -12,13 +12,12 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="T">Type of model.</typeparam>
     public class EntityViewModel<T> : ViewModel<T>, IEntityViewModel<T>
-        where T : IEntity
     {
         /// <summary>
         /// Initialize entity view model.
         /// </summary>
         /// <param name="queryable">Queryable of entity.</param>
-        public EntityViewModel(IQueryable<T> queryable) : this(queryable, 1, Pagination.DefaultPageSize) { }
+        public EntityViewModel(IAsyncQueryable<T> queryable) : this(queryable, 1, Pagination.DefaultPageSize) { }
 
         /// <summary>
         /// Initialize entity view model.
@@ -26,7 +25,7 @@ namespace System.ComponentModel
         /// <param name="queryable">Queryable of entity.</param>
         /// <param name="page">Current page.</param>
         /// <param name="size">Current page size.</param>
-        public EntityViewModel(IQueryable<T> queryable, int page, int size) : base(queryable, page, size)
+        public EntityViewModel(IAsyncQueryable<T> queryable, int page, int size) : base(queryable, page, size)
         {
             Metadata = EntityDescriptor.GetMetadata<T>();
         }
@@ -49,27 +48,6 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the search items.
         /// </summary>
-        public EntitySearchItem[] SearchItem { get; set; }
-                
-        /// <summary>
-        /// Update total page.
-        /// </summary>
-        [Obsolete("请使用UpdateTotalPageAsync。")]
-        public virtual void UpdateTotalPage()
-        {
-            int total = Queryable.Count();
-            TotalPage = (int)Math.Ceiling(total / (double)CurrentSize);
-            if (TotalPage == 0)
-                TotalPage = 1;
-        }
-
-        /// <summary>
-        /// Update items of current page.
-        /// </summary>
-        [Obsolete("请使用UpdateItemsAsync。")]
-        public virtual void UpdateItems()
-        {
-            Items = Queryable.Skip((CurrentPage - 1) * CurrentSize).Take(CurrentSize).ToArray();
-        }
+        public EntitySearchItem[] SearchItem { get; set; }                
     }
 }

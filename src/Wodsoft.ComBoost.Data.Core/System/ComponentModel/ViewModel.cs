@@ -17,7 +17,7 @@ namespace System.ComponentModel
         /// 实例化视图模型。
         /// </summary>
         /// <param name="queryable">查询体。</param>
-        public ViewModel(IQueryable<T> queryable) : this(queryable, 1, Pagination.DefaultPageSize) { }
+        public ViewModel(IAsyncQueryable<T> queryable) : this(queryable, 1, 0) { }
 
         /// <summary>
         /// 实例化视图模型。
@@ -25,12 +25,12 @@ namespace System.ComponentModel
         /// <param name="queryable">查询体。</param>
         /// <param name="page">当前页。</param>
         /// <param name="size">每页显示数量。</param>
-        public ViewModel(IQueryable<T> queryable, int page, int size)
+        public ViewModel(IAsyncQueryable<T> queryable, int page, int size)
         {
             if (page < 1)
                 throw new ArgumentException("不能小于1。", "page");
-            if (size < 1)
-                throw new ArgumentException("不能小于1。", "size");
+            if (size < 0)
+                throw new ArgumentException("不能小于0。", "size");
             ViewButtons = new IViewButton[0];
             ItemButtons = new IItemButton[0];
             CurrentSize = size;
@@ -38,9 +38,9 @@ namespace System.ComponentModel
             Queryable = queryable ?? throw new ArgumentNullException("queryable");
         }
 
-        private IQueryable<T> _Queryable;
+        private IAsyncQueryable<T> _Queryable;
         /// <inheritdoc />
-        public IQueryable<T> Queryable
+        public IAsyncQueryable<T> Queryable
         {
             get
             {
@@ -84,19 +84,15 @@ namespace System.ComponentModel
         {
             if (page < 1)
                 throw new ArgumentException("页数不能小于1。", "page");
-            if (page > TotalPage)
-                page = TotalPage;
             CurrentPage = page;
         }
 
         /// <inheritdoc />
         public void SetSize(int size)
         {
-            if (size < 1)
-                throw new ArgumentException("每页显示数量不能小于1。", "size");
+            if (size < 0)
+                throw new ArgumentException("每页显示数量不能小于0。", "size");
             CurrentSize = size;
-            if (CurrentPage != 1)
-                SetPage(1);
         }
 
         /// <inheritdoc />
@@ -107,12 +103,17 @@ namespace System.ComponentModel
             TotalPage = (int)Math.Ceiling(total / (double)CurrentSize);
             if (TotalPage == 0)
                 TotalPage = 1;
+            if (CurrentPage > TotalPage)
+                CurrentPage = TotalPage;
         }
 
         /// <inheritdoc />
         public async Task UpdateItemsAsync()
         {
-            Items = await Linq.Queryable.Skip<T>(Queryable, (int)((CurrentPage - 1) * CurrentSize)).Take(CurrentSize).ToArrayAsync();
+            if (CurrentSize > 0)
+                Items = await Queryable.Skip((CurrentPage - 1) * CurrentSize).Take(CurrentSize).ToArrayAsync();
+            else
+                Items = await Queryable.ToArrayAsync();
         }
     }
 }

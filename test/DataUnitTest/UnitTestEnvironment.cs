@@ -11,7 +11,7 @@ using Wodsoft.ComBoost;
 
 namespace DataUnitTest
 {
-    public class UnitTestEnvironment : MockEnvironment
+    public class UnitTestEnvironment : Mock
     {
         private string _DatabaseName = Guid.NewGuid().ToString();
 

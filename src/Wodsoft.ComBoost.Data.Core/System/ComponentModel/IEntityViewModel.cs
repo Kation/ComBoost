@@ -31,19 +31,7 @@ namespace System.ComponentModel
         /// <summary>
         /// Get the search items.
         /// </summary>
-        EntitySearchItem[] SearchItem { get; }
-        
-        /// <summary>
-        /// Update total page.
-        /// </summary>
-        [Obsolete("请使用UpdateTotalPageAsync。")]
-        void UpdateTotalPage();
-        
-        /// <summary>
-        /// Update items of current page.
-        /// </summary>
-        [Obsolete("请使用UpdateItemsAsync。")]
-        void UpdateItems();        
+        EntitySearchItem[] SearchItem { get; }           
     }
 
     /// <summary>
@@ -51,7 +39,6 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="T">实体类型。</typeparam>
     public interface IEntityViewModel<out T> : IEntityViewModel, IViewModel<T>
-        where T : IEntity
     {
 
     }

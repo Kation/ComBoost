@@ -35,17 +35,6 @@ namespace Wodsoft.ComBoost
 
         public CancellationToken ServiceAborted { get; private set; }
 
-        private IDomainServiceOptions _Options;
-        public virtual IDomainServiceOptions Options
-        {
-            get
-            {
-                if (_Options == null)
-                    _Options = new DomainServiceOptions();
-                return _Options;
-            }
-        }
-
         public IList<IDomainServiceFilter> Filter { get; private set; }
 
         public DomainServiceEventManager EventManager { get; private set; }

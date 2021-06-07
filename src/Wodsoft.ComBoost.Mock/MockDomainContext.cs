@@ -8,13 +8,11 @@ namespace Wodsoft.ComBoost.Mock
 {
     public class MockDomainContext : DomainContext
     {
-        public MockDomainContext(IServiceProvider serviceProvider, CancellationTokenSource cancellationTokenSource)
-            : base(serviceProvider, cancellationTokenSource.Token)
+        public MockDomainContext(IServiceProvider serviceProvider, CancellationToken cancellationToken)
+            : base(serviceProvider, cancellationToken)
         {
-            CancellationTokenSource = cancellationTokenSource;
-        }
 
-        public CancellationTokenSource CancellationTokenSource { get; private set; }
+        }
 
         private MockValueProvider _ValueProvider;
         public MockValueProvider ValueProvider

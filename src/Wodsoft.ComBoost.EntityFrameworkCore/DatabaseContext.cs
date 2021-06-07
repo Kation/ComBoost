@@ -11,10 +11,11 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Collections.ObjectModel;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class DatabaseContext : IDatabaseContext
+    public abstract class DatabaseContext : IDatabaseContext
     {
         private static ConcurrentDictionary<Type, IEnumerable<Type>> _CachedSupportTypes;
         private Dictionary<Type, object> _CachedEntityContext;
@@ -26,25 +27,16 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public DbContext InnerContext { get; private set; }
 
-        public IEnumerable<Type> SupportTypes { get; private set; }
+        public abstract IEnumerable<Type> SupportTypes { get; }
 
         public bool TrackEntity { get; set; }
 
         public DatabaseContext(DbContext context)
         {
             TrackEntity = false;
-            DatabaseContextAccessor.Context = this;
-            AsyncQueryableExtensions.Context = AsyncQueryable.Default;
             _CachedEntityContext = new Dictionary<Type, object>();
             InnerContext = context;
             context.ChangeTracker.AutoDetectChangesEnabled = false;
-            SupportTypes = _CachedSupportTypes.GetOrAdd(context.GetType(), type =>
-            {
-                var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(t => t.CanRead && t.CanWrite && t.PropertyType.IsConstructedGenericType && t.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
-                    .Select(t => t.PropertyType.GetGenericArguments()[0]).ToList();
-                return new System.Collections.ObjectModel.ReadOnlyCollection<Type>(properties);
-            });
         }
 
         public Task<int> SaveAsync()
@@ -60,72 +52,32 @@ namespace Wodsoft.ComBoost.Data.Entity
             _CachedEntityContext.Add(typeof(T), context);
             return context;
         }
+    }
 
-        async Task<TResult> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, TResult>> expression)
+    public class DatabaseContext<TDbContext> : DatabaseContext
+        where TDbContext : DbContext
+    {
+        private static ReadOnlyCollection<Type> _supportTypes;
+
+        static DatabaseContext()
         {
-            if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
-            if (expression == null)
-                throw new ArgumentNullException(nameof(expression));
-            string propertyName = GetPropertyName(expression);
-            var entry = InnerContext.ChangeTracker.Entries<TSource>().FirstOrDefault(t => t.Entity.Index.Equals(entity.Index));
-            if (entry != null && entry.Entity != entity)
-                entry.CurrentValues.SetValues(entity);
-            else
-                entry = InnerContext.Entry(entity);
-            var reference = entry.Reference(propertyName);
-            if (!reference.IsLoaded)
-            {
-                if (entry.State == EntityState.Detached)
-                    entry.State = EntityState.Unchanged;
-                await reference.LoadAsync();
-            }
-            return (TResult)reference.CurrentValue;
+            _supportTypes = new ReadOnlyCollection<Type>(typeof(TDbContext).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(t => t.CanRead && t.CanWrite && t.PropertyType.IsConstructedGenericType && t.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
+                    .Select(t => t.PropertyType.GetGenericArguments()[0]).ToArray());
         }
 
-        async Task<IQueryableCollection<TResult>> IDatabaseContext.LoadAsync<TSource, TResult>(TSource entity, Expression<Func<TSource, ICollection<TResult>>> expression)
+        public DatabaseContext(TDbContext context) : base(context)
         {
-            if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
-            if (expression == null)
-                throw new ArgumentNullException(nameof(expression));
-            string propertyName = GetPropertyName(expression);
-            var entry = InnerContext.ChangeTracker.Entries<TSource>().FirstOrDefault(t => t.Entity.Index.Equals(entity.Index));
-            if (entry != null && entry.Entity != entity)
-                entry.CurrentValues.SetValues(entity);
-            else
-                entry = InnerContext.Entry(entity);
-            var reference = entry.Collection(propertyName);
-            var property = entry.Metadata.FindNavigation(propertyName);
-            var context = this.GetWrappedContext<TResult>();
-            if (entry.State == EntityState.Detached)
-                entry.State = EntityState.Unchanged;
-            var queryable = (IQueryable<TResult>)reference.Query();
-            var count = await queryable.CountAsync();
-            if (!TrackEntity)
-                queryable = queryable.AsNoTracking();
-            return new ComBoostEntityCollection<TResult>(entry, context, property, queryable, count);
+            
         }
 
-        private static string GetPropertyName<TSource, TResult>(Expression<Func<TSource, TResult>> expression)
-        {
-            MemberExpression memberExpression = expression.Body as MemberExpression;
-            if (memberExpression == null)
-                throw new NotSupportedException("不支持的路径。");
-            var parameter = memberExpression.Expression as ParameterExpression;
-            if (parameter == null)
-                throw new NotSupportedException("不支持的路径。");
-            return memberExpression.Member.Name;
-        }
+        public override IEnumerable<Type> SupportTypes => _supportTypes;
 
-        public Task<int> ExecuteNonQueryAsync(string sql, params object[] parameters)
+        public static IEntityContext<TEntity> GetEntityContextDelegate<TEntity>(IServiceProvider serviceProvider)
+            where TEntity : class, IEntity, new()
         {
-            throw new NotSupportedException();
-        }
-
-        public Task<TValue> ExecuteScalarAsync<TValue>(string sql, params object[] parameters)
-        {
-            throw new NotSupportedException();
+            var dataContext = serviceProvider.GetService<DatabaseContext<TDbContext>>();
+            return dataContext.GetContext<TEntity>();
         }
     }
 }

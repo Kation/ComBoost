@@ -6,35 +6,29 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class WrappedEnumerator<T, M> : IEnumerator<T>
+    public class WrappedEnumerator<T, M> : IAsyncEnumerator<T>
             where T : IEntity
             where M : IEntity, T
     {
-        public WrappedEnumerator(IEnumerator<M> enumerator)
+        public WrappedEnumerator(IAsyncEnumerator<M> enumerator)
         {
             if (enumerator == null)
                 throw new ArgumentNullException(nameof(enumerator));
             InnerEnumerator = enumerator;
         }
 
-        public IEnumerator<M> InnerEnumerator { get; private set; }
+        public IAsyncEnumerator<M> InnerEnumerator { get; private set; }
 
-        public T Current { get { return InnerEnumerator.Current; } }
+        public T Current => InnerEnumerator.Current;
 
-        object IEnumerator.Current { get { return InnerEnumerator.Current; } }
-        public void Dispose()
+        public ValueTask DisposeAsync()
         {
-            InnerEnumerator.Dispose();
+            return InnerEnumerator.DisposeAsync();
         }
 
-        public bool MoveNext()
+        public ValueTask<bool> MoveNextAsync()
         {
-            return InnerEnumerator.MoveNext();
-        }
-
-        public void Reset()
-        {
-            InnerEnumerator.Reset();
+            return InnerEnumerator.MoveNextAsync();
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost
 
         public override object GetService(Type serviceType)
         {
-            if (serviceType == typeof(IValueProvider))
+            if (serviceType == typeof(IValueProvider) || serviceType == typeof(IConfigurableValueProvider))
                 return ValueProvider;
             return base.GetService(serviceType);
         }

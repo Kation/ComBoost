@@ -42,10 +42,10 @@ namespace Wodsoft.ComBoost
         /// <param name="executionContext">领域执行上下文。</param>
         /// <param name="parameter">参数信息。</param>
         /// <returns>返回值。</returns>
-        public override object GetValue(IDomainExecutionContext executionContext, ParameterInfo parameter)
+        public override object GetValue(IDomainContext context, ParameterInfo parameter)
         {
             var metadata = EntityDescriptor.GetMetadata(parameter.ParameterType);
-            IValueProvider provider = executionContext.DomainContext.GetRequiredService<IValueProvider>();
+            IValueProvider provider = context.GetRequiredService<IValueProvider>();
             var keyType = metadata.KeyType;
             if (keyType.GetTypeInfo().IsValueType)
                 keyType = typeof(Nullable<>).MakeGenericType(keyType);
@@ -55,7 +55,7 @@ namespace Wodsoft.ComBoost
                     throw new DomainServiceException(new ArgumentNullException(parameter.Name, "获取" + (Name ?? parameter.Name) + "实体的值为空。"));
                 else
                     return null;
-            var databaseContext = executionContext.DomainContext.GetRequiredService<IDatabaseContext>();
+            var databaseContext = context.GetRequiredService<IDatabaseContext>();
             dynamic entityContext;
             var type = metadata.Type;
             entityContext = typeof(IDatabaseContext).GetMethod("GetContext").MakeGenericMethod(type).Invoke(databaseContext, new object[0]);

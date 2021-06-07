@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost.Data.Entity
     /// 实体查询上下文。
     /// </summary>
     /// <typeparam name="T">实体类型。</typeparam>
-    public interface IEntityQueryContext<out T>
+    public interface IEntityQueryContext<T>
         where T : IEntity
     {
         /// <summary>
@@ -28,6 +28,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// 获取查询接口。
         /// </summary>
         /// <returns>返回查询对象。</returns>
-        IQueryable<T> Query();        
+        IAsyncQueryable<T> Query();
     }
 }

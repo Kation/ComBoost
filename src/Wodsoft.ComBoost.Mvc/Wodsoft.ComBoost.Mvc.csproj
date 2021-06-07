@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>ComBoost用于AspNetCore的Mvc模块。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.Mvc</AssemblyTitle>
-    <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
     <AssemblyName>Wodsoft.ComBoost.Mvc</AssemblyName>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -16,17 +16,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj" />
-    <ProjectReference Include="..\Wodsoft.ComBoost.AspNetCore.Security\Wodsoft.ComBoost.AspNetCore.Security.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.AspNetCore\Wodsoft.ComBoost.AspNetCore.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.0.3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+  <ItemGroup Condition="'$(TargetFramework)'== 'netcoreapp2.1'">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+  <ItemGroup Condition="'$(TargetFramework)'== 'netcoreapp3.1'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)'== 'net5.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 </Project>

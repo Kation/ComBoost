@@ -10,7 +10,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public static class QueryableExtensions
     {
-        public static IQueryable<T> Wrap<T, M>(this IQueryable<M> queryable)
+        public static IAsyncQueryable<T> Wrap<T, M>(this IAsyncQueryable<M> queryable)
             where T : IEntity
             where M : IEntity, T
         {
@@ -23,7 +23,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             return value;
         }
 
-        public static IQueryable<M> Unwrap<T, M>(this IQueryable<T> queryable)
+        public static IAsyncQueryable<M> Unwrap<T, M>(this IAsyncQueryable<T> queryable)
             where T : IEntity
             where M : IEntity, T
         {

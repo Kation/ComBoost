@@ -30,22 +30,21 @@ namespace Wodsoft.ComBoost
 
         public string[] Parameters { get; private set; }
 
-        public override async Task OnExecutingAsync(IDomainExecutionContext context)
+        public override async Task OnExecutionAsync(IDomainExecutionContext context, DomainExecutionPipeline next)
         {
             var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
             var key = GetCacheKey(context, valueProvider);
             var cacheProvider = context.DomainContext.GetRequiredService<ICacheProvider>();
             var value = await cacheProvider.GetCache().GetAsync(key, ValueType);
-            if (value != null)
+            if (value == null)
+            {
+                await next();
+                await cacheProvider.GetCache().SetAsync(key, context.Result, ExpireTime);
+            }
+            else
+            {
                 context.Done(value);
-        }
-
-        public override Task OnExecutedAsync(IDomainExecutionContext context)
-        {
-            var valueProvider = context.DomainContext.GetRequiredService<IValueProvider>();
-            var key = GetCacheKey(context, valueProvider);
-            var cacheProvider = context.DomainContext.GetRequiredService<ICacheProvider>();
-            return cacheProvider.GetCache().SetAsync(key, context.Result, ExpireTime);
+            }
         }
 
         protected virtual string GetCacheKey(IDomainExecutionContext context, IValueProvider valueProvider)

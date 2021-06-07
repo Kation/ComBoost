@@ -58,5 +58,10 @@ namespace Wodsoft.ComBoost
         /// 获取是否中断。
         /// </summary>
         bool IsAborted { get; }
+
+        /// <summary>
+        /// 获取是否完成。
+        /// </summary>
+        bool IsCompleted { get; }
     }
 }

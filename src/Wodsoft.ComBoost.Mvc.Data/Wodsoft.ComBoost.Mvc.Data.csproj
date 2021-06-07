@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>ComBoost用于AspNetCore Mvc的实体模块。</Description>
     <AssemblyTitle>Wodsoft.ComBoost.Mvc.Data</AssemblyTitle>
-    <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
     <AssemblyName>Wodsoft.ComBoost.Mvc.Data</AssemblyName>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -17,6 +17,18 @@
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.Mvc\Wodsoft.ComBoost.Mvc.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)'== 'netcoreapp2.1'">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.0" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)'== 'netcoreapp3.1'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'== 'net5.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
 </Project>

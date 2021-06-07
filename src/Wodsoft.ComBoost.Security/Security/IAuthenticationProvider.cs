@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Security;
@@ -13,29 +14,15 @@ namespace Wodsoft.ComBoost.Security
     public interface IAuthenticationProvider
     {
         /// <summary>
-        /// 获取当前权限。
+        /// 获取用户声明主体。
         /// </summary>
-        /// <returns></returns>
-        IAuthentication GetAuthentication();
+        ClaimsPrincipal User { get; }
 
         /// <summary>
-        /// 登录。
+        /// 判断角色。
         /// </summary>
-        /// <param name="properties">数据。</param>
-        /// <returns>返回是否成功。</returns>
-        Task<bool> SignInAsync(IDictionary<string, string> properties);
-
-        /// <summary>
-        /// 登录。
-        /// </summary>
-        /// <param name="permission">许可。</param>
-        /// <returns></returns>
-        Task SignInAsync(IPermission permission);
-
-        /// <summary>
-        /// 登出。
-        /// </summary>
-        /// <returns></returns>
-        Task SignOutAsync();
+        /// <param name="role">角色。</param>
+        /// <returns>拥有角色返回true，否则返回false。</returns>
+        bool IsInRole(string role);
     }
 }

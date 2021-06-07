@@ -10,7 +10,7 @@ using Wodsoft.ComBoost.AspNetCore;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public abstract class MvcDomainContext : HttpDomainContext
+    public class MvcDomainContext : HttpDomainContext
     {
         public MvcDomainContext(ActionContext actionContext)
             : base(actionContext.HttpContext)

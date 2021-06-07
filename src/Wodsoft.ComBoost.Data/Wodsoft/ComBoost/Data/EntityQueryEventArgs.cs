@@ -7,15 +7,15 @@ namespace Wodsoft.ComBoost.Data
 {
     public class EntityQueryEventArgs<T> : DomainServiceEventArgs
     {
-        public EntityQueryEventArgs(IQueryable<T> queryable)
+        public EntityQueryEventArgs(IAsyncQueryable<T> queryable)
         {
             OriginQueryable = Queryable = queryable;
             IsOrdered = false;
         }
 
-        public IQueryable<T> OriginQueryable { get; private set; }
+        public IAsyncQueryable<T> OriginQueryable { get; private set; }
 
-        public IQueryable<T> Queryable { get; set; }
+        public IAsyncQueryable<T> Queryable { get; set; }
 
         public bool IsOrdered { get; set; }
     }

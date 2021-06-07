@@ -8,7 +8,7 @@ using Wodsoft.ComBoost;
 
 namespace DataUnitTest
 {
-    public class EventTestEnvironment : MockEnvironment
+    public class EventTestEnvironment : Mock
     {
         private string _DatabaseName = Guid.NewGuid().ToString();
 

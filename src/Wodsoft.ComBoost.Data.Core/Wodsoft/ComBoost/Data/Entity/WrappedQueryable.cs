@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class WrappedQueryable<T, M> : IQueryable<T>, IWrappedQueryable
+    public class WrappedQueryable<T, M> : IAsyncQueryable<T>, IWrappedQueryable
         where T : IEntity
         where M : IEntity, T
     {
@@ -27,20 +28,15 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public WrappedQueryableProvider<T, M> Provider { get; private set; }
 
-        System.Linq.IQueryProvider IQueryable.Provider { get { return Provider; } }
+        IAsyncQueryProvider IAsyncQueryable.Provider { get { return Provider; } }
 
-        public IEnumerator<T> GetEnumerator()
+        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
-            return new WrappedEnumerator<T, M>(Provider.InnerQueryProvider.CreateQuery<M>(Expression).GetEnumerator());
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new WrappedEnumerator<T, M>(Provider.InnerQueryProvider.CreateQuery<M>(Expression).GetEnumerator());
+            return new WrappedEnumerator<T, M>(Provider.InnerQueryProvider.CreateQuery<M>(Expression).GetAsyncEnumerator(cancellationToken));
         }
     }
 
-    public class WrappedOrderedQueryable<T, M> : WrappedQueryable<T, M>, IOrderedQueryable<T>
+    public class WrappedOrderedQueryable<T, M> : WrappedQueryable<T, M>, IOrderedAsyncQueryable<T>
         where T : IEntity
         where M : IEntity, T
     {

@@ -23,6 +23,20 @@ namespace Wodsoft.ComBoost
             _ParameterValues = GetParameters();
         }
 
+        public DomainExecutionContext(IDomainService domainService, IDomainContext domainContext, MethodInfo method, object[] parameters)
+        {
+            if (domainService == null)
+                throw new ArgumentNullException(nameof(domainService));
+            if (domainContext == null)
+                throw new ArgumentNullException(nameof(domainContext));
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
+            _DomainService = domainService;
+            _Context = domainContext;
+            _Method = method;
+            _ParameterValues = parameters;
+        }
+
         private IDomainService _DomainService;
         public IDomainService DomainService
         {
@@ -57,7 +71,7 @@ namespace Wodsoft.ComBoost
                 var from = t.GetCustomAttribute<FromAttribute>();
                 if (from == null)
                     throw new NotSupportedException(string.Format("不能解析的参数，{0}的{1}。", _Method.DeclaringType.FullName, t.Name));
-                var value = from.GetValue(this, t);
+                var value = from.GetValue(DomainContext, t);
                 if (value == null && t.HasDefaultValue)
                     value = t.DefaultValue;
                 return value;
@@ -75,7 +89,7 @@ namespace Wodsoft.ComBoost
             IsCompleted = true;
         }
 
-        public object Result { get; internal set; }
+        public object Result { get; set; }
 
         public bool IsAborted { get { return DomainContext.ServiceAborted.IsCancellationRequested; } }
 

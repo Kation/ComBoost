@@ -3,23 +3,21 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
     public class SessionCacheProvider : ICacheProvider
     {
-        public SessionCacheProvider(IHttpContextAccessor httpContextAccessor, ISerializerProvider serializerProvider)
+        public SessionCacheProvider(IHttpContextAccessor httpContextAccessor)
         {
             if (httpContextAccessor == null)
                 throw new ArgumentNullException(nameof(httpContextAccessor));
             HttpContext = httpContextAccessor.HttpContext;
-            SerializerProvider = serializerProvider ?? throw new ArgumentNullException(nameof(serializerProvider));
         }
 
         public HttpContext HttpContext { get; private set; }
-
-        public ISerializerProvider SerializerProvider { get; private set; }
 
         private SessionCache _Cache;
 
@@ -27,7 +25,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         public ICache GetCache()
         {
             if (_Cache == null)
-                _Cache = new SessionCache("__ComBoost_Cache_", HttpContext.Session, SerializerProvider);
+                _Cache = new SessionCache("__ComBoost_Cache_", HttpContext.Session);
             return _Cache;
         }
 
@@ -35,24 +33,21 @@ namespace Wodsoft.ComBoost.AspNetCore
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
-            return new SessionCache("__ComBoost_Cache_" + name + "_", HttpContext.Session, SerializerProvider);
+            return new SessionCache("__ComBoost_Cache_" + name + "_", HttpContext.Session);
         }
     }
 
     public class SessionCache : ICache
     {
-        public SessionCache(string prefix, ISession session, ISerializerProvider serializerProvider)
+        public SessionCache(string prefix, ISession session)
         {
             Prefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
             Session = session ?? throw new ArgumentNullException(nameof(session));
-            SerializerProvider = serializerProvider ?? throw new ArgumentNullException(nameof(serializerProvider));
         }
 
         public string Prefix { get; private set; }
 
         public ISession Session { get; private set; }
-
-        public ISerializerProvider SerializerProvider { get; private set; }
 
         public Task ClearAsync()
         {
@@ -78,9 +73,8 @@ namespace Wodsoft.ComBoost.AspNetCore
             byte[] data;
             if (!Session.TryGetValue(Prefix + name, out data))
                 return Task.FromResult<object>(null);
-            var stream = new MemoryStream(data);
             var type = typeof(CacheItem<>).MakeGenericType(valueType);
-            dynamic item = SerializerProvider.GetSerializer(type).Deserialize(stream);
+            dynamic item = JsonSerializer.Deserialize(data, valueType);
             DateTime? expiredDate = item.ExpiredDate;
             if (expiredDate < DateTime.Now)
                 return Task.FromResult<object>(null);
@@ -98,9 +92,7 @@ namespace Wodsoft.ComBoost.AspNetCore
             type.GetProperty("Value").SetValue(item, value);
             if (expireTime.HasValue)
                 item.ExpiredDate = DateTime.Now.Add(expireTime.Value);
-            var stream = new MemoryStream();
-            SerializerProvider.GetSerializer(type).Serialize(stream, item);
-            var data = stream.ToArray();
+            var data = JsonSerializer.SerializeToUtf8Bytes(item);
             Session.Set(Prefix + name, data);
             return Task.CompletedTask;
         }
