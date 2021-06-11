@@ -127,6 +127,8 @@ namespace Wodsoft.ComBoost
 
             protected void HandleResult(Task task)
             {
+                if (!task.IsCompleted)
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
                 DomainService.Context.Done();
             }
 
@@ -148,12 +150,16 @@ namespace Wodsoft.ComBoost
 
             protected void HandleResult(Task<TResult> task)
             {
+                if (task.IsFaulted)
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
                 result = task.Result;
                 DomainService.Context.Done(result);
             }
 
             protected TResult ReturnResult(Task task)
             {
+                if (task.IsFaulted)
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
                 return result;
             }
         }
@@ -448,14 +454,14 @@ namespace Wodsoft.ComBoost
                     invokeILGenerator.Emit(OpCodes.Ldarg_0);
                     invokeILGenerator.Emit(OpCodes.Ldftn, baseType.GetMethod("ReturnResult", BindingFlags.NonPublic | BindingFlags.Instance));
                     invokeILGenerator.Emit(OpCodes.Newobj, typeof(Func<,>).MakeGenericType(typeof(Task), method.ReturnType.GenericTypeArguments[0]).GetConstructors()[0]);
-                    invokeILGenerator.Emit(OpCodes.Ldc_I4, (int)TaskContinuationOptions.OnlyOnRanToCompletion);
-                    invokeILGenerator.Emit(OpCodes.Call, typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(t => t.Name == "ContinueWith" && t.IsGenericMethodDefinition && t.GetParameters().Length == 2 && t.GetParameters()[1].ParameterType == typeof(TaskContinuationOptions)).First().MakeGenericMethod(method.ReturnType.GenericTypeArguments[0]));
+                    //invokeILGenerator.Emit(OpCodes.Ldc_I4, (int)TaskContinuationOptions.OnlyOnRanToCompletion);
+                    invokeILGenerator.Emit(OpCodes.Call, typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(t => t.Name == "ContinueWith" && t.IsGenericMethodDefinition && t.GetParameters().Length == 1/* && t.GetParameters()[1].ParameterType == typeof(TaskContinuationOptions)*/).First().MakeGenericMethod(method.ReturnType.GenericTypeArguments[0]));
                 }
                 executeILGenerator.Emit(OpCodes.Ldarg_0);
                 executeILGenerator.Emit(OpCodes.Ldftn, baseType.GetMethod("HandleResult", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { method.ReturnType }, null));
                 executeILGenerator.Emit(OpCodes.Newobj, typeof(Action<>).MakeGenericType(method.ReturnType).GetConstructors()[0]);
-                executeILGenerator.Emit(OpCodes.Ldc_I4, (int)TaskContinuationOptions.OnlyOnRanToCompletion);
-                executeILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", new Type[] { typeof(Action<>).MakeGenericType(method.ReturnType), typeof(TaskContinuationOptions) }));
+                //executeILGenerator.Emit(OpCodes.Ldc_I4, (int)TaskContinuationOptions.OnlyOnRanToCompletion);
+                executeILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", new Type[] { typeof(Action<>).MakeGenericType(method.ReturnType)/*, typeof(TaskContinuationOptions)*/ }));
 
                 executeILGenerator.Emit(OpCodes.Ret);
                 invokeILGenerator.Emit(OpCodes.Ret);
