@@ -69,9 +69,9 @@ namespace Wodsoft.ComBoost.Data.Entity
         public IAsyncQueryable<T> Query()
         {
             if (Database.TrackEntity)
-                return DbSet.AsAsyncQueryable();
+                return new WrappedAsyncQueryable<T>(DbSet);
             else
-                return ((IAsyncEnumerable<T>)DbSet.AsNoTracking()).AsAsyncQueryable();
+                return new WrappedAsyncQueryable<T>(DbSet.AsNoTracking());
         }
 
         public void Remove(T item)

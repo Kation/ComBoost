@@ -73,12 +73,12 @@ namespace Wodsoft.ComBoost.Data.Entity
             return item;
         }
 
-        public IQueryable<T> Query()
+        public IAsyncQueryable<T> Query()
         {
             if (Database.TrackEntity)
-                return DbSet;
+                return new WrappedAsyncQueryable<T>(DbSet);
             else
-                return DbSet.AsNoTracking();
+                return new WrappedAsyncQueryable<T>(DbSet.AsNoTracking());
         }
 
         public void Remove(T item)
