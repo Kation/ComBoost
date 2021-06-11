@@ -9,25 +9,20 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DomainAspNetCoreDependencyInjectionExtensions
     {
-        public static void AddDomainServiceMapping<T>(this IServiceCollection services, string name)
+        public static void AddDomainServiceMapping<T>(this IComBoostAspNetCoreBuilder builder, string name = null)
             where T : class, IDomainService
         {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
             if (name == null)
-                throw new ArgumentNullException(nameof(name));
-            services.Configure<DomainServiceMapping>(name.ToLower(), options =>
+                name = typeof(T).Name;
+            builder.Services.Configure<DomainServiceMapping>(name.ToLower(), options =>
             {
                 options.ServiceType = typeof(T);
             });
-            services.AddSingleton<DomainServiceDescriptor<T>>();
-            services.AddTransient<T>();
+            builder.Services.AddSingleton<DomainServiceDescriptor<T>>();
+            builder.Services.AddTransient<T>();
         }
-
-        //public static void AddComBoostAspNetCore(this IServiceCollection services)
-        //{
-        //    services.AddSingleton<IExecutionResultHandler, DefaultExecutionResultHandler>();
-        //}
 
         public static IComBoostBuilder AddAspNetCore(this IComBoostBuilder builder, Action<IComBoostAspNetCoreBuilder> builderConfigure = null)
         {

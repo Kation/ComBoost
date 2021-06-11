@@ -27,7 +27,6 @@ namespace Wodsoft.ComBoost
         internal static readonly MethodInfo _Initialize = typeof(IDomainService).GetMethod("Initialize");
         internal static readonly ConstructorInfo _ExecutionContextConstructor = typeof(DomainExecutionContext).GetConstructor(new Type[] { typeof(IDomainService), typeof(IDomainContext), typeof(MethodInfo), typeof(object[]) });
 
-
         public static ModuleBuilder Module { get; }
 
         static DomainTemplateBuilder()
@@ -74,95 +73,6 @@ namespace Wodsoft.ComBoost
                 return items;
             }
         }
-
-        public abstract class DomainTemplateInvoker<TDomainService>
-            where TDomainService : class, IDomainService
-        {
-            protected DomainTemplateInvoker(TDomainService domainService)
-            {
-                DomainService = domainService;
-            }
-
-            public TDomainService DomainService { get; }
-
-            private static List<IDomainServiceFilter> _Filters;
-
-            protected abstract Task ExecuteAsync();
-
-            protected IList<IDomainServiceFilter> GetFilters()
-            {
-                if (_Filters == null)
-                {
-                    List<IDomainServiceFilter> filters = new List<IDomainServiceFilter>();
-                    filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions>>().Value.Filters);
-                    filters.AddRange(typeof(TDomainService).GetCustomAttributes<DomainServiceFilterAttribute>());
-                    filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions<TDomainService>>>().Value.Filters);
-                    filters.AddRange(DomainService.Context.DomainMethod.GetCustomAttributes<DomainServiceFilterAttribute>());
-                    filters.AddRange(DomainService.Context.DomainContext.GetService<IOptionsMonitor<DomainFilterOptions<TDomainService>>>().Get(DomainService.Context.DomainMethod.Name).Filters);
-                    _Filters = filters;
-                }
-                return _Filters;
-            }
-
-            protected DomainExecutionPipeline MakePipeline()
-            {
-                var globalFilters = GetFilters();
-                DomainExecutionPipeline pipeline = ExecuteAsync;
-                var filters = DomainService.Context.DomainContext.Filter;
-                var context = DomainService.Context;
-                for (int i = filters.Count - 1; i >= 0; i--)
-                {
-                    var next = pipeline;
-                    var index = i;
-                    pipeline = () => filters[index].OnExecutionAsync(context, next);
-                }
-                for (int i = globalFilters.Count - 1; i >= 0; i--)
-                {
-                    var next = pipeline;
-                    var index = i;
-                    pipeline = () => globalFilters[index].OnExecutionAsync(context, next);
-                }
-                return pipeline;
-            }
-
-            protected void HandleResult(Task task)
-            {
-                if (!task.IsCompleted)
-                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
-                DomainService.Context.Done();
-            }
-
-            protected Task RunPipeline()
-            {
-                return MakePipeline()();
-            }
-        }
-
-        public abstract class DomainTemplateInvoker<TDomainService, TResult> : DomainTemplateInvoker<TDomainService>
-            where TDomainService : class, IDomainService
-        {
-            protected DomainTemplateInvoker(TDomainService domainService) : base(domainService)
-            {
-
-            }
-
-            private TResult result;
-
-            protected void HandleResult(Task<TResult> task)
-            {
-                if (task.IsFaulted)
-                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
-                result = task.Result;
-                DomainService.Context.Done(result);
-            }
-
-            protected TResult ReturnResult(Task task)
-            {
-                if (task.IsFaulted)
-                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
-                return result;
-            }
-        }
     }
 
     public class DomainTemplateBuilder<TDomainService, T> : DomainTemplateBuilder, IDomainTemplateDescriptor<T>
@@ -173,13 +83,10 @@ namespace Wodsoft.ComBoost
 
         internal static readonly MethodInfo _GetAttribute = typeof(DomainTemplateBuilder<TDomainService, T>).GetMethod(nameof(GetAttribute), BindingFlags.Public | BindingFlags.Static);
         internal static readonly MethodInfo _GetParameterInfo = typeof(DomainTemplateBuilder<TDomainService, T>).GetMethod("GetParameterInfo");
-        internal static readonly MethodInfo _GetMethodInfo = typeof(DomainTemplateBuilder<TDomainService, T>).GetMethod("GetMethodInfo");
         internal static readonly MethodInfo _GetDomainService = typeof(DomainTemplateAgent<TDomainService>).GetProperty("Service").GetGetMethod();
         internal static readonly ConstructorInfo _AgentConstructor = typeof(DomainTemplateAgent<TDomainService>).GetConstructor(new Type[] { typeof(IDomainContext), typeof(TDomainService) });
         private static Dictionary<string, FromAttribute[]> _FromAttributes;
         private static Dictionary<string, ParameterInfo[]> _ParameterInfos;
-        private static Dictionary<string, MethodInfo> _MethodInfos;
-        private static Dictionary<string, Invoker> _Invoker = new Dictionary<string, Invoker>();
         private static TypeBuilder _AgentBuilder;
 
         public static FromAttribute GetAttribute(string method, int parameterIndex)
@@ -194,11 +101,6 @@ namespace Wodsoft.ComBoost
             return values[parameterIndex];
         }
 
-        public static MethodInfo GetMethodInfo(string method)
-        {
-            return _MethodInfos[method];
-        }
-
         static DomainTemplateBuilder()
         {
             var serviceType = typeof(TDomainService);
@@ -206,7 +108,6 @@ namespace Wodsoft.ComBoost
             _FromAttributes = serviceType.GetMethods().ToDictionary(x => x.Name,
                     x => x.GetParameters().Select(y => (FromAttribute)y.GetCustomAttributes().FirstOrDefault(z => z is FromAttribute)).ToArray());
             _ParameterInfos = serviceType.GetMethods().ToDictionary(x => x.Name, x => x.GetParameters());
-            _MethodInfos = serviceType.GetMethods().ToDictionary(t => t.Name, t => t);
 
             if (!type.IsInterface)
                 throw new NotSupportedException("Not support non interface type as a template.");
@@ -357,137 +258,29 @@ namespace Wodsoft.ComBoost
                     count++;
                 }
 
-                //Call IDomainService.Initialize
+                //new Invoker(DomainService, DomainContext).InvokeAsync(...)
                 ilGenerator.Emit(OpCodes.Ldarg_0);
                 ilGenerator.Emit(OpCodes.Call, _GetDomainService);
-                //Create DomainExecutionContext
-                //Copy for IDomainService parameter
-                ilGenerator.Emit(OpCodes.Dup);
-                //Copy for create DomainTemplateInvoker
-                ilGenerator.Emit(OpCodes.Dup);
-                //IDomainContext
                 ilGenerator.Emit(OpCodes.Ldarg_0);
                 ilGenerator.Emit(OpCodes.Call, _GetContext);
-                //MethodInfo
-                ilGenerator.Emit(OpCodes.Ldstr, serviceMethod.Name);
-                ilGenerator.Emit(OpCodes.Call, _GetMethodInfo);
-                //Parameters
-                ilGenerator.Emit(OpCodes.Ldc_I4, count);
-                ilGenerator.Emit(OpCodes.Newarr, typeof(object));
-                for (int i = 0; i < count; i++)
-                {
-                    ilGenerator.Emit(OpCodes.Dup);
-                    ilGenerator.Emit(OpCodes.Ldc_I4, i);
-                    ilGenerator.Emit(OpCodes.Ldloc, locals[i]);
-                    if (locals[i].LocalType.IsValueType)
-                        ilGenerator.Emit(OpCodes.Box, locals[i].LocalType);
-                    ilGenerator.Emit(OpCodes.Stelem_Ref);
-                }
-                ilGenerator.Emit(OpCodes.Newobj, _ExecutionContextConstructor);
-                ilGenerator.Emit(OpCodes.Callvirt, _Initialize);
-
-                var invoker = GetInvoker(serviceMethod);
+                var invoker = DomainServiceInvokerBuilder<TDomainService>.GetInvokerReference(serviceMethod);
                 ilGenerator.Emit(OpCodes.Newobj, invoker.Constructor);
                 for (int i = 0; i < count; i++)
                     ilGenerator.Emit(OpCodes.Ldloc, locals[i]);
-
                 //Call invoker method and return
                 ilGenerator.Emit(OpCodes.Call, invoker.InvokeMethod);
-
                 //ilGenerator.Emit(OpCodes.Ldnull);
                 ilGenerator.Emit(OpCodes.Ret);
             }
 
             var typeInfo = _AgentBuilder.CreateTypeInfo();
-            foreach (var invoker in _Invoker)
-                invoker.Value.Type.CreateTypeInfo();
             _TemplateType = typeInfo.AsType();
-        }
-
-        private static Invoker GetInvoker(MethodInfo method)
-        {
-            if (!_Invoker.TryGetValue(method.Name, out var invoker))
-            {
-                Type baseType;
-                if (method.ReturnType == typeof(Task))
-                    baseType = typeof(DomainTemplateInvoker<TDomainService>);
-                else
-                    baseType = typeof(DomainTemplateInvoker<,>).MakeGenericType(typeof(TDomainService), method.ReturnType.GetGenericArguments()[0]);
-                var type = _AgentBuilder.DefineNestedType(method.Name + "Invoker", TypeAttributes.NestedPublic | TypeAttributes.Class, baseType);
-
-                var constructor = type.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, CallingConventions.Standard, new Type[] { typeof(TDomainService) });
-                var constructorILGenerator = constructor.GetILGenerator();
-                constructorILGenerator.Emit(OpCodes.Ldarg_0);
-                constructorILGenerator.Emit(OpCodes.Ldarg_1);
-                constructorILGenerator.Emit(OpCodes.Call, baseType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0]);
-                constructorILGenerator.Emit(OpCodes.Ret);
-
-                var executeMethod = type.DefineMethod("ExecuteAsync", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final, typeof(Task), null);
-                var executeILGenerator = executeMethod.GetILGenerator();
-                //Service.{method}
-                executeILGenerator.Emit(OpCodes.Ldarg_0);
-                executeILGenerator.Emit(OpCodes.Call, baseType.GetProperty("DomainService").GetGetMethod());
-                type.DefineMethodOverride(executeMethod, baseType.GetMethod("ExecuteAsync", BindingFlags.NonPublic | BindingFlags.Instance));
-
-                var invokeMethod = type.DefineMethod("InvokeAsync", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot, method.ReturnType, method.GetParameters().Select(t => t.ParameterType).ToArray());
-                var invokeILGenerator = invokeMethod.GetILGenerator();
-
-                int count = 0;
-                foreach (var parameter in method.GetParameters())
-                {
-                    var field = type.DefineField("Parameter" + parameter.Name, parameter.ParameterType, FieldAttributes.Public);
-                    executeILGenerator.Emit(OpCodes.Ldarg_0);
-                    executeILGenerator.Emit(OpCodes.Ldfld, field);
-                    invokeILGenerator.Emit(OpCodes.Ldarg_0);
-                    invokeILGenerator.Emit(OpCodes.Ldarg_S, (byte)(count + 1));
-                    invokeILGenerator.Emit(OpCodes.Stfld, field);
-                    count++;
-                }
-
-                invokeILGenerator.Emit(OpCodes.Ldarg_0);
-                invokeILGenerator.Emit(OpCodes.Call, baseType.GetMethod("RunPipeline", BindingFlags.NonPublic | BindingFlags.Instance));
-                //invokeILGenerator.Emit(OpCodes.Ldarg_0);
-
-                executeILGenerator.Emit(OpCodes.Callvirt, method);
-                if (method.ReturnType != typeof(Task))
-                {
-                    invokeILGenerator.Emit(OpCodes.Ldarg_0);
-                    invokeILGenerator.Emit(OpCodes.Ldftn, baseType.GetMethod("ReturnResult", BindingFlags.NonPublic | BindingFlags.Instance));
-                    invokeILGenerator.Emit(OpCodes.Newobj, typeof(Func<,>).MakeGenericType(typeof(Task), method.ReturnType.GenericTypeArguments[0]).GetConstructors()[0]);
-                    //invokeILGenerator.Emit(OpCodes.Ldc_I4, (int)TaskContinuationOptions.OnlyOnRanToCompletion);
-                    invokeILGenerator.Emit(OpCodes.Call, typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(t => t.Name == "ContinueWith" && t.IsGenericMethodDefinition && t.GetParameters().Length == 1/* && t.GetParameters()[1].ParameterType == typeof(TaskContinuationOptions)*/).First().MakeGenericMethod(method.ReturnType.GenericTypeArguments[0]));
-                }
-                executeILGenerator.Emit(OpCodes.Ldarg_0);
-                executeILGenerator.Emit(OpCodes.Ldftn, baseType.GetMethod("HandleResult", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { method.ReturnType }, null));
-                executeILGenerator.Emit(OpCodes.Newobj, typeof(Action<>).MakeGenericType(method.ReturnType).GetConstructors()[0]);
-                //executeILGenerator.Emit(OpCodes.Ldc_I4, (int)TaskContinuationOptions.OnlyOnRanToCompletion);
-                executeILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", new Type[] { typeof(Action<>).MakeGenericType(method.ReturnType)/*, typeof(TaskContinuationOptions)*/ }));
-
-                executeILGenerator.Emit(OpCodes.Ret);
-                invokeILGenerator.Emit(OpCodes.Ret);
-
-                invoker = new Invoker
-                {
-                    Constructor = constructor,
-                    InvokeMethod = invokeMethod,
-                    Type = type
-                };
-                _Invoker[method.Name] = invoker;
-            }
-            return invoker;
         }
 
         public T GetTemplate(IDomainContext context)
         {
             var service = context.GetRequiredService<TDomainService>();
             return (T)Activator.CreateInstance(_TemplateType, context, service);
-        }
-
-        private class Invoker
-        {
-            public TypeBuilder Type;
-            public MethodBuilder InvokeMethod;
-            public ConstructorBuilder Constructor;
         }
     }
 }
