@@ -31,7 +31,7 @@ namespace Wodsoft.ComBoost.Grpc.Test
                         .ConfigureAppConfiguration((context, configBuilder) =>
                         {
                             configBuilder.AddJsonFile("appsettings.json", true);
-                            configBuilder.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", true);                            
+                            configBuilder.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", true);
                         })
                         .ConfigureLogging(builder => builder.AddDebug())
                         .UseTestServer()
@@ -68,8 +68,8 @@ namespace Wodsoft.ComBoost.Grpc.Test
                 var request = new HelloRequest { Name = "Kation" };
                 var response = await greeter.SayHi(request);
                 Assert.Equal($"Hi {request.Name}.", response.Answer);
-                await greeter.Hello();
-                await greeter.Hello("I'm Kation.");
+                Assert.Equal("Hi.", await greeter.Hello());
+                Assert.Equal("Hi.", await greeter.Hello("I'm Kation."));
             }
         }
 
@@ -78,7 +78,7 @@ namespace Wodsoft.ComBoost.Grpc.Test
             Action<string, string> action = Test;
         }
 
-        private void Test(string a , string b)
+        private void Test(string a, string b)
         {
 
         }

@@ -14,7 +14,7 @@ namespace Wodsoft.ComBoost.Test
             services.AddComBoost()
                 .AddLocalService(builder =>
                 {
-                    builder.AddService<GreeterService>().UseTemplate<IGreeterTemplate>();                        
+                    builder.AddService<GreeterService>().UseTemplate<IGreeterTemplate>();
                 })
                 .AddEmptyContextProvider();
             var serviceProvider = services.BuildServiceProvider();
@@ -26,8 +26,8 @@ namespace Wodsoft.ComBoost.Test
                 var response = await greeter.SayHi(request);
                 Assert.Equal($"Hi {request.Name}.", response.Answer);
 
-                await greeter.Hello();
-                await greeter.Hello("I'm Kation.");
+                Assert.Equal("Hi.", await greeter.Hello());
+                Assert.Equal("Hi.", await greeter.Hello("I'm Kation."));
             }
         }
     }

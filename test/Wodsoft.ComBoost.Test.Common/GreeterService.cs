@@ -13,10 +13,10 @@ namespace Wodsoft.ComBoost.Test
             return Task.FromResult(new HelloResponse { Answer = $"Hi {request.Name}." });
         }
 
-        public Task Hello([FromValue(false)] string text)
+        public Task<string> Hello([FromValue(false)] string text)
         {
             Debug.WriteLine("Receive hello: " + text);
-            return Task.CompletedTask;
+            return Task.FromResult("Hi.");
         }
     }
 }

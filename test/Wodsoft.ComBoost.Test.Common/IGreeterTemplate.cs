@@ -9,8 +9,8 @@ namespace Wodsoft.ComBoost.Test
     {
         Task<HelloResponse> SayHi(HelloRequest request);
 
-        Task Hello();
+        Task<string> Hello();
 
-        Task Hello(string text);
+        Task<string> Hello(string text);
     }
 }
