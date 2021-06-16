@@ -82,7 +82,6 @@ namespace Wodsoft.ComBoost.Grpc
     }
 
     public class DomainGrpcResponse<T> : DomainGrpcResponse, IDomainRpcResponse<T>
-        where T : class, new()
     {
         private T _result;
         public T Result { get => _result; set => _result = value; }
@@ -143,7 +142,13 @@ namespace Wodsoft.ComBoost.Grpc
 
 
             if (codeGenerator == null)
-                codeGenerator = new ObjectCodeGenerator<T>();
+            {
+                if (!resultType.IsClass)
+                    throw new NotSupportedException($"Do not support response type \"{resultType.FullName}\".");
+                if (resultType.GetConstructor(Array.Empty<Type>()) == null)
+                    throw new NotSupportedException($"Response type \"{resultType.FullName}\" doesn't have a default constructor.");
+                codeGenerator = (ICodeGenerator<T>)Activator.CreateInstance(typeof(ObjectCodeGenerator<>).MakeGenericType(resultType));
+            }
             _ResultTag = WireFormat.MakeTag(4, codeGenerator.WireType);
             //CalculateSize
             {

@@ -75,7 +75,6 @@ namespace Wodsoft.ComBoost.Grpc
     }
 
     public class DomainGrpcRequest<T> : DomainGrpcRequest
-        where T : new()
     {
         public T Argument { get; set; }
 
@@ -102,7 +101,7 @@ namespace Wodsoft.ComBoost.Grpc
         {
             if (tag == 34)
             {
-                Argument = new T();
+                Argument = default(T);
                 Message<T> message = Argument;
                 parser.ReadMessage(message);
             }

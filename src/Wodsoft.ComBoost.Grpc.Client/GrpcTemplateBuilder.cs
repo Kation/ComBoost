@@ -48,7 +48,6 @@ namespace Wodsoft.ComBoost.Grpc.Client
             }
 
             protected async Task<TValue> InvokeWithReturnValueAsync<TValue>(Method<DomainGrpcRequest, DomainGrpcResponse<TValue>> method)
-                where TValue : class, new()
             {
                 DomainGrpcRequest request = new DomainGrpcRequest();
                 HandleRequest(request);
@@ -59,7 +58,6 @@ namespace Wodsoft.ComBoost.Grpc.Client
             }
 
             protected async Task InvokeWithArgumentsAsync<TArgs>(Method<DomainGrpcRequest<TArgs>, DomainGrpcResponse> method, TArgs args)
-                where TArgs : class, new()
             {
                 DomainGrpcRequest<TArgs> request = new DomainGrpcRequest<TArgs>();
                 request.Argument = args;
@@ -70,8 +68,6 @@ namespace Wodsoft.ComBoost.Grpc.Client
             }
 
             protected async Task<TValue> InvokeWithArgumentsAndReturnValueAsync<TArgs, TValue>(Method<DomainGrpcRequest<TArgs>, DomainGrpcResponse<TValue>> method, TArgs args)
-                where TArgs : class, new()
-                where TValue : class, new()
             {
                 DomainGrpcRequest<TArgs> request = new DomainGrpcRequest<TArgs>();
                 request.Argument = args;
