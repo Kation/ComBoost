@@ -82,7 +82,7 @@ namespace Wodsoft.ComBoost.Grpc
     }
 
     public class DomainGrpcResponse<T> : DomainGrpcResponse, IDomainRpcResponse<T>
-        where T : new()
+        where T : class, new()
     {
         private T _result;
         public T Result { get => _result; set => _result = value; }

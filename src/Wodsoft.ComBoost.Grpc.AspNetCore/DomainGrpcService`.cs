@@ -41,7 +41,7 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
         }
 
         protected DomainGrpcResponse<TResult> HandleResponse<TResult>(Task<TResult> task)
-            where TResult : new()
+            where TResult : class, new()
         {
             var response = new DomainGrpcResponse<TResult>();
             if (_options.IsTraceEnabled)
