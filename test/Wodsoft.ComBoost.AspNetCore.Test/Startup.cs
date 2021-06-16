@@ -15,11 +15,11 @@ namespace Wodsoft.ComBoost.AspNetCore.Test
             services.AddComBoost()
                 .AddLocalService(builder =>
                 {
-                    builder.AddService<GreeterService>().UseTemplate<IGreeterTemplate>();
+                    //builder.AddService<GreeterService>().UseTemplate<IGreeterTemplate>();
                 })
-                .AddAspNetCore(builder=>
+                .AddAspNetCore(builder =>
                 {
-                    
+                    builder.AddDomainServiceMapping<GreeterService>();
                 });
         }
 
@@ -29,8 +29,6 @@ namespace Wodsoft.ComBoost.AspNetCore.Test
 
             app.UseEndpoints(endpoints =>
             {
-
-
                 endpoints.MapDomainService();
             });
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +16,11 @@ namespace Microsoft.Extensions.DependencyInjection
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
             if (name == null)
+            {
                 name = typeof(T).Name;
+                if (name.EndsWith("DomainService"))
+                    name = name.Substring(0, name.Length - "DomainService".Length);
+            }
             builder.Services.Configure<DomainServiceMapping>(name.ToLower(), options =>
             {
                 options.ServiceType = typeof(T);
@@ -26,8 +31,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IComBoostBuilder AddAspNetCore(this IComBoostBuilder builder, Action<IComBoostAspNetCoreBuilder> builderConfigure = null)
         {
+            builder.Services.AddRouting();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<IDomainContextProvider, HttpDomainContextProvider>();
+            builder.Services.TryAddScoped<IExecutionResultHandler, DefaultExecutionResultHandler>();
             if (builderConfigure != null)
                 builderConfigure(new ComBoostAspNetCoreBuilder(builder.Services));
             return builder;

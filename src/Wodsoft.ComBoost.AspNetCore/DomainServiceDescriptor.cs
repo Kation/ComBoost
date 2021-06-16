@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,63 +23,50 @@ namespace Wodsoft.ComBoost.AspNetCore
     public class DomainServiceDescriptor<T> : DomainServiceDescriptor
         where T : class, IDomainService
     {
-        private Dictionary<string, Tuple<MethodInfo, Func<IDomainService, object[], Task>, Func<Task, object>>> _Caches = new Dictionary<string, Tuple<MethodInfo, Func<IDomainService, object[], Task>, Func<Task, object>>>();
-        private IDomainServiceFilter[] _ClassFilters;
-        private Dictionary<string, IDomainServiceFilter[]> _MethodFilters;
+        //private Dictionary<string, Tuple<MethodInfo, Func<IDomainService, object[], Task>, Func<Task, object>>> _Caches = new Dictionary<string, Tuple<MethodInfo, Func<IDomainService, object[], Task>, Func<Task, object>>>();
+        private static readonly Dictionary<string, Func<IDomainService, IDomainContext, IValueProvider, Task>> _Caches = new Dictionary<string, Func<IDomainService, IDomainContext, IValueProvider, Task>>();
 
-        public DomainServiceDescriptor()
+        static DomainServiceDescriptor()
         {
             var type = typeof(T);
-            _MethodFilters = new Dictionary<string, IDomainServiceFilter[]>();
-            foreach (var method in type.GetMethods())
+            _Caches = type.GetMethods().Where(method => !method.IsSpecialName && typeof(Task).IsAssignableFrom(method.ReturnType) && !method.IsGenericMethodDefinition).ToDictionary(t => t.Name.ToLower(), method =>
             {
-                if (method.IsSpecialName)
-                    continue;
-                if (!typeof(Task).IsAssignableFrom(method.ReturnType))
-                    continue;
-                if (method.IsGenericMethodDefinition)
-                    continue;
-                if (_Caches.ContainsKey(method.Name))
-                    throw new NotSupportedException("领域服务方法不允许重载方法。");
-
+                var invoker = DomainServiceInvokerBuilder<T>.GetInvokerReference(method);
                 var serviceInput = Expression.Parameter(typeof(IDomainService), "serviceInput");
-                var valuesInput = Expression.Parameter(typeof(object[]), "valuesInput");
+                var contextInput = Expression.Parameter(typeof(IDomainContext), "contextInput");
+                var valueProviderInput = Expression.Parameter(typeof(IValueProvider), "valueProvider");
+                var parameters = method.GetParameters();
+                var values = parameters.Select(t => Expression.Variable(t.ParameterType, t.Name + "Value")).ToArray();
                 var serviceVariable = Expression.Variable(type, "service");
+                var invokerVariable = Expression.Variable(invoker.Type, "invoker");
                 var i = 0;
-                var blocks = Expression.Block(typeof(Task), new ParameterExpression[] { serviceVariable },
-                    Expression.Assign(serviceVariable, Expression.Convert(serviceInput, type)),
-                    Expression.Call(serviceVariable, method,
-                        method.GetParameters().Select(t =>
-                        {
-                            var value = Expression.ArrayAccess(valuesInput, Expression.Constant(i));
-                            i++;
-                            if (t.ParameterType.IsValueType)
-                                return Expression.Unbox(value, t.ParameterType);
-                            else
-                                return Expression.Convert(value, t.ParameterType);
-                        }))
-                    );
-                var executeLambda = Expression.Lambda<Func<IDomainService, object[], Task>>(blocks, serviceInput, valuesInput);
-                var executeFunc = executeLambda.Compile();
-
-                Func<Task, object> resultFunc = null;
-                if (method.ReturnType.IsGenericType)
+                List<Expression> blocks = parameters.Select(parameter =>
                 {
-                    var taskInput = Expression.Parameter(typeof(Task), "task");
-
-                    var taskVariable = Expression.Variable(method.ReturnType, "convertedTask");
-
-                    var b = Expression.Block(typeof(object), new ParameterExpression[] { taskVariable },
-                        Expression.Assign(taskVariable, Expression.Convert(taskInput, method.ReturnType)),
-                        Expression.Call(Expression.Call(taskVariable, method.ReturnType.GetMethod("GetAwaiter")), method.ReturnType.GetMethod("GetAwaiter").ReturnType.GetMethod("GetResult")));
-
-                    var resultLambda = Expression.Lambda<Func<Task, object>>(b, taskInput);
-                    resultFunc = resultLambda.Compile();
-                }
-                _Caches.Add(method.Name.ToLower(), new Tuple<MethodInfo, Func<IDomainService, object[], Task>, Func<Task, object>>(method, executeFunc, resultFunc));
-                _MethodFilters.Add(method.Name, method.GetCustomAttributes().Where(t => t is IDomainServiceFilter).Cast<IDomainServiceFilter>().ToArray());
-            }
-            _ClassFilters = type.GetCustomAttributes().Where(t => t is IDomainServiceFilter).Cast<IDomainServiceFilter>().ToArray();
+                    Expression expression;
+                    var fromAttribute = parameter.GetCustomAttributes().Where(t => t is FromAttribute).Cast<FromAttribute>().FirstOrDefault();
+                    if (fromAttribute == null)
+                    {
+                        expression = Expression.Call(valueProviderInput, typeof(IValueProvider).GetMethod(nameof(IValueProvider.GetValue)), Expression.Constant(parameter.Name, typeof(string)), Expression.Constant(parameter.ParameterType, typeof(Type)));
+                    }
+                    else
+                    {
+                        expression = Expression.Call(Expression.Constant(fromAttribute), typeof(FromAttribute).GetMethod(nameof(FromAttribute.GetValue)), contextInput, Expression.Constant(parameter, typeof(ParameterInfo)));
+                    }
+                    if (parameter.ParameterType.IsValueType)
+                        expression = Expression.Unbox(expression, parameter.ParameterType);
+                    else
+                        expression = Expression.Convert(expression, parameter.ParameterType);
+                    expression = Expression.Assign(values[i], expression);
+                    i++;
+                    return expression;
+                }).ToList();
+                blocks.Add(Expression.Assign(invokerVariable, Expression.New(invoker.Constructor, Expression.Convert(serviceInput, typeof(T)), contextInput)));
+                blocks.Add(Expression.Call(invokerVariable, invoker.InvokeMethod, values));
+                var executeLambda = Expression.Lambda<Func<IDomainService, IDomainContext, IValueProvider, Task>>(
+                    Expression.Block(values.Append(serviceVariable).Append(invokerVariable), blocks)
+                    , serviceInput, contextInput, valueProviderInput);
+                return executeLambda.Compile();
+            });
         }
 
         public override bool ContainsMethod(string methodName)
@@ -89,56 +77,11 @@ namespace Wodsoft.ComBoost.AspNetCore
         public override async Task<IDomainExecutionContext> ExecuteAsync(string methodName, IDomainContext context)
         {
             methodName = methodName.ToLower();
-            if (!_Caches.TryGetValue(methodName, out var value))
+            if (!_Caches.TryGetValue(methodName, out var invoker))
                 throw new InvalidOperationException("不存在的方法名。");
             var service = context.GetRequiredService<T>();
-
-            var globalFilters = context.GetService<IOptions<DomainFilterOptions>>()?.Value.Filters;
-            var filterFactory = context.GetService<IOptionsFactory<DomainFilterOptions<T>>>();
-            var serviceFilters = filterFactory?.Create(null).Filters;
-            var methodAttributeFilters = _MethodFilters[value.Item1.Name];
-            var methodFilters = filterFactory?.Create(value.Item1.Name).Filters;
-
-            DomainExecutionContext executionContext = new DomainExecutionContext(service, context, value.Item1);
-            service.Initialize(executionContext);
-            DomainExecutionPipeline pipeline = async () =>
-            {
-                var task = value.Item2(service, executionContext.ParameterValues);
-                await task;
-                if (value.Item3 == null)
-                    executionContext.Done();
-                else
-                {
-                    executionContext.Done(value.Item3(task));
-                }
-            };
-
-            pipeline = MakePipleline(pipeline, executionContext, context.Filter.ToArray());
-            if (methodFilters != null)
-                pipeline = MakePipleline(pipeline, executionContext, methodFilters);
-            if (methodAttributeFilters.Length > 0)
-                pipeline = MakePipleline(pipeline, executionContext, methodAttributeFilters);
-            if (serviceFilters != null)
-                pipeline = MakePipleline(pipeline, executionContext, serviceFilters);
-            if (_ClassFilters.Length > 0)
-                pipeline = MakePipleline(pipeline, executionContext, _ClassFilters);
-            if (globalFilters != null)
-                pipeline = MakePipleline(pipeline, executionContext, globalFilters);
-
-            await pipeline();
-
-            return executionContext;
-        }
-
-        private DomainExecutionPipeline MakePipleline(DomainExecutionPipeline pipeline, DomainExecutionContext context, IReadOnlyList<IDomainServiceFilter> filters)
-        {
-            for (int i = filters.Count - 1; i >= 0; i--)
-            {
-                var next = pipeline;
-                var index = i;
-                pipeline = () => filters[index].OnExecutionAsync(context, next);
-            }
-            return pipeline;
+            await invoker(service, context, context.GetService<IValueProvider>());
+            return service.Context;
         }
     }
 }
