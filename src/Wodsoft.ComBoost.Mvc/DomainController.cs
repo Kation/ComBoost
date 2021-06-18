@@ -8,24 +8,40 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class DomainController : Controller
+    internal class DomainController
     {
-
-        protected virtual ControllerDomainContext CreateDomainContext()
+        internal static Type GetDomainServiceType(Type controllerType)
         {
-            return new ControllerDomainContext(this);
+            while (controllerType.BaseType != typeof(object))
+            {
+                controllerType = controllerType.BaseType;
+            }
+            if (!controllerType.IsGenericType)
+                return null;
+            if (controllerType.GetGenericTypeDefinition() != typeof(DomainController<>))
+                return null;
+            return controllerType.GetGenericArguments()[0];
+        }
+    }
+
+    public abstract class DomainController<TDomainService> : IDomainController
+        where TDomainService : class, IDomainService
+    {
+        [ControllerContext]
+        public ControllerContext ControllerContext { get; set; }
+
+        protected virtual TDomainService GetDomainService()
+        {
+            if (ControllerContext == null)
+                throw new InvalidOperationException("ControllerContext is null.");
+            return ControllerContext.HttpContext.RequestServices.GetRequiredService<TDomainService>();
         }
 
-        protected virtual EmptyDomainContext CreateEmptyDomainContext()
+        protected virtual IDomainContext GetDomainContext()
         {
-            return new EmptyDomainContext(HttpContext.RequestServices, HttpContext.RequestAborted);
-        }
-
-        protected T GetDomainTemplate<T>() where T : IDomainTemplate
-        {
-            var template = HttpContext.RequestServices.GetRequiredService<T>();
-            template.Context = CreateDomainContext();
-            return template;
+            if (ControllerContext == null)
+                throw new InvalidOperationException("ControllerContext is null.");
+            return ControllerContext.HttpContext.RequestServices.GetRequiredService<IDomainContextProvider>().GetContext();
         }
     }
 }
