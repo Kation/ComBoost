@@ -1,8 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>ComBoost Grpc客户端。</Description>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+  <Import Project="../../common.props" />
 
   <ItemGroup>
     <PackageReference Include="Grpc.Net.Client" Version="2.37.0" />

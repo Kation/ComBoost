@@ -1,12 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>ComBoost用于EntityFramework实现的实体模块。</Description>
-    <AssemblyTitle>Wodsoft.ComBoost.EntityFramework</AssemblyTitle>
     <TargetFrameworks>net461;netstandard2.1</TargetFrameworks>
-    <AssemblyName>Wodsoft.ComBoost.EntityFramework</AssemblyName>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <RootNamespace>Wodsoft.ComBoost.Data.Entity</RootNamespace>
   </PropertyGroup>
   <Import Project="../../common.props" />
