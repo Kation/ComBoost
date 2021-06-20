@@ -3,6 +3,8 @@
     <Product>Wodsoft ComBoost</Product>
     <PackageTags>ComBoost</PackageTags>
     <VersionPrefix>4.0.0</VersionPrefix>
+    <FileVersion>4.0.0</FileVersion>
+    <AssemblyVersion>4.0.0</AssemblyVersion>
     <VersionSuffix></VersionSuffix>
     <VersionSuffix Condition="'$(BuildNumber)' != ''">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
     <Authors>Kation</Authors>

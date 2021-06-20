@@ -17,8 +17,6 @@ namespace Wodsoft.ComBoost.Data
 
         public T Entity { get; private set; }
 
-        public bool IsHandled { get; set; }
-
         public IValueProvider ValueProvider { get; private set; }
 
         public IPropertyMetadata[] Properties { get; set; }

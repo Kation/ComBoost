@@ -23,7 +23,5 @@ namespace Wodsoft.ComBoost.Data
         public IPropertyMetadata Property { get; private set; }
 
         public object Value { get; private set; }
-
-        public bool IsHandled { get; set; }
     }
 }
