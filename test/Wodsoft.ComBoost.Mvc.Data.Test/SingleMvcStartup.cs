@@ -15,15 +15,13 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
             services.AddComBoost()
                 .AddLocalService(builder =>
                 {
                     builder.AddEntityService<Guid, UserEntity, UserDto>();
                 })
-                .AddAspNetCore(builder =>
-                {
-                    
-                });
+                .AddMvc();
 
             services.AddAutoMapper(config =>
             {
