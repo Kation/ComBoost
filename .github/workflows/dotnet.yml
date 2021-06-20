@@ -23,24 +23,25 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -c Release
     - name: Pack
       run: |
-        dotnet pack --configuration Release src/Wodsoft.ComBoost/Wodsoft.ComBoost.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.AspNetCore/Wodsoft.ComBoost.AspNetCore.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Core/Wodsoft.ComBoost.Core.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Data/Wodsoft.ComBoost.Data.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Data.Core/Wodsoft.ComBoost.Data.Core.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Distributed/Wodsoft.ComBoost.Distributed.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.EntityFramework/Wodsoft.ComBoost.EntityFramework.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.EntityFrameworkCore/Wodsoft.ComBoost.EntityFrameworkCore.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Mock/Wodsoft.ComBoost.Mock.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Mvc/Wodsoft.ComBoost.Mvc.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Mvc.Data/Wodsoft.ComBoost.Mvc.Data.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Security/Wodsoft.ComBoost.Security.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Grpc/Wodsoft.ComBoost.Grpc.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Grpc.AspNetCore/Wodsoft.ComBoost.Grpc.AspNetCore.csproj --version-suffix "${{github.run_id}}" -o nupkgs
-        dotnet pack --configuration Release src/Wodsoft.ComBoost.Grpc.Client/Wodsoft.ComBoost.Grpc.Client.csproj --version-suffix "${{github.run_id}}" -o nupkgs
+        dotnet pack -c Release src/Wodsoft.ComBoost/Wodsoft.ComBoost.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.AspNetCore/Wodsoft.ComBoost.AspNetCore.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Core/Wodsoft.ComBoost.Core.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Data/Wodsoft.ComBoost.Data.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Data.Core/Wodsoft.ComBoost.Data.Core.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Distributed/Wodsoft.ComBoost.Distributed.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.EntityFramework/Wodsoft.ComBoost.EntityFramework.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.EntityFrameworkCore/Wodsoft.ComBoost.EntityFrameworkCore.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Mock/Wodsoft.ComBoost.Mock.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Mvc/Wodsoft.ComBoost.Mvc.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Mvc.Data/Wodsoft.ComBoost.Mvc.Data.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Security/Wodsoft.ComBoost.Security.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Grpc/Wodsoft.ComBoost.Grpc.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Grpc.AspNetCore/Wodsoft.ComBoost.Grpc.AspNetCore.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Grpc.Client/Wodsoft.ComBoost.Grpc.Client.csproj --version-suffix "${{github.run_id}}" -o nupkgs --no-build
     - name: Publish package
       run: |
-        dotnet nuget push nupkgs/*.symbols.nupkg -k ${{secrets.MYGET_TOKEN}} -s https://www.myget.org/F/comboost/api/v2/package
+        cd nupkgs
+        dotnet nuget push "*.symbols.nupkg" -k ${{secrets.MYGET_TOKEN}} -s https://www.myget.org/F/comboost/api/v2/package
