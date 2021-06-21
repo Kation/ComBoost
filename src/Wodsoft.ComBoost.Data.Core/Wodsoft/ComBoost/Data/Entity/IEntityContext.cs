@@ -12,7 +12,7 @@ namespace Wodsoft.ComBoost.Data.Entity
     /// </summary>
     /// <typeparam name="T">实体类型。</typeparam>
     public interface IEntityContext<T> : IEntityQueryContext<T>
-        where T : IEntity
+        where T : class, IEntity
     {
         /// <summary>
         /// 将实体添加到数据库。

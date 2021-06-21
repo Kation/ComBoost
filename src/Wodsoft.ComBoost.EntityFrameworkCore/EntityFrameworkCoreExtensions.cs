@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DomainEntityFrameworkCoreExtensions
     {
-        public static void AddEFCoreContext<TDbContext>(this IServiceCollection services)
+        public static IServiceCollection AddEFCoreContext<TDbContext>(this IServiceCollection services)
             where TDbContext : DbContext
         {
             services.AddScoped<DatabaseContext<TDbContext>>();
@@ -22,6 +22,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 var func = (Func<IServiceProvider, object>)Delegate.CreateDelegate(typeof(Func<IServiceProvider, object>), typeof(DatabaseContext<TDbContext>).GetMethod(nameof(DatabaseContext<TDbContext>.GetEntityContextDelegate), BindingFlags.Public | BindingFlags.Static).MakeGenericMethod(type));
                 services.Add(new ServiceDescriptor(typeof(IEntityContext<>).MakeGenericType(type), func, ServiceLifetime.Scoped));
             }
+            return services;
         }
     }
 }

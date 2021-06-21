@@ -12,6 +12,7 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class ViewModel<T> : NotifyBase, IViewModel<T>
+        where T : class
     {
         /// <summary>
         /// 实例化视图模型。
@@ -31,8 +32,6 @@ namespace System.ComponentModel
                 throw new ArgumentException("不能小于1。", "page");
             if (size < 0)
                 throw new ArgumentException("不能小于0。", "size");
-            ViewButtons = new IViewButton[0];
-            ItemButtons = new IItemButton[0];
             CurrentSize = size;
             PageSizeOption = Pagination.DefaultPageSizeOption;
             Queryable = queryable ?? throw new ArgumentNullException("queryable");
@@ -40,7 +39,7 @@ namespace System.ComponentModel
 
         private IAsyncQueryable<T> _Queryable;
         /// <inheritdoc />
-        public IAsyncQueryable<T> Queryable
+        protected IAsyncQueryable<T> Queryable
         {
             get
             {
@@ -65,16 +64,10 @@ namespace System.ComponentModel
         /// <inheritdoc />
         public int CurrentPage { get { return (int)GetValue(); } set { SetValue(value); } }
 
-        /// <inheritdoc />
-        public IViewButton[] ViewButtons { get; set; }
+        IReadOnlyList<object> IViewModel.Items { get { return Items; } }
 
         /// <inheritdoc />
-        public IItemButton[] ItemButtons { get; set; }
-
-        object[] IViewModel.Items { get { return Items as object[]; } }
-
-        /// <inheritdoc />
-        public T[] Items { get { return (T[])GetValue(); } set { SetValue(value); } }
+        public IReadOnlyList<T> Items { get { return (IReadOnlyList<T>)GetValue(); } set { SetValue(value); } }
 
         /// <inheritdoc />
         public int TotalCount { get { return (int)GetValue(); } set { SetValue(value); } }

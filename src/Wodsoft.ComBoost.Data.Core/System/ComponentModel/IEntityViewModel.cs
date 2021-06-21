@@ -31,7 +31,17 @@ namespace System.ComponentModel
         /// <summary>
         /// Get the search items.
         /// </summary>
-        EntitySearchItem[] SearchItem { get; }           
+        EntitySearchItem[] SearchItem { get; }
+
+        /// <summary>
+        /// 获取页面按钮。
+        /// </summary>
+        IViewButton[] ViewButtons { get; }
+
+        /// <summary>
+        /// 获取内容项按钮。
+        /// </summary>
+        IItemButton[] ItemButtons { get; }
     }
 
     /// <summary>
@@ -39,6 +49,7 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="T">实体类型。</typeparam>
     public interface IEntityViewModel<out T> : IEntityViewModel, IViewModel<T>
+        where T : class
     {
 
     }

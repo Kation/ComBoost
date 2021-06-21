@@ -19,7 +19,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="context">数据库上下文。</param>
         /// <returns>返回实体上下文。</returns>
         public static IEntityContext<T> GetWrappedContext<T>(this IDatabaseContext context)
-            where T : IEntity
+            where T : class, IEntity
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));

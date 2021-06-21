@@ -12,6 +12,7 @@ namespace System.ComponentModel
     /// </summary>
     /// <typeparam name="T">Type of model.</typeparam>
     public class EntityViewModel<T> : ViewModel<T>, IEntityViewModel<T>
+        where T : class
     {
         /// <summary>
         /// Initialize entity view model.
@@ -28,6 +29,8 @@ namespace System.ComponentModel
         public EntityViewModel(IAsyncQueryable<T> queryable, int page, int size) : base(queryable, page, size)
         {
             Metadata = EntityDescriptor.GetMetadata<T>();
+            ViewButtons = new IViewButton[0];
+            ItemButtons = new IItemButton[0];
         }
         
         /// <summary>
@@ -48,6 +51,12 @@ namespace System.ComponentModel
         /// <summary>
         /// Get or set the search items.
         /// </summary>
-        public EntitySearchItem[] SearchItem { get; set; }                
+        public EntitySearchItem[] SearchItem { get; set; }
+
+        /// <inheritdoc />
+        public IViewButton[] ViewButtons { get; set; }
+
+        /// <inheritdoc />
+        public IItemButton[] ItemButtons { get; set; }
     }
 }

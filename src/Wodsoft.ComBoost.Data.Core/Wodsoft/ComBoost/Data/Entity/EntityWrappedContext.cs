@@ -9,8 +9,8 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 namespace Wodsoft.ComBoost.Data.Entity
 {
     public class EntityWrappedContext<T, M> : IEntityContext<T>
-        where M : IEntity, T
-        where T : IEntity
+        where M : class, IEntity, T
+        where T : class, IEntity
     {
         public EntityWrappedContext(IEntityContext<M> context)
         {

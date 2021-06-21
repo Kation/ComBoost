@@ -14,17 +14,7 @@ namespace System.ComponentModel
         /// <summary>
         /// 获取内容项。
         /// </summary>
-        object[] Items { get; }
-
-        /// <summary>
-        /// 获取页面按钮。
-        /// </summary>
-        IViewButton[] ViewButtons { get; }
-
-        /// <summary>
-        /// 获取内容项按钮。
-        /// </summary>
-        IItemButton[] ItemButtons { get; }
+        IReadOnlyList<object> Items { get; }
 
         /// <summary>
         /// 设置每页显示个数选项。
@@ -55,15 +45,16 @@ namespace System.ComponentModel
     }
 
     public interface IViewModel<out T> : IViewModel
+        where T : class
     {
-        /// <summary>
-        /// 获取当前查询体。
-        /// </summary>
-        IAsyncQueryable<T> Queryable { get; }
+        ///// <summary>
+        ///// 获取当前查询体。
+        ///// </summary>
+        //IAsyncQueryable<T> Queryable { get; }
 
         /// <summary>
         /// 获取内容项。
         /// </summary>
-        new T[] Items { get; }
+        new IReadOnlyList<T> Items { get; }
     }
 }

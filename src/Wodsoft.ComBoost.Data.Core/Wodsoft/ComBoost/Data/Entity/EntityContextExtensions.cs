@@ -41,7 +41,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="key">主键。</param>
         /// <returns>返回实体。找不到实体时返回空。</returns>
         public static async Task<T> GetAsync<T>(this IEntityContext<T> context, IAsyncQueryable<T> query, object key)
-            where T : IEntity
+            where T : class, IEntity
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -81,7 +81,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="context">实体上下文。</param>
         /// <returns></returns>
         public static ValueTask<int> CountAsync<T>(this IEntityContext<T> context)
-            where T : IEntity
+            where T : class, IEntity
         {
             return context.Query().CountAsync();
         }
@@ -93,7 +93,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="context">实体上下文。</param>
         /// <returns>返回排序后的实体查询。</returns>
         public static IOrderedAsyncQueryable<T> Order<T>(this IEntityContext<T> context)
-            where T : IEntity
+            where T : class, IEntity
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -108,7 +108,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <param name="query">实体查询。</param>
         /// <returns>返回排序后的实体查询。</returns>
         public static IOrderedAsyncQueryable<T> Order<T>(this IEntityContext<T> context, IAsyncQueryable<T> query)
-            where T : IEntity
+            where T : class, IEntity
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -124,7 +124,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
 
         public static IAsyncQueryable<T> InParent<T>(this IEntityContext<T> context, IAsyncQueryable<T> query, string path, object value)
-            where T : IEntity
+            where T : class, IEntity
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -162,7 +162,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
 
         public static IAsyncQueryable<T> InParent<T>(this IEntityContext<T> context, IAsyncQueryable<T> query, object[] parentIds)
-            where T : IEntity
+            where T : class, IEntity
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
