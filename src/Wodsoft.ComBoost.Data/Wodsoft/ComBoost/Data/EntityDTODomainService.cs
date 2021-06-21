@@ -9,7 +9,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
-using Wodsoft.ComBoost.Data.Entity.Metadata;
 using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.Data
@@ -25,7 +24,6 @@ namespace Wodsoft.ComBoost.Data
         [EntityViewModelFilter]
         public virtual async Task<IViewModel<TListDTO>> List([FromService] IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> dtoContext)
         {
-            var metadata = EntityDescriptor.GetMetadata<TListDTO>();
             var queryable = dtoContext.Query();
             var e = new EntityQueryEventArgs<TListDTO>(queryable);
             await RaiseEvent(e);
