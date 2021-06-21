@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.5" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.csproj" />
+    <ProjectReference Include="..\..\src\Wodsoft.ComBoost.EntityFrameworkCore\Wodsoft.ComBoost.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\..\src\Wodsoft.ComBoost.Mvc.Data\Wodsoft.ComBoost.Mvc.Data.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.Test.Common\Wodsoft.ComBoost.Test.Common.csproj" />
   </ItemGroup>

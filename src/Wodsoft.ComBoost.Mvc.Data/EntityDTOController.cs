@@ -56,7 +56,7 @@ namespace Wodsoft.ComBoost.Mvc
         #region Create
 
         [HttpPost]
-        public virtual async Task<IActionResult> Create(TCreateDTO dto)
+        public virtual async Task<IActionResult> Create([FromBody] TCreateDTO dto)
         {
             var model = await CreateEntity(dto);
             return OnCreateModelCreated(model);
@@ -78,7 +78,7 @@ namespace Wodsoft.ComBoost.Mvc
         #region Edit
 
         [HttpPut]
-        public virtual async Task<IActionResult> Edit(TEditDTO dto)
+        public virtual async Task<IActionResult> Edit([FromBody] TEditDTO dto)
         {
             var model = await EditEntity(dto);
             return OnEditModelCreated(model);
@@ -100,7 +100,7 @@ namespace Wodsoft.ComBoost.Mvc
         #region Remove
 
         [HttpDelete]
-        public virtual async Task<IActionResult> Remove(TRemoveDTO dto)
+        public virtual async Task<IActionResult> Remove([FromBody] TRemoveDTO dto)
         {
             var model = await RemoveEntity(dto);
             return OnRemoveModelCreated(model);

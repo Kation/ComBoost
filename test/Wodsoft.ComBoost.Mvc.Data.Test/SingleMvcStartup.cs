@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -16,10 +17,14 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddDbContext<DataContext>(options=> options.UseInMemoryDatabase("Wodsoft.ComBoost.Mvc.Data.Test"));
+            services.AddEFCoreContext<DataContext>();
+            services.AddEntityDtoContext<UserEntity, UserDto>();
             services.AddComBoost()
                 .AddLocalService(builder =>
                 {
-                    builder.AddEntityService<Guid, UserEntity, UserDto>();
+                    //builder.AddEntityService<Guid, UserEntity, UserDto>();
+                    builder.AddEntityDtoService<UserDto>();                    
                 })
                 .AddMvc();
 

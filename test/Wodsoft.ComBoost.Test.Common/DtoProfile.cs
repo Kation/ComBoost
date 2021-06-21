@@ -11,7 +11,8 @@ namespace Wodsoft.ComBoost.Test
     {
         public DtoProfile()
         {
-            CreateMap<UserEntity, UserDto>();
+            CreateMap<UserEntity, UserDto>()
+                .ForMember(t => t.Password, options => options.Ignore());
             CreateMap<UserDto, UserEntity>()
                 .ForMember(t => t.Password, options => options.Ignore())
                 .AfterMap((dto, entity) =>
