@@ -29,6 +29,33 @@ namespace Microsoft.Extensions.DependencyInjection
             return serviceBuilder;
         }
 
+        public static IComBoostLocalServiceBuilder<EntityDTODomainService<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>> AddEntityDtoService<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>(this IComBoostLocalBuilder builder)
+            where TListDTO : class, IEntityDTO
+            where TCreateDTO : class, IEntityDTO
+            where TEditDTO : class, IEntityDTO
+            where TRemoveDTO : class, IEntityDTO
+        {
+            var serviceBuilder = builder.AddService<EntityDTODomainService<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            serviceBuilder.UseTemplate<IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            return serviceBuilder;
+        }
 
+        public static IComBoostLocalServiceBuilder<EntityDTODomainService<TDTO, TDTO, TDTO, TDTO>> AddEntityDtoService<TDTO>(this IComBoostLocalBuilder builder)
+            where TDTO : class, IEntityDTO
+        {
+            return AddEntityDtoService<TDTO, TDTO, TDTO, TDTO>(builder);
+        }
+
+        public static IServiceCollection AddEntityDtoContext<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>(this IServiceCollection services)
+            where TEntity : class, IEntity
+        {
+            return services.AddScoped<IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>, EntityDtoContext<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+        }
+
+        public static IServiceCollection AddEntityDtoContext<TEntity, TDto>(this IServiceCollection services)
+            where TEntity : class, IEntity
+        {
+            return AddEntityDtoContext<TEntity, TDto, TDto, TDto, TDto>(services);
+        }
     }
 }
