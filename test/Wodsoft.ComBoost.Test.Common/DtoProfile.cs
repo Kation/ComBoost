@@ -15,6 +15,8 @@ namespace Wodsoft.ComBoost.Test
                 .ForMember(t => t.Password, options => options.Ignore());
             CreateMap<UserDto, UserEntity>()
                 .ForMember(t => t.Password, options => options.Ignore())
+                .ForMember(t => t.CreationDate, options => options.Ignore())
+                .ForMember(t => t.ModificationDate, options => options.Ignore())
                 .AfterMap((dto, entity) =>
                 {
                     if (!string.IsNullOrEmpty(dto.Password))

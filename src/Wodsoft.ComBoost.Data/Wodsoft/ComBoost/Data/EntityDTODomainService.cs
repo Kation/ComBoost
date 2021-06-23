@@ -13,16 +13,15 @@ using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.Data
 {
-    public class EntityDTODomainService<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : DomainService
-        where TListDTO : class, IEntityDTO
-        where TCreateDTO : class, IEntityDTO
-        where TEditDTO : class, IEntityDTO
-        where TRemoveDTO : class, IEntityDTO
+    public class EntityDTODomainService<TKey, TListDTO, TCreateDTO, TEditDTO> : DomainService
+        where TListDTO : class, IEntityDTO<TKey>
+        where TCreateDTO : class, IEntityDTO<TKey>
+        where TEditDTO : class, IEntityDTO<TKey>
     {
         #region List
 
         [EntityViewModelFilter]
-        public virtual async Task<IViewModel<TListDTO>> List([FromService] IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> dtoContext)
+        public virtual async Task<IViewModel<TListDTO>> List([FromService] IDTOContext<TKey, TListDTO, TCreateDTO, TEditDTO> dtoContext)
         {
             var queryable = dtoContext.Query();
             var e = new EntityQueryEventArgs<TListDTO>(queryable);
@@ -45,7 +44,7 @@ namespace Wodsoft.ComBoost.Data
 
         #region Create
 
-        public virtual async Task<IUpdateModel<TCreateDTO>> Create([FromService] IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> dtoContext, [FromValue] TCreateDTO dto)
+        public virtual async Task<IUpdateModel<TCreateDTO>> Create([FromService] IDTOContext<TKey, TListDTO, TCreateDTO, TEditDTO> dtoContext, [FromValue] TCreateDTO dto)
         {
             await dtoContext.Add(dto);
             UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>
@@ -65,7 +64,7 @@ namespace Wodsoft.ComBoost.Data
 
         #region Edit
 
-        public virtual async Task<IUpdateModel<TEditDTO>> Edit([FromService] IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> dtoContext, [FromValue] TEditDTO dto)
+        public virtual async Task<IUpdateModel<TEditDTO>> Edit([FromService] IDTOContext<TKey, TListDTO, TCreateDTO, TEditDTO> dtoContext, [FromValue] TEditDTO dto)
         {
             await dtoContext.Update(dto);
             IUpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>
@@ -85,9 +84,9 @@ namespace Wodsoft.ComBoost.Data
 
         #region Remove
 
-        public virtual async Task<IUpdateModel> Remove([FromService] IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> dtoContext, [FromValue] TRemoveDTO dto)
+        public virtual async Task<IUpdateModel> Remove([FromService] IDTOContext<TKey, TListDTO, TCreateDTO, TEditDTO> dtoContext, [FromValue] TKey id)
         {
-            await dtoContext.Remove(dto);
+            await dtoContext.Remove(id);
             return new UpdateModel() { IsSuccess = true };
         }
 

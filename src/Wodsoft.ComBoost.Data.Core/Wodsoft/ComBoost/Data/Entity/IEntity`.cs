@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public interface IEntity<TKey> : IEntity
+    public interface IEntity<TKey> : IEntity, IEntityDTO<TKey>
     {
-        TKey Id { get; set; }
+
     }
 }

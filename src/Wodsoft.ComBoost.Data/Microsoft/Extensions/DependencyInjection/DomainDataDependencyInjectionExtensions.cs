@@ -29,33 +29,36 @@ namespace Microsoft.Extensions.DependencyInjection
             return serviceBuilder;
         }
 
-        public static IComBoostLocalServiceBuilder<EntityDTODomainService<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>> AddEntityDtoService<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>(this IComBoostLocalBuilder builder)
-            where TListDTO : class, IEntityDTO
-            where TCreateDTO : class, IEntityDTO
-            where TEditDTO : class, IEntityDTO
-            where TRemoveDTO : class, IEntityDTO
+        public static IComBoostLocalServiceBuilder<EntityDTODomainService<TKey, TListDTO, TCreateDTO, TEditDTO>> AddEntityDtoService<TKey, TListDTO, TCreateDTO, TEditDTO>(this IComBoostLocalBuilder builder)
+            where TListDTO : class, IEntityDTO<TKey>
+            where TCreateDTO : class, IEntityDTO<TKey>
+            where TEditDTO : class, IEntityDTO<TKey>
         {
-            var serviceBuilder = builder.AddService<EntityDTODomainService<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
-            serviceBuilder.UseTemplate<IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            var serviceBuilder = builder.AddService<EntityDTODomainService<TKey, TListDTO, TCreateDTO, TEditDTO>>();
+            serviceBuilder.UseTemplate<IEntityDTODomainTemplate<TKey, TListDTO, TCreateDTO, TEditDTO>>();
             return serviceBuilder;
         }
 
-        public static IComBoostLocalServiceBuilder<EntityDTODomainService<TDTO, TDTO, TDTO, TDTO>> AddEntityDtoService<TDTO>(this IComBoostLocalBuilder builder)
-            where TDTO : class, IEntityDTO
+        public static IComBoostLocalServiceBuilder<EntityDTODomainService<TKey, TDTO, TDTO, TDTO>> AddEntityDtoService<TKey, TDTO>(this IComBoostLocalBuilder builder)
+            where TDTO : class, IEntityDTO<TKey>
         {
-            return AddEntityDtoService<TDTO, TDTO, TDTO, TDTO>(builder);
+            return AddEntityDtoService<TKey, TDTO, TDTO, TDTO>(builder);
         }
 
-        public static IServiceCollection AddEntityDtoContext<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>(this IServiceCollection services)
-            where TEntity : class, IEntity
+        public static IServiceCollection AddEntityDtoContext<TKey, TEntity, TListDTO, TCreateDTO, TEditDTO>(this IServiceCollection services)
+            where TEntity : class, IEntity<TKey>
+            where TListDTO : class, IEntityDTO<TKey>
+            where TCreateDTO : class, IEntityDTO<TKey>
+            where TEditDTO : class, IEntityDTO<TKey>
         {
-            return services.AddScoped<IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>, EntityDtoContext<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            return services.AddScoped<IDTOContext<TKey, TListDTO, TCreateDTO, TEditDTO>, EntityDtoContext<TKey, TEntity, TListDTO, TCreateDTO, TEditDTO>>();
         }
 
-        public static IServiceCollection AddEntityDtoContext<TEntity, TDto>(this IServiceCollection services)
-            where TEntity : class, IEntity
+        public static IServiceCollection AddEntityDtoContext<TKey, TEntity, TDto>(this IServiceCollection services)
+            where TEntity : class, IEntity<TKey> 
+            where TDto : class, IEntityDTO<TKey>
         {
-            return AddEntityDtoContext<TEntity, TDto, TDto, TDto, TDto>(services);
+            return AddEntityDtoContext<TKey, TEntity, TDto, TDto, TDto>(services);
         }
     }
 }

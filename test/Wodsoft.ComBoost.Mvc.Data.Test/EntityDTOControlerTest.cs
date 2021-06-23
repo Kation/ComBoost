@@ -51,6 +51,7 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
                 Id = Guid.NewGuid(),
                 Email = "test@test.com",
                 UserName = "test",
+                DisplayName = "test",
                 Password = "test"
             };
 
@@ -63,9 +64,9 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
 
             viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user"), serializerOptions);
             Assert.Single(viewModel.Items);
-            Assert.Equal(newUser.UserName, viewModel.Items[0].UserName);
+            Assert.Equal(newUser.DisplayName, viewModel.Items[0].DisplayName);
 
-            newUser.UserName = "newUsername";
+            newUser.DisplayName = "newUsername";
             var putContent = new StringContent(JsonSerializer.Serialize(newUser, serializerOptions), Encoding.UTF8, "application/json");
             response = await client.PutAsync("/api/user", putContent);
             updateModel = JsonSerializer.Deserialize<ClientUpdateModel<UserDto>>(await response.Content.ReadAsStringAsync(), serializerOptions);
@@ -75,12 +76,9 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
 
             viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user"), serializerOptions);
             Assert.Single(viewModel.Items);
-            Assert.Equal(newUser.UserName, viewModel.Items[0].UserName);
+            Assert.Equal(newUser.DisplayName, viewModel.Items[0].DisplayName);
 
-            var deleteContent = new StringContent(JsonSerializer.Serialize(newUser, serializerOptions), Encoding.UTF8, "application/json");
-            var message = new HttpRequestMessage(HttpMethod.Delete, "/api/user");
-            message.Content = deleteContent;
-            response = await client.SendAsync(message);
+            response = await client.DeleteAsync("/api/user?id=" + newUser.Id);
             updateModel = JsonSerializer.Deserialize<ClientUpdateModel<UserDto>>(await response.Content.ReadAsStringAsync(), serializerOptions);
             Assert.True(updateModel.IsSuccess);
             Assert.Empty(updateModel.ErrorMessage);

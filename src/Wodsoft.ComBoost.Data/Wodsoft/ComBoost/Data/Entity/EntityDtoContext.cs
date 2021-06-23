@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class EntityDtoContext<TEntity, TList, TCreate, TEdit, TRemove> : IDTOContext<TList, TCreate, TEdit, TRemove>
-        where TEntity : class, IEntity
+    public class EntityDtoContext<TKey, TEntity, TListDTO, TCreateDTO, TEditDTO> : IDTOContext<TKey, TListDTO, TCreateDTO, TEditDTO>
+        where TEntity : class, IEntity<TKey>
+        where TListDTO : IEntityDTO<TKey>
+        where TCreateDTO : IEntityDTO<TKey>
+        where TEditDTO : IEntityDTO<TKey>
     {
         private IEntityContext<TEntity> _context;
         private IMapper _mapper;
@@ -19,57 +22,64 @@ namespace Wodsoft.ComBoost.Data.Entity
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task Add(TCreate item)
+        public async Task Add(TCreateDTO item)
         {
-            var entity = _mapper.Map<TCreate, TEntity>(item);
+            var entity = _mapper.Map<TCreateDTO, TEntity>(item);
             _context.Add(entity);
             await _context.Database.SaveAsync();
             _mapper.Map(entity, item);
         }
 
-        public async Task AddRange(IEnumerable<TCreate> items)
+        public async Task AddRange(IEnumerable<TCreateDTO> items)
         {
             var source = items.ToArray();
-            var entities = source.Select(t => _mapper.Map<TCreate, TEntity>(t)).ToArray();
+            var entities = source.Select(t => _mapper.Map<TCreateDTO, TEntity>(t)).ToArray();
             _context.AddRange(entities);
             await _context.Database.SaveAsync();
             for (int i = 0; i < source.Length; i++)
                 _mapper.Map(entities[i], source[i]);
         }
 
-        public IAsyncQueryable<TList> Query()
+        public IAsyncQueryable<TListDTO> Query()
         {
-            return _context.Query().ProjectTo<TList>(_mapper.ConfigurationProvider);
+            return _context.Query().ProjectTo<TListDTO>(_mapper.ConfigurationProvider);
         }
 
-        public Task Remove(TRemove item)
+        public async Task Remove(TKey id)
         {
-            _context.Remove(_mapper.Map<TRemove, TEntity>(item));
-            return _context.Database.SaveAsync();
+            var entity = await _context.Query().Where(t => t.Id.Equals(id)).FirstOrDefaultAsync();
+            if (entity != null)
+            {
+                _context.Remove(entity);
+                await _context.Database.SaveAsync();
+            }
         }
 
-        public Task RemoveRange(IEnumerable<TRemove> items)
+        public async Task RemoveRange(params TKey[] keys)
         {
-            _context.AddRange(items.Select(t => _mapper.Map<TRemove, TEntity>(t)));
-            return _context.Database.SaveAsync();
+            var entities = await _context.Query().Where(t => keys.Contains(t.Id)).ToArrayAsync();
+            _context.RemoveRange(entities);
+            await _context.Database.SaveAsync();
         }
 
-        public async Task Update(TEdit item)
+        public async Task Update(TEditDTO item)
         {
-            var entity = _mapper.Map<TEdit, TEntity>(item);
+            var entity = await _context.Query().Where(t => t.Id.Equals(item.Id)).FirstOrDefaultAsync();
+            _mapper.Map(item, entity);
             _context.Update(entity);
             await _context.Database.SaveAsync();
             _mapper.Map(entity, item);
         }
 
-        public async Task UpdateRange(IEnumerable<TEdit> items)
+        public async Task UpdateRange(IEnumerable<TEditDTO> items)
         {
             var source = items.ToArray();
-            var entities = source.Select(t => _mapper.Map<TEdit, TEntity>(t)).ToArray();
-            _context.UpdateRange(entities);
+            var keys = source.Select(t => t.Id).ToArray();
+            var entities = await _context.Query().Where(t => keys.Contains(t.Id)).ToDictionaryAsync(t => t.Id, t => t);
+            _context.UpdateRange(entities.Values);
             await _context.Database.SaveAsync();
-            for (int i = 0; i < source.Length; i++)
-                _mapper.Map(entities[i], source[i]);
+            foreach (var item in source)
+                _mapper.Map(entities[item.Id], item);
         }
     }
 }

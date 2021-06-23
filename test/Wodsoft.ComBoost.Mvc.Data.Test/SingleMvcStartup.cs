@@ -19,12 +19,12 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
             services.AddMvc();
             services.AddDbContext<DataContext>(options=> options.UseInMemoryDatabase("Wodsoft.ComBoost.Mvc.Data.Test"));
             services.AddEFCoreContext<DataContext>();
-            services.AddEntityDtoContext<UserEntity, UserDto>();
+            services.AddEntityDtoContext<Guid, UserEntity, UserDto>();
             services.AddComBoost()
                 .AddLocalService(builder =>
                 {
                     //builder.AddEntityService<Guid, UserEntity, UserDto>();
-                    builder.AddEntityDtoService<UserDto>();                    
+                    builder.AddEntityDtoService<Guid, UserDto>();                    
                 })
                 .AddMvc();
 
