@@ -64,5 +64,19 @@ namespace Wodsoft.ComBoost.Mock
                 });
             return builder;
         }
+
+        public Task StartHostedServiceAsync()
+        {
+            var services = _serviceProvider.GetServices<IHostedService>();
+            var tasks = services.Select(t => t.StartAsync(default(CancellationToken))).ToArray();
+            return Task.WhenAll(tasks);
+        }
+
+        public Task StopHostedServiceAsync()
+        {
+            var services = _serviceProvider.GetServices<IHostedService>();
+            var tasks = services.Select(t => t.StopAsync(default(CancellationToken))).ToArray();
+            return Task.WhenAll(tasks);
+        }
     }
 }
