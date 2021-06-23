@@ -70,7 +70,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.EntityFram
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.EntityFramework.Test", "test\Wodsoft.ComBoost.EntityFramework.Test\Wodsoft.ComBoost.EntityFramework.Test.csproj", "{496CD7AD-4286-4E08-B6F4-58CF401FE638}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.Mvc.Test", "test\Wodsoft.ComBoost.Mvc.Test\Wodsoft.ComBoost.Mvc.Test.csproj", "{DD6ABF7C-239D-4FA2-AEE2-837D4D96871A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Mvc.Test", "test\Wodsoft.ComBoost.Mvc.Test\Wodsoft.ComBoost.Mvc.Test.csproj", "{DD6ABF7C-239D-4FA2-AEE2-837D4D96871A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.Distributed.RabbitMQ", "src\Wodsoft.ComBoost.Distributed.RabbitMQ\Wodsoft.ComBoost.Distributed.RabbitMQ.csproj", "{E713BB45-791D-4A26-97B5-965578706E16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.Distributed.RabbitMQ.Test", "test\Wodsoft.ComBoost.Distributed.RabbitMQ.Test\Wodsoft.ComBoost.Distributed.RabbitMQ.Test.csproj", "{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -406,6 +410,30 @@ Global
 		{DD6ABF7C-239D-4FA2-AEE2-837D4D96871A}.Release|ARM.Build.0 = Release|Any CPU
 		{DD6ABF7C-239D-4FA2-AEE2-837D4D96871A}.Release|x86.ActiveCfg = Release|Any CPU
 		{DD6ABF7C-239D-4FA2-AEE2-837D4D96871A}.Release|x86.Build.0 = Release|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Debug|x86.Build.0 = Debug|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Release|ARM.Build.0 = Release|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Release|x86.ActiveCfg = Release|Any CPU
+		{E713BB45-791D-4A26-97B5-965578706E16}.Release|x86.Build.0 = Release|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Debug|ARM.Build.0 = Debug|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Debug|x86.Build.0 = Debug|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Release|ARM.ActiveCfg = Release|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Release|ARM.Build.0 = Release|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Release|x86.ActiveCfg = Release|Any CPU
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -440,6 +468,8 @@ Global
 		{8E9D38B2-FE3F-43AC-909D-E468B1724CC7} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
 		{496CD7AD-4286-4E08-B6F4-58CF401FE638} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
 		{DD6ABF7C-239D-4FA2-AEE2-837D4D96871A} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
+		{E713BB45-791D-4A26-97B5-965578706E16} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACC3A7A0-05C5-40E9-ABE8-98770CA245F0}

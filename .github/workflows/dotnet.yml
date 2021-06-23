@@ -32,6 +32,7 @@ jobs:
         dotnet pack -c Release src/Wodsoft.ComBoost.Data/Wodsoft.ComBoost.Data.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Data.Core/Wodsoft.ComBoost.Data.Core.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Distributed/Wodsoft.ComBoost.Distributed.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Distributed.RabbitMQ/Wodsoft.ComBoost.Distributed.RabbitMQ.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.EntityFramework/Wodsoft.ComBoost.EntityFramework.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.EntityFrameworkCore/Wodsoft.ComBoost.EntityFrameworkCore.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Mock/Wodsoft.ComBoost.Mock.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
