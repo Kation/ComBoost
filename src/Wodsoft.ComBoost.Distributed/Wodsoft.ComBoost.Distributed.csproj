@@ -6,9 +6,14 @@
     <RootNamespace>Wodsoft.ComBoost</RootNamespace>
   </PropertyGroup>
   <Import Project="../../common.props" />
-
+  
   <ItemGroup>
-    <ProjectReference Include="..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="2.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.Core\Wodsoft.ComBoost.Core.csproj" />
   </ItemGroup>
 
 </Project>
