@@ -13,6 +13,9 @@ namespace Wodsoft.ComBoost
             where THandler : IDomainServiceEventHandler<TArgs>, new()
             where TArgs : DomainServiceEventArgs;
 
+        IComBoostLocalBuilder AddEventHandler<TArgs>(DomainServiceEventHandler<TArgs> handler)
+            where TArgs : DomainServiceEventArgs;
+
         IComBoostLocalServiceBuilder<T> AddService<T>() where T : class, IDomainService;
 
         IServiceCollection Services { get; }
