@@ -27,7 +27,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public ValueTask<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken token)
         {
-            expression = new WrappedAsyncExpressionVisitor(SourceExpression).Visit(expression);
+            expression = new WrappedAsyncExpressionVisitor(this).Visit(expression);
             if (expression is MethodCallExpression methodExpression)
             {
                 switch (methodExpression.Method.Name)

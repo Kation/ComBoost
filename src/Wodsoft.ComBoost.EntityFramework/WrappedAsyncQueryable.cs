@@ -29,7 +29,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
-            var expression = new WrappedAsyncExpressionVisitor(_Provider.SourceExpression).Visit(Expression);
+            var expression = new WrappedAsyncExpressionVisitor(_Provider).Visit(Expression);
             return ((IAsyncEnumerable<T>)_Provider.SourceProvider.CreateQuery<T>(expression)).GetAsyncEnumerator(cancellationToken);
         }
     }

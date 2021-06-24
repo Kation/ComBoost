@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 
@@ -185,6 +186,130 @@ namespace Wodsoft.ComBoost.Data.Entity
             var express = Expression.Lambda<Func<T, bool>>(equal, parameter);
             return query.Where(express);
 
+        }
+
+
+        private static readonly MethodInfo IncludeMethodInfo
+            = typeof(EntityContextExtensions)
+                .GetTypeInfo().GetDeclaredMethods(nameof(Include))
+                .Single(
+                    mi =>
+                        mi.GetGenericArguments().Count() == 2
+                        && mi.GetParameters().Any(
+                            pi => pi.Name == "navigationPropertyPath" && pi.ParameterType != typeof(string)));
+        public static IAsyncIncludableQueryable<TEntity, TProperty> Include<TEntity, TProperty>(this IAsyncQueryable<TEntity> source, Expression<Func<TEntity, TProperty>> navigationPropertyPath)
+            where TEntity : class
+        {
+            return new AsyncIncludableQueryableWrapper<TEntity, TProperty>(
+                source.Provider.CreateQuery<TEntity>(
+                        Expression.Call(
+                            instance: null,
+                            method: IncludeMethodInfo.MakeGenericMethod(typeof(TEntity), typeof(TProperty)),
+                            arguments: new[] { source.Expression, Expression.Quote(navigationPropertyPath) })));
+        }
+
+        private static readonly MethodInfo StringIncludeMethodInfo
+            = typeof(EntityContextExtensions)
+                .GetTypeInfo().GetDeclaredMethods(nameof(Include))
+                .Single(
+                    mi => mi.GetParameters().Any(
+                        pi => pi.Name == "navigationPropertyPath" && pi.ParameterType == typeof(string)));
+        public static IAsyncQueryable<TEntity> Include<TEntity>(this IAsyncQueryable<TEntity> source, string navigationPropertyPath)
+            where TEntity : class
+        {
+            return new AsyncQueryableWrapper<TEntity>(
+                source.Provider.CreateQuery<TEntity>(
+                        Expression.Call(
+                            instance: null,
+                            method: StringIncludeMethodInfo.MakeGenericMethod(typeof(TEntity)),
+                            arg0: source.Expression,
+                            arg1: Expression.Constant(navigationPropertyPath))));
+        }
+
+
+        private static readonly MethodInfo ThenIncludeAfterEnumerableMethodInfo
+            = typeof(EntityContextExtensions)
+                .GetTypeInfo().GetDeclaredMethods(nameof(ThenInclude))
+                .Where(mi => mi.GetGenericArguments().Count() == 3)
+                .Single(
+                    mi =>
+                    {
+                        var typeInfo = mi.GetParameters()[0].ParameterType.GenericTypeArguments[1];
+                        return typeInfo.IsGenericType
+                            && typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+                    });
+
+        private static readonly MethodInfo ThenIncludeAfterReferenceMethodInfo
+            = typeof(EntityContextExtensions)
+                .GetTypeInfo().GetDeclaredMethods(nameof(ThenInclude))
+                .Single(
+                    mi => mi.GetGenericArguments().Count() == 3
+                        && mi.GetParameters()[0].ParameterType.GenericTypeArguments[1].IsGenericParameter);
+
+        public static IAsyncIncludableQueryable<TEntity, TProperty> ThenInclude<TEntity, TPreviousProperty, TProperty>(
+            this IAsyncIncludableQueryable<TEntity, IEnumerable<TPreviousProperty>> source,
+            Expression<Func<TPreviousProperty, TProperty>> navigationPropertyPath)
+            where TEntity : class
+            => new AsyncIncludableQueryableWrapper<TEntity, TProperty>(
+                source.Provider.CreateQuery<TEntity>(
+                    Expression.Call(
+                        instance: null,
+                        method: ThenIncludeAfterEnumerableMethodInfo.MakeGenericMethod(
+                            typeof(TEntity), typeof(TPreviousProperty), typeof(TProperty)),
+                        arguments: new[] { source.Expression, Expression.Quote(navigationPropertyPath) })));
+
+        public static IAsyncIncludableQueryable<TEntity, TProperty> ThenInclude<TEntity, TPreviousProperty, TProperty>(
+            this IAsyncIncludableQueryable<TEntity, TPreviousProperty> source,
+            Expression<Func<TPreviousProperty, TProperty>> navigationPropertyPath)
+            where TEntity : class
+            => new AsyncIncludableQueryableWrapper<TEntity, TProperty>(
+                source.Provider.CreateQuery<TEntity>(
+                    Expression.Call(
+                        instance: null,
+                        method: ThenIncludeAfterReferenceMethodInfo.MakeGenericMethod(
+                            typeof(TEntity), typeof(TPreviousProperty), typeof(TProperty)),
+                        arguments: new[] { source.Expression, Expression.Quote(navigationPropertyPath) })));
+
+        private class AsyncIncludableQueryableWrapper<TEntity, TProperty> : IAsyncIncludableQueryable<TEntity, TProperty>
+        {
+            private readonly IAsyncQueryable<TEntity> _queryable;
+
+            public AsyncIncludableQueryableWrapper(IAsyncQueryable<TEntity> queryable)
+            {
+                _queryable = queryable;
+            }
+
+            public Type ElementType => _queryable.ElementType;
+
+            public Expression Expression => _queryable.Expression;
+
+            public IAsyncQueryProvider Provider => _queryable.Provider;
+
+            public IAsyncEnumerator<TEntity> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+            {
+                return _queryable.GetAsyncEnumerator(cancellationToken);
+            }
+        }
+
+        private class AsyncQueryableWrapper<T> : IAsyncQueryable<T>
+        {
+            private readonly IAsyncQueryable<T> _queryable;
+
+            public AsyncQueryableWrapper(IAsyncQueryable<T> queryable)
+            {
+                _queryable = queryable;
+            }
+
+            public Type ElementType => _queryable.ElementType;
+
+            public Expression Expression => _queryable.Expression;
+
+            public IAsyncQueryProvider Provider => _queryable.Provider;
+
+            public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+            {
+                return _queryable.GetAsyncEnumerator(cancellationToken);
+            }
         }
     }
 }

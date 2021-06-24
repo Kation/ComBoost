@@ -93,7 +93,17 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
                 ValueLong = 5,
                 ValueFloat = 5,
                 ValueDouble = 4,
-                ValueDecimal = 5
+                ValueDecimal = 5,
+                Include = new IncludeEntity
+                {
+                    Id = Guid.NewGuid(),
+                    Text = "include",
+                    ThenInclude = new ThenIncludeEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        Text = "theninclude"
+                    }
+                }
             });
             dataContext.SaveChanges();
 
@@ -294,6 +304,26 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
             var databaseContext = SeedData();
             var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>();
             Assert.Equal(new int[] { 2, 3, 4 }, await entityContext.Query().OrderBy(t => t.ValueInt).Select(t => t.ValueInt).Skip(2).Take(3).ToArrayAsync());
+        }
+
+        [Fact]
+        public async Task IncludeTest()
+        {
+            var databaseContext = SeedData();
+            var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>();
+            var items = await entityContext.Query().Include(t => t.Include).ThenInclude(t => t.ThenInclude).OrderBy(t => t.ValueInt).ThenBy(t => t.ValueDouble).ToArrayAsync();
+            Assert.NotNull(items[5].Include);
+            Assert.NotNull(items[5].Include.ThenInclude);
+        }
+
+        [Fact]
+        public async Task IncludeWithStringTest()
+        {
+            var databaseContext = SeedData();
+            var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>();
+            var items = await entityContext.Query().Include("Include.ThenInclude").OrderBy(t => t.ValueInt).ThenBy(t => t.ValueDouble).ToArrayAsync();
+            Assert.NotNull(items[5].Include);
+            Assert.NotNull(items[5].Include.ThenInclude);
         }
     }
 }

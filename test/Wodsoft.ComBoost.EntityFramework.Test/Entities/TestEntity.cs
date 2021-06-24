@@ -16,5 +16,9 @@ namespace Wodsoft.ComBoost.EntityFramework.Test.Entities
         public double ValueDouble { get; set; }
 
         public decimal ValueDecimal { get; set; }
+
+        public Guid? IncludeId;
+        private IncludeEntity _include;
+        public IncludeEntity Include { get => _include; set { _include = value; IncludeId = value?.Id ?? Guid.Empty; } }
     }
 }

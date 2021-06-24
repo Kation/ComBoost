@@ -13,5 +13,9 @@ namespace Wodsoft.ComBoost.EntityFramework.Test
         public DataContext(string connectionString) : base(connectionString) { }
 
         public virtual DbSet<TestEntity> Tests { get; set; }
+
+        public virtual DbSet<IncludeEntity> Includes { get; set; }
+
+        public virtual DbSet<ThenIncludeEntity> ThenIncludes { get; set; }
     }
 }

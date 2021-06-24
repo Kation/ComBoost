@@ -15,5 +15,9 @@ namespace Wodsoft.ComBoost.Test
         public DbSet<TestEntity> Tests { get; set; }
 
         public DbSet<UserEntity> Users { get; set; }
+
+        public virtual DbSet<IncludeEntity> Includes { get; set; }
+
+        public virtual DbSet<ThenIncludeEntity> ThenIncludes { get; set; }
     }
 }
