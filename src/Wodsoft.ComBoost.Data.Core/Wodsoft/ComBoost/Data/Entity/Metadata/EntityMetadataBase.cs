@@ -217,8 +217,8 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             Properties = propertyMetadatas;
 
             KeyProperty = propertyMetadatas.FirstOrDefault(t => t.IsKey);
-            if (KeyProperty == null)
-                throw new NotSupportedException("不支持没有主键的实体类型，" + Type.FullName + "。");
+            //if (KeyProperty == null)
+            //    throw new NotSupportedException("不支持没有主键的实体类型，" + Type.FullName + "。");
             ViewProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnView && t.CanGet).ToArray());
             CreateProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnCreate && t.CanSet).ToArray());
             EditProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnEdit && t.CanSet).ToArray());
