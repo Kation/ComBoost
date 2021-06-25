@@ -72,7 +72,7 @@ namespace Wodsoft.ComBoost
 
             protected void HandleResult(Task task)
             {
-                if (!task.IsCompleted)
+                if (task.IsFaulted)
                     System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
                 DomainService.Context.Done();
             }
