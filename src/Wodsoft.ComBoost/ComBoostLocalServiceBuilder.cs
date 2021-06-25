@@ -19,7 +19,7 @@ namespace Wodsoft.ComBoost
             Services = services ?? throw new ArgumentNullException(nameof(services));
 
             var type = typeof(TService);
-            var descriptors = type.GetCustomAttributes<DomainServiceTemplateDescriptorAttribute>();
+            var descriptors = type.GetCustomAttributes<DomainTemplateImplementerAttribute>();
             foreach (var descriptor in descriptors)
             {
                 var descriptorType = typeof(IDomainTemplateDescriptor<>).MakeGenericType(descriptor.TemplateType);

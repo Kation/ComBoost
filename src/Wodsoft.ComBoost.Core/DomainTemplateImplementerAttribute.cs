@@ -5,9 +5,9 @@ using System.Text;
 namespace Wodsoft.ComBoost
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-    public class DomainServiceTemplateDescriptorAttribute : Attribute
+    public class DomainTemplateImplementerAttribute : Attribute
     {
-        public DomainServiceTemplateDescriptorAttribute(Type type)
+        public DomainTemplateImplementerAttribute(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
