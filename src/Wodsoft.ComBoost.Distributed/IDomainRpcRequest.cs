@@ -9,7 +9,7 @@ namespace Wodsoft.ComBoost
     {
         string OS { get; }
 
-        IDictionary<string, string> Headers { get; }
+        IDictionary<string, byte[]> Headers { get; }
 
         IDictionary<string, string> Values { get; }
     }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Wodsoft.Protobuf;
+using Wodsoft.Protobuf.Generators;
 
 namespace Wodsoft.ComBoost.Grpc
 {
@@ -19,9 +20,9 @@ namespace Wodsoft.ComBoost.Grpc
 
         public string OS { get; set; }
 
-        private static readonly MapField<string, string>.Codec _HeaderCodec = new MapField<string, string>.Codec(FieldCodec.ForString(10), FieldCodec.ForString(18), 18);
-        private MapField<string, string> _headers { get; set; } = new MapField<string, string>();
-        public IDictionary<string, string> Headers { get => _headers; }
+        private static readonly MapField<string, byte[]>.Codec _HeaderCodec = new MapField<string, byte[]>.Codec(FieldCodec.ForString(10), new ByteArrayCodeGenerator().CreateFieldCodec(2), 18);
+        private MapField<string, byte[]> _headers { get; set; } = new MapField<string, byte[]>();
+        public IDictionary<string, byte[]> Headers { get => _headers; }
 
         private static readonly MapField<string, string>.Codec _ValuesCodec = new MapField<string, string>.Codec(FieldCodec.ForString(10), FieldCodec.ForString(18), 26);
         private MapField<string, string> _values { get; set; } = new MapField<string, string>();
@@ -75,6 +76,7 @@ namespace Wodsoft.ComBoost.Grpc
     }
 
     public class DomainGrpcRequest<T> : DomainGrpcRequest
+        where T : new()
     {
         public T Argument { get; set; }
 
@@ -101,7 +103,7 @@ namespace Wodsoft.ComBoost.Grpc
         {
             if (tag == 34)
             {
-                Argument = default(T);
+                Argument = new T();
                 Message<T> message = Argument;
                 parser.ReadMessage(message);
             }
