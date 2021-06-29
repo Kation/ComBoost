@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using Wodsoft.ComBoost;
 using Wodsoft.ComBoost.AspNetCore;
+using Wodsoft.ComBoost.Security;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -35,6 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<IDomainContextProvider, HttpDomainContextProvider>();
             builder.Services.TryAddScoped<IExecutionResultHandler, DefaultExecutionResultHandler>();
+            builder.Services.TryAddScoped<IAuthenticationProvider, AspNetCoreAuthenticationProvider>();
             if (builderConfigure != null)
                 builderConfigure(new ComBoostAspNetCoreBuilder(builder.Services));
             return builder;
