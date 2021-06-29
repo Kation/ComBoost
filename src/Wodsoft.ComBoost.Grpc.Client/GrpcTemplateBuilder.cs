@@ -22,7 +22,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
             Module = assembly.DefineDynamicModule("default");
         }
 
-        protected internal static ConstructorInfo _TemplateConstructorInfo = typeof(GrpcTemplate).GetConstructor(new Type[] { typeof(GrpcChannel) });
+        protected internal static ConstructorInfo _TemplateConstructorInfo = typeof(GrpcTemplate).GetConstructor(new Type[] { typeof(GrpcChannel), typeof(CallOptions) });
         protected internal static MethodInfo _InvokeAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeAsync", BindingFlags.NonPublic | BindingFlags.Instance);
         protected internal static MethodInfo _InvokeWithReturnValueAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeWithReturnValueAsync", BindingFlags.NonPublic | BindingFlags.Instance);
         protected internal static MethodInfo _InvokeWithArgumentsAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeWithArgumentsAsync", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -30,9 +30,12 @@ namespace Wodsoft.ComBoost.Grpc.Client
 
         public class GrpcTemplate : IDomainTemplate
         {
-            public GrpcTemplate(GrpcChannel channel)
+            private CallOptions _callOptions;
+
+            public GrpcTemplate(GrpcChannel channel, CallOptions callOptions)
             {
                 Channel = channel ?? throw new ArgumentNullException(nameof(channel));
+                _callOptions = callOptions;
             }
 
             public IDomainContext Context { get; set; }
@@ -44,7 +47,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 DomainGrpcRequest request = new DomainGrpcRequest();
                 HandleRequest(request);
                 var invoker = Channel.CreateCallInvoker();
-                var response = await invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
+                var response = await invoker.AsyncUnaryCall(method, null, _callOptions, request);
                 HandleResponse(response);
             }
 
@@ -53,7 +56,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 DomainGrpcRequest request = new DomainGrpcRequest();
                 HandleRequest(request);
                 var invoker = Channel.CreateCallInvoker();
-                var response = await invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
+                var response = await invoker.AsyncUnaryCall(method, null, _callOptions, request);
                 HandleResponse(response);
                 return response.Result;
             }
@@ -65,7 +68,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 request.Argument = args;
                 HandleRequest(request);
                 var invoker = Channel.CreateCallInvoker();
-                var response = await invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
+                var response = await invoker.AsyncUnaryCall(method, null, _callOptions, request);
                 HandleResponse(response);
             }
 
@@ -76,7 +79,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 request.Argument = args;
                 HandleRequest(request);
                 var invoker = Channel.CreateCallInvoker();
-                var response = await invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
+                var response = await invoker.AsyncUnaryCall(method, null, _callOptions, request);
                 HandleResponse(response);
                 return response.Result;
             }
@@ -120,10 +123,11 @@ namespace Wodsoft.ComBoost.Grpc.Client
 
             //Create constructor ctor(GrpcChannel)
             {
-                var constructor = typeBuilder.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, CallingConventions.Standard, new Type[] { typeof(GrpcChannel) });
+                var constructor = typeBuilder.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, CallingConventions.Standard, new Type[] { typeof(GrpcChannel), typeof(CallOptions) });
                 var ilGenerator = constructor.GetILGenerator();
                 ilGenerator.Emit(OpCodes.Ldarg_0);
                 ilGenerator.Emit(OpCodes.Ldarg_1);
+                ilGenerator.Emit(OpCodes.Ldarg_2);
                 ilGenerator.Emit(OpCodes.Call, _TemplateConstructorInfo);
                 ilGenerator.Emit(OpCodes.Ret);
             }
@@ -221,15 +225,17 @@ namespace Wodsoft.ComBoost.Grpc.Client
         }
 
         private GrpcChannel _channel;
+        private CallOptions _callOptions;
 
-        public GrpcTemplateBuilder(GrpcChannel channel)
+        public GrpcTemplateBuilder(GrpcChannel channel, CallOptions callOptions)
         {
             _channel = channel ?? throw new ArgumentNullException(nameof(channel));
+            _callOptions = callOptions;
         }
 
         public T GetTemplate(IDomainContext context)
         {
-            var template = (T)Activator.CreateInstance(_TemplateType, _channel);
+            var template = (T)Activator.CreateInstance(_TemplateType, _channel, _callOptions);
             template.Context = context;
             return template;
         }

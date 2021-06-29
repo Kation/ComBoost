@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Grpc.Core;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +10,6 @@ namespace Wodsoft.ComBoost.Grpc.Client
     {
         IServiceCollection Services { get; }
 
-        IComBoostGrpcServiceBuilder UseTemplate<T>() where T : class, IDomainTemplate;
+        IComBoostGrpcServiceBuilder UseTemplate<T>(CallOptions callOptions = default(CallOptions)) where T : class, IDomainTemplate;
     }
 }

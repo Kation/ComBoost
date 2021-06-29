@@ -1,4 +1,5 @@
-﻿using Grpc.Net.Client;
+﻿using Grpc.Core;
+using Grpc.Net.Client;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -20,10 +21,10 @@ namespace Wodsoft.ComBoost.Grpc.Client
 
         public IServiceCollection Services { get; }
 
-        IComBoostGrpcServiceBuilder IComBoostGrpcServiceBuilder.UseTemplate<T>()
+        IComBoostGrpcServiceBuilder IComBoostGrpcServiceBuilder.UseTemplate<T>(CallOptions callOptions)
         {
             Services.AddSingleton<IDomainTemplateDescriptor<T>, GrpcTemplateBuilder<T>>(sp =>
-                new GrpcTemplateBuilder<T>(GrpcChannel.ForAddress(_address, _optionsFactory(sp)))
+                new GrpcTemplateBuilder<T>(GrpcChannel.ForAddress(_address, _optionsFactory(sp)), callOptions)
             );
             Services.AddTransient<T>(sp =>
             {
