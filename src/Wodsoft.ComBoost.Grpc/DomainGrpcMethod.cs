@@ -9,29 +9,37 @@ using Wodsoft.Protobuf;
 namespace Wodsoft.ComBoost.Grpc
 {
     public class DomainGrpcMethod<TRequest, TResponse>
-        where TRequest : class, new()
-        where TResponse : class, new()
+        where TRequest : class, IMessage, new()
+        where TResponse : class, IMessage, new()
     {
         public static Method<TRequest, TResponse> CreateMethod(string serviceName, string methodName)
         {
             return new Method<TRequest, TResponse>(MethodType.Unary, serviceName, methodName, new Marshaller<TRequest>((request) =>
             {
                 MemoryStream stream = new MemoryStream();
-                Message<TRequest>.Serialize(stream, request);
+                var output = new CodedOutputStream(stream, true);
+                output.WriteRawMessage(request);
+                output.Flush();
                 return stream.ToArray();
             }, (data) =>
             {
-                MemoryStream stream = new MemoryStream(data);
-                return Message<TRequest>.Deserialize(stream);
+                var input = new CodedInputStream(data);
+                var value = new TRequest();
+                input.ReadRawMessage(value);
+                return value;
             }), new Marshaller<TResponse>((response) =>
             {
                 MemoryStream stream = new MemoryStream();
-                Message<TResponse>.Serialize(stream, response);
+                var output = new CodedOutputStream(stream, true);
+                output.WriteRawMessage(response);
+                output.Flush();
                 return stream.ToArray();
             }, (data) =>
             {
-                MemoryStream stream = new MemoryStream(data);
-                return Message<TResponse>.Deserialize(stream);
+                var input = new CodedInputStream(data);
+                var value = new TResponse();
+                input.ReadRawMessage(value);
+                return value;
             }));
         }
     }
