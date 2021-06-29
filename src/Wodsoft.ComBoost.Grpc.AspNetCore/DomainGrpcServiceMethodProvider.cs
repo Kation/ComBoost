@@ -50,10 +50,15 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
                     var templateVariable = Expression.Variable(type);
                     var body = Expression.Block(
                         new ParameterExpression[] { serviceVariable, domainContextVaiable, templateDescriptorVariable, templateVariable },
+                        //var domainContext = new DomainGrpcContext(request, context);
                         Expression.Assign(domainContextVaiable, Expression.New(_GrpcContextConstructorInfo, requestParameter, contextParameter)),
+                        //var templateDescriptor = domainGrpcDiscoveryService.Services.GetService<IDomainTemplateDescriptor<T>>();
                         Expression.Assign(templateDescriptorVariable, Expression.Call(_GetServiceMethodInfo.MakeGenericMethod(templateDescriptorVariable.Type), Expression.Property(discoveryServiceParameter, _ServicesPropertyInfo))),
+                        //var template = templateDescriptor.GetTemplate(domainContext);
                         Expression.Assign(templateVariable, Expression.Call(templateDescriptorVariable, templateDescriptorVariable.Type.GetMethod("GetTemplate"), domainContextVaiable)),
+                        //var service = domainGrpcDiscoveryService.Services.GetService<DomainGrpcService<T>>();
                         Expression.Assign(serviceVariable, Expression.Call(_CreateInstanceMethodInfo.MakeGenericMethod(serviceType), Expression.Property(discoveryServiceParameter, _ServicesPropertyInfo), Expression.NewArrayInit(typeof(object), templateVariable))),
+                        //service.{Method}(request, context);
                         Expression.Label(responseTarget, Expression.Call(serviceVariable, method, requestParameter, contextParameter))
                     );
                     var invoker = Expression.Lambda(addMethod.GetParameters()[2].ParameterType, body, discoveryServiceParameter, requestParameter, contextParameter).Compile();

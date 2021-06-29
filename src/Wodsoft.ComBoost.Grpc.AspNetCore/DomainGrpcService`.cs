@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -31,6 +32,9 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
 
         protected void HandleRequest(DomainGrpcRequest request, ServerCallContext context)
         {
+            var handlers = Template.Context.GetServices<IDomainRpcServerRequestHandler>();
+            foreach (var handler in handlers)
+                handler.Handle(request, (DomainGrpcContext)Template.Context);
             if (_options.IsTraceEnabled)
             {
                 _trace = new DomainGrpcTrace();
@@ -55,6 +59,9 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
                 response.Result = task.Result;
             else
                 response.Exception = new DomainGrpcException(task.Exception);
+            var handlers = Template.Context.GetServices<IDomainRpcServerResponseHandler>();
+            foreach (var handler in handlers)
+                handler.Handle(response);
             return response;
         }
 
@@ -71,6 +78,9 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
             response.OS = Environment.OSVersion.VersionString;
             if (task.Exception != null)
                 response.Exception = new DomainGrpcException(task.Exception);
+            var handlers = Template.Context.GetServices<IDomainRpcServerResponseHandler>();
+            foreach (var handler in handlers)
+                handler.Handle(response);
             return response;
         }
 

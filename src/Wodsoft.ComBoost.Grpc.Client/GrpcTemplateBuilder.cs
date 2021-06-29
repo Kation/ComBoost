@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using Grpc.Net.Client;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,6 +59,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
             }
 
             protected async Task InvokeWithArgumentsAsync<TArgs>(Method<DomainGrpcRequest<TArgs>, DomainGrpcResponse> method, TArgs args)
+                where TArgs : new()
             {
                 DomainGrpcRequest<TArgs> request = new DomainGrpcRequest<TArgs>();
                 request.Argument = args;
@@ -68,6 +70,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
             }
 
             protected async Task<TValue> InvokeWithArgumentsAndReturnValueAsync<TArgs, TValue>(Method<DomainGrpcRequest<TArgs>, DomainGrpcResponse<TValue>> method, TArgs args)
+                where TArgs : new()
             {
                 DomainGrpcRequest<TArgs> request = new DomainGrpcRequest<TArgs>();
                 request.Argument = args;
@@ -81,10 +84,16 @@ namespace Wodsoft.ComBoost.Grpc.Client
             private void HandleRequest(DomainGrpcRequest request)
             {
                 request.OS = Environment.OSVersion.ToString();
+                var handlers = Context.GetServices<IDomainRpcClientRequestHandler>();
+                foreach (var handler in handlers)
+                    handler.Handle(request, Context);
             }
 
             private void HandleResponse(DomainGrpcResponse response)
             {
+                var handlers = Context.GetServices<IDomainRpcClientResponseHandler>();
+                foreach (var handler in handlers)
+                    handler.Handle(response);
                 if (response.Exception != null)
                     throw new DomainGrpcInvokeException(response.Exception);
             }
