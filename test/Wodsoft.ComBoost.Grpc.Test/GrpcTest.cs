@@ -54,12 +54,17 @@ namespace Wodsoft.ComBoost.Grpc.Test
             services.AddComBoost()
                 .AddGrpcService(builder =>
                 {
+                    builder.AddAuthenticationPassthrough();
                     builder.AddService(host.GetTestServer().BaseAddress, new GrpcChannelOptions
                     {
                         HttpClient = client
                     }).UseTemplate<IGreeterTemplate>();
                 })
-                .AddEmptyContextProvider();
+                .AddEmptyContextProvider()
+                .AddMock(builder=>
+                {
+                    builder.AddAnonymous();
+                });
 
             var serviceProvider = services.BuildServiceProvider();
             using (var scope = serviceProvider.CreateScope())

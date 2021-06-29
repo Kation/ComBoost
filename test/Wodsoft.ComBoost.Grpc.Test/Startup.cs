@@ -21,11 +21,10 @@ namespace Wodsoft.ComBoost.Grpc.Test
                 })
                 .AddAspNetCore(builder=>
                 {
-                    builder.AddGrpcServices(options=>
-                    {
-                        options.AddTemplate<IGreeterTemplate>();
-                    });
-                });
+                    builder.AddGrpcServices()
+                        .AddTemplate<IGreeterTemplate>()
+                        .AddAuthenticationPassthrough();
+                }); 
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

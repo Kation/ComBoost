@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Grpc\Wodsoft.ComBoost.Grpc.csproj" />
+    <ProjectReference Include="..\Wodsoft.ComBoost.Security\Wodsoft.ComBoost.Security.csproj" />
   </ItemGroup>
 
 </Project>

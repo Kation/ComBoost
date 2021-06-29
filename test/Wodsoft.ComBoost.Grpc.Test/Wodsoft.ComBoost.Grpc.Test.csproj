@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\src\Wodsoft.ComBoost.AspNetCore\Wodsoft.ComBoost.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\Wodsoft.ComBoost.Grpc.AspNetCore\Wodsoft.ComBoost.Grpc.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\Wodsoft.ComBoost.Grpc.Client\Wodsoft.ComBoost.Grpc.Client.csproj" />
+    <ProjectReference Include="..\..\src\Wodsoft.ComBoost.Mock\Wodsoft.ComBoost.Mock.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.Test.Common\Wodsoft.ComBoost.Test.Common.csproj" />
   </ItemGroup>
   

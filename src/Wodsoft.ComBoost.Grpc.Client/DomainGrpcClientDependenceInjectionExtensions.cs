@@ -1,4 +1,5 @@
 ﻿using Grpc.Net.Client;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,6 +18,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builderConfigure));
             ComBoostGrpcBuilder grpcBuilder = new ComBoostGrpcBuilder(builder.Services);
             builderConfigure(grpcBuilder);
+            return builder;
+        }
+
+        public static IComBoostGrpcBuilder AddAuthenticationPassthrough(this IComBoostGrpcBuilder builder)
+        {
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IDomainRpcClientRequestHandler, DomainGrpcClientAuthenticationPassthroughRequestHandler>());
             return builder;
         }
 
