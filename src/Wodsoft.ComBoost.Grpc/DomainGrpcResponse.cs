@@ -16,6 +16,10 @@ namespace Wodsoft.ComBoost.Grpc
     {
         public string OS { get; set; }
 
+        private static readonly MapField<string, byte[]>.Codec _HeaderCodec = new MapField<string, byte[]>.Codec(FieldCodec.ForString(10), new ByteArrayCodeGenerator().CreateFieldCodec(2), 18);
+        private MapField<string, byte[]> _headers { get; set; } = new MapField<string, byte[]>();
+        public IDictionary<string, byte[]> Headers { get => _headers; }
+
         public DomainGrpcTrace Trace { get; set; }
         IDomainRpcTrace IDomainRpcResponse.Trace => Trace;
 
@@ -27,6 +31,7 @@ namespace Wodsoft.ComBoost.Grpc
             int size = 0;
             if (OS != null)
                 size += 1 + CodedOutputStream.ComputeStringSize(OS);
+            size += _headers.CalculateSize(_HeaderCodec);
             if (Trace != null)
                 size += 1 + CodedOutputStream.ComputeMessageSize(Trace);
             if (Exception != null)
@@ -45,10 +50,13 @@ namespace Wodsoft.ComBoost.Grpc
                         OS = parser.ReadString();
                         break;
                     case 18:
+                        _headers.AddEntriesFrom(ref parser, _HeaderCodec);
+                        break;
+                    case 26:
                         Trace = new DomainGrpcTrace();
                         parser.ReadMessage(Trace);
                         break;
-                    case 26:
+                    case 34:
                         Exception = new DomainGrpcException();
                         parser.ReadMessage(Exception);
                         break;
@@ -68,14 +76,15 @@ namespace Wodsoft.ComBoost.Grpc
                 writer.WriteRawTag(10);
                 writer.WriteString(OS);
             }
+            _headers.WriteTo(ref writer, _HeaderCodec);
             if (Trace != null)
             {
-                writer.WriteRawTag(18);
+                writer.WriteRawTag(26);
                 writer.WriteMessage(Trace);
             }
             if (Exception != null)
             {
-                writer.WriteRawTag(26);
+                writer.WriteRawTag(34);
                 writer.WriteMessage(Exception);
             }
         }
@@ -89,7 +98,7 @@ namespace Wodsoft.ComBoost.Grpc
         protected override int CalculateSize()
         {
             var size = base.CalculateSize();
-            size += _CalculateResultSize(ref _result);
+            size += _CalculateResultSize(this, ref _result);
             return size;
         }
 
@@ -97,38 +106,38 @@ namespace Wodsoft.ComBoost.Grpc
         {
             if (tag == _ResultTag)
             {
-                Result = _ReadResult(ref parser);
+                Result = _ReadResult(this, ref parser);
             }
         }
 
         protected override void Write(ref WriteContext writer)
         {
             base.Write(ref writer);
-            _WriteResult(ref writer, ref _result);
+            _WriteResult(this, ref writer, _result);
         }
 
         private static readonly uint _ResultTag;
         private static readonly CalculateResultSize _CalculateResultSize;
         private static readonly ParseResult _ReadResult;
         private static readonly WriteResult _WriteResult;
-        private delegate int CalculateResultSize(ref T result);
-        private delegate void WriteResult(ref WriteContext writer, ref T result);
-        private delegate T ParseResult(ref ParseContext parser);
+        private delegate int CalculateResultSize(DomainGrpcResponse<T> source, ref T result);
+        private delegate void WriteResult(DomainGrpcResponse<T> source, ref WriteContext writer, T result);
+        private delegate T ParseResult(DomainGrpcResponse<T> source, ref ParseContext parser);
 
         static DomainGrpcResponse()
         {
             var resultType = typeof(T);
             var codeGenerator = MessageBuilder.GetCodeGenerator<T>();
 
-            DynamicMethod calculateSize = new DynamicMethod("CalculateResultSize", typeof(int), new Type[] { resultType.MakeByRefType() });
+            DynamicMethod calculateSize = new DynamicMethod("CalculateResultSize", typeof(int), new Type[] { typeof(DomainGrpcResponse<T>), resultType.MakeByRefType() });
             var calculateSizeILGenerator = calculateSize.GetILGenerator();
             var calculateSizeEnd = calculateSizeILGenerator.DefineLabel();
 
-            DynamicMethod write = new DynamicMethod("WriteResult", null, new Type[] { typeof(WriteContext).MakeByRefType(), resultType.MakeByRefType() });
+            DynamicMethod write = new DynamicMethod("WriteResult", null, new Type[] { typeof(DomainGrpcResponse<T>), typeof(WriteContext).MakeByRefType(), resultType });
             var writeILGenerator = write.GetILGenerator();
             var writeEnd = writeILGenerator.DefineLabel();
 
-            DynamicMethod read = new DynamicMethod("ReadResult", resultType, new Type[] { typeof(ParseContext).MakeByRefType() });
+            DynamicMethod read = new DynamicMethod("ReadResult", resultType, new Type[] { typeof(DomainGrpcResponse<T>), typeof(ParseContext).MakeByRefType() });
             var readILGenerator = read.GetILGenerator();
 
             //CalculateSize
@@ -149,7 +158,7 @@ namespace Wodsoft.ComBoost.Grpc
                     throw new NotSupportedException($"Response type \"{resultType.FullName}\" doesn't have a default constructor.");
                 codeGenerator = (ICodeGenerator<T>)Activator.CreateInstance(typeof(ObjectCodeGenerator<>).MakeGenericType(resultType));
             }
-            _ResultTag = WireFormat.MakeTag(4, codeGenerator.WireType);
+            _ResultTag = WireFormat.MakeTag(5, codeGenerator.WireType);
             //CalculateSize
             {
                 codeGenerator.GenerateCalculateSizeCode(calculateSizeILGenerator, calculateSizeValueVariable);
@@ -160,7 +169,7 @@ namespace Wodsoft.ComBoost.Grpc
             }
             //Write
             {
-                codeGenerator.GenerateWriteCode(writeILGenerator, writeValueVariable, 4);
+                codeGenerator.GenerateWriteCode(writeILGenerator, writeValueVariable, 5);
             }
             calculateSizeILGenerator.MarkLabel(calculateSizeEnd);
             calculateSizeILGenerator.Emit(OpCodes.Ret);

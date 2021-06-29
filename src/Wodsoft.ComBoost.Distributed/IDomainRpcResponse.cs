@@ -8,6 +8,8 @@ namespace Wodsoft.ComBoost
     {
         string OS { get; }
 
+        IDictionary<string, byte[]> Headers { get; }
+
         IDomainRpcTrace Trace { get; }
 
         IDomainRpcException Exception { get; }
