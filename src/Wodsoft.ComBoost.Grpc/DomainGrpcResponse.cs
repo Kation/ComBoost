@@ -161,7 +161,7 @@ namespace Wodsoft.ComBoost.Grpc
             _ResultTag = WireFormat.MakeTag(5, codeGenerator.WireType);
             //CalculateSize
             {
-                codeGenerator.GenerateCalculateSizeCode(calculateSizeILGenerator, calculateSizeValueVariable);
+                codeGenerator.GenerateCalculateSizeCode(calculateSizeILGenerator, calculateSizeValueVariable, 5);
             }
             //Read
             {
@@ -230,7 +230,7 @@ namespace Wodsoft.ComBoost.Grpc
             _ResultTag1 = WireFormat.MakeTag(4, WireFormat.WireType.LengthDelimited);
             var codeGenerator = MessageBuilder.GetCodeGenerator<TElement>();
             if (codeGenerator == null)
-                codeGenerator = new ObjectCodeGenerator<TElement>();
+                codeGenerator = (ICodeGenerator<TElement>)Activator.CreateInstance(typeof(ObjectCodeGenerator<>).MakeGenericType(typeof(TElement)));
             if (codeGenerator.WireType == WireFormat.WireType.Varint)
                 _ResultTag2 = WireFormat.MakeTag(4, WireFormat.WireType.Varint);
             _ResultCodec = codeGenerator.CreateFieldCodec(4);
@@ -280,13 +280,13 @@ namespace Wodsoft.ComBoost.Grpc
             {
                 var codeGenerator = MessageBuilder.GetCodeGenerator<TKey>();
                 if (codeGenerator == null)
-                    codeGenerator = new ObjectCodeGenerator<TKey>();
+                    codeGenerator = (ICodeGenerator<TKey>)Activator.CreateInstance(typeof(ObjectCodeGenerator<>).MakeGenericType(typeof(TKey)));
                 keyCodec = codeGenerator.CreateFieldCodec(1);
             }
             {
                 var codeGenerator = MessageBuilder.GetCodeGenerator<TValue>();
                 if (codeGenerator == null)
-                    codeGenerator = new ObjectCodeGenerator<TValue>();
+                    codeGenerator = (ICodeGenerator<TValue>)Activator.CreateInstance(typeof(ObjectCodeGenerator<>).MakeGenericType(typeof(TValue)));
                 valueCodec = codeGenerator.CreateFieldCodec(1);
             }
             _ResultCodec = new MapField<TKey, TValue>.Codec(keyCodec, valueCodec, WireFormat.MakeTag(4, WireFormat.WireType.LengthDelimited));
