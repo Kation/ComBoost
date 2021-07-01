@@ -117,7 +117,7 @@ namespace Wodsoft.ComBoost
                 throw new NotSupportedException("Interface template could not contains properties.");
             if (type.GetEvents().Length != 0)
                 throw new NotSupportedException("Interface template could not contains events.");
-            _AgentBuilder = Module.DefineType("Proxy_" + typeof(T).Name, TypeAttributes.Public | TypeAttributes.Class, typeof(DomainTemplateAgent<TDomainService>), new Type[] { type, typeof(IDomainTemplate) });
+            _AgentBuilder = Module.DefineType("Proxy_" + typeof(T).Name + "_" + typeof(T).GetHashCode(), TypeAttributes.Public | TypeAttributes.Class, typeof(DomainTemplateAgent<TDomainService>), new Type[] { type, typeof(IDomainTemplate) });
 
             //Create constructor ctor(IDomainContext, IDomainService)
             {

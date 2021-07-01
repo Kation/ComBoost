@@ -230,10 +230,10 @@ namespace Wodsoft.ComBoost.Grpc
             _ResultTag1 = WireFormat.MakeTag(4, WireFormat.WireType.LengthDelimited);
             var codeGenerator = MessageBuilder.GetCodeGenerator<TElement>();
             if (codeGenerator == null)
-                codeGenerator = (ICodeGenerator<TElement>)Activator.CreateInstance(typeof(ObjectCodeGenerator<>).MakeGenericType(typeof(TElement)));
+                codeGenerator = new ObjectCodeGenerator<TElement>();
             if (codeGenerator.WireType == WireFormat.WireType.Varint)
                 _ResultTag2 = WireFormat.MakeTag(4, WireFormat.WireType.Varint);
-            _ResultCodec = codeGenerator.CreateFieldCodec(4);
+            _ResultCodec = codeGenerator.CreateFieldCodec(5);
         }
     }
 
@@ -280,14 +280,14 @@ namespace Wodsoft.ComBoost.Grpc
             {
                 var codeGenerator = MessageBuilder.GetCodeGenerator<TKey>();
                 if (codeGenerator == null)
-                    codeGenerator = (ICodeGenerator<TKey>)Activator.CreateInstance(typeof(ObjectCodeGenerator<>).MakeGenericType(typeof(TKey)));
+                    codeGenerator = new ObjectCodeGenerator<TKey>();
                 keyCodec = codeGenerator.CreateFieldCodec(1);
             }
             {
                 var codeGenerator = MessageBuilder.GetCodeGenerator<TValue>();
                 if (codeGenerator == null)
-                    codeGenerator = (ICodeGenerator<TValue>)Activator.CreateInstance(typeof(ObjectCodeGenerator<>).MakeGenericType(typeof(TValue)));
-                valueCodec = codeGenerator.CreateFieldCodec(1);
+                    codeGenerator = new ObjectCodeGenerator<TValue>();
+                valueCodec = codeGenerator.CreateFieldCodec(2);
             }
             _ResultCodec = new MapField<TKey, TValue>.Codec(keyCodec, valueCodec, WireFormat.MakeTag(4, WireFormat.WireType.LengthDelimited));
         }

@@ -130,7 +130,8 @@ namespace Wodsoft.ComBoost
                 baseType = typeof(DomainServiceInvoker<TDomainService>);
             else
                 baseType = typeof(DomainServiceInvoker<,>).MakeGenericType(typeof(TDomainService), method.ReturnType.GetGenericArguments()[0]);
-            var type = DomainTemplateBuilder.Module.DefineType(method.Name + "Invoker", TypeAttributes.Public | TypeAttributes.Class, baseType);
+            var ns = "Wodsoft.ComBoost.Dynamic." + typeof(TDomainService).Name + "_" + typeof(TDomainService).GetHashCode() + ".";
+            var type = DomainTemplateBuilder.Module.DefineType(ns + method.Name + "Invoker", TypeAttributes.Public | TypeAttributes.Class, baseType);
 
             var constructor = type.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, CallingConventions.Standard, new Type[] { typeof(TDomainService), typeof(IDomainContext) });
             var constructorILGenerator = constructor.GetILGenerator();
