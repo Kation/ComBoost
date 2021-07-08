@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost
         }
 
         private static ConcurrentDictionary<Type, string> _typeNames = new ConcurrentDictionary<Type, string>();
-        private static string GetTypeName(Type type)
+        public static string GetTypeName(Type type)
         {
             var name = type.Namespace + "." + type.Name;
             if (type.IsGenericType)

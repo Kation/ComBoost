@@ -2,13 +2,18 @@
 
   <PropertyGroup>
     <Description>ComBoost CAP分布式事务支持。</Description>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Wodsoft.ComBoost.Distributed</RootNamespace>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
   <Import Project="../../common.props" />
 
   <ItemGroup>
-    <PackageReference Include="DotNetCore.CAP" Version="3.1.2" />
+    <PackageReference Include="DotNetCore.CAP" Version="5.1.0" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.Distributed\Wodsoft.ComBoost.Distributed.csproj" />
+    <ProjectReference Include="..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj" />
   </ItemGroup>
 
 </Project>

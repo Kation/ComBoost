@@ -72,9 +72,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.EntityFram
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Mvc.Test", "test\Wodsoft.ComBoost.Mvc.Test\Wodsoft.ComBoost.Mvc.Test.csproj", "{DD6ABF7C-239D-4FA2-AEE2-837D4D96871A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.Distributed.RabbitMQ", "src\Wodsoft.ComBoost.Distributed.RabbitMQ\Wodsoft.ComBoost.Distributed.RabbitMQ.csproj", "{E713BB45-791D-4A26-97B5-965578706E16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Distributed.RabbitMQ", "src\Wodsoft.ComBoost.Distributed.RabbitMQ\Wodsoft.ComBoost.Distributed.RabbitMQ.csproj", "{E713BB45-791D-4A26-97B5-965578706E16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.Distributed.RabbitMQ.Test", "test\Wodsoft.ComBoost.Distributed.RabbitMQ.Test\Wodsoft.ComBoost.Distributed.RabbitMQ.Test.csproj", "{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Distributed.RabbitMQ.Test", "test\Wodsoft.ComBoost.Distributed.RabbitMQ.Test\Wodsoft.ComBoost.Distributed.RabbitMQ.Test.csproj", "{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.Distributed.CAP.Test", "test\Wodsoft.ComBoost.Distributed.CAP.Test\Wodsoft.ComBoost.Distributed.CAP.Test.csproj", "{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -434,6 +436,18 @@ Global
 		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Release|ARM.Build.0 = Release|Any CPU
 		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Release|x86.ActiveCfg = Release|Any CPU
 		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE}.Release|x86.Build.0 = Release|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Debug|x86.Build.0 = Debug|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Release|ARM.Build.0 = Release|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Release|x86.ActiveCfg = Release|Any CPU
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -470,6 +484,7 @@ Global
 		{DD6ABF7C-239D-4FA2-AEE2-837D4D96871A} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
 		{E713BB45-791D-4A26-97B5-965578706E16} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
 		{1DEEFD83-EFDA-42E3-91E9-EB976346B3CE} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
+		{E10F08E5-E70C-4BE0-83E7-7D69746D5E66} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACC3A7A0-05C5-40E9-ABE8-98770CA245F0}
