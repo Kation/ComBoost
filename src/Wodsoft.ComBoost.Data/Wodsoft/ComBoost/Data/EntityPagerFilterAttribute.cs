@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data
 {
-    public class EntityPagerFilter : IDomainServiceFilter
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class EntityPagerFilterAttribute : Attribute, IDomainServiceFilter
     {
         public async Task OnExecutionAsync(IDomainExecutionContext context, DomainExecutionPipeline next)
         {
