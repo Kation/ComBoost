@@ -38,7 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
-            builder.Services.AddScoped<IDomainContextProvider, EmptyDomainContextProvider>();
+            builder.Services.AddSingleton<IDomainContextProvider, EmptyDomainContextProvider>();
             return builder;
         }
 
