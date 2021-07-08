@@ -23,7 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IComBoostGrpcBuilder AddAuthenticationPassthrough(this IComBoostGrpcBuilder builder)
         {
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IDomainRpcClientRequestHandler, DomainGrpcClientAuthenticationPassthroughRequestHandler>());
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IDomainRpcClientRequestHandler, DomainGrpcClientAuthenticationPassthroughRequestHandler>());
             return builder;
         }
 
