@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -54,7 +55,12 @@ namespace Wodsoft.ComBoost.Mock
             var builder = new MockBuilder()
                 .UseEnvironment(Environments.Development)
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .ConfigureConfiguration(configBuilder=>
+                .ConfigureLogging(loggingBuilder =>
+                {
+                    loggingBuilder.AddConsole();
+                    loggingBuilder.AddDebug();
+                })
+                .ConfigureConfiguration(configBuilder =>
                 {
                     configBuilder.AddJsonFile("appsettings.json", true);
                 })
