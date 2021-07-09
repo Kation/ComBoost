@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost.Data
         public override async Task OnExecutionAsync(IDomainExecutionContext context, DomainExecutionPipeline next)
         {
             await next();
-            if (context.Result is IViewModel viewModel)
+            if (context.Result is IViewModel viewModel && viewModel.Items == null)
             {
                 await viewModel.UpdateItemsAsync();
             }
