@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class EntityPagerFilterAttribute : Attribute, IDomainServiceFilter
+    public class EntityPagerFilterAttribute : DomainServiceFilterAttribute
     {
-        public async Task OnExecutionAsync(IDomainExecutionContext context, DomainExecutionPipeline next)
+        public override async Task OnExecutionAsync(IDomainExecutionContext context, DomainExecutionPipeline next)
         {
             await next();
             if (context.Result is IViewModel viewModel)
