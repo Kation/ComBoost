@@ -40,9 +40,9 @@ namespace Wodsoft.ComBoost
                 {
                     List<IDomainServiceFilter> filters = new List<IDomainServiceFilter>();
                     filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions>>().Value.Filters);
-                    filters.AddRange(typeof(TDomainService).GetCustomAttributes<DomainServiceFilterAttribute>());
+                    filters.AddRange(typeof(TDomainService).GetCustomAttributes().OfType<IDomainServiceFilter>());
                     filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions<TDomainService>>>().Value.Filters);
-                    filters.AddRange(DomainService.Context.DomainMethod.GetCustomAttributes<DomainServiceFilterAttribute>());
+                    filters.AddRange(DomainService.Context.DomainMethod.GetCustomAttributes().OfType<IDomainServiceFilter>());
                     filters.AddRange(DomainService.Context.DomainContext.GetService<IOptionsMonitor<DomainFilterOptions<TDomainService>>>().Get(DomainService.Context.DomainMethod.Name).Filters);
                     _Filters = filters;
                 }
