@@ -34,19 +34,19 @@ namespace Wodsoft.ComBoost.Grpc
         protected override int CalculateSize()
         {
             int size = 0;
-            if (Title.Length != 0)
+            if (Title != null && Title.Length != 0)
             {
                 size += 1 + CodedOutputStream.ComputeStringSize(Title);
             }
-            if (Message.Length != 0)
+            if (Message != null && Message.Length != 0)
             {
                 size += 1 + CodedOutputStream.ComputeStringSize(Message);
             }
-            if (Source.Length != 0)
+            if (Source != null && Source.Length != 0)
             {
                 size += 1 + CodedOutputStream.ComputeStringSize(Source);
             }
-            if (StackTrace.Length != 0)
+            if (StackTrace != null && StackTrace.Length != 0)
             {
                 size += 1 + CodedOutputStream.ComputeStringSize(StackTrace);
             }
@@ -86,22 +86,22 @@ namespace Wodsoft.ComBoost.Grpc
 
         protected override void Write(ref WriteContext writer)
         {
-            if (Title.Length != 0)
+            if (Title != null && Title.Length != 0)
             {
                 writer.WriteRawTag(10);
                 writer.WriteString(Title);
             }
-            if (Message.Length != 0)
+            if (Message != null && Message.Length != 0)
             {
                 writer.WriteRawTag(18);
                 writer.WriteString(Message);
             }
-            if (Source.Length != 0)
+            if (Source != null && Source.Length != 0)
             {
                 writer.WriteRawTag(26);
                 writer.WriteString(Source);
             }
-            if (StackTrace.Length != 0)
+            if (StackTrace != null && StackTrace.Length != 0)
             {
                 writer.WriteRawTag(34);
                 writer.WriteString(StackTrace);
