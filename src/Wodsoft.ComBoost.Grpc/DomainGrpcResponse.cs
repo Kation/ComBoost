@@ -113,7 +113,8 @@ namespace Wodsoft.ComBoost.Grpc
         protected override void Write(ref WriteContext writer)
         {
             base.Write(ref writer);
-            _WriteResult(this, ref writer, _result);
+            if (Result != null)
+                _WriteResult(this, ref writer, _result);
         }
 
         private static readonly uint _ResultTag;
