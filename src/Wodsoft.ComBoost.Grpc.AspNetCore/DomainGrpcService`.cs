@@ -58,7 +58,10 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
             if (task.Exception == null)
                 response.Result = task.Result;
             else
+            {
+                _logger.LogError(task.Exception, "Domain service throw a unhandled exception.");
                 response.Exception = new DomainGrpcException(task.Exception);
+            }
             var handlers = Template.Context.GetServices<IDomainRpcServerResponseHandler>();
             foreach (var handler in handlers)
                 handler.Handle(response);
