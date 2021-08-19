@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -30,23 +31,25 @@ namespace Wodsoft.ComBoost
 
             public IDomainContext DomainContext { get; }
 
-            private static List<IDomainServiceFilter> _Filters;
+            private static Dictionary<MethodInfo, List<IDomainServiceFilter>> _Filters;
 
             protected abstract Task ExecuteAsync();
 
-            protected IList<IDomainServiceFilter> GetFilters()
+            protected virtual IList<IDomainServiceFilter> GetFilters()
             {
                 if (_Filters == null)
-                {
-                    List<IDomainServiceFilter> filters = new List<IDomainServiceFilter>();
-                    filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions>>().Value.Filters);
-                    filters.AddRange(typeof(TDomainService).GetCustomAttributes().OfType<IDomainServiceFilter>());
-                    filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions<TDomainService>>>().Value.Filters);
-                    filters.AddRange(DomainService.Context.DomainMethod.GetCustomAttributes().OfType<IDomainServiceFilter>());
-                    filters.AddRange(DomainService.Context.DomainContext.GetService<IOptionsMonitor<DomainFilterOptions<TDomainService>>>().Get(DomainService.Context.DomainMethod.Name).Filters);
-                    _Filters = filters;
-                }
-                return _Filters;
+                    _Filters = typeof(TDomainService).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(t => !t.IsSpecialName && t.ReturnType == typeof(Task) || ((t.ReturnType.IsGenericType && t.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))))
+                        .ToDictionary(t => t, t =>
+                        {
+                            List<IDomainServiceFilter> filters = new List<IDomainServiceFilter>();
+                            filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions>>().Value.Filters);
+                            filters.AddRange(typeof(TDomainService).GetCustomAttributes().OfType<IDomainServiceFilter>());
+                            filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions<TDomainService>>>().Value.Filters);
+                            filters.AddRange(t.GetCustomAttributes().OfType<IDomainServiceFilter>());
+                            filters.AddRange(DomainService.Context.DomainContext.GetService<IOptionsMonitor<DomainFilterOptions<TDomainService>>>().Get(t.Name).Filters);
+                            return filters;
+                        });
+                return _Filters[DomainService.Context.DomainMethod];
             }
 
             protected DomainExecutionPipeline MakePipeline()
@@ -203,14 +206,12 @@ namespace Wodsoft.ComBoost
                 invokeILGenerator.Emit(OpCodes.Ldarg_0);
                 invokeILGenerator.Emit(OpCodes.Ldftn, baseType.GetMethod("ReturnResult", BindingFlags.NonPublic | BindingFlags.Instance));
                 invokeILGenerator.Emit(OpCodes.Newobj, typeof(Func<,>).MakeGenericType(typeof(Task), method.ReturnType.GenericTypeArguments[0]).GetConstructors()[0]);
-                //invokeILGenerator.Emit(OpCodes.Ldc_I4, (int)TaskContinuationOptions.OnlyOnRanToCompletion);
-                invokeILGenerator.Emit(OpCodes.Call, typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(t => t.Name == "ContinueWith" && t.IsGenericMethodDefinition && t.GetParameters().Length == 1/* && t.GetParameters()[1].ParameterType == typeof(TaskContinuationOptions)*/).First().MakeGenericMethod(method.ReturnType.GenericTypeArguments[0]));
+                invokeILGenerator.Emit(OpCodes.Call, typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(t => t.Name == "ContinueWith" && t.IsGenericMethodDefinition && t.GetParameters().Length == 1).First().MakeGenericMethod(method.ReturnType.GenericTypeArguments[0]));
             }
             executeILGenerator.Emit(OpCodes.Ldarg_0);
             executeILGenerator.Emit(OpCodes.Ldftn, baseType.GetMethod("HandleResult", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { method.ReturnType }, null));
             executeILGenerator.Emit(OpCodes.Newobj, typeof(Action<>).MakeGenericType(method.ReturnType).GetConstructors()[0]);
-            //executeILGenerator.Emit(OpCodes.Ldc_I4, (int)TaskContinuationOptions.OnlyOnRanToCompletion);
-            executeILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", new Type[] { typeof(Action<>).MakeGenericType(method.ReturnType)/*, typeof(TaskContinuationOptions)*/ }));
+            executeILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", new Type[] { typeof(Action<>).MakeGenericType(method.ReturnType) }));
 
             executeILGenerator.Emit(OpCodes.Ret);
             invokeILGenerator.Emit(OpCodes.Ret);
