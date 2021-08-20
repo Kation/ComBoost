@@ -31,7 +31,7 @@ namespace Wodsoft.ComBoost
 
             public IDomainContext DomainContext { get; }
 
-            private static Dictionary<MethodInfo, List<IDomainServiceFilter>> _Filters;
+            private static Dictionary<string, List<IDomainServiceFilter>> _Filters;
 
             protected abstract Task ExecuteAsync();
 
@@ -39,7 +39,7 @@ namespace Wodsoft.ComBoost
             {
                 if (_Filters == null)
                     _Filters = typeof(TDomainService).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(t => !t.IsSpecialName && t.ReturnType == typeof(Task) || ((t.ReturnType.IsGenericType && t.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))))
-                        .ToDictionary(t => t, t =>
+                        .ToDictionary(t => t.Name, t =>
                         {
                             List<IDomainServiceFilter> filters = new List<IDomainServiceFilter>();
                             filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions>>().Value.Filters);
@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost
                             filters.AddRange(DomainService.Context.DomainContext.GetService<IOptionsMonitor<DomainFilterOptions<TDomainService>>>().Get(t.Name).Filters);
                             return filters;
                         });
-                return _Filters[DomainService.Context.DomainMethod];
+                return _Filters[DomainService.Context.DomainMethod.Name];
             }
 
             protected DomainExecutionPipeline MakePipeline()
