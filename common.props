@@ -9,8 +9,13 @@
     <PackageId>$(AssemblyName)</PackageId>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Kation/ComBoost</RepositoryUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
     <PackageReleaseNotes></PackageReleaseNotes>
+    <IncludeSymbols>true</IncludeSymbols>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
 </Project>
