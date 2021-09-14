@@ -7,10 +7,9 @@
   <Import Project="../../common.props" />
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.17.0" />
-    <PackageReference Include="Grpc.Core.Api" Version="2.37.1" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.40.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
-    <PackageReference Include="Wodsoft.Protobuf.Wrapper" Version="1.0.0-beta9" />
+    <PackageReference Include="Wodsoft.Protobuf.Wrapper" Version="1.0.0-preview1" />
   </ItemGroup>
 
   <ItemGroup>
