@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,12 @@ namespace Wodsoft.ComBoost
         void IDomainService.Initialize(IDomainExecutionContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
+            OnInitialize();
+        }
+
+        protected virtual void OnInitialize()
+        {
+
         }
 
         #endregion
