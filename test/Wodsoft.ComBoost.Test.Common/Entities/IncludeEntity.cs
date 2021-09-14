@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Test.Entities
 {
-    public class IncludeEntity
+    public class IncludeEntity : EntityBase
     {
-        public Guid Id { get; set; }
-
         public string Text { get; set; }
 
         public Guid? ThenIncludeId;
