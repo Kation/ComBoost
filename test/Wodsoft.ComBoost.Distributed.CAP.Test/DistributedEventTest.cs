@@ -31,9 +31,9 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                                 x.UseInMemoryStorage();
                                 x.UseRabbitMQ(options=>
                                 {
-                                    options.HostName = "10.128.0.13";
-                                    options.UserName = "user";
-                                    options.Password = "wJJfkJh3mv";
+                                    options.HostName = "127.0.0.1";
+                                    options.UserName = "guest";
+                                    options.Password = "guest";
                                 });
                             });
                         })
@@ -65,9 +65,9 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                                 x.UseInMemoryStorage();
                                 x.UseRabbitMQ(options =>
                                 {
-                                    options.HostName = "10.128.0.13";
-                                    options.UserName = "user";
-                                    options.Password = "wJJfkJh3mv";
+                                    options.HostName = "127.0.0.1";
+                                    options.UserName = "guest";
+                                    options.Password = "guest";
                                 });
                             });
                         })

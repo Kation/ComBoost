@@ -1,5 +1,6 @@
 ﻿using DotNetCore.CAP;
 using DotNetCore.CAP.Internal;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
-            builder.Services.AddSingleton<IDomainDistributedEventProvider>(sp => sp.GetService<DomainCAPEventProvider>());
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDomainDistributedEventProvider, DomainCAPEventProvider>(sp => sp.GetService<DomainCAPEventProvider>()));
             builder.Services.AddSingleton<DomainCAPEventProvider>();
             builder.Services.AddSingleton<ISubscribeInvoker, DomainSubscribeInvoker>();
             builder.Services.AddSingleton<IConsumerServiceSelector, DomainConsumerServiceSelector>();

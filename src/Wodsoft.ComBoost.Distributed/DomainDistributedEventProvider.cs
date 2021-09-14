@@ -9,7 +9,7 @@ namespace Wodsoft.ComBoost
 {
     public abstract class DomainDistributedEventProvider : IDomainDistributedEventProvider
     {
-        public abstract Task SendEventAsync<T>(T args) where T : DomainServiceEventArgs;
+        public abstract Task SendEventAsync<T>(T args, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
 
         protected virtual string GetTypeName<T>()
         {
@@ -27,8 +27,10 @@ namespace Wodsoft.ComBoost
             return name;
         }
 
-        public abstract void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler) where T : DomainServiceEventArgs;
+        public abstract void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
 
-        public abstract void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler) where T : DomainServiceEventArgs;
+        public abstract void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+
+        public abstract bool CanHandleEvent<T>(IReadOnlyList<string> features) where T : DomainServiceEventArgs;
     }
 }

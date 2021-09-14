@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Wodsoft.ComBoost.Distributed.CAP.Test.Services
+namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
 {
-    public class TestEventArgs : DomainServiceEventArgs, IDomainDistributedHandleOnceEvent
+    public class HandleMoreEventArgs : DomainServiceEventArgs, IDomainDistributedMustHandleEvent
     {
         public string Text { get; set; }
     }

@@ -8,9 +8,24 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
 {
     public class EventTestService : DomainService
     {
-        public Task Test([FromValue] string text)
+        public Task FireHandleMore([FromValue] string text)
         {
-            return RaiseEvent(new TestEventArgs { Text = text });
+            return RaiseEvent(new HandleMoreEventArgs { Text = text });
+        }
+
+        public Task FireHandleMoreDelay([FromValue] string text)
+        {
+            return RaiseEvent(new HandleMoreDelayEventArgs { Text = text, Delay = 2000 });
+        }
+
+        public Task FireHandleOnce([FromValue] string text)
+        {
+            return RaiseEvent(new HandleOnceEventArgs { Text = text });
+        }
+
+        public Task FireHandleOnceDelay([FromValue] string text)
+        {
+            return RaiseEvent(new HandleOnceDelayEventArgs { Text = text, Delay = 2000 });
         }
     }
 }

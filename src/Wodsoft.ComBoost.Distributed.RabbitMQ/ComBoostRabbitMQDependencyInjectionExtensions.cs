@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Wodsoft.ComBoost;
@@ -12,7 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
-            builder.Services.AddSingleton<IDomainDistributedEventProvider, DomainRabbitMQEventProvider>();
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDomainDistributedEventProvider, DomainRabbitMQEventProvider>());
             return builder;
         }
 
@@ -24,8 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(optionsConfigure));
             builder.Services.PostConfigure(optionsConfigure);
             builder.Services.AddSingleton<IDomainRabbitMQProvider, DomainRabbitMQProvider>();
-            builder.Services.AddSingleton<IDomainDistributedEventProvider, DomainRabbitMQEventProvider>();
-            return builder;
+            return UseRabbitMQ(builder);
         }
 
         public static IComBoostDistributedBuilder UseRabbitMQ(this IComBoostDistributedBuilder builder, string connectionString)
@@ -36,8 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(connectionString));
             builder.Services.PostConfigure<DomainRabbitMQOptions>(options => options.ConnectionString = connectionString);
             builder.Services.AddSingleton<IDomainRabbitMQProvider, DomainRabbitMQProvider>();
-            builder.Services.AddSingleton<IDomainDistributedEventProvider, DomainRabbitMQEventProvider>();
-            return builder;
+            return UseRabbitMQ(builder);
         }
     }
 }

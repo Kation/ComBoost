@@ -7,10 +7,12 @@ namespace Wodsoft.ComBoost
 {
     public interface IDomainDistributedEventProvider
     {
-        Task SendEventAsync<T>(T args) where T : DomainServiceEventArgs;
+        bool CanHandleEvent<T>(IReadOnlyList<string> features) where T : DomainServiceEventArgs;
 
-        void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler) where T : DomainServiceEventArgs;
+        Task SendEventAsync<T>(T args, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
 
-        void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler) where T : DomainServiceEventArgs;
+        void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+
+        void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
     }
 }

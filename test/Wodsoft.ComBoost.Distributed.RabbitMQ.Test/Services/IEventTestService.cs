@@ -8,6 +8,12 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
 {
     public interface IEventTestService : IDomainTemplate
     {
-        Task Test(string text);
+        Task FireHandleOnce(string text);
+
+        Task FireHandleMore(string text);
+
+        Task FireHandleOnceDelay(string text);
+
+        Task FireHandleMoreDelay(string text);
     }
 }
