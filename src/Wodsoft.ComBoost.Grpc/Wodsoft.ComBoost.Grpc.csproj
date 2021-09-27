@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" Version="2.40.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
-    <PackageReference Include="Wodsoft.Protobuf.Wrapper" Version="1.0.0-preview4" />
+    <PackageReference Include="Wodsoft.Protobuf.Wrapper" Version="1.0.0-preview5" />
   </ItemGroup>
 
   <ItemGroup>
