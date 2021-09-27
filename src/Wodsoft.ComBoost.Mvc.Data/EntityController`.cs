@@ -146,19 +146,14 @@ namespace Wodsoft.ComBoost.Mvc
         [HttpPost]
         public virtual async Task<IActionResult> Remove(TKey id)
         {
-            var model = await RemoveEntity(id);
-            return OnRemoveModelCreated(model);
+            await RemoveEntity(id);
+            return NoContent();
         }
 
-        protected virtual Task<IUpdateModel> RemoveEntity(TKey id)
+        protected virtual Task RemoveEntity(TKey id)
         {
             var domain = HttpContext.RequestServices.GetRequiredService<IEntityDomainTemplate<TKey, TListDTO, TCreateDTO, TEditDTO>>();
             return domain.Remove(id);
-        }
-
-        protected virtual IActionResult OnRemoveModelCreated(IUpdateModel model)
-        {
-            return View(model);
         }
 
         #endregion

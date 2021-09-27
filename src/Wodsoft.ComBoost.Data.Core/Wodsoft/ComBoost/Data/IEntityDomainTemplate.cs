@@ -24,6 +24,6 @@ namespace Wodsoft.ComBoost.Data
 
         Task<IUpdateModel<TEditDTO>> Edit(TEditDTO dto);
 
-        Task<IUpdateModel> Remove(TKey id);
+        Task Remove(TKey id);
     }
 }

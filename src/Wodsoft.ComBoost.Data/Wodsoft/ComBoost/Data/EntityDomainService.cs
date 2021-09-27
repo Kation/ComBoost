@@ -66,7 +66,9 @@ namespace Wodsoft.ComBoost.Data
             var entity = entityContext.Create();
             mapper.Map(dto, entity);
             entityContext.Add(entity);
+            await RaiseEvent(new EntityPreCreateEventArgs<TEntity>(entity));
             await entityContext.Database.SaveAsync();
+            await RaiseEvent(new EntityCreatedEventArgs<TEntity>(entity));
             UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>();
             model.Result = dto;
             model.IsSuccess = true;
@@ -86,9 +88,14 @@ namespace Wodsoft.ComBoost.Data
         public virtual async Task<IUpdateModel<TEditDTO>> Edit([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TEditDTO dto)
         {
             var entity = await entityContext.Query().Where(t => t.Id.Equals(dto.Id)).FirstOrDefaultAsync();
+            if (entity == null)
+                throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+            await RaiseEvent(new EntityEditMapEventArgs<TEntity, TEditDTO>(entity, dto));
             mapper.Map(dto, entity);
             entityContext.Update(entity);
+            await RaiseEvent(new EntityPreEditEventArgs<TEntity>(entity));
             await entityContext.Database.SaveAsync();
+            await RaiseEvent(new EntityEditedEventArgs<TEntity>(entity));
             UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>();
             model.Result = dto;
             model.IsSuccess = true;
@@ -105,19 +112,15 @@ namespace Wodsoft.ComBoost.Data
 
         #region Remove
 
-        public virtual async Task<IUpdateModel> Remove([FromService] IEntityContext<TEntity> entityContext, [FromValue] TKey id)
+        public virtual async Task Remove([FromService] IEntityContext<TEntity> entityContext, [FromValue] TKey id)
         {
             var entity = await entityContext.Query().Where(t => t.Id.Equals(id)).FirstOrDefaultAsync();
             if (entity == null)
-            {
-                return new UpdateModel() { IsSuccess = false };
-            }
-            else
-            {
-                entityContext.Remove(entity);
-                await entityContext.Database.SaveAsync();
-                return new UpdateModel() { IsSuccess = true };
-            }
+                throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+            await RaiseEvent(new EntityPreRemoveEventArgs<TEntity>(entity));
+            entityContext.Remove(entity);
+            await entityContext.Database.SaveAsync();
+            await RaiseEvent(new EntityRemovedEventArgs<TEntity>(entity));
         }
 
         #endregion
