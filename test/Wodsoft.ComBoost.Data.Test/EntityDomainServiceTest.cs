@@ -97,8 +97,7 @@ namespace Wodsoft.ComBoost.Data.Test
             await mock.RunAsync(async sp =>
             {
                 var template = sp.GetRequiredService<IEntityDomainTemplate<Guid, UserDto>>();
-                var model = await template.Remove(user.Id);
-                Assert.True(model.IsSuccess);
+                await template.Remove(user.Id);
             });
 
             await mock.RunAsync(async sp =>
