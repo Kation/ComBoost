@@ -6,6 +6,6 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public abstract class EntityDTOBase<T> : EntityDTOBase, IEntityDTO<T>
     {
-        public T Id { get; set; }
+        public virtual T Id { get; set; }
     }
 }
