@@ -7,7 +7,16 @@ using System.Threading;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class WrappedAsyncQueryable<T> : IAsyncQueryable<T>, IOrderedAsyncQueryable<T>
+    public abstract class WrappedAsyncQueryable : IAsyncQueryable
+    {
+        public abstract Type ElementType { get; }
+
+        public abstract Expression Expression { get; }
+
+        public abstract IAsyncQueryProvider Provider { get; }
+    }
+
+    public class WrappedAsyncQueryable<T> : WrappedAsyncQueryable, IAsyncQueryable<T>, IOrderedAsyncQueryable<T>
     {
         public WrappedAsyncQueryable(IQueryable<T> queryable)
         {
@@ -20,12 +29,12 @@ namespace Wodsoft.ComBoost.Data.Entity
             Expression = expression;
         }
 
-        public Type ElementType => typeof(T);
+        public override Type ElementType => typeof(T);
 
-        public Expression Expression { get; }
+        public override Expression Expression { get; }
 
         private WrappedAsyncQueryProvider _Provider;
-        public IAsyncQueryProvider Provider => _Provider;
+        public override IAsyncQueryProvider Provider => _Provider;
 
         public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {

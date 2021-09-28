@@ -103,6 +103,19 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
                         Id = Guid.NewGuid(),
                         Text = "theninclude"
                     }
+                },
+                Items = new List<SubItemEntity>
+                {
+                    new SubItemEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Test1"
+                    },
+                    new SubItemEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Test2"
+                    }
                 }
             });
             dataContext.SaveChanges();
@@ -324,6 +337,16 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
             var items = await entityContext.Query().Include("Include.ThenInclude").OrderBy(t => t.ValueInt).ThenBy(t => t.ValueDouble).ToArrayAsync();
             Assert.NotNull(items[5].Include);
             Assert.NotNull(items[5].Include.ThenInclude);
+        }
+
+        [Fact]
+        public async Task SelectManyTest()
+        {
+            var databaseContext = SeedData();
+            var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>();
+            var count = await entityContext.Query().Where(t => t.ValueInt == 5).SelectMany(t => t.Items).CountAsync();
+            var items = await entityContext.Query().SelectMany(t => t.Items, (t, x) => x.Name).ToArrayAsync();
+            Assert.Equal(2, items.Length);
         }
     }
 }

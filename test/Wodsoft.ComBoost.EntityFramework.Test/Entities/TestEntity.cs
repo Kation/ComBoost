@@ -20,5 +20,7 @@ namespace Wodsoft.ComBoost.EntityFramework.Test.Entities
         public Guid? IncludeId;
         private IncludeEntity _include;
         public IncludeEntity Include { get => _include; set { _include = value; IncludeId = value?.Id ?? Guid.Empty; } }
+
+        public ICollection<SubItemEntity> Items { get; set; }
     }
 }

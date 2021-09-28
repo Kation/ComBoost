@@ -154,6 +154,22 @@ namespace Wodsoft.ComBoost.Data.Entity
                         throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
                 }
             }
+            else if (node.Method.DeclaringType == typeof(QueryableExtensions))
+            {
+                switch (node.Method.Name)
+                {
+                    case "SelectMany":
+                        {
+                            var method = MapMethod(node.Method);
+                            if (method.GetParameters().Length == 2)
+                                return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
+                            else
+                                return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2]);
+                        }
+                    default:
+                        throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
+                }
+            }
             return base.VisitMethodCall(node);
         }
 
@@ -277,6 +293,34 @@ namespace Wodsoft.ComBoost.Data.Entity
                                 typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IIncludableQueryable<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(1), Type.MakeGenericMethodParameter(2))) })
                                 : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IIncludableQueryable<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(IEnumerable<>).MakeGenericType(Type.MakeGenericMethodParameter(1))), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(2), Type.MakeGenericMethodParameter(3))) })
                                 ).MakeGenericMethod(method.GetGenericArguments());
+                        default:
+                            return null;
+                    }
+                }
+                else if (method.DeclaringType == typeof(QueryableExtensions))
+                {
+                    switch (method.Name)
+                    {
+                        case "SelectMany":
+                            if (method.GetGenericArguments().Length == 2)
+                            {
+                                var type1 = Type.MakeGenericMethodParameter(0);
+                                var type2 = Type.MakeGenericMethodParameter(1);
+                                return (method.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments().Length == 2 ?
+                                    typeof(Queryable).GetMethod("SelectMany", 2, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(type1, typeof(IEnumerable<>).MakeGenericType(type2))) })
+                                    : typeof(Queryable).GetMethod("SelectMany", 2, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(type1, typeof(int), typeof(IEnumerable<>).MakeGenericType(type2))) }))
+                                    .MakeGenericMethod(method.GetGenericArguments());
+                            }
+                            else
+                            {
+                                var type1 = Type.MakeGenericMethodParameter(0);
+                                var type2 = Type.MakeGenericMethodParameter(1);
+                                var type3 = Type.MakeGenericMethodParameter(2);
+                                return (method.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments().Length == 2 ?
+                                    typeof(Queryable).GetMethod("SelectMany", 3, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(type1, typeof(IEnumerable<>).MakeGenericType(type2))), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(type1, type2, type3)) })
+                                    : typeof(Queryable).GetMethod("SelectMany", 3, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(type1, typeof(int), typeof(IEnumerable<>).MakeGenericType(type2))), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(type1, type2, type3)) }))
+                                    .MakeGenericMethod(method.GetGenericArguments());
+                            }
                         default:
                             return null;
                     }

@@ -154,6 +154,22 @@ namespace Wodsoft.ComBoost.Data.Entity
                         throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
                 }
             }
+            else if (node.Method.DeclaringType == typeof(QueryableExtensions))
+            {
+                switch (node.Method.Name)
+                {
+                    case "SelectMany":
+                        {
+                            var method = MapMethod(node.Method);
+                            if (method.GetParameters().Length == 2)
+                                return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
+                            else
+                                return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2]);
+                        }
+                    default:
+                        throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
+                }
+            }
             return base.VisitMethodCall(node);
         }
 
@@ -217,6 +233,16 @@ namespace Wodsoft.ComBoost.Data.Entity
                         case "ToDictionaryAsync":
                             return typeof(System.Data.Entity.QueryableExtensions).GetMember(method.Name).Cast<MethodInfo>().Where(t => t.GetGenericArguments().Length == method.GetGenericArguments().Length && t.GetParameters().Length == method.GetParameters().Length).First().MakeGenericMethod(method.GetGenericArguments());
                         #endregion
+                        default:
+                            return null;
+                    }
+                }
+                else if (method.DeclaringType == typeof(QueryableExtensions))
+                {
+                    switch (method.Name)
+                    {
+                        case "SelectMany":
+                            return typeof(Queryable).GetMember(method.Name).Cast<MethodInfo>().Where(t => t.GetGenericArguments().Length == method.GetGenericArguments().Length && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments().Length == method.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments().Length).First().MakeGenericMethod(method.GetGenericArguments());
                         default:
                             return null;
                     }
