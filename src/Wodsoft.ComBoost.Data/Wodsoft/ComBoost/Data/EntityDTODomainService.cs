@@ -32,6 +32,7 @@ namespace Wodsoft.ComBoost.Data
             if (!isOrdered)
                 queryable = queryable.OrderByDescending(t => t.CreationDate);
             ViewModel<TListDTO> model = new ViewModel<TListDTO>(queryable);
+            await RaiseEvent(new EntityQueryModelCreatedEventArgs<TListDTO>(model));
             return model;
         }
 
