@@ -7,6 +7,7 @@ using System.Text;
 namespace Wodsoft.ComBoost.Data
 {
     public class EntityQueryModelCreatedEventArgs<TModel> : DomainServiceEventArgs
+        where TModel : class
     {
         public EntityQueryModelCreatedEventArgs(IViewModel<TModel> model)
         {
