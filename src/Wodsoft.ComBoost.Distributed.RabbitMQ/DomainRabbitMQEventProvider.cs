@@ -135,7 +135,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
         public override bool CanHandleEvent<T>(IReadOnlyList<string> features)
         {
             var type = typeof(T);
-            bool result = false;
+            bool result = true;
             bool must = false;
             foreach (var feature in features)
             {
