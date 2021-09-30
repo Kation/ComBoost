@@ -12,8 +12,12 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
 
         Task FireHandleMore(string text);
 
+        Task FireHandleGroup(string text);
+
         Task FireHandleOnceDelay(string text);
 
         Task FireHandleMoreDelay(string text);
+
+        Task FireHandleGroupDelay(string text);
     }
 }

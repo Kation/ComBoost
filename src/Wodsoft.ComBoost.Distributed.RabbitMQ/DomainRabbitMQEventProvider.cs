@@ -21,14 +21,16 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
         private Dictionary<string, AsyncEventingBasicConsumer> _consumers = new Dictionary<string, AsyncEventingBasicConsumer>();
         private DomainRabbitMQEventOptions _options;
         private IServiceProvider _serviceProvider;
+        private DomainServiceDistributedEventOptions _eventOptions;
 
-        public DomainRabbitMQEventProvider(IDomainRabbitMQProvider provider, IOptions<DomainRabbitMQEventOptions> options, IServiceProvider serviceProvider)
+        public DomainRabbitMQEventProvider(IDomainRabbitMQProvider provider, IOptions<DomainRabbitMQEventOptions> options, IOptions<DomainServiceDistributedEventOptions> eventOptions, IServiceProvider serviceProvider)
         {
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));
             _connection = provider.GetConnection();
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _eventOptions = eventOptions?.Value ?? throw new ArgumentNullException(nameof(eventOptions));
         }
 
         public override Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
@@ -47,10 +49,10 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 }
                 else
                 {
-                    if (features.Contains(DomainDistributedEventFeatures.HandleOnce))
+                    if (features.Contains(DomainDistributedEventFeatures.HandleOnce) && !features.Contains(DomainDistributedEventFeatures.Group))
                         channel.BasicPublish("", name, properties, JsonSerializer.SerializeToUtf8Bytes(args));
                     else
-                        channel.BasicPublish(name, "", properties, JsonSerializer.SerializeToUtf8Bytes(args));
+                        channel.BasicPublish(name + "_EXCHANGE", "", properties, JsonSerializer.SerializeToUtf8Bytes(args));
                 }
             });
         }
@@ -62,8 +64,18 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             string queueName;
             if (features.Contains(DomainDistributedEventFeatures.HandleOnce))
             {
-                channel.QueueDeclare(name, true, false, false, null);
-                queueName = name;
+                if (features.Contains(DomainDistributedEventFeatures.Group))
+                {
+                    channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
+                    queueName = name + "_" + _eventOptions.GroupName;
+                    channel.QueueDeclare(queueName, true, false, false, null);
+                    channel.QueueBind(queueName, name + "_EXCHANGE", "");
+                }
+                else
+                {
+                    channel.QueueDeclare(name, true, false, false, null);
+                    queueName = name;
+                }
             }
             else
             {
@@ -75,7 +87,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             {
                 var args = new Dictionary<string, object>();
                 args["x-dead-letter-exchange"] = name + "_EXCHANGE";
-                if (features.Contains(DomainDistributedEventFeatures.HandleOnce))
+                if (features.Contains(DomainDistributedEventFeatures.HandleOnce) && !features.Contains(DomainDistributedEventFeatures.Group))
                 {
                     channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
                     channel.QueueBind(name, name + "_EXCHANGE", "");
@@ -124,6 +136,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
         {
             var type = typeof(T);
             bool result = false;
+            bool must = false;
             foreach (var feature in features)
             {
                 switch (feature)
@@ -132,16 +145,19 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         result = true;
                         break;
                     case DomainDistributedEventFeatures.MustHandle:
-                        result = true;
+                        must = true;
                         break;
                     case DomainDistributedEventFeatures.Delay:
+                        result = true;
+                        break;
+                    case DomainDistributedEventFeatures.Group:
                         result = true;
                         break;
                     default:
                         return false;
                 }
             }
-            return result;
+            return result && must;
         }
     }
 }
