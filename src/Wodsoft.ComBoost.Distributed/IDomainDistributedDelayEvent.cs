@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Wodsoft.ComBoost
 {
-    [DomainDistributedEventFeature("DELAY")]
+    [DomainDistributedEventFeature(DomainDistributedEventFeatures.Delay)]
     public interface IDomainDistributedDelayEvent
     {
         int Delay { get; set; }

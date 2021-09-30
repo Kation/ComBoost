@@ -34,5 +34,14 @@ namespace Wodsoft.ComBoost
             });
             return this;
         }
+
+        public IComBoostDistributedBuilder WithGroupName(string groupName)
+        {
+            Services.PostConfigure<DomainServiceDistributedEventOptions>(options =>
+            {
+                options.GroupName = groupName;
+            });
+            return this;
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Wodsoft.ComBoost
 {
-    [DomainDistributedEventFeature("MUST")]
+    [DomainDistributedEventFeature(DomainDistributedEventFeatures.MustHandle)]
     public interface IDomainDistributedMustHandleEvent
     {
     }

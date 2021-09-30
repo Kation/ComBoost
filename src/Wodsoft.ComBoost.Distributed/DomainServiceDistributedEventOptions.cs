@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace Wodsoft.ComBoost
@@ -19,5 +20,8 @@ namespace Wodsoft.ComBoost
         }
 
         internal Dictionary<Type, Delegate> GetEvents() => _events;
+
+        private string _groupName;
+        public string GroupName { get => _groupName ?? Assembly.GetEntryAssembly().FullName; set => _groupName = value; }
     }
 }

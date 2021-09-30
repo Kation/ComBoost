@@ -15,5 +15,7 @@ namespace Wodsoft.ComBoost
 
         IComBoostDistributedBuilder AddDistributedEventHandler<TArgs>(DomainServiceEventHandler<TArgs> handler)
             where TArgs : DomainServiceEventArgs;
+
+        IComBoostDistributedBuilder WithGroupName(string groupName);
     }
 }

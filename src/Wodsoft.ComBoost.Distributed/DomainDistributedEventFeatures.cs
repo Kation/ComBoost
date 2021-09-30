@@ -11,5 +11,7 @@ namespace Wodsoft.ComBoost
         public const string HandleOnce = "ONCE";
 
         public const string Delay = "DELAY";
+
+        public const string Group = "GROUP";
     }
 }
