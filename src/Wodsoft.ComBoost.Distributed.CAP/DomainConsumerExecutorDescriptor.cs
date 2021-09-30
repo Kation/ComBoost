@@ -21,10 +21,10 @@ namespace Wodsoft.ComBoost.Distributed.CAP
     {
         private DomainServiceEventHandler<T> _handler;
 
-        public DomainConsumerExecutorDescriptor(DomainServiceEventHandler<T> handler)
+        public DomainConsumerExecutorDescriptor(DomainServiceEventHandler<T> handler, string groupName)
         {
             _handler = handler ?? throw new ArgumentNullException(nameof(handler));
-            Attribute = new CapSubscribeAttribute(DomainDistributedEventProvider.GetTypeName(typeof(T))) { Group = "ComBoost.CAP" };
+            Attribute = new CapSubscribeAttribute(DomainDistributedEventProvider.GetTypeName(typeof(T))) { Group = groupName };
             Parameters = new List<ParameterDescriptor>
             {
                 new ParameterDescriptor{ ParameterType = typeof(T), IsFromCap = false }

@@ -26,8 +26,8 @@ namespace Wodsoft.ComBoost.Distributed.CAP
         {
             return _provider.Handlers.Select(t =>
             {
-                var argType = t.Method.GetParameters()[1].ParameterType;
-                var descriptor = (DomainConsumerExecutorDescriptor)Activator.CreateInstance(typeof(DomainConsumerExecutorDescriptor<>).MakeGenericType(argType), t);
+                var argType = t.Key.Method.GetParameters()[1].ParameterType;
+                var descriptor = (DomainConsumerExecutorDescriptor)Activator.CreateInstance(typeof(DomainConsumerExecutorDescriptor<>).MakeGenericType(argType), t.Key, t.Value);
                 return descriptor;
             }).ToList();
         }

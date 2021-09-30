@@ -12,8 +12,11 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
 {
     public class DistributedEventTest
     {
+        volatile int _handleOnceCount = 0;
+        volatile int _handleGroupCount = 0;
+
         [Fact]
-        public async Task CAPTest()
+        public async Task HandleOnceTest()
         {
             var serviceMock = Mock.Mock.CreateDefaultBuilder()
                 .ConfigureServices(services =>
@@ -22,7 +25,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                         .AddLocalService(builder =>
                         {
                             builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
-                            builder.AddEventHandler<DomainDistributedEventPublisher<TestEventArgs>, TestEventArgs>();
+                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleOnceEventArgs>, HandleOnceEventArgs>();
                         })
                         .AddDistributed(builder =>
                         {
@@ -41,23 +44,18 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                 })
                 .Build();
 
-            TaskCompletionSource taskCompletionSource = new TaskCompletionSource();
-
             string text = "Hello";
 
-            var clientMock = Mock.Mock.CreateDefaultBuilder()
+            var client1Mock = Mock.Mock.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
-                        //.AddLocalService(builder =>
-                        //{
-                        //})
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<TestEventArgs>((context, e) =>
+                            builder.AddDistributedEventHandler<HandleOnceEventArgs>((context, e) =>
                             {
                                 Assert.Equal(text, e.Text);
-                                taskCompletionSource.SetResult();
+                                _handleOnceCount++;
                                 return Task.CompletedTask;
                             });
                             builder.UseCAP(x =>
@@ -75,17 +73,216 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                 })
                 .Build();
 
-            await clientMock.StartHostedServiceAsync();
+            var client2Mock = Mock.Mock.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.AddDistributedEventHandler<HandleOnceEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleOnceCount++;
+                                return Task.CompletedTask;
+                            });
+                            builder.UseCAP(x =>
+                            {
+                                x.UseInMemoryStorage();
+                                x.UseRabbitMQ(options =>
+                                {
+                                    options.HostName = "127.0.0.1";
+                                    options.UserName = "guest";
+                                    options.Password = "guest";
+                                });
+                            });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            await client1Mock.StartHostedServiceAsync();
+            await client2Mock.StartHostedServiceAsync();
+
+            await Task.Delay(2000);
 
             await serviceMock.RunAsync(async sp =>
             {
                 var service = sp.GetRequiredService<IEventTestService>();
-                await service.Test(text);
+                await service.FireHandleOnce(text);
             });
 
-            await taskCompletionSource.Task;
+            await Task.Delay(2000);
 
-            await clientMock.StopHostedServiceAsync();
+            await client1Mock.StopHostedServiceAsync();
+            await client2Mock.StopHostedServiceAsync();
+
+            Assert.Equal(1, _handleOnceCount);
+        }
+
+        [Fact]
+        public async Task HandleGroupTest()
+        {
+            var serviceMock = Mock.Mock.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddLocalService(builder =>
+                        {
+                            builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
+                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleGroupEventArgs>, HandleGroupEventArgs>();
+                        })
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseCAP(x =>
+                            {
+                                x.UseInMemoryStorage();
+                                x.UseRabbitMQ(options =>
+                                {
+                                    options.HostName = "127.0.0.1";
+                                    options.UserName = "guest";
+                                    options.Password = "guest";
+                                });
+                            });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            string text = "Hello";
+
+            var group1client1Mock = Mock.Mock.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.WithGroupName("group1");
+                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleGroupCount++;
+                                return Task.CompletedTask;
+                            });
+                            builder.UseCAP(x =>
+                            {
+                                x.UseInMemoryStorage();
+                                x.UseRabbitMQ(options =>
+                                {
+                                    options.HostName = "127.0.0.1";
+                                    options.UserName = "guest";
+                                    options.Password = "guest";
+                                });
+                            });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            var group1client2Mock = Mock.Mock.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.WithGroupName("group1");
+                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleGroupCount++;
+                                return Task.CompletedTask;
+                            });
+                            builder.UseCAP(x =>
+                            {
+                                x.UseInMemoryStorage();
+                                x.UseRabbitMQ(options =>
+                                {
+                                    options.HostName = "127.0.0.1";
+                                    options.UserName = "guest";
+                                    options.Password = "guest";
+                                });
+                            });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            var group2client1Mock = Mock.Mock.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.WithGroupName("group2");
+                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleGroupCount++;
+                                return Task.CompletedTask;
+                            });
+                            builder.UseCAP(x =>
+                            {
+                                x.UseInMemoryStorage();
+                                x.UseRabbitMQ(options =>
+                                {
+                                    options.HostName = "127.0.0.1";
+                                    options.UserName = "guest";
+                                    options.Password = "guest";
+                                });
+                            });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            var group2client2Mock = Mock.Mock.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.WithGroupName("group2");
+                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleGroupCount++;
+                                return Task.CompletedTask;
+                            });
+                            builder.UseCAP(x =>
+                            {
+                                x.UseInMemoryStorage();
+                                x.UseRabbitMQ(options =>
+                                {
+                                    options.HostName = "127.0.0.1";
+                                    options.UserName = "guest";
+                                    options.Password = "guest";
+                                });
+                            });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            await group1client1Mock.StartHostedServiceAsync();
+            await group1client2Mock.StartHostedServiceAsync();
+            await group2client1Mock.StartHostedServiceAsync();
+            await group2client2Mock.StartHostedServiceAsync();
+
+            await Task.Delay(2000);
+
+            await serviceMock.RunAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IEventTestService>();
+                await service.FireHandleGroup(text);
+            });
+
+            await Task.Delay(2000);
+
+            await group1client1Mock.StopHostedServiceAsync();
+            await group1client2Mock.StopHostedServiceAsync();
+            await group2client1Mock.StopHostedServiceAsync();
+            await group2client2Mock.StopHostedServiceAsync();
+
+            Assert.Equal(2, _handleGroupCount);
         }
     }
 }

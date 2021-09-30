@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Distributed.CAP.Test.Services
 {
-    public interface IEventTestService : IDomainTemplate
+    public class HandleOnceEventArgs : DomainServiceEventArgs, IDomainDistributedHandleOnceEvent
     {
-        Task FireHandleOnce(string text);
-
-        Task FireHandleGroup(string text);
+        public string Text { get; set; }
     }
 }

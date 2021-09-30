@@ -8,9 +8,14 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test.Services
 {
     public class EventTestService : DomainService
     {
-        public Task Test([FromValue] string text)
+        public Task FireHandleOnce([FromValue] string text)
         {
-            return RaiseEvent(new TestEventArgs { Text = text });
+            return RaiseEvent(new HandleOnceEventArgs { Text = text });
+        }
+
+        public Task FireHandleGroup([FromValue] string text)
+        {
+            return RaiseEvent(new HandleGroupEventArgs { Text = text });
         }
     }
 }
