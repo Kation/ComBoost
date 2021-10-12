@@ -103,8 +103,13 @@ namespace Wodsoft.ComBoost.AspNetCore
             object value = GetValueCore(name, valueType);
             if (value == null && _Alias.TryGetValue(IgnoreCase ? name.ToLower() : name, out string alias))
                 value = GetValueCore(alias, valueType);
-            if (value == null || !valueType.IsAssignableFrom(value.GetType()))
+            if (value == null)
                 return null;
+            if (!valueType.IsAssignableFrom(value.GetType()))
+            {
+                var converter = TypeDescriptor.GetConverter(valueType);
+                value = converter.ConvertFrom(value);
+            }
             return value;
         }
 
@@ -120,7 +125,7 @@ namespace Wodsoft.ComBoost.AspNetCore
                 return _Values[IgnoreCase ? name.ToLower() : name];
             return GetHttpValue(name, valueType);
         }
-        
+
         /// <summary>
         /// 获取Http值。
         /// </summary>
