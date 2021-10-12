@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IComBoostBuilder AddDomainGlobalFilter<T>(this IComBoostBuilder builder)
+        public static IComBoostBuilder AddGlobalFilter<T>(this IComBoostBuilder builder)
             where T : class, IDomainServiceFilter, new()
         {
             builder.Services.PostConfigure<DomainFilterOptions>(options =>
