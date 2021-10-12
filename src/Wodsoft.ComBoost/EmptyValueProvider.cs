@@ -75,10 +75,18 @@ namespace Wodsoft.ComBoost
             }
             if (value == null)
                 return null;
-            if (!valueType.IsAssignableFrom(value.GetType()))
+            var currentType = value.GetType();
+            if (!valueType.IsAssignableFrom(currentType))
             {
                 var converter = TypeDescriptor.GetConverter(valueType);
-                value = converter.ConvertFrom(value);
+                if (converter.CanConvertFrom(currentType))
+                    value = converter.ConvertFrom(value);
+                else
+                {
+                    var currentConverter = TypeDescriptor.GetConverter(currentType);
+                    var currentStringValue = currentConverter.ConvertToString(value);
+                    value = converter.ConvertFromString(currentStringValue);
+                }
             }
             return value;
         }
