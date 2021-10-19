@@ -34,6 +34,7 @@ namespace Wodsoft.ComBoost
             _DomainService = domainService;
             _Context = domainContext;
             _Method = method;
+            _Parameters = _Method.GetParameters();
             _ParameterValues = parameters;
         }
 
