@@ -190,7 +190,7 @@ namespace Wodsoft.ComBoost
             {
                 invokeILGenerator.Emit(OpCodes.Dup);
                 invokeILGenerator.Emit(OpCodes.Ldc_I4, i);
-                invokeILGenerator.Emit(OpCodes.Ldarga_S, (byte)(i + 1));
+                invokeILGenerator.Emit(OpCodes.Ldarg_S, (byte)(i + 1));
                 if (parameters[i].ParameterType.IsValueType)
                     invokeILGenerator.Emit(OpCodes.Box, parameters[i].ParameterType);
                 invokeILGenerator.Emit(OpCodes.Stelem_Ref);
