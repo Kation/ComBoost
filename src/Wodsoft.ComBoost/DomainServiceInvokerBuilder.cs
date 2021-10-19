@@ -156,7 +156,8 @@ namespace Wodsoft.ComBoost
             var invokeILGenerator = invokeMethod.GetILGenerator();
 
             int count = 0;
-            foreach (var parameter in method.GetParameters())
+            var parameters = method.GetParameters();
+            foreach (var parameter in parameters)
             {
                 var field = type.DefineField("Parameter" + parameter.Name, parameter.ParameterType, FieldAttributes.Public);
                 //Load value for calling method
@@ -190,8 +191,8 @@ namespace Wodsoft.ComBoost
                 invokeILGenerator.Emit(OpCodes.Dup);
                 invokeILGenerator.Emit(OpCodes.Ldc_I4, i);
                 invokeILGenerator.Emit(OpCodes.Ldarga_S, (byte)(i + 1));
-                //if (locals[i].LocalType.IsValueType)
-                //    invokeILGenerator.Emit(OpCodes.Box, locals[i].LocalType);
+                if (parameters[i].ParameterType.IsValueType)
+                    invokeILGenerator.Emit(OpCodes.Box, parameters[i].ParameterType);
                 invokeILGenerator.Emit(OpCodes.Stelem_Ref);
             }
             invokeILGenerator.Emit(OpCodes.Newobj, _ExecutionContextConstructor);
