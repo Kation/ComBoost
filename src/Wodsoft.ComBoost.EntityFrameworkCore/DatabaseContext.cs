@@ -36,7 +36,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             TrackEntity = false;
             _CachedEntityContext = new Dictionary<Type, object>();
             InnerContext = context;
-            context.ChangeTracker.AutoDetectChangesEnabled = false;
         }
 
         public Task<int> SaveAsync()
