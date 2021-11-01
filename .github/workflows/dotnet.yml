@@ -43,6 +43,12 @@ jobs:
         dotnet pack -c Release src/Wodsoft.ComBoost.Grpc/Wodsoft.ComBoost.Grpc.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Grpc.AspNetCore/Wodsoft.ComBoost.Grpc.AspNetCore.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Grpc.Client/Wodsoft.ComBoost.Grpc.Client.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation/Wodsoft.ComBoost.Aggregation.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Caching/Wodsoft.ComBoost.Aggregation.Caching.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Data/Wodsoft.ComBoost.Aggregation.Data.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Json/Wodsoft.ComBoost.Aggregation.Json.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Mvc/Wodsoft.ComBoost.Aggregation.Mvc.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.NewtonsoftJson/Wodsoft.ComBoost.Aggregation.NewtonsoftJson.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
     - name: Publish package
       run: |
         cd nupkgs
