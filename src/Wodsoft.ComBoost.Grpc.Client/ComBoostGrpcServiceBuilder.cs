@@ -21,6 +21,10 @@ namespace Wodsoft.ComBoost.Grpc.Client
 
         public IServiceCollection Services { get; }
 
+        public Uri Address => _address;
+
+        public Func<IServiceProvider, GrpcChannelOptions> OptionsFactory => _optionsFactory;
+
         IComBoostGrpcServiceBuilder IComBoostGrpcServiceBuilder.UseTemplate<T>(CallOptions callOptions)
         {
             Services.AddSingleton<IDomainTemplateDescriptor<T>, GrpcTemplateBuilder<T>>(sp =>
