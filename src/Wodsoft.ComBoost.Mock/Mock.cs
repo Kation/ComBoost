@@ -21,6 +21,9 @@ namespace Wodsoft.ComBoost.Mock
         }
 
         private bool _disposed = false;
+
+        public IServiceProvider ServiceProvider => _serviceProvider;
+
         public void Dispose()
         {
             if (!_disposed)
