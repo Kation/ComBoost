@@ -24,5 +24,13 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddSingleton<IAuthenticationProvider, AnonymousAuthenticationProvider>();
             return builder;
         }
+
+        public static IComBoostBuilder AddMockService(this IComBoostBuilder builder, Func<IMock> mockGetter, Action<IComBoostMockServiceBuilder> builderConfigure)
+        {
+            if (builderConfigure == null)
+                throw new ArgumentNullException(nameof(builderConfigure));
+            builderConfigure(new ComBoostMockServiceBuilder(builder.Services, mockGetter));
+            return builder;
+        }
     }
 }
