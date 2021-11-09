@@ -28,6 +28,8 @@ namespace Wodsoft.ComBoost.Test
 
                 Assert.Equal("Hi.", await greeter.Hello());
                 Assert.Equal("Hi.", await greeter.Hello("I'm Kation."));
+
+                await greeter.Test(Guid.NewGuid());
             }
         }
     }

@@ -18,5 +18,10 @@ namespace Wodsoft.ComBoost.Test
             Debug.WriteLine("Receive hello: " + text);
             return Task.FromResult("Hi.");
         }
+
+        public Task Test(Guid id)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

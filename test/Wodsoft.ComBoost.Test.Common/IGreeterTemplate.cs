@@ -12,5 +12,7 @@ namespace Wodsoft.ComBoost.Test
         Task<string> Hello();
 
         Task<string> Hello(string text);
+
+        Task Test(Guid id);
     }
 }

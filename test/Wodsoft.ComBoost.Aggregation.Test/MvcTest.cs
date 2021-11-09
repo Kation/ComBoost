@@ -29,7 +29,7 @@ namespace Wodsoft.ComBoost.Aggregation.Test
             orgServiceMock = Mock.Mock.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddDbContext<OrganizationDataContext>(options => options.UseInMemoryDatabase("OrganizationDataContext"));
+                    services.AddDbContext<OrganizationDataContext>(options => options.UseInMemoryDatabase("MvcOrganizationDataContext"));
                     services.AddEFCoreContext<OrganizationDataContext>();
                     services.AddComBoost()
                         .AddLocalService(builder =>
@@ -54,7 +54,7 @@ namespace Wodsoft.ComBoost.Aggregation.Test
                         .ConfigureServices(services =>
                         {
                             services.AddControllers();
-                            services.AddDbContext<UserDataContext>(options => options.UseInMemoryDatabase("UserDataContext"));
+                            services.AddDbContext<UserDataContext>(options => options.UseInMemoryDatabase("MvcUserDataContext"));
                             services.AddEFCoreContext<UserDataContext>();
                             services.AddComBoost()
                                 .AddLocalService(builder =>

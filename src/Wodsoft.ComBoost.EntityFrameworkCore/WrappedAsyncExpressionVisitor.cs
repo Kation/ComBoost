@@ -212,12 +212,13 @@ namespace Wodsoft.ComBoost.Data.Entity
                                 typeof(Queryable).GetMethod("Select", 2, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1))) })
                                 : typeof(Queryable).GetMethod("Select", 2, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(int), Type.MakeGenericMethodParameter(1))) }))
                                 .MakeGenericMethod(method.GetGenericArguments());
-                        case "Reverse":
+                        case "Reverse": 
+                            return typeof(Queryable).GetMethod(method.Name).MakeGenericMethod(method.GetGenericArguments());
                         case "Skip":
                         case "SkipLast":
                         case "Take":
                         case "TakeLast":
-                            return typeof(Queryable).GetMethod(method.Name).MakeGenericMethod(method.GetGenericArguments());
+                            return typeof(Queryable).GetTypeInfo().GetDeclaredMethods(method.Name).First(t=>t.IsGenericMethod && t.GetParameters()[1].ParameterType == method.GetParameters()[1].ParameterType).MakeGenericMethod(method.GetGenericArguments());
                         case "SkipWhile":
                         case "TakeWhile":
                         case "Where":

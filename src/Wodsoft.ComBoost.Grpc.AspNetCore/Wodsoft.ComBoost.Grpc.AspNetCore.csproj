@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Description>ComBoost Grpc AspNetCore服务端。</Description>
-    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
   </PropertyGroup>
   <Import Project="../../common.props" />
 

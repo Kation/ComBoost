@@ -205,7 +205,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                         case "SkipLast":
                         case "Take":
                         case "TakeLast":
-                            return typeof(Queryable).GetMethod(method.Name).MakeGenericMethod(method.GetGenericArguments());
+                            return typeof(Queryable).GetTypeInfo().GetDeclaredMethods(method.Name).First(t => t.IsGenericMethod && t.GetParameters()[1].ParameterType == method.GetParameters()[1].ParameterType).MakeGenericMethod(method.GetGenericArguments());
                         #endregion
                         #region ReadMethod
                         case "AllAsync":
