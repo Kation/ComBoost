@@ -1,8 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>ComBoost聚合服务数据层。</Description>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+  <Import Project="../../common.props" />
 
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Aggregation\Wodsoft.ComBoost.Aggregation.csproj" />
