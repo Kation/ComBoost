@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Mock
 {
+    [Obsolete("Pleause use IHost instead of IMock.")]
     public interface IMock : IDisposable
     {
         Task StartHostedServiceAsync();

@@ -16,17 +16,27 @@ using Wodsoft.ComBoost.Aggregation.Test.Models;
 using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Mock;
 using Xunit;
+using Xunit.Abstractions;
 
+[assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, DisableTestParallelization = true)]
 namespace Wodsoft.ComBoost.Aggregation.Test
 {
+    [Collection("MvcTest")]
     public class MvcTest
     {
+        private readonly ITestOutputHelper _output;
+
+        public MvcTest(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [Fact]
         public async Task JsonTest()
         {
-            IMock orgServiceMock = null;
+            IHost orgServiceMock = null;
 
-            orgServiceMock = Mock.Mock.CreateDefaultBuilder()
+            orgServiceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddDbContext<OrganizationDataContext>(options => options.UseInMemoryDatabase("MvcOrganizationDataContext"));
@@ -117,6 +127,7 @@ namespace Wodsoft.ComBoost.Aggregation.Test
 
             var client = host.GetTestClient();
             var result = await client.GetStringAsync("user");
+            _output.WriteLine(result);
             var doc = JsonDocument.Parse(result);
             Assert.Equal(1, doc.RootElement.GetArrayLength());
             Assert.Throws<KeyNotFoundException>(() => doc.RootElement[0].GetProperty("organizationId"));

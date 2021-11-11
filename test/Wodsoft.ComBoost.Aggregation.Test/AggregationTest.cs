@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ using Xunit;
 
 namespace Wodsoft.ComBoost.Aggregation.Test
 {
+    [Collection("AggregationTest")]
     public class AggregationTest
     {
         [Fact]
@@ -31,9 +33,9 @@ namespace Wodsoft.ComBoost.Aggregation.Test
         [Fact]
         public async Task User_Organization_Test()
         {
-            IMock userServiceMock = null, orgServiceMock = null;
+            IHost userServiceMock = null, orgServiceMock = null;
 
-            userServiceMock = Mock.Mock.CreateDefaultBuilder()
+            userServiceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddDbContext<UserDataContext>(options => options.UseInMemoryDatabase("UserDataContext"));
@@ -57,7 +59,7 @@ namespace Wodsoft.ComBoost.Aggregation.Test
                 })
                 .Build();
 
-            orgServiceMock = Mock.Mock.CreateDefaultBuilder()
+            orgServiceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddDbContext<OrganizationDataContext>(options => options.UseInMemoryDatabase("OrganizationDataContext"));

@@ -21,7 +21,7 @@ namespace Wodsoft.ComBoost.Data.Test
         [Fact]
         public async Task CURDTest()
         {
-            var mock = Mock.Mock.CreateDefaultBuilder()
+            var mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase("Wodsoft.ComBoost.Data.Test"));

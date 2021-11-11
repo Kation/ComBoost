@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,7 +23,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
         [Fact]
         public async Task HandleOnceTest()
         {
-            var serviceMock = Mock.Mock.CreateDefaultBuilder()
+            var serviceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -42,7 +43,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
             string text = "Hello";
 
 
-            var client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -60,7 +61,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            var client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -78,8 +79,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            await client1Mock.StartHostedServiceAsync();
-            await client2Mock.StartHostedServiceAsync();
+            await client1Mock.StartAsync();
+            await client2Mock.StartAsync();
 
             await serviceMock.RunAsync(async sp =>
             {
@@ -89,8 +90,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             await Task.Delay(1000);
 
-            await client1Mock.StopHostedServiceAsync();
-            await client2Mock.StopHostedServiceAsync();
+            await client1Mock.StopAsync();
+            await client2Mock.StopAsync();
 
             Assert.Equal(1, _handleOnceCount);
         }
@@ -99,7 +100,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
         [Fact]
         public async Task HandleMoreTest()
         {
-            var serviceMock = Mock.Mock.CreateDefaultBuilder()
+            var serviceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -118,7 +119,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             string text = "Hello";
 
-            var client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -136,7 +137,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            var client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -154,8 +155,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            await client1Mock.StartHostedServiceAsync();
-            await client2Mock.StartHostedServiceAsync();
+            await client1Mock.StartAsync();
+            await client2Mock.StartAsync();
 
             await serviceMock.RunAsync(async sp =>
             {
@@ -165,8 +166,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             await Task.Delay(2000);
 
-            await client1Mock.StopHostedServiceAsync();
-            await client2Mock.StopHostedServiceAsync();
+            await client1Mock.StopAsync();
+            await client2Mock.StopAsync();
 
             Assert.Equal(2, _handleMoreCount);
         }
@@ -174,7 +175,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
         [Fact]
         public async Task HandleOnceDelayTest()
         {
-            var serviceMock = Mock.Mock.CreateDefaultBuilder()
+            var serviceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -195,7 +196,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             Stopwatch stopwatch = new Stopwatch();
 
-            var client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -214,7 +215,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            var client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -233,8 +234,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            await client1Mock.StartHostedServiceAsync();
-            await client2Mock.StartHostedServiceAsync();
+            await client1Mock.StartAsync();
+            await client2Mock.StartAsync();
 
             await serviceMock.RunAsync(async sp =>
             {
@@ -246,8 +247,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
             await Task.Delay(3000);
             Assert.True(stopwatch.ElapsedMilliseconds >= 2000);
 
-            await client1Mock.StopHostedServiceAsync();
-            await client2Mock.StopHostedServiceAsync();
+            await client1Mock.StopAsync();
+            await client2Mock.StopAsync();
 
             Assert.Equal(1, _handleOnceDelayCount);
         }
@@ -255,7 +256,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
         [Fact]
         public async Task HandleMoreDelayTest()
         {
-            var serviceMock = Mock.Mock.CreateDefaultBuilder()
+            var serviceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -276,7 +277,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             Stopwatch stopwatch = new Stopwatch();
 
-            var client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -295,7 +296,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            var client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -314,8 +315,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            await client1Mock.StartHostedServiceAsync();
-            await client2Mock.StartHostedServiceAsync();
+            await client1Mock.StartAsync();
+            await client2Mock.StartAsync();
 
             await serviceMock.RunAsync(async sp =>
             {
@@ -327,8 +328,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
             await Task.Delay(3000);
             Assert.True(stopwatch.ElapsedMilliseconds >= 2000);
 
-            await client1Mock.StopHostedServiceAsync();
-            await client2Mock.StopHostedServiceAsync();
+            await client1Mock.StopAsync();
+            await client2Mock.StopAsync();
 
             Assert.Equal(2, _handleMoreDelayCount);
         }
@@ -336,7 +337,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
         [Fact]
         public async Task HandleGroupTest()
         {
-            var serviceMock = Mock.Mock.CreateDefaultBuilder()
+            var serviceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -357,7 +358,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             Stopwatch stopwatch = new Stopwatch();
 
-            var group1Client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var group1Client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -377,7 +378,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            var group1Client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var group1Client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -397,7 +398,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            var group2Client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var group2Client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -417,7 +418,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            var group2Client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var group2Client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -437,10 +438,10 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            await group1Client1Mock.StartHostedServiceAsync();
-            await group1Client2Mock.StartHostedServiceAsync();
-            await group2Client1Mock.StartHostedServiceAsync();
-            await group2Client2Mock.StartHostedServiceAsync();
+            await group1Client1Mock.StartAsync();
+            await group1Client2Mock.StartAsync();
+            await group2Client1Mock.StartAsync();
+            await group2Client2Mock.StartAsync();
 
             await serviceMock.RunAsync(async sp =>
             {
@@ -451,10 +452,10 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             await Task.Delay(3000);
 
-            await group1Client1Mock.StopHostedServiceAsync();
-            await group1Client2Mock.StopHostedServiceAsync();
-            await group2Client1Mock.StopHostedServiceAsync();
-            await group2Client2Mock.StopHostedServiceAsync();
+            await group1Client1Mock.StopAsync();
+            await group1Client2Mock.StopAsync();
+            await group2Client1Mock.StopAsync();
+            await group2Client2Mock.StopAsync();
 
             Assert.Equal(2, _handleGroupCount);
         }
@@ -463,7 +464,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
         [Fact]
         public async Task HandleGroupDelayTest()
         {
-            var serviceMock = Mock.Mock.CreateDefaultBuilder()
+            var serviceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -484,7 +485,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             Stopwatch stopwatch = new Stopwatch();
 
-            var group1Client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var group1Client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -504,7 +505,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            var group1Client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var group1Client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -524,7 +525,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            var group2Client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var group2Client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -544,7 +545,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            var group2Client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var group2Client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -564,10 +565,10 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 })
                 .Build();
 
-            await group1Client1Mock.StartHostedServiceAsync();
-            await group1Client2Mock.StartHostedServiceAsync();
-            await group2Client1Mock.StartHostedServiceAsync();
-            await group2Client2Mock.StartHostedServiceAsync();
+            await group1Client1Mock.StartAsync();
+            await group1Client2Mock.StartAsync();
+            await group2Client1Mock.StartAsync();
+            await group2Client2Mock.StartAsync();
 
             await serviceMock.RunAsync(async sp =>
             {
@@ -579,10 +580,10 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
             await Task.Delay(3000);
             Assert.True(stopwatch.ElapsedMilliseconds >= 2000);
 
-            await group1Client1Mock.StopHostedServiceAsync();
-            await group1Client2Mock.StopHostedServiceAsync();
-            await group2Client1Mock.StopHostedServiceAsync();
-            await group2Client2Mock.StopHostedServiceAsync();
+            await group1Client1Mock.StopAsync();
+            await group1Client2Mock.StopAsync();
+            await group2Client1Mock.StopAsync();
+            await group2Client2Mock.StopAsync();
 
             Assert.Equal(2, _handleGroupCount);
         }

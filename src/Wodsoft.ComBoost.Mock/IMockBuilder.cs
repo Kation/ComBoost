@@ -17,6 +17,7 @@ namespace Wodsoft.ComBoost.Mock
 
         IMockBuilder ConfigureLogging(Action<ILoggingBuilder> configureLogging);
 
+        [Obsolete]
         IMock Build();
     }
 }

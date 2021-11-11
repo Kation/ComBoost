@@ -12,6 +12,7 @@ using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.Mock
 {
+    [Obsolete("Pleause use IHost instead of IMock.")]
     public class Mock : IMock
     {
         private IServiceProvider _serviceProvider;
@@ -53,6 +54,7 @@ namespace Wodsoft.ComBoost.Mock
             }
         }
 
+        [Obsolete("Pleause use Host.CreateDefaultBuilder() instead of Mock.CreateDefaultBuilder().")]
         public static IMockBuilder CreateDefaultBuilder()
         {
             var builder = new MockBuilder()

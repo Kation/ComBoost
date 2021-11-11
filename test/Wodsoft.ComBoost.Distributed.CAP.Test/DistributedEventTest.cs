@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
         [Fact]
         public async Task HandleOnceTest()
         {
-            var serviceMock = Mock.Mock.CreateDefaultBuilder()
+            var serviceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -46,7 +47,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
 
             string text = "Hello";
 
-            var client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -73,7 +74,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                 })
                 .Build();
 
-            var client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -100,8 +101,8 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                 })
                 .Build();
 
-            await client1Mock.StartHostedServiceAsync();
-            await client2Mock.StartHostedServiceAsync();
+            await client1Mock.StartAsync();
+            await client2Mock.StartAsync();
 
             await Task.Delay(2000);
 
@@ -113,8 +114,8 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
 
             await Task.Delay(2000);
 
-            await client1Mock.StopHostedServiceAsync();
-            await client2Mock.StopHostedServiceAsync();
+            await client1Mock.StopAsync();
+            await client2Mock.StopAsync();
 
             Assert.Equal(1, _handleOnceCount);
         }
@@ -122,7 +123,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
         [Fact]
         public async Task HandleGroupTest()
         {
-            var serviceMock = Mock.Mock.CreateDefaultBuilder()
+            var serviceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -150,7 +151,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
 
             string text = "Hello";
 
-            var group1client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var group1client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -178,7 +179,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                 })
                 .Build();
 
-            var group1client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var group1client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -206,7 +207,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                 })
                 .Build();
 
-            var group2client1Mock = Mock.Mock.CreateDefaultBuilder()
+            var group2client1Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -234,7 +235,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                 })
                 .Build();
 
-            var group2client2Mock = Mock.Mock.CreateDefaultBuilder()
+            var group2client2Mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddComBoost()
@@ -262,10 +263,10 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                 })
                 .Build();
 
-            await group1client1Mock.StartHostedServiceAsync();
-            await group1client2Mock.StartHostedServiceAsync();
-            await group2client1Mock.StartHostedServiceAsync();
-            await group2client2Mock.StartHostedServiceAsync();
+            await group1client1Mock.StartAsync();
+            await group1client2Mock.StartAsync();
+            await group2client1Mock.StartAsync();
+            await group2client2Mock.StartAsync();
 
             await Task.Delay(2000);
 
@@ -277,10 +278,10 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
 
             await Task.Delay(2000);
 
-            await group1client1Mock.StopHostedServiceAsync();
-            await group1client2Mock.StopHostedServiceAsync();
-            await group2client1Mock.StopHostedServiceAsync();
-            await group2client2Mock.StopHostedServiceAsync();
+            await group1client1Mock.StopAsync();
+            await group1client2Mock.StopAsync();
+            await group2client1Mock.StopAsync();
+            await group2client2Mock.StopAsync();
 
             Assert.Equal(2, _handleGroupCount);
         }

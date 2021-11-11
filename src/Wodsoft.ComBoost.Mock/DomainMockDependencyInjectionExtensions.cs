@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Hosting;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Wodsoft.ComBoost;
@@ -25,11 +26,20 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
+        [Obsolete]
         public static IComBoostBuilder AddMockService(this IComBoostBuilder builder, Func<IMock> mockGetter, Action<IComBoostMockServiceBuilder> builderConfigure)
         {
             if (builderConfigure == null)
                 throw new ArgumentNullException(nameof(builderConfigure));
-            builderConfigure(new ComBoostMockServiceBuilder(builder.Services, mockGetter));
+            builderConfigure(new ComBoostMockServiceBuilder(builder.Services, () => mockGetter().ServiceProvider));
+            return builder;
+        }
+
+        public static IComBoostBuilder AddMockService(this IComBoostBuilder builder, Func<IHost> hostGetter, Action<IComBoostMockServiceBuilder> builderConfigure)
+        {
+            if (builderConfigure == null)
+                throw new ArgumentNullException(nameof(builderConfigure));
+            builderConfigure(new ComBoostMockServiceBuilder(builder.Services, () => hostGetter().Services));
             return builder;
         }
     }

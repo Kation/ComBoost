@@ -7,12 +7,12 @@ namespace Wodsoft.ComBoost.Mock
 {
     public class ComBoostMockServiceBuilder : IComBoostMockServiceBuilder
     {
-        private Func<IMock> _mockGetter;
+        private Func<IServiceProvider> _servicesGetter;
 
-        public ComBoostMockServiceBuilder(IServiceCollection services, Func<IMock> mockGetter)
+        public ComBoostMockServiceBuilder(IServiceCollection services, Func<IServiceProvider> servicesGetter)
         {
             Services = services;
-            _mockGetter = mockGetter;
+            _servicesGetter = servicesGetter;
             services.AddScoped<IMockServiceLifecycle, MockServiceLifecycle>();
         }
 
@@ -24,8 +24,7 @@ namespace Wodsoft.ComBoost.Mock
             Services.AddScoped(sp =>
             {
                 var lifecycle = sp.GetService<IMockServiceLifecycle>();
-                var mock = _mockGetter();
-                var scope = mock.ServiceProvider.CreateScope();
+                var scope = _servicesGetter().CreateScope();
                 lifecycle.Register(() => scope.Dispose());
                 return scope.ServiceProvider.GetService<TService>();
             });

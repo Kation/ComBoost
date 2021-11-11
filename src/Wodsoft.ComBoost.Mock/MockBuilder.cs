@@ -27,6 +27,7 @@ namespace Wodsoft.ComBoost.Mock
             return this;
         }
 
+        [Obsolete]
         public IMock Build()
         {
             _config = _configBuilder.Build();
