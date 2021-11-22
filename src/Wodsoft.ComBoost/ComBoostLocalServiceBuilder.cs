@@ -14,9 +14,10 @@ namespace Wodsoft.ComBoost
         private static MethodInfo _GetRequiredServiceMethodInfo = typeof(ServiceProviderServiceExtensions).GetMethod("GetRequiredService", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IServiceProvider) }, null);
         private static MethodInfo _GetContextMethodInfo = typeof(IDomainContextProvider).GetMethod("GetContext");
 
-        public ComBoostLocalServiceBuilder(IServiceCollection services)
+        public ComBoostLocalServiceBuilder(IServiceCollection services, IComBoostLocalBuilder builder)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
+            LocalBuilder = builder ?? throw new ArgumentNullException(nameof(builder));
 
             var type = typeof(TService);
             var descriptors = type.GetCustomAttributes<DomainTemplateImplementerAttribute>();
@@ -35,6 +36,8 @@ namespace Wodsoft.ComBoost
         }
 
         public IServiceCollection Services { get; }
+
+        public IComBoostLocalBuilder LocalBuilder { get; }
 
         public IComBoostLocalServiceBuilder<TService> UseFilter<T>(params string[] methods)
             where T : class, IDomainServiceFilter, new()

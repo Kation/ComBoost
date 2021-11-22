@@ -9,6 +9,8 @@ namespace Wodsoft.ComBoost
     {
         IServiceCollection Services { get; }
 
+        IComBoostLocalBuilder LocalBuilder { get; }
+
         IComBoostLocalServiceBuilder<TService> UseTemplate<TTemplate>() where TTemplate : class, IDomainTemplate;
 
         IComBoostLocalServiceBuilder<TService> UseFilter<TTemplate>(params string[] methods) where TTemplate : class, IDomainServiceFilter, new();
