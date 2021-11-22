@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -101,7 +102,18 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 var args = JsonSerializer.Deserialize<T>(e.Body.Span);
                 DomainContext domainContext = new EmptyDomainContext(_serviceProvider.CreateScope().ServiceProvider, default(CancellationToken));
                 DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
-                await handler(executionContext, args);
+                var logger = domainContext.GetRequiredService<ILogger<DomainServiceEventHandler<T>>>();
+                try
+                {
+                    await handler(executionContext, args);
+                    logger.LogInformation("Event handle successfully.");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, ex.Message);
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
+                    throw;
+                }
                 channel.BasicAck(e.DeliveryTag, false);
             };
             channel.BasicConsume(queueName, false, consumer);

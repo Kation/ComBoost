@@ -1,5 +1,7 @@
 ﻿using DotNetCore.CAP;
 using DotNetCore.CAP.Internal;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -33,11 +35,22 @@ namespace Wodsoft.ComBoost.Distributed.CAP
 
         public override Type ArgumentType => typeof(T);
 
-        public override Task HandleAsync(IServiceProvider serviceProvider, object value, CancellationToken cancellation)
+        public override async Task HandleAsync(IServiceProvider serviceProvider, object value, CancellationToken cancellation)
         {
             DomainContext domainContext = new EmptyDomainContext(serviceProvider, cancellation);
             DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
-            return _handler(executionContext, (T)value);
+            var logger = serviceProvider.GetRequiredService<ILogger<DomainServiceEventHandler<T>>>();
+            try
+            {
+                await _handler(executionContext, (T)value);
+                logger.LogInformation("Event handle successfully.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
+                throw;
+            }
         }
     }
 }

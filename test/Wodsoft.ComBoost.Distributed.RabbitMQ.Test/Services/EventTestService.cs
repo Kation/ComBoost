@@ -15,7 +15,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
 
         public Task FireHandleMoreDelay([FromValue] string text)
         {
-            return RaiseEvent(new HandleMoreDelayEventArgs { Text = text, Delay = 2000 });
+            return RaiseEvent(new HandleMoreDelayEventArgs { Text = text, Delay = 5000 });
         }
 
         public Task FireHandleOnce([FromValue] string text)
@@ -25,7 +25,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
 
         public Task FireHandleOnceDelay([FromValue] string text)
         {
-            return RaiseEvent(new HandleOnceDelayEventArgs { Text = text, Delay = 2000 });
+            return RaiseEvent(new HandleOnceDelayEventArgs { Text = text, Delay = 5000 });
         }
 
         public Task FireHandleGroup([FromValue] string text)
@@ -35,7 +35,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
 
         public Task FireHandleGroupDelay([FromValue] string text)
         {
-            return RaiseEvent(new HandleGroupDelayEventArgs { Text = text, Delay = 2000 });
+            return RaiseEvent(new HandleGroupDelayEventArgs { Text = text, Delay = 5000 });
         }
     }
 }

@@ -244,8 +244,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 await service.FireHandleOnceDelay(text);
             });
 
-            await Task.Delay(3000);
-            Assert.True(stopwatch.ElapsedMilliseconds >= 2000);
+            await Task.Delay(8000);
+            Assert.True(stopwatch.ElapsedMilliseconds >= 5000);
 
             await client1Mock.StopAsync();
             await client2Mock.StopAsync();
@@ -325,8 +325,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 await service.FireHandleMoreDelay(text);
             });
 
-            await Task.Delay(3000);
-            Assert.True(stopwatch.ElapsedMilliseconds >= 2000);
+            await Task.Delay(8000);
+            Assert.True(stopwatch.ElapsedMilliseconds >= 5000);
 
             await client1Mock.StopAsync();
             await client2Mock.StopAsync();
@@ -577,8 +577,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                 await service.FireHandleGroupDelay(text);
             });
 
-            await Task.Delay(3000);
-            Assert.True(stopwatch.ElapsedMilliseconds >= 2000);
+            await Task.Delay(8000);
+            Assert.True(stopwatch.ElapsedMilliseconds >= 5000);
 
             await group1Client1Mock.StopAsync();
             await group1Client2Mock.StopAsync();
