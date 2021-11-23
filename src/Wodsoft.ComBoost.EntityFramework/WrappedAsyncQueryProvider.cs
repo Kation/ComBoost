@@ -30,7 +30,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IQueryable CreateQuery(Expression expression)
         {
-            return new WrappedAsyncQueryable(expression, this, expression.Type);
+            return (IQueryable)Activator.CreateInstance(typeof(WrappedAsyncQueryable<>).MakeGenericType(expression.Type.GetGenericArguments()[0]), expression, this);
         }
 
         public object Execute(Expression expression)

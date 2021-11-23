@@ -97,13 +97,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             return base.VisitMethodCall(node);
         }
 
-        protected override Expression VisitExtension(Expression node)
-        {
-            if (node is WrappedAsyncQueryExpression)
-                return _root;
-            return base.VisitExtension(node);
-        }
-
         private static ConcurrentDictionary<MethodInfo, MethodInfo> _Mapping = new ConcurrentDictionary<MethodInfo, MethodInfo>();
         private static MethodInfo MapMethod(MethodInfo value)
         {

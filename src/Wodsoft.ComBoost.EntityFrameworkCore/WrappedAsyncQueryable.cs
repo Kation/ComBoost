@@ -8,9 +8,9 @@ using System.Threading;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class WrappedAsyncQueryable : IQueryable
+    public abstract class WrappedAsyncQueryable : IQueryable
     {
-        public WrappedAsyncQueryable(Expression expression, WrappedAsyncQueryProvider queryProvider, Type elementType)
+        protected WrappedAsyncQueryable(Expression expression, WrappedAsyncQueryProvider queryProvider, Type elementType)
         {
             Expression = expression;
             _Provider = queryProvider;
@@ -33,10 +33,11 @@ namespace Wodsoft.ComBoost.Data.Entity
 
     public class WrappedAsyncQueryable<T> : WrappedAsyncQueryable, IQueryable<T>, IOrderedQueryable<T>
     {
-        public WrappedAsyncQueryable(IQueryable<T> queryable) : base(new WrappedAsyncQueryExpression(typeof(T)), new WrappedAsyncQueryProvider(queryable.Provider, queryable.Expression), typeof(T))
+        public WrappedAsyncQueryable(IQueryable<T> queryable) : base(queryable.Expression, new WrappedAsyncQueryProvider(queryable.Provider, queryable.Expression), typeof(T))
         {
 
         }
+
         public WrappedAsyncQueryable(Expression expression, WrappedAsyncQueryProvider queryProvider) : base(expression, queryProvider, typeof(T))
         {
 
