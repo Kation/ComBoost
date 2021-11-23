@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace Wodsoft.ComBoost.Aggregation.Test.Controllers
                 ModificationDate = t.ModificationDate,
                 OrganizationId = t.OrganizationId,
                 UserName = t.UserName
-            }).ToArrayAsync().AsTask();
+            }).ToArrayAsync();
         }
     }
 }
