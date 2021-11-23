@@ -29,7 +29,7 @@ namespace Wodsoft.ComBoost.Data.Test
                     services.AddComBoost()
                         .AddLocalService(builder =>
                         {
-                            builder.AddEntityService<Guid, UserEntity, UserDto>();
+                            builder.AddEntityService<UserEntity, UserDto>();
                         })
                         .AddMock();
                     services.AddAutoMapper(config =>
@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost.Data.Test
 
             await mock.RunAsync(async sp =>
             {
-                var template = sp.GetRequiredService<IEntityDomainTemplate<Guid, UserDto>>();
+                var template = sp.GetRequiredService<IEntityDomainTemplate<UserDto>>();
                 //var generator = new Lokad.ILPack.AssemblyGenerator();
                 //var bytes = generator.GenerateAssemblyBytes(DomainTemplateBuilder.Module.Assembly);
                 //File.WriteAllBytes("dynamic.dll", bytes);
@@ -61,7 +61,7 @@ namespace Wodsoft.ComBoost.Data.Test
 
             await mock.RunAsync(async sp =>
             {
-                var template = sp.GetRequiredService<IEntityDomainTemplate<Guid, UserDto>>();
+                var template = sp.GetRequiredService<IEntityDomainTemplate<UserDto>>();
                 var model = await template.Create(new UserDto
                 {
                     UserName = "test1",
@@ -78,7 +78,7 @@ namespace Wodsoft.ComBoost.Data.Test
 
             await mock.RunAsync(async sp =>
             {
-                var template = sp.GetRequiredService<IEntityDomainTemplate<Guid, UserDto>>();
+                var template = sp.GetRequiredService<IEntityDomainTemplate<UserDto>>();
                 var viewModel = await template.List();
                 Assert.Single(viewModel.Items);
             });
@@ -86,7 +86,7 @@ namespace Wodsoft.ComBoost.Data.Test
             user.DisplayName = "New Name";
             await mock.RunAsync(async sp =>
             {
-                var template = sp.GetRequiredService<IEntityDomainTemplate<Guid, UserDto>>();
+                var template = sp.GetRequiredService<IEntityDomainTemplate<UserDto>>();
                 var model = await template.Edit(user);
                 Assert.True(model.IsSuccess);
                 Assert.NotNull(model.Result);
@@ -96,13 +96,13 @@ namespace Wodsoft.ComBoost.Data.Test
 
             await mock.RunAsync(async sp =>
             {
-                var template = sp.GetRequiredService<IEntityDomainTemplate<Guid, UserDto>>();
-                await template.Remove(user.Id);
+                var template = sp.GetRequiredService<IEntityDomainTemplate<UserDto>>();
+                await template.Remove(user);
             });
 
             await mock.RunAsync(async sp =>
             {
-                var template = sp.GetRequiredService<IEntityDomainTemplate<Guid, UserDto>>();
+                var template = sp.GetRequiredService<IEntityDomainTemplate<UserDto>>();
                 var viewModel = await template.List();
                 Assert.Empty(viewModel.Items);
             });

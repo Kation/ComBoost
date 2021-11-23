@@ -22,11 +22,12 @@ namespace Wodsoft.ComBoost.Data
     //{
     //}
 
-    public class EntityDomainService<TKey, TEntity, TListDTO, TCreateDTO, TEditDTO> : DomainService
-        where TEntity : class, IEntity<TKey>
-        where TListDTO : class, IEntityDTO<TKey>
-        where TCreateDTO : class, IEntityDTO<TKey>
-        where TEditDTO : class, IEntityDTO<TKey>
+    public class EntityDomainService<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : DomainService
+        where TEntity : class, IEntity
+        where TListDTO : class, IEntityDTO
+        where TCreateDTO : class, IEntityDTO
+        where TEditDTO : class, IEntityDTO
+        where TRemoveDTO : class
     {
         #region List
 
@@ -90,7 +91,12 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task<IUpdateModel<TEditDTO>> Edit([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TEditDTO dto)
         {
-            var entity = await entityContext.Query().Where(t => t.Id.Equals(dto.Id)).FirstOrDefaultAsync();
+            var mappedEntity = mapper.Map<TEntity>(dto);
+            var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
+            var keys = new object[keyProperties.Count];
+            for (int i = 0; i < keyProperties.Count; i++)
+                keys[i] = keyProperties[i].GetValue(mappedEntity);
+            var entity = await entityContext.GetAsync(keys);
             if (entity == null)
                 throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
             await RaiseEvent(new EntityEditMapEventArgs<TEntity, TEditDTO>(entity, dto));
@@ -115,9 +121,14 @@ namespace Wodsoft.ComBoost.Data
 
         #region Remove
 
-        public virtual async Task Remove([FromService] IEntityContext<TEntity> entityContext, [FromValue] TKey id)
+        public virtual async Task Remove([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TRemoveDTO dto)
         {
-            var entity = await entityContext.Query().Where(t => t.Id.Equals(id)).FirstOrDefaultAsync();
+            var mappedEntity = mapper.Map<TEntity>(dto);
+            var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
+            var keys = new object[keyProperties.Count];
+            for (int i = 0; i < keyProperties.Count; i++)
+                keys[i] = keyProperties[i].GetValue(mappedEntity);
+            var entity = await entityContext.GetAsync(keys);
             if (entity == null)
                 throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
             await RaiseEvent(new EntityPreRemoveEventArgs<TEntity>(entity));

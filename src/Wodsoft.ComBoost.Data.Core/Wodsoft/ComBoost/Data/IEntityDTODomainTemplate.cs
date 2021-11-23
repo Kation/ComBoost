@@ -7,19 +7,20 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Data
 {
-    public interface IEntityDTODomainTemplate<TKey, TDto> : IEntityDTODomainTemplate<TKey, TDto, TDto, TDto>
-        where TDto : class, IEntityDTO<TKey>
+    public interface IEntityDTODomainTemplate<TDto> : IEntityDTODomainTemplate<TDto, TDto, TDto, TDto>
+        where TDto : class, IEntityDTO
     { }
 
-    public interface IEntityDTODomainTemplate<TKey, TListDTO, TCreateDTO, TEditDTO> : IDomainTemplate
-        where TListDTO : class, IEntityDTO<TKey>
-        where TCreateDTO : class, IEntityDTO<TKey>
-        where TEditDTO : class, IEntityDTO<TKey>
+    public interface IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : IDomainTemplate
+        where TListDTO : class, IEntityDTO
+        where TCreateDTO : class, IEntityDTO
+        where TEditDTO : class, IEntityDTO
+        where TRemoveDTO : class
     {
         Task<IViewModel<TListDTO>> List();
         Task<IViewModel<TListDTO>> List(int page, int size);
         Task<IUpdateModel<TCreateDTO>> Create(TCreateDTO dto);
         Task<IUpdateModel<TEditDTO>> Edit(TEditDTO dto);
-        Task<IUpdateModel> Remove(TKey id);
+        Task<IUpdateModel> Remove(TRemoveDTO dto);
     }
 }

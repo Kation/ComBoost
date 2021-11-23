@@ -100,7 +100,7 @@
 //                    null,
 //                    QueryableSelectMethod.MakeGenericMethod(source.ElementType, lambda.ReturnType),
 //                    new[] { source.Expression, Expression.Quote(lambda) }
-//                    )
+//                    ) 
 //                );
 
 //        private static MethodInfo FindQueryableSelectMethod()

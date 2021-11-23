@@ -14,10 +14,17 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class EntityDTOController<TKey, TListDTO, TCreateDTO, TEditDTO> : Controller
-        where TListDTO : class, IEntityDTO<TKey>
-        where TCreateDTO : class, IEntityDTO<TKey>
-        where TEditDTO : class, IEntityDTO<TKey>
+    public class EntityDTOController<TDTO> : EntityDTOController<TDTO, TDTO, TDTO, TDTO>
+        where TDTO : class, IEntityDTO
+    {
+
+    }
+
+    public class EntityDTOController<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : Controller
+        where TListDTO : class, IEntityDTO
+        where TCreateDTO : class, IEntityDTO
+        where TEditDTO : class, IEntityDTO
+        where TRemoveDTO : class
     {
         #region List
 
@@ -30,7 +37,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         protected virtual async Task<IViewModel<TListDTO>> CreateListModel()
         {
-            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TKey, TListDTO, TCreateDTO, TEditDTO>>();
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
             domain.Context.EventManager.AddEventHandler<EntityQueryEventArgs<TListDTO>>((context, e) =>
             {
                 bool isOrdered = e.IsOrdered;
@@ -43,7 +50,7 @@ namespace Wodsoft.ComBoost.Mvc
             return model;
         }
 
-        protected virtual void OnListQuery(ref IAsyncQueryable<TListDTO> queryable, ref bool isOrdered) { }
+        protected virtual void OnListQuery(ref IQueryable<TListDTO> queryable, ref bool isOrdered) { }
 
         protected virtual IActionResult OnListModelCreated(IViewModel<TListDTO> model)
         {
@@ -63,7 +70,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         protected virtual Task<IUpdateModel<TCreateDTO>> CreateEntity(TCreateDTO dto)
         {
-            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TKey, TListDTO, TCreateDTO, TEditDTO>>();
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
             return domain.Create(dto);
         }
 
@@ -85,7 +92,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         protected virtual Task<IUpdateModel<TEditDTO>> EditEntity(TEditDTO dto)
         {
-            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TKey, TListDTO, TCreateDTO, TEditDTO>>();
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
             return domain.Edit(dto);
         }
 
@@ -99,16 +106,16 @@ namespace Wodsoft.ComBoost.Mvc
         #region Remove
 
         [HttpDelete]
-        public virtual async Task<IActionResult> Remove([FromQuery] TKey id)
+        public virtual async Task<IActionResult> Remove([FromQuery] TRemoveDTO dto)
         {
-            var model = await RemoveEntity(id);
+            var model = await RemoveEntity(dto);
             return OnRemoveModelCreated(model);
         }
 
-        protected virtual Task<IUpdateModel> RemoveEntity(TKey id)
+        protected virtual Task<IUpdateModel> RemoveEntity(TRemoveDTO dto)
         {
-            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TKey, TListDTO, TCreateDTO, TEditDTO>>();
-            return domain.Remove(id);
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            return domain.Remove(dto);
         }
 
         protected virtual IActionResult OnRemoveModelCreated(IUpdateModel model)

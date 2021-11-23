@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AutoMapper.Extensions.ExpressionMapping;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -19,18 +20,18 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
             services.AddMvc();
             services.AddDbContext<DataContext>(options=> options.UseInMemoryDatabase("Wodsoft.ComBoost.Mvc.Data.Test"));
             services.AddEFCoreContext<DataContext>();
-            services.AddEntityDtoContext<Guid, UserEntity, UserDto>();
+            services.AddEntityDtoContext<UserEntity, UserDto>();
             services.AddComBoost()
                 .AddLocalService(builder =>
                 {
                     //builder.AddEntityService<Guid, UserEntity, UserDto>();
-                    builder.AddEntityDtoService<Guid, UserDto>();                    
+                    builder.AddEntityDtoService<UserDto>();                    
                 })
                 .AddMvc();
 
             services.AddAutoMapper(config =>
             {
-                //config.AddExpressionMapping();
+                config.AddExpressionMapping();
                 config.AddProfile<DtoProfile>();
             });
         }
