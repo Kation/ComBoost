@@ -36,7 +36,7 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        protected virtual void OnListQuery(ref IAsyncQueryable<TListDTO> queryable, ref bool isOrdered)
+        protected virtual void OnListQuery(ref IQueryable<TListDTO> queryable, ref bool isOrdered)
         {
 
         }

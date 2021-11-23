@@ -10,6 +10,8 @@ using Wodsoft.ComBoost.Security;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using Wodsoft.ComBoost.Data.Linq;
+using AutoMapper.QueryableExtensions;
 
 namespace Wodsoft.ComBoost.Data
 {
@@ -48,12 +50,12 @@ namespace Wodsoft.ComBoost.Data
             return model;
         }
 
-        protected virtual void OnListQuery(ref IAsyncQueryable<TEntity> queryable, ref bool isOrdered)
+        protected virtual void OnListQuery(ref IQueryable<TEntity> queryable, ref bool isOrdered)
         {
 
         }
 
-        protected virtual void OnListQuery(ref IAsyncQueryable<TListDTO> queryable, ref bool isOrdered)
+        protected virtual void OnListQuery(ref IQueryable<TListDTO> queryable, ref bool isOrdered)
         {
 
         }

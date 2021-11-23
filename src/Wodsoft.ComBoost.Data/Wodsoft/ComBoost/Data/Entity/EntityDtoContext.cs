@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wodsoft.ComBoost.Data.Linq;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -40,7 +42,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 _mapper.Map(entities[i], source[i]);
         }
 
-        public IAsyncQueryable<TListDTO> Query()
+        public IQueryable<TListDTO> Query()
         {
             return _context.Query().ProjectTo<TListDTO>(_mapper.ConfigurationProvider);
         }
