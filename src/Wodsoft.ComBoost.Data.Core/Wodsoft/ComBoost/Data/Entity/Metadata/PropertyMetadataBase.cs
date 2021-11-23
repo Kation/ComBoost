@@ -144,11 +144,6 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         public IEnumerable<object> EditRoles { get; protected set; }
 
         /// <summary>
-        /// Get the authentication required mode.
-        /// </summary>
-        public AuthenticationRequiredMode AuthenticationRequiredMode { get; protected set; }
-
-        /// <summary>
         /// Get is the property can get value.
         /// </summary>
         public bool CanGet { get; protected set; }
@@ -235,7 +230,6 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             AddRoles = new ReadOnlyCollection<object>(authentication.AddRolesRequired);
             EditRoles = new ReadOnlyCollection<object>(authentication.EditRolesRequired);
             ViewRoles = new ReadOnlyCollection<object>(authentication.ViewRolesRequired);
-            AuthenticationRequiredMode = authentication.Mode;
         }
 
         /// <summary>

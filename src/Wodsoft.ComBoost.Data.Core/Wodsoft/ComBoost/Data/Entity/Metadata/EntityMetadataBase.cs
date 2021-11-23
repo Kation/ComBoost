@@ -25,27 +25,6 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             if (entityType == null)
                 throw new ArgumentNullException("entityType");
             Type = entityType;
-            var key = entityType.GetProperties().FirstOrDefault(t => t.GetCustomAttribute<KeyAttribute>() != null);
-            if (key != null)
-                KeyType = key.PropertyType;
-            else
-            {
-                key = entityType.GetProperty("Index");
-                if (key != null)
-                    KeyType = key.PropertyType;
-                else
-                {
-                    key = entityType.GetProperty("Id");
-                    if (key != null)
-                        KeyType = key.PropertyType;
-                    else
-                    {
-                        key = entityType.GetProperty("ID");
-                        if (key != null)
-                            KeyType = key.PropertyType;
-                    }
-                }
-            }
             DataBag = new EntityMetadataDataBag();
         }
 
@@ -56,12 +35,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         public Type Type { get; private set; }
 
-        /// <summary>
-        /// Get the system type of key of entity.
-        /// </summary>
-        public Type KeyType { get; private set; }
-
-        public IPropertyMetadata KeyProperty { get; private set; }
+        public IReadOnlyList<IPropertyMetadata> KeyProperties { get; protected set; }
 
         /// <summary>
         /// Get the display name of entity.
@@ -91,32 +65,32 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// Get the properties of entity.
         /// </summary>
-        public IEnumerable<IPropertyMetadata> Properties { get; private set; }
+        public IReadOnlyList<IPropertyMetadata> Properties { get; private set; }
 
         /// <summary>
         /// Get the properties of entity in viewlist.
         /// </summary>
-        public IEnumerable<IPropertyMetadata> ViewProperties { get; private set; }
+        public IReadOnlyList<IPropertyMetadata> ViewProperties { get; private set; }
 
         /// <summary>
         /// Get the properties of entity while create.
         /// </summary>
-        public IEnumerable<IPropertyMetadata> CreateProperties { get; private set; }
+        public IReadOnlyList<IPropertyMetadata> CreateProperties { get; private set; }
 
         /// <summary>
         /// Get the properties of entity while edit.
         /// </summary>
-        public IEnumerable<IPropertyMetadata> EditProperties { get; private set; }
+        public IReadOnlyList<IPropertyMetadata> EditProperties { get; private set; }
 
         /// <summary>
         /// Get the properties of entity while search.
         /// </summary>
-        public IEnumerable<IPropertyMetadata> SearchProperties { get; private set; }
+        public IReadOnlyList<IPropertyMetadata> SearchProperties { get; private set; }
 
         /// <summary>
         /// Get the properties of entity in detail.
         /// </summary>
-        public IEnumerable<IPropertyMetadata> DetailProperties { get; private set; }
+        public IReadOnlyList<IPropertyMetadata> DetailProperties { get; private set; }
 
         /// <summary>
         /// Get is entity allow anonymous operate.
@@ -142,11 +116,6 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// Get roles to remove entity.
         /// </summary>
         public IEnumerable<object> RemoveRoles { get; protected set; }
-
-        /// <summary>
-        /// Get the authentication required mode.
-        /// </summary>
-        public AuthenticationRequiredMode AuthenticationRequiredMode { get; protected set; }
 
         /// <summary>
         /// Get the cache of properties.
@@ -214,19 +183,22 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             if (propertyMetadatas == null)
                 throw new ArgumentNullException("propertyMetadatas");
-            Properties = propertyMetadatas;
+            Properties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.ToList());
+            Dictionary<string, IPropertyMetadata> cache = Properties.ToDictionary(t => t.ClrName, t => t);
+            PropertyCache = new ReadOnlyDictionary<string, IPropertyMetadata>(cache);
 
-            KeyProperty = propertyMetadatas.FirstOrDefault(t => t.IsKey);
-            //if (KeyProperty == null)
-            //    throw new NotSupportedException("不支持没有主键的实体类型，" + Type.FullName + "。");
+            KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(Properties.Where(t => t.IsKey).ToArray());
+            if (KeyProperties.Count == 0)
+            {
+                var key = GetProperty("Id") ?? GetProperty("ID") ?? GetProperty("Index");
+                if (key != null)
+                    KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(new IPropertyMetadata[] { key });
+            }
             ViewProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnView && t.CanGet).ToArray());
             CreateProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnCreate && t.CanSet).ToArray());
             EditProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnEdit && t.CanSet).ToArray());
             SearchProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => t.Searchable).ToArray());
             DetailProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnDetail && t.CanGet).ToArray());
-
-            Dictionary<string, IPropertyMetadata> cache = Properties.ToDictionary(t => t.ClrName, t => t);
-            PropertyCache = new ReadOnlyDictionary<string, IPropertyMetadata>(cache);
         }
 
         /// <summary>
@@ -242,7 +214,6 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             EditRoles = new ReadOnlyCollection<object>(authentication.EditRolesRequired);
             ViewRoles = new ReadOnlyCollection<object>(authentication.ViewRolesRequired);
             RemoveRoles = new ReadOnlyCollection<object>(authentication.RemoveRolesRequired);
-            AuthenticationRequiredMode = authentication.Mode;
         }
 
         /// <summary>

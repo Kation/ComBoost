@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
+using Wodsoft.ComBoost.Data.Linq;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -40,7 +41,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             return InnerContext.Create();
         }
 
-        public IAsyncQueryable<T> Query()
+        public IQueryable<T> Query()
         {
             return InnerContext.Query().Wrap<T, M>();
         }
@@ -65,14 +66,24 @@ namespace Wodsoft.ComBoost.Data.Entity
             InnerContext.UpdateRange(items.Cast<M>());
         }
 
-        public IAsyncQueryable<T> Include<TProperty>(IAsyncQueryable<T> query, Expression<Func<T, TProperty>> expression)
+        public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
         {
             ExpressionWrapper<T, M> wrapper = new ExpressionWrapper<T, M>();
             LambdaExpression newExpression = (LambdaExpression)wrapper.Visit(expression);
             var propertyType = newExpression.Type.GetGenericArguments()[1];
             var queryable = query.Unwrap<T, M>();
-            queryable = (IAsyncQueryable<M>)InnerContext.GetType().GetMethod("Include").MakeGenericMethod(propertyType).Invoke(InnerContext, new object[] { queryable, newExpression });
+            queryable = (IQueryable<M>)InnerContext.GetType().GetMethod("Include").MakeGenericMethod(propertyType).Invoke(InnerContext, new object[] { queryable, newExpression });
             return queryable.Wrap<T, M>();
+        }
+
+        public Task<T> GetAsync(params object[] keys)
+        {
+            return InnerContext.GetAsync(keys).ContinueWith(task =>
+            {
+                if (task.Exception!=null)
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
+                return (T)task.Result;
+            });
         }
     }
 }

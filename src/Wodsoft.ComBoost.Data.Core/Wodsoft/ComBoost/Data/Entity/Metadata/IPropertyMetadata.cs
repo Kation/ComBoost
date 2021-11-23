@@ -126,11 +126,6 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// Get the roles to edit property.
         /// </summary>
         IEnumerable<object> EditRoles { get; }
-        
-        /// <summary>
-        /// Get the authentication required mode.
-        /// </summary>
-        AuthenticationRequiredMode AuthenticationRequiredMode { get; }
 
         /// <summary>
         /// Get is the property can get value.

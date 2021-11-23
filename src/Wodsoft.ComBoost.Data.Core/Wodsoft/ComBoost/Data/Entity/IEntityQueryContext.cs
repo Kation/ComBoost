@@ -28,6 +28,13 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// 获取查询接口。
         /// </summary>
         /// <returns>返回查询对象。</returns>
-        IAsyncQueryable<T> Query();
+        IQueryable<T> Query();
+
+        /// <summary>
+        /// 获取实体。
+        /// </summary>
+        /// <param name="keys">主键。</param>
+        /// <returns>返回实体对象，可能为空。</returns>
+        Task<T> GetAsync(params object[] keys);
     }
 }

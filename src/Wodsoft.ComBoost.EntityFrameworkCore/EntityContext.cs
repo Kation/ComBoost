@@ -66,7 +66,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             return item;
         }
 
-        public IAsyncQueryable<T> Query()
+        public IQueryable<T> Query()
         {
             if (Database.TrackEntity)
                 return new WrappedAsyncQueryable<T>(DbSet);
@@ -99,6 +99,11 @@ namespace Wodsoft.ComBoost.Data.Entity
                 SetUnchangeProperties(item);
             }
             DbSet.UpdateRange(items);
+        }
+
+        public Task<T> GetAsync(params object[] keys)
+        {
+            return DbSet.FindAsync(keys).AsTask();
         }
     }
 }

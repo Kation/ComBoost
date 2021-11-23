@@ -8,32 +8,45 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class WrappedQueryableProvider<T, M> : IAsyncQueryProvider
+    public class WrappedQueryableProvider<T, M> : IQueryProvider
         where T : IEntity
         where M : IEntity, T
     {
-        public WrappedQueryableProvider(IAsyncQueryProvider queryProvider)
+        public WrappedQueryableProvider(IQueryProvider queryProvider)
         {
             if (queryProvider == null)
                 throw new ArgumentNullException(nameof(queryProvider));
             InnerQueryProvider = queryProvider;
         }
 
-        public IAsyncQueryProvider InnerQueryProvider { get; private set; }
+        public IQueryProvider InnerQueryProvider { get; private set; }
 
-        public IAsyncQueryable<TElement> CreateQuery<TElement>(Expression expression)
+        public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
             if (typeof(TElement) != typeof(T))
                 throw new NotSupportedException("不支持的元素类型。");
             if (typeof(IOrderedQueryable).IsAssignableFrom(expression.Type))
-                return (IAsyncQueryable<TElement>)new WrappedOrderedQueryable<T, M>(this, expression);
+                return (IQueryable<TElement>)new WrappedOrderedQueryable<T, M>(this, expression);
             else
-                return (IAsyncQueryable<TElement>)new WrappedQueryable<T, M>(this, expression);
+                return (IQueryable<TElement>)new WrappedQueryable<T, M>(this, expression);
         }
 
-        public ValueTask<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken token)
+        public IQueryable CreateQuery(Expression expression)
         {
-            return InnerQueryProvider.ExecuteAsync<TResult>(expression, token);
+            if (typeof(IOrderedQueryable).IsAssignableFrom(expression.Type))
+                return new WrappedOrderedQueryable<T, M>(this, expression);
+            else
+                return new WrappedQueryable<T, M>(this, expression);
+        }
+
+        public object Execute(Expression expression)
+        {
+            return InnerQueryProvider.Execute(expression);
+        }
+
+        public TResult Execute<TResult>(Expression expression)
+        {
+            return InnerQueryProvider.Execute<TResult>(expression);
         }
     }
 }

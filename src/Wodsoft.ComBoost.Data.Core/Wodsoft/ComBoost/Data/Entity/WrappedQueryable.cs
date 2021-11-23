@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class WrappedQueryable<T, M> : IAsyncQueryable<T>, IWrappedQueryable
+    public class WrappedQueryable<T, M> : IQueryable<T>, IWrappedQueryable
         where T : IEntity
         where M : IEntity, T
     {
@@ -28,15 +28,20 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public WrappedQueryableProvider<T, M> Provider { get; private set; }
 
-        IAsyncQueryProvider IAsyncQueryable.Provider { get { return Provider; } }
+        IQueryProvider IQueryable.Provider { get { return Provider; } }
 
-        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        public IEnumerator<T> GetEnumerator()
         {
-            return new WrappedEnumerator<T, M>(Provider.InnerQueryProvider.CreateQuery<M>(Expression).GetAsyncEnumerator(cancellationToken));
+            return new WrappedEnumerator<T, M>(Provider.InnerQueryProvider.CreateQuery<M>(Expression).GetEnumerator());
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 
-    public class WrappedOrderedQueryable<T, M> : WrappedQueryable<T, M>, IOrderedAsyncQueryable<T>
+    public class WrappedOrderedQueryable<T, M> : WrappedQueryable<T, M>, IOrderedQueryable<T>
         where T : IEntity
         where M : IEntity, T
     {

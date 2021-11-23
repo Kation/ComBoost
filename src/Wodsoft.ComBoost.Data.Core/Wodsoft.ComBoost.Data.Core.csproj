@@ -12,9 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
-    <PackageReference Include="System.Linq.Async.Queryable" Version="5.0.0" />
-    <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 

@@ -39,14 +39,18 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取值。
         /// </summary>
-        /// <param name="executionContext">领域执行上下文。</param>
+        /// <param name="context">领域上下文。</param>
         /// <param name="parameter">参数信息。</param>
         /// <returns>返回值。</returns>
         public override object GetValue(IDomainContext context, ParameterInfo parameter)
         {
             var metadata = EntityDescriptor.GetMetadata(parameter.ParameterType);
             IValueProvider provider = context.GetRequiredService<IValueProvider>();
-            var keyType = metadata.KeyType;
+            if (metadata.KeyProperties.Count == 0)
+                throw new InvalidOperationException($"实体“{parameter.ParameterType.FullName}”没有主键。");
+            if (metadata.KeyProperties.Count != 0)
+                throw new InvalidOperationException($"实体“{parameter.ParameterType.FullName}”有多个主键。");
+            var keyType = metadata.KeyProperties[0].ClrType;
             if (keyType.GetTypeInfo().IsValueType)
                 keyType = typeof(Nullable<>).MakeGenericType(keyType);
             object value = provider.GetValue(Name ?? parameter.Name, keyType);

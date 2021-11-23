@@ -73,7 +73,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             return item;
         }
 
-        public IAsyncQueryable<T> Query()
+        public IQueryable<T> Query()
         {
             if (Database.TrackEntity)
                 return new WrappedAsyncQueryable<T>(DbSet);
@@ -144,15 +144,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             return query.Include(expression);
         }
 
-        public Task<T> GetAsync(object key)
-        {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-            if (key.GetType() != Metadata.KeyType)
-                key = TypeDescriptor.GetConverter(Metadata.KeyType).ConvertFrom(key);
-            return DbSet.FindAsync(key);
-        }
-
         public Task ReloadAsync(T item)
         {
             return Database.InnerContext.Entry(item).ReloadAsync();
@@ -161,6 +152,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         public IQueryable<T> ExecuteQuery(string sql, params object[] parameters)
         {
             return DbSet.SqlQuery(sql, parameters).AsNoTracking().AsQueryable();
+        }
+
+        public Task<T> GetAsync(params object[] keys)
+        {
+            return DbSet.FindAsync(keys);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Reflection;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
+using Wodsoft.ComBoost.Data.Linq;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {

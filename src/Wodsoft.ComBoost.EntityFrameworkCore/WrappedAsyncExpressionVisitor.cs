@@ -20,66 +20,12 @@ namespace Wodsoft.ComBoost.Data.Entity
             _root = root;
         }
 
-        private static readonly MethodInfo _ToArrayAsync = typeof(EntityFrameworkQueryableExtensions).GetMethod("ToArrayAsync");
-
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType == typeof(AsyncQueryable))
+            if (node.Method.DeclaringType == typeof(Wodsoft.ComBoost.Data.Linq.QueryableExtensions))
             {
                 switch (node.Method.Name)
                 {
-                    #region QueryMethod
-                    case "Distinct":
-                        {
-                            var method = MapMethod(node.Method);
-                            return method.GetParameters().Length == 1 ?
-                                Expression.Call(method, Visit(node.Arguments[0]))
-                                : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
-                        }
-                    case "OrderBy":
-                    case "OrderByDescending":
-                        {
-                            var method = MapMethod(node.Method);
-                            return method.GetParameters().Length == 2 ?
-                                Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1])
-                                : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2]);
-                        }
-                    case "ThenBy":
-                    case "ThenByDescending":
-                        {
-                            var method = MapMethod(node.Method);
-                            return method.GetParameters().Length == 2 ?
-                                Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1])
-                                : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2]);
-                        }
-                    case "Select":
-                        {
-                            var method = MapMethod(node.Method);
-                            return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
-                        }
-                    case "Reverse":
-                        {
-                            var method = MapMethod(node.Method);
-                            return Expression.Call(method, Visit(node.Arguments[0]));
-                        }
-                    case "Skip":
-                    case "SkipLast":
-                    case "Take":
-                    case "TakeLast":
-                        {
-                            var method = MapMethod(node.Method);
-                            return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
-                        }
-                    case "SkipWhile":
-                    case "TakeWhile":
-                    case "Where":
-                        {
-                            var method = MapMethod(node.Method);
-                            return method.GetParameters().Length == 2 ?
-                                Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1])
-                                : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2]);
-                        }
-                    #endregion
                     #region ReadMethod
                     case "AllAsync":
                     case "AnyAsync":
@@ -125,47 +71,25 @@ namespace Wodsoft.ComBoost.Data.Entity
                             if (node.Method.GetGenericArguments().Length == 2)
                             {
                                 return method.GetParameters().Length == 3 ?
-                                    Expression.Call(method, Visit(node.Arguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[1]).Operand).Compile(), node.Arguments[1].Type.GenericTypeArguments[0]), node.Arguments[2])
-                                    : Expression.Call(method, Visit(node.Arguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[1]).Operand).Compile(), node.Arguments[1].Type.GenericTypeArguments[0]), node.Arguments[2], node.Arguments[3]);
+                                    Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2])
+                                    : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2], node.Arguments[3]);
                             }
                             else
                             {
                                 return method.GetParameters().Length == 4 ?
-                                    Expression.Call(method, Visit(node.Arguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[1]).Operand).Compile(), node.Arguments[1].Type.GenericTypeArguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[2]).Operand).Compile(), node.Arguments[2].Type.GenericTypeArguments[0]), node.Arguments[3])
-                                    : Expression.Call(method, Visit(node.Arguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[1]).Operand).Compile(), node.Arguments[1].Type.GenericTypeArguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[2]).Operand).Compile(), node.Arguments[2].Type.GenericTypeArguments[0]), node.Arguments[3], node.Arguments[4]);
+                                    Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2], node.Arguments[3])
+                                    : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2], node.Arguments[3], node.Arguments[4]);
                             }
                         }
                     #endregion
-                    default:
-                        throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
-                }
-            }
-            else if (node.Method.DeclaringType == typeof(EntityContextExtensions))
-            {
-                switch (node.Method.Name)
-                {
+                    #region Include
                     case "Include":
                     case "ThenInclude":
                         {
                             var method = MapMethod(node.Method);
                             return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
                         }
-                    default:
-                        throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
-                }
-            }
-            else if (node.Method.DeclaringType == typeof(QueryableExtensions))
-            {
-                switch (node.Method.Name)
-                {
-                    case "SelectMany":
-                        {
-                            var method = MapMethod(node.Method);
-                            if (method.GetParameters().Length == 2)
-                                return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
-                            else
-                                return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2]);
-                        }
+                    #endregion
                     default:
                         throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
                 }
@@ -185,48 +109,10 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             return _Mapping.GetOrAdd(value, method =>
             {
-                if (method.DeclaringType == typeof(AsyncQueryable))
+                if (method.DeclaringType == typeof(Wodsoft.ComBoost.Data.Linq.QueryableExtensions))
                 {
                     switch (method.Name)
                     {
-                        #region QueryMethod
-                        case "Distinct":
-                            return (method.GetParameters().Length == 1 ?
-                                typeof(Queryable).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) })
-                                : typeof(Queryable).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(IEqualityComparer<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) }))
-                                .MakeGenericMethod(method.GetGenericArguments()[0]);
-                        case "OrderBy":
-                        case "OrderByDescending":
-                            return (method.GetParameters().Length == 2 ?
-                                typeof(Queryable).GetMethod(method.Name, 2, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1))) })
-                                : typeof(Queryable).GetMethod(method.Name, 2, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1)), typeof(IComparer<>).MakeGenericType(Type.MakeGenericMethodParameter(1))) }))
-                                .MakeGenericMethod(method.GetGenericArguments());
-                        case "ThenBy":
-                        case "ThenByDescending":
-                            return (method.GetParameters().Length == 2 ?
-                                typeof(Queryable).GetMethod(method.Name, 2, new Type[] { typeof(IOrderedQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1))) })
-                                : typeof(Queryable).GetMethod(method.Name, 2, new Type[] { typeof(IOrderedQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1)), typeof(IComparer<>).MakeGenericType(Type.MakeGenericMethodParameter(1))) }))
-                                .MakeGenericMethod(method.GetGenericArguments());
-                        case "Select":
-                            return (method.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments().Length == 2 ?
-                                typeof(Queryable).GetMethod("Select", 2, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1))) })
-                                : typeof(Queryable).GetMethod("Select", 2, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(int), Type.MakeGenericMethodParameter(1))) }))
-                                .MakeGenericMethod(method.GetGenericArguments());
-                        case "Reverse": 
-                            return typeof(Queryable).GetMethod(method.Name).MakeGenericMethod(method.GetGenericArguments());
-                        case "Skip":
-                        case "SkipLast":
-                        case "Take":
-                        case "TakeLast":
-                            return typeof(Queryable).GetTypeInfo().GetDeclaredMethods(method.Name).First(t=>t.IsGenericMethod && t.GetParameters()[1].ParameterType == method.GetParameters()[1].ParameterType).MakeGenericMethod(method.GetGenericArguments());
-                        case "SkipWhile":
-                        case "TakeWhile":
-                        case "Where":
-                            return (method.GetParameters().Length == 2 ?
-                                typeof(Queryable).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(bool))) })
-                                : typeof(Queryable).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(int), typeof(bool))) }))
-                                .MakeGenericMethod(method.GetGenericArguments());
-                        #endregion
                         #region ReadMethod
                         case "AllAsync":
                         case "AnyAsync":
@@ -276,14 +162,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                                     .MakeGenericMethod(method.GetGenericArguments());
                             }
                         #endregion
-                        default:
-                            return null;
-                    }
-                }
-                else if (method.DeclaringType == typeof(EntityContextExtensions))
-                {
-                    switch (method.Name)
-                    {
+                        #region Include
                         case "Include":
                             return (method.GetGenericArguments().Length == 1 ?
                                 typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(string) })
@@ -294,34 +173,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                                 typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IIncludableQueryable<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(1), Type.MakeGenericMethodParameter(2))) })
                                 : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IIncludableQueryable<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(IEnumerable<>).MakeGenericType(Type.MakeGenericMethodParameter(1))), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(2), Type.MakeGenericMethodParameter(3))) })
                                 ).MakeGenericMethod(method.GetGenericArguments());
-                        default:
-                            return null;
-                    }
-                }
-                else if (method.DeclaringType == typeof(QueryableExtensions))
-                {
-                    switch (method.Name)
-                    {
-                        case "SelectMany":
-                            if (method.GetGenericArguments().Length == 2)
-                            {
-                                var type1 = Type.MakeGenericMethodParameter(0);
-                                var type2 = Type.MakeGenericMethodParameter(1);
-                                return (method.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments().Length == 2 ?
-                                    typeof(Queryable).GetMethod("SelectMany", 2, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(type1, typeof(IEnumerable<>).MakeGenericType(type2))) })
-                                    : typeof(Queryable).GetMethod("SelectMany", 2, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(type1, typeof(int), typeof(IEnumerable<>).MakeGenericType(type2))) }))
-                                    .MakeGenericMethod(method.GetGenericArguments());
-                            }
-                            else
-                            {
-                                var type1 = Type.MakeGenericMethodParameter(0);
-                                var type2 = Type.MakeGenericMethodParameter(1);
-                                var type3 = Type.MakeGenericMethodParameter(2);
-                                return (method.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments().Length == 2 ?
-                                    typeof(Queryable).GetMethod("SelectMany", 3, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(type1, typeof(IEnumerable<>).MakeGenericType(type2))), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(type1, type2, type3)) })
-                                    : typeof(Queryable).GetMethod("SelectMany", 3, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(type1, typeof(int), typeof(IEnumerable<>).MakeGenericType(type2))), typeof(Expression<>).MakeGenericType(typeof(Func<,,>).MakeGenericType(type1, type2, type3)) }))
-                                    .MakeGenericMethod(method.GetGenericArguments());
-                            }
+                        #endregion
                         default:
                             return null;
                     }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿//using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Formats.Asn1;
@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
+using Wodsoft.ComBoost.Data.Linq;
 using Wodsoft.ComBoost.Test;
 using Wodsoft.ComBoost.Test.Entities;
 using Xunit;
@@ -17,7 +18,7 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
     {
         private IDatabaseContext SeedData([CallerMemberName] string callerName = null)
         {
-            var dataContext = new DataContext(new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase(callerName).Options);
+            var dataContext = new DataContext(Microsoft.EntityFrameworkCore.InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<DataContext>(), callerName).Options);
             dataContext.Tests.Add(new ComBoost.Test.Entities.TestEntity
             {
                 Id = Guid.NewGuid(),

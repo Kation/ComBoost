@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
+using Wodsoft.ComBoost.Data.Linq;
 
 namespace System.ComponentModel
 {
@@ -18,7 +19,7 @@ namespace System.ComponentModel
         /// 实例化视图模型。
         /// </summary>
         /// <param name="queryable">查询体。</param>
-        public ViewModel(IAsyncQueryable<T> queryable) : this(queryable, 1, 0) { }
+        public ViewModel(IQueryable<T> queryable) : this(queryable, 1, 0) { }
 
         /// <summary>
         /// 实例化视图模型。
@@ -26,7 +27,7 @@ namespace System.ComponentModel
         /// <param name="queryable">查询体。</param>
         /// <param name="page">当前页。</param>
         /// <param name="size">每页显示数量。</param>
-        public ViewModel(IAsyncQueryable<T> queryable, int page, int size)
+        public ViewModel(IQueryable<T> queryable, int page, int size)
         {
             if (page < 1)
                 throw new ArgumentException("不能小于1。", "page");
@@ -37,9 +38,9 @@ namespace System.ComponentModel
             Queryable = queryable ?? throw new ArgumentNullException("queryable");
         }
 
-        private IAsyncQueryable<T> _Queryable;
+        private IQueryable<T> _Queryable;
         /// <inheritdoc />
-        protected IAsyncQueryable<T> Queryable
+        protected IQueryable<T> Queryable
         {
             get
             {

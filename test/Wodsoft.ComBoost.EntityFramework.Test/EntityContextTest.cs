@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
+using Wodsoft.ComBoost.Data.Linq;
 using Wodsoft.ComBoost.EntityFramework.Test.Entities;
 using Xunit;
 

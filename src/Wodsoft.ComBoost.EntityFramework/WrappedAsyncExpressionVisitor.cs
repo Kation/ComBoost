@@ -22,57 +22,10 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType == typeof(AsyncQueryable))
+            if (node.Method.DeclaringType == typeof(Wodsoft.ComBoost.Data.Linq.QueryableExtensions))
             {
                 switch (node.Method.Name)
                 {
-                    #region QueryMethod
-                    case "Distinct":
-                        {
-                            var method = MapMethod(node.Method);
-                            return node.Method.GetParameters().Length == 1 ?
-                                Expression.Call(method, Visit(node.Arguments[0]))
-                                : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
-                        }
-                    case "OrderBy":
-                    case "OrderByDescending":
-                        {
-                            var method = MapMethod(node.Method);
-                            return node.Method.GetParameters().Length == 2 ?
-                                Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1])
-                                : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2]);
-                        }
-                    case "ThenBy":
-                    case "ThenByDescending":
-                        {
-                            var method = MapMethod(node.Method);
-                            return node.Method.GetParameters().Length == 2 ?
-                                Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1])
-                                : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2]);
-                        }
-                    case "Select":
-                        {
-                            var method = MapMethod(node.Method);
-                            return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
-                        }
-                    case "Skip":
-                    case "SkipLast":
-                    case "Take":
-                    case "TakeLast":
-                        {
-                            var method = MapMethod(node.Method);
-                            return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
-                        }
-                    case "SkipWhile":
-                    case "TakeWhile":
-                    case "Where":
-                        {
-                            var method = MapMethod(node.Method);
-                            return node.Method.GetParameters().Length == 2 ?
-                                Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1])
-                                : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2]);
-                        }
-                    #endregion
                     #region ReadMethod
                     case "AllAsync":
                     case "AnyAsync":
@@ -115,25 +68,18 @@ namespace Wodsoft.ComBoost.Data.Entity
                         {
                             var method = MapMethod(node.Method);
                             return node.Method.GetParameters().Length == 3 ?
-                                Expression.Call(method, Visit(node.Arguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[1]).Operand).Compile(), node.Arguments[1].Type.GenericTypeArguments[0]), node.Arguments[2])
-                                : Expression.Call(method, Visit(node.Arguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[1]).Operand).Compile(), node.Arguments[1].Type.GenericTypeArguments[0]), node.Arguments[2], node.Arguments[3]);
+                                Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2])
+                                : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2], node.Arguments[3]);
                         }
                         else
                         {
                             var method = MapMethod(node.Method);
                             return node.Method.GetParameters().Length == 4 ?
-                                Expression.Call(method, Visit(node.Arguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[1]).Operand).Compile(), node.Arguments[1].Type.GenericTypeArguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[2]).Operand).Compile(), node.Arguments[2].Type.GenericTypeArguments[0]), node.Arguments[3])
-                                : Expression.Call(method, Visit(node.Arguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[1]).Operand).Compile(), node.Arguments[1].Type.GenericTypeArguments[0]), Expression.Constant(((LambdaExpression)((UnaryExpression)node.Arguments[2]).Operand).Compile(), node.Arguments[2].Type.GenericTypeArguments[0]), node.Arguments[3], node.Arguments[4]);
+                                Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2], node.Arguments[3])
+                                : Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2], node.Arguments[3], node.Arguments[4]);
                         }
                     #endregion
-                    default:
-                        throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
-                }
-            }
-            else if (node.Method.DeclaringType == typeof(EntityContextExtensions))
-            {
-                switch (node.Method.Name)
-                {
+                    #region Include
                     case "Include":
                         {
                             string path;
@@ -150,22 +96,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                             queryable = (IQueryable)queryable.GetType().GetMethod("Include").Invoke(queryable, new object[] { path });
                             return queryable.Expression;
                         }
-                    default:
-                        throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
-                }
-            }
-            else if (node.Method.DeclaringType == typeof(QueryableExtensions))
-            {
-                switch (node.Method.Name)
-                {
-                    case "SelectMany":
-                        {
-                            var method = MapMethod(node.Method);
-                            if (method.GetParameters().Length == 2)
-                                return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
-                            else
-                                return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1], node.Arguments[2]);
-                        }
+                    #endregion
                     default:
                         throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
                 }
@@ -185,7 +116,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             return _Mapping.GetOrAdd(value, method =>
             {
-                if (method.DeclaringType == typeof(AsyncQueryable))
+                if (method.DeclaringType == typeof(Wodsoft.ComBoost.Data.Linq.QueryableExtensions))
                 {
                     switch (method.Name)
                     {
@@ -233,16 +164,6 @@ namespace Wodsoft.ComBoost.Data.Entity
                         case "ToDictionaryAsync":
                             return typeof(System.Data.Entity.QueryableExtensions).GetMember(method.Name).Cast<MethodInfo>().Where(t => t.GetGenericArguments().Length == method.GetGenericArguments().Length && t.GetParameters().Length == method.GetParameters().Length).First().MakeGenericMethod(method.GetGenericArguments());
                         #endregion
-                        default:
-                            return null;
-                    }
-                }
-                else if (method.DeclaringType == typeof(QueryableExtensions))
-                {
-                    switch (method.Name)
-                    {
-                        case "SelectMany":
-                            return typeof(Queryable).GetMember(method.Name).Cast<MethodInfo>().Where(t => t.GetGenericArguments().Length == method.GetGenericArguments().Length && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments().Length == method.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments().Length).First().MakeGenericMethod(method.GetGenericArguments());
                         default:
                             return null;
                     }

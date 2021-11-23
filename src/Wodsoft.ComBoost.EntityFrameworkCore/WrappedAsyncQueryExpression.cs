@@ -10,7 +10,7 @@ namespace Wodsoft.ComBoost.Data.Entity
     {
         public WrappedAsyncQueryExpression(Type elementType)
         {
-            Type = typeof(IAsyncQueryable<>).MakeGenericType(elementType);
+            Type = typeof(IQueryable<>).MakeGenericType(elementType);
         }
 
         public override Type Type { get; }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -7,39 +8,43 @@ using System.Threading;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public abstract class WrappedAsyncQueryable : IAsyncQueryable
+    public class WrappedAsyncQueryable : IQueryable
     {
-        public abstract Type ElementType { get; }
-
-        public abstract Expression Expression { get; }
-
-        public abstract IAsyncQueryProvider Provider { get; }
-    }
-
-    public class WrappedAsyncQueryable<T> : WrappedAsyncQueryable, IAsyncQueryable<T>, IOrderedAsyncQueryable<T>
-    {
-        public WrappedAsyncQueryable(IQueryable<T> queryable)
+        public WrappedAsyncQueryable(Expression expression, WrappedAsyncQueryProvider queryProvider, Type elementType)
         {
-            _Provider = new WrappedAsyncQueryProvider(queryable.Provider, queryable.Expression);
-            Expression = new WrappedAsyncQueryExpression(typeof(T));
-        }
-        public WrappedAsyncQueryable(Expression expression, WrappedAsyncQueryProvider queryProvider)
-        {
-            _Provider = queryProvider;
             Expression = expression;
+            _Provider = queryProvider;
+            ElementType = elementType;
         }
 
-        public override Type ElementType => typeof(T);
+        public Type ElementType { get; private set; }
 
-        public override Expression Expression { get; }
+        public Expression Expression { get; }
 
         private WrappedAsyncQueryProvider _Provider;
-        public override IAsyncQueryProvider Provider => _Provider;
+        public IQueryProvider Provider => _Provider;
+        protected WrappedAsyncQueryProvider WrappedProvider => _Provider;
 
-        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            var expression = new WrappedAsyncExpressionVisitor(_Provider).Visit(Expression);
-            return ((IAsyncEnumerable<T>)_Provider.SourceProvider.CreateQuery<T>(expression)).GetAsyncEnumerator(cancellationToken);
+            return _Provider.SourceProvider.CreateQuery(Expression).GetEnumerator();
+        }
+    }
+
+    public class WrappedAsyncQueryable<T> : WrappedAsyncQueryable, IQueryable<T>, IOrderedQueryable<T>
+    {
+        public WrappedAsyncQueryable(IQueryable<T> queryable) : base(new WrappedAsyncQueryExpression(typeof(T)), new WrappedAsyncQueryProvider(queryable.Provider, queryable.Expression), typeof(T))
+        {
+
+        }
+        public WrappedAsyncQueryable(Expression expression, WrappedAsyncQueryProvider queryProvider) : base(expression, queryProvider, typeof(T))
+        {
+
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return WrappedProvider.SourceProvider.CreateQuery<T>(Expression).GetEnumerator();
         }
     }
 }

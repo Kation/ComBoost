@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         where TCreateDTO : IEntityDTO<TKey>
         where TEditDTO : IEntityDTO<TKey>
     {
-        IAsyncQueryable<TListDTO> Query();
+        IQueryable<TListDTO> Query();
 
         /// <summary>
         /// 将实体添加到数据库。

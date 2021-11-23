@@ -25,9 +25,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             if (type == null)
                 throw new ArgumentNullException("type");
             
-            PropertyInfo[] properties = type.GetProperties().ToArray();
-            SetProperties(properties.Select(t => new ClrPropertyMetadata(t)).OrderBy(t => t.Order).ToArray());
-
+            SetProperties(type.GetProperties().Select(t => new ClrPropertyMetadata(t)).OrderBy(t => t.Order));
             SetMetadata();
         }
     }
