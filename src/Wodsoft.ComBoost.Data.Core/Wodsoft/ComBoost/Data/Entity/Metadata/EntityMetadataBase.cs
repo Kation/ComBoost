@@ -35,6 +35,9 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         public Type Type { get; private set; }
 
+        /// <summary>
+        /// Get the properties of key of entity.
+        /// </summary>
         public IReadOnlyList<IPropertyMetadata> KeyProperties { get; protected set; }
 
         /// <summary>
@@ -194,11 +197,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 if (key != null)
                     KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(new IPropertyMetadata[] { key });
             }
-            ViewProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnView && t.CanGet).ToArray());
-            CreateProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnCreate && t.CanSet).ToArray());
-            EditProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnEdit && t.CanSet).ToArray());
-            SearchProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => t.Searchable).ToArray());
-            DetailProperties = new ReadOnlyCollection<IPropertyMetadata>(propertyMetadatas.Where(t => !t.IsHiddenOnDetail && t.CanGet).ToArray());
+            ViewProperties = new ReadOnlyCollection<IPropertyMetadata>(Properties.Where(t => !t.IsHiddenOnView && t.CanGet).ToArray());
+            CreateProperties = new ReadOnlyCollection<IPropertyMetadata>(Properties.Where(t => !t.IsHiddenOnCreate && t.CanSet).ToArray());
+            EditProperties = new ReadOnlyCollection<IPropertyMetadata>(Properties.Where(t => !t.IsHiddenOnEdit && t.CanSet).ToArray());
+            SearchProperties = new ReadOnlyCollection<IPropertyMetadata>(Properties.Where(t => t.Searchable).ToArray());
+            DetailProperties = new ReadOnlyCollection<IPropertyMetadata>(Properties.Where(t => !t.IsHiddenOnDetail && t.CanGet).ToArray());
         }
 
         /// <summary>
