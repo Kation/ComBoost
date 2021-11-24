@@ -31,7 +31,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
     }
 
-    public class WrappedAsyncQueryable<T> : WrappedAsyncQueryable, IQueryable<T>, IOrderedQueryable<T>
+    public class WrappedAsyncQueryable<T> : WrappedAsyncQueryable, IQueryable<T>, IOrderedQueryable<T>, IAsyncEnumerable<T>
     {
         public WrappedAsyncQueryable(IQueryable<T> queryable) : base(queryable.Expression, new WrappedAsyncQueryProvider(queryable.Provider, queryable.Expression), typeof(T))
         {
@@ -41,6 +41,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         public WrappedAsyncQueryable(Expression expression, WrappedAsyncQueryProvider queryProvider) : base(expression, queryProvider, typeof(T))
         {
 
+        }
+
+        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        {
+            return ((IAsyncEnumerable<T>)WrappedProvider.CreateQuery<T>(Expression)).GetAsyncEnumerator();
         }
 
         public IEnumerator<T> GetEnumerator()

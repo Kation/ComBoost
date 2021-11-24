@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -31,7 +32,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         }
     }
 
-    public class WrappedAsyncQueryable<T> : WrappedAsyncQueryable, IQueryable<T>, IOrderedQueryable<T>
+    public class WrappedAsyncQueryable<T> : WrappedAsyncQueryable, IQueryable<T>, IOrderedQueryable<T>, IDbAsyncEnumerable<T>
     {
         public WrappedAsyncQueryable(IQueryable<T> queryable) : base(queryable.Expression, new WrappedAsyncQueryProvider(queryable.Provider, queryable.Expression), typeof(T))
         {
@@ -42,9 +43,19 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         }
 
+        public IDbAsyncEnumerator<T> GetAsyncEnumerator()
+        {
+            return ((IDbAsyncEnumerable<T>)WrappedProvider.SourceProvider.CreateQuery<T>(Expression)).GetAsyncEnumerator();
+        }
+
         public IEnumerator<T> GetEnumerator()
         {
             return WrappedProvider.SourceProvider.CreateQuery<T>(Expression).GetEnumerator();
+        }
+
+        IDbAsyncEnumerator IDbAsyncEnumerable.GetAsyncEnumerator()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -11,7 +12,7 @@ using Wodsoft.ComBoost.Data.Linq;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class WrappedAsyncQueryProvider : IQueryProvider, IWrappedAsyncQueryProvider
+    public class WrappedAsyncQueryProvider : IQueryProvider, IWrappedAsyncQueryProvider, IDbAsyncQueryProvider
     {
         public WrappedAsyncQueryProvider(IQueryProvider queryProvider, Expression sourceExpression)
         {
@@ -129,6 +130,11 @@ namespace Wodsoft.ComBoost.Data.Entity
                 }
                 return Expression.Lambda<Func<List<object>, Task>>(Expression.Call(method, parameters), args).Compile();
             });
+        }
+
+        Task<object> IDbAsyncQueryProvider.ExecuteAsync(Expression expression, CancellationToken cancellationToken)
+        {
+            return ((IDbAsyncQueryProvider)SourceProvider).ExecuteAsync(expression, cancellationToken);
         }
     }
 }
