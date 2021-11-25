@@ -45,7 +45,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
-            return ((IAsyncEnumerable<T>)WrappedProvider.CreateQuery<T>(Expression)).GetAsyncEnumerator();
+            return ((IAsyncEnumerable<T>)WrappedProvider.SourceProvider.CreateQuery<T>(Expression)).GetAsyncEnumerator();
         }
 
         public IEnumerator<T> GetEnumerator()
