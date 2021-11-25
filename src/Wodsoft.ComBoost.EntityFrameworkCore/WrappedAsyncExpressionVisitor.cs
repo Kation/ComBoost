@@ -13,13 +13,6 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public class WrappedAsyncExpressionVisitor : ExpressionVisitor
     {
-        private Expression _root;
-
-        public WrappedAsyncExpressionVisitor(Expression root)
-        {
-            _root = root;
-        }
-
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             if (node.Method.DeclaringType == typeof(Wodsoft.ComBoost.Data.Linq.QueryableExtensions))

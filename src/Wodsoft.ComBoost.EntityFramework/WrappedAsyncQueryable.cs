@@ -45,12 +45,12 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IDbAsyncEnumerator<T> GetAsyncEnumerator()
         {
-            return ((IDbAsyncEnumerable<T>)WrappedProvider.SourceProvider.CreateQuery<T>(Expression)).GetAsyncEnumerator();
+            return ((IDbAsyncEnumerable<T>)WrappedProvider.SourceProvider.CreateQuery<T>(new WrappedAsyncExpressionVisitor(WrappedProvider).Visit(Expression))).GetAsyncEnumerator();
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return WrappedProvider.SourceProvider.CreateQuery<T>(Expression).GetEnumerator();
+            return WrappedProvider.SourceProvider.CreateQuery<T>(new WrappedAsyncExpressionVisitor(WrappedProvider).Visit(Expression)).GetEnumerator();
         }
 
         IDbAsyncEnumerator IDbAsyncEnumerable.GetAsyncEnumerator()

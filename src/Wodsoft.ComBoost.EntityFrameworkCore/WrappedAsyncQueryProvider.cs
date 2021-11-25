@@ -37,13 +37,13 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public object Execute(Expression expression)
         {
-            expression = new WrappedAsyncExpressionVisitor(SourceExpression).Visit(expression);
+            expression = new WrappedAsyncExpressionVisitor().Visit(expression);
             return SourceProvider.Execute(expression);
         }
 
         public TResult Execute<TResult>(Expression expression)
         {
-            expression = new WrappedAsyncExpressionVisitor(SourceExpression).Visit(expression);
+            expression = new WrappedAsyncExpressionVisitor().Visit(expression);
             return SourceProvider.Execute<TResult>(expression);
         }
 
@@ -52,7 +52,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             //expression = new WrappedAsyncExpressionVisitor(SourceExpression).Visit(expression);
             if (expression is MethodCallExpression methodExpression && methodExpression.Method.DeclaringType == typeof(QueryableExtensions))
             {
-                var visitor = new WrappedAsyncExpressionVisitor(SourceExpression);
+                var visitor = new WrappedAsyncExpressionVisitor();
                 expression = visitor.Visit(expression);
                 methodExpression = (MethodCallExpression)expression;
                 List<object> parameters = new List<object> { SourceProvider.CreateQuery(methodExpression.Arguments[0]) };

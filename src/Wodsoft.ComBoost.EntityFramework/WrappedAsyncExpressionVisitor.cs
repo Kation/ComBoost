@@ -11,13 +11,11 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public class WrappedAsyncExpressionVisitor : ExpressionVisitor
     {
-        private Expression _root;
         private WrappedAsyncQueryProvider _provider;
 
         public WrappedAsyncExpressionVisitor(WrappedAsyncQueryProvider provider)
         {
             _provider = provider;
-            _root = provider.SourceExpression;
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
