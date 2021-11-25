@@ -131,7 +131,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         TResult IAsyncQueryProvider.ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
-            return ((IAsyncQueryProvider)SourceProvider).ExecuteAsync<TResult>(expression, cancellationToken);
+            return ((IAsyncQueryProvider)SourceProvider).ExecuteAsync<TResult>(new WrappedAsyncExpressionVisitor().Visit(expression), cancellationToken);
         }
     }
 }

@@ -134,7 +134,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         Task<object> IDbAsyncQueryProvider.ExecuteAsync(Expression expression, CancellationToken cancellationToken)
         {
-            return ((IDbAsyncQueryProvider)SourceProvider).ExecuteAsync(expression, cancellationToken);
+            return ((IDbAsyncQueryProvider)SourceProvider).ExecuteAsync(new WrappedAsyncExpressionVisitor(this).Visit(expression), cancellationToken);
         }
     }
 }
