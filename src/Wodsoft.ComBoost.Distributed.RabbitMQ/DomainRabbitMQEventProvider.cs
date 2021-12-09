@@ -23,15 +23,42 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
         private DomainRabbitMQEventOptions _options;
         private IServiceProvider _serviceProvider;
         private DomainServiceDistributedEventOptions _eventOptions;
+        private ILogger _logger;
 
-        public DomainRabbitMQEventProvider(IDomainRabbitMQProvider provider, IOptions<DomainRabbitMQEventOptions> options, IOptions<DomainServiceDistributedEventOptions> eventOptions, IServiceProvider serviceProvider)
+        public DomainRabbitMQEventProvider(IDomainRabbitMQProvider provider, IOptions<DomainRabbitMQEventOptions> options, IOptions<DomainServiceDistributedEventOptions> eventOptions, IServiceProvider serviceProvider,
+            ILogger<DomainRabbitMQEventProvider> logger)
         {
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));
             _connection = provider.GetConnection();
+            _logger = logger;
+            _connection.ConnectionBlocked += _connection_ConnectionBlocked;
+            _connection.ConnectionUnblocked += _connection_ConnectionUnblocked;
+            _connection.ConnectionShutdown += _connection_ConnectionShutdown;
+            _connection.CallbackException += _connection_CallbackException;
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _eventOptions = eventOptions?.Value ?? throw new ArgumentNullException(nameof(eventOptions));
+        }
+
+        private void _connection_CallbackException(object sender, CallbackExceptionEventArgs e)
+        {
+            _logger.LogError(e.Exception, "RabbitMQ connection callback throw exception.");
+        }
+
+        private void _connection_ConnectionShutdown(object sender, ShutdownEventArgs e)
+        {
+            _logger.LogError("RabbitMQ connection shutdown.");
+        }
+
+        private void _connection_ConnectionUnblocked(object sender, EventArgs e)
+        {
+            _logger.LogInformation("RabbitMQ connection unblocked.");
+        }
+
+        private void _connection_ConnectionBlocked(object sender, ConnectionBlockedEventArgs e)
+        {
+            _logger.LogWarning("RabbitMQ connection blocked. " + e.Reason);
         }
 
         public override Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
