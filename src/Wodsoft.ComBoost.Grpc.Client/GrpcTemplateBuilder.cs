@@ -170,7 +170,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
 
                 //Create static Method<,> field and set value
                 var methodField = typeBuilder.DefineField("_Method_" + method.Name + "_" + methodIndex, typeof(Method<,>).MakeGenericType(requestType, responseType), FieldAttributes.Private | FieldAttributes.Static);
-                staticILGenerator.Emit(OpCodes.Ldstr, type.Name);
+                staticILGenerator.Emit(OpCodes.Ldstr, DomainService.GetServiceName(type));
                 staticILGenerator.Emit(OpCodes.Ldstr, method.Name + "_" + methodIndex);
                 staticILGenerator.Emit(OpCodes.Call, typeof(DomainGrpcMethod<,>).MakeGenericType(requestType, responseType).GetMethod("CreateMethod"));
                 staticILGenerator.Emit(OpCodes.Stsfld, methodField);

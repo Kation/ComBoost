@@ -18,9 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             if (name == null)
             {
-                name = typeof(T).Name;
-                if (name.EndsWith("DomainService"))
-                    name = name.Substring(0, name.Length - "DomainService".Length);
+                name = DomainService.GetServiceName(typeof(T));
             }
             builder.Services.Configure<DomainServiceMapping>(name.ToLower(), options =>
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,5 +31,19 @@ namespace Wodsoft.ComBoost
         }
 
         #endregion
+
+        public static string GetServiceName(Type type)
+        {
+            string name = type.Name;
+            if (type.IsGenericType)
+                name = name.Split('`')[0];
+            if (name.EndsWith("DomainService"))
+                name = name.Substring(0, name.Length - "DomainService".Length);
+            if (type.IsGenericType)
+            {
+                name += "(" + string.Join(",", type.GetGenericArguments().Select(t => GetServiceName(t))) + ")";
+            }
+            return name;
+        }
     }
 }
