@@ -15,8 +15,7 @@ namespace Wodsoft.ComBoost.Test
                 .AddLocalService(builder =>
                 {
                     builder.AddService<GreeterService>().UseTemplate<IGreeterTemplate>();
-                })
-                .AddEmptyContextProvider();
+                });
             var serviceProvider = services.BuildServiceProvider();
 
             using (var scope = serviceProvider.CreateScope())

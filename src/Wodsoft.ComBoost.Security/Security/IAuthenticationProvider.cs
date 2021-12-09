@@ -16,13 +16,7 @@ namespace Wodsoft.ComBoost.Security
         /// <summary>
         /// 获取用户声明主体。
         /// </summary>
-        ClaimsPrincipal User { get; }
-
-        /// <summary>
-        /// 判断角色。
-        /// </summary>
-        /// <param name="role">角色。</param>
-        /// <returns>拥有角色返回true，否则返回false。</returns>
-        bool IsInRole(string role);
+        /// <returns></returns>
+        Task<ClaimsPrincipal> GetUserAsync();
     }
 }

@@ -45,19 +45,19 @@ namespace Wodsoft.ComBoost.Grpc.Client
             protected async Task InvokeAsync(Method<DomainGrpcRequest, DomainGrpcResponse> method)
             {
                 DomainGrpcRequest request = new DomainGrpcRequest();
-                HandleRequest(request);
+                await HandleRequestAsync(request);
                 var invoker = Channel.CreateCallInvoker();
                 var response = await invoker.AsyncUnaryCall(method, null, _callOptions, request);
-                HandleResponse(response);
+                await HandleResponseAsync(response);
             }
 
             protected async Task<TValue> InvokeWithReturnValueAsync<TValue>(Method<DomainGrpcRequest, DomainGrpcResponse<TValue>> method)
             {
                 DomainGrpcRequest request = new DomainGrpcRequest();
-                HandleRequest(request);
+                await HandleRequestAsync(request);
                 var invoker = Channel.CreateCallInvoker();
                 var response = await invoker.AsyncUnaryCall(method, null, _callOptions, request);
-                HandleResponse(response);
+                await HandleResponseAsync(response);
                 return response.Result;
             }
 
@@ -66,10 +66,10 @@ namespace Wodsoft.ComBoost.Grpc.Client
             {
                 DomainGrpcRequest<TArgs> request = new DomainGrpcRequest<TArgs>();
                 request.Argument = args;
-                HandleRequest(request);
+                await HandleRequestAsync(request);
                 var invoker = Channel.CreateCallInvoker();
                 var response = await invoker.AsyncUnaryCall(method, null, _callOptions, request);
-                HandleResponse(response);
+                await HandleResponseAsync(response);
             }
 
             protected async Task<TValue> InvokeWithArgumentsAndReturnValueAsync<TArgs, TValue>(Method<DomainGrpcRequest<TArgs>, DomainGrpcResponse<TValue>> method, TArgs args)
@@ -77,26 +77,26 @@ namespace Wodsoft.ComBoost.Grpc.Client
             {
                 DomainGrpcRequest<TArgs> request = new DomainGrpcRequest<TArgs>();
                 request.Argument = args;
-                HandleRequest(request);
+                await HandleRequestAsync(request);
                 var invoker = Channel.CreateCallInvoker();
                 var response = await invoker.AsyncUnaryCall(method, null, _callOptions, request);
-                HandleResponse(response);
+                await HandleResponseAsync(response);
                 return response.Result;
             }
 
-            private void HandleRequest(DomainGrpcRequest request)
+            private async Task HandleRequestAsync(DomainGrpcRequest request)
             {
                 request.OS = Environment.OSVersion.ToString();
                 var handlers = Context.GetServices<IDomainRpcClientRequestHandler>();
                 foreach (var handler in handlers)
-                    handler.Handle(request, Context);
+                    await handler.HandleAsync(request, Context);
             }
 
-            private void HandleResponse(DomainGrpcResponse response)
+            private async Task HandleResponseAsync(DomainGrpcResponse response)
             {
                 var handlers = Context.GetServices<IDomainRpcClientResponseHandler>();
                 foreach (var handler in handlers)
-                    handler.Handle(response);
+                    await handler.HandleAsync(response);
                 if (response.Exception != null)
                     throw new DomainGrpcInvokeException(response.Exception);
             }

@@ -14,7 +14,9 @@ namespace Wodsoft.ComBoost
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public IDomainContext GetContext()
+        public virtual bool CanProvide => true;
+
+        public virtual IDomainContext GetContext()
         {
             return new EmptyDomainContext(_serviceProvider, CancellationToken.None);
         }

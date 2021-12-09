@@ -6,6 +6,8 @@ namespace Wodsoft.ComBoost
 {
     public interface IDomainContextProvider
     {
+        bool CanProvide { get; }
+
         IDomainContext GetContext();
     }
 }

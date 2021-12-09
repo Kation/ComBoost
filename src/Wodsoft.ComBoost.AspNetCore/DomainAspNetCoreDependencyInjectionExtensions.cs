@@ -34,9 +34,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             builder.Services.AddRouting();
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddScoped<IDomainContextProvider, HttpDomainContextProvider>();
+            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.AddContextProvider<HttpDomainContextProvider>(500));
             builder.Services.TryAddScoped<IExecutionResultHandler, DefaultExecutionResultHandler>();
-            builder.Services.TryAddScoped<IAuthenticationProvider, AspNetCoreAuthenticationProvider>();
+            builder.Services.PostConfigure<AuthenticationProviderOptions>(options => options.AddHandler<AspNetCoreAuthenticationHandler>(500));
             if (builderConfigure != null)
                 builderConfigure(new ComBoostAspNetCoreBuilder(builder.Services));
             return builder;

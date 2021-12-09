@@ -8,9 +8,9 @@ using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
-    public class AspNetCoreAuthenticationProvider : IAuthenticationProvider
+    public class AspNetCoreAuthenticationHandler : IAuthenticationHandler
     {
-        public AspNetCoreAuthenticationProvider(IHttpContextAccessor accessor)
+        public AspNetCoreAuthenticationHandler(IHttpContextAccessor accessor)
         {
             if (accessor == null)
                 throw new ArgumentNullException(nameof(accessor));
@@ -21,11 +21,9 @@ namespace Wodsoft.ComBoost.AspNetCore
 
         public HttpContext Context { get; }
 
-        public ClaimsPrincipal User => Context.User;
-
-        public bool IsInRole(string role)
+        public Task<AuthenticationResult> AuthenticateAsync()
         {
-            return User.IsInRole(role);
+            return Task.FromResult(AuthenticationResult.Success(Context.User));
         }
     }
 }

@@ -10,11 +10,14 @@ namespace Wodsoft.ComBoost
         protected DomainRpcContext(IDomainRpcRequest request, IServiceProvider serviceProvider, CancellationToken cancellationToken)
             : base(serviceProvider, cancellationToken)
         {
+            Request = request;
             var valueProvider = new DomainRpcValueProvider(request);
             _services = new Dictionary<Type, object>();
             _services.Add(typeof(IValueProvider), valueProvider);
             _services.Add(typeof(IConfigurableValueProvider), valueProvider);
         }
+
+        public IDomainRpcRequest Request { get; }
 
         private Dictionary<Type, object> _services;
         public override object GetService(Type serviceType)

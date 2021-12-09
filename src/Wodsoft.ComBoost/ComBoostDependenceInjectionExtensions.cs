@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Wodsoft.ComBoost;
+using Wodsoft.ComBoost.Mock;
+using Wodsoft.ComBoost.Security;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -22,6 +24,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 var manager = new DomainServiceEventManager(options.Value);
                 return manager;
             });
+            services.TryAddScoped<IDomainContextProvider, CompositeDomainContextProvider>();
+            services.TryAddScoped<IAuthenticationProvider, AuthenticationProvider>();
+            services.PostConfigure<AuthenticationProviderOptions>(options => options.AddHandler<AnonymousAuthenticationHandler>(1000));
             return new ComBoostBuilder(services);
         }
 
@@ -34,11 +39,12 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
+        [Obsolete("It is already add a empty context provider when use AddComBoost.")]
         public static IComBoostBuilder AddEmptyContextProvider(this IComBoostBuilder builder)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
-            builder.Services.AddSingleton<IDomainContextProvider, EmptyDomainContextProvider>();
+            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.AddContextProvider<EmptyDomainContextProvider>(1000));
             return builder;
         }
 

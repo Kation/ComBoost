@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.Grpc.AspNetCore
@@ -15,9 +16,9 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
 
         public ClaimsPrincipal User { get; }
 
-        public bool IsInRole(string role)
+        public Task<ClaimsPrincipal> GetUserAsync()
         {
-            return User.IsInRole(role);
+            return Task.FromResult(User);
         }
     }
 }

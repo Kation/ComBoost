@@ -41,6 +41,8 @@ namespace Wodsoft.ComBoost
 
         public virtual object GetService(Type serviceType)
         {
+            if (serviceType == typeof(IDomainContext) || serviceType == typeof(IServiceProvider))
+                return this;
             return _ServiceProvider.GetService(serviceType);
         }
     }

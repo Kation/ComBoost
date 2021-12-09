@@ -53,7 +53,7 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
                         //var domainContext = new DomainGrpcContext(request, context);
                         Expression.Assign(domainContextVaiable, Expression.New(_GrpcContextConstructorInfo, requestParameter, contextParameter)),
                         //var templateDescriptor = domainGrpcDiscoveryService.Services.GetService<IDomainTemplateDescriptor<T>>();
-                        Expression.Assign(templateDescriptorVariable, Expression.Call(_GetServiceMethodInfo.MakeGenericMethod(templateDescriptorVariable.Type), Expression.Property(discoveryServiceParameter, _ServicesPropertyInfo))),
+                        Expression.Assign(templateDescriptorVariable, Expression.Call(_GetServiceMethodInfo.MakeGenericMethod(templateDescriptorVariable.Type), domainContextVaiable)),
                         //var template = templateDescriptor.GetTemplate(domainContext);
                         Expression.Assign(templateVariable, Expression.Call(templateDescriptorVariable, templateDescriptorVariable.Type.GetMethod("GetTemplate"), domainContextVaiable)),
                         //var service = domainGrpcDiscoveryService.Services.GetService<DomainGrpcService<T>>();

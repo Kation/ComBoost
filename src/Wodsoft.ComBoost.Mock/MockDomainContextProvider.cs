@@ -16,6 +16,9 @@ namespace Wodsoft.ComBoost.Mock
         }
 
         private bool _disposed;
+
+        public bool CanProvide => true;
+
         public void Dispose()
         {
             if (!_disposed)

@@ -9,20 +9,22 @@ namespace Wodsoft.ComBoost.AspNetCore
     {
         public HttpDomainContextProvider(IHttpContextAccessor httpContextAccessor)
         {
-            if (httpContextAccessor == null)
-                throw new ArgumentNullException(nameof(httpContextAccessor));
-            HttpContext = httpContextAccessor.HttpContext;
+            HttpContext = httpContextAccessor?.HttpContext;
         }
 
         protected HttpDomainContextProvider(HttpContext httpContext)
         {
-            HttpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
+            HttpContext = httpContext;
         }
+
+        public virtual bool CanProvide => HttpContext != null;
 
         protected HttpContext HttpContext { get; }
 
         public virtual IDomainContext GetContext()
         {
+            if (HttpContext == null)
+                throw new NotSupportedException("There is no http context currently.");
             return new HttpDomainContext(HttpContext);
         }
     }

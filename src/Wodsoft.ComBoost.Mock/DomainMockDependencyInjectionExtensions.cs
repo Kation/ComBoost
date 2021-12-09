@@ -13,16 +13,15 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IComBoostBuilder AddMock(this IComBoostBuilder builder, Action<IComBoostMockBuilder> builderConfigure = null)
         {
             builder.Services.AddScoped<IDomainContextProvider, MockDomainContextProvider>();
+            builder.Services.AddScoped<MockAuthenticationSettings>();
+            builder.Services.PostConfigure<AuthenticationProviderOptions>(options =>
+            {
+                options.AddHandler<MockAuthenticationHandler>();
+            });
             if (builderConfigure != null)
             {
                 builderConfigure(new ComBoostMockBuilder(builder.Services));
             }
-            return builder;
-        }
-
-        public static IComBoostMockBuilder AddAnonymous(this IComBoostMockBuilder builder)
-        {
-            builder.Services.AddSingleton<IAuthenticationProvider, AnonymousAuthenticationProvider>();
             return builder;
         }
 
