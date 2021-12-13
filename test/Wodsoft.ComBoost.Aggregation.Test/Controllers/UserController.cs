@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost.Aggregation.Test.Controllers
     public class UserController : ControllerBase
     {
         [HttpGet]
-        [ResultAggregate]
+        [AggregateResult]
         public Task<User[]> Get([FromServices] IEntityContext<UserEntity> userContext)
         {
             return userContext.Query().Select(t => new User

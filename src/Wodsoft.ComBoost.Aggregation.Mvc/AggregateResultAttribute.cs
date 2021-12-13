@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Wodsoft.ComBoost.Aggregation.Mvc
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class ResultAggregateAttribute : Attribute, IAsyncActionFilter
+    public class AggregateResultAttribute : Attribute, IAsyncActionFilter
     {
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
