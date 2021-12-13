@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Aggregation\Wodsoft.ComBoost.Aggregation.csproj" />
+    <ProjectReference Include="..\Wodsoft.ComBoost.Distributed\Wodsoft.ComBoost.Distributed.csproj" />
   </ItemGroup>
 
 </Project>

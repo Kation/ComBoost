@@ -7,13 +7,13 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Aggregation.Test.Models
 {
+    [Aggregate(typeof(Organization), "Organization", "OrganizationId", IsSelfIgnored = true)]
     public class User : EntityDTOBase<Guid>
     {
         public string UserName { get; set; }
 
         public string DisplayName { get; set; }
 
-        [Aggregate(typeof(Organization), "Organization", IsSelfIgnored = true)]
         public virtual Guid OrganizationId { get; set; }
     }
 }

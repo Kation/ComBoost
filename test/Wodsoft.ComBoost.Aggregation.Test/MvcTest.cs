@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AutoMapper.Extensions.ExpressionMapping;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
@@ -44,11 +45,13 @@ namespace Wodsoft.ComBoost.Aggregation.Test
                     services.AddComBoost()
                         .AddLocalService(builder =>
                         {
-                            builder.AddAggregatorService<Guid, OrganizationEntity, Organization>();
+                            builder.AddAggregatorService<OrganizationEntity, Organization>();
                         })
                         .AddMock();
                     services.AddAutoMapper(config =>
                     {
+                        config.AddExpressionMapping();
+
                         config.CreateMap<OrganizationEntity, Organization>();
                     });
                 })
@@ -76,11 +79,13 @@ namespace Wodsoft.ComBoost.Aggregation.Test
                                 })
                                 .AddMockService(() => orgServiceMock, builder =>
                                 {
-                                    builder.AddService<IDomainAggregatorService<Organization, Guid>>();
+                                    builder.AddService<IDomainAggregatorService<Organization>>();
                                 })
                                 .AddMock();
                             services.AddAutoMapper(config =>
                             {
+                                config.AddExpressionMapping();
+
                                 config.CreateMap<UserEntity, User>();
                             });
                         })

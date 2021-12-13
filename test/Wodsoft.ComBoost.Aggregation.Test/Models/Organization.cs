@@ -7,13 +7,13 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Aggregation.Test.Models
 {
+    [Aggregate(typeof(Organization), "Parent", "ParentId")]
     public class Organization
     {
         public Guid Id { get; set; }
 
         public string Name { get; set; }
 
-        [Aggregate(typeof(Organization), "Parent")]
         public virtual Guid? ParentId { get; set; }
     }
 }

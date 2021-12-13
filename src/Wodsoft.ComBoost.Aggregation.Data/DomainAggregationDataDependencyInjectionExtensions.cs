@@ -14,17 +14,17 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DomainAggregationDataDependencyInjectionExtensions
     {
-        public static IComBoostGrpcServiceBuilder AddAggregatorService<T, TKey>(this IComBoostGrpcServiceBuilder builder, CallOptions callOptions = default(CallOptions))
+        public static IComBoostGrpcServiceBuilder AddAggregatorService<T>(this IComBoostGrpcServiceBuilder builder, CallOptions callOptions = default(CallOptions))
         {
-            builder.UseTemplate<IDomainAggregatorService<T, TKey>>(callOptions);
+            builder.UseTemplate<IDomainAggregatorService<T>>(callOptions);
             return builder;
         }
 
-        public static IComBoostLocalServiceBuilder<DomainAggregatorEntityService<TKey, TEntity, TDto>> AddAggregatorService<TKey, TEntity, TDto>(this IComBoostLocalBuilder builder)
-            where TEntity : class, IEntity<TKey>
+        public static IComBoostLocalServiceBuilder<DomainAggregatorEntityService<TEntity, TDto>> AddAggregatorService<TEntity, TDto>(this IComBoostLocalBuilder builder)
+            where TEntity : class, IEntity
             where TDto : class
         {
-            return builder.AddService<DomainAggregatorEntityService<TKey, TEntity, TDto>>().UseTemplate<IDomainAggregatorService<TDto, TKey>>();
+            return builder.AddService<DomainAggregatorEntityService<TEntity, TDto>>().UseTemplate<IDomainAggregatorService<TDto>>();
         }
     }
 }

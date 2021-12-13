@@ -44,32 +44,33 @@ namespace Wodsoft.ComBoost.Aggregation
                 HasAggregation = false;
                 return;
             }
-            var aggregationProperties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(t => t.CanRead && t.GetGetMethod().IsVirtual && t.GetCustomAttribute<AggregateAttribute>() != null).ToList();
-            if (aggregationProperties.Count > 0)
+            var aggregates = type.GetCustomAttributes<AggregateAttribute>().ToArray();
+            //var aggregationProperties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(t => t.CanRead && t.GetGetMethod().IsVirtual && t.GetCustomAttribute<AggregateAttribute>() != null).ToList();
+            if (aggregates.Length > 0)
             {
                 HasAggregation = true;
             }
-            var subProperties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(t => t.PropertyType != typeof(string) && t.PropertyType != typeof(object) && t.CanRead && t.GetGetMethod().IsVirtual && t.GetCustomAttribute<IgnoreAggregateAttribute>() == null).ToList();
-            if (subProperties.Count > 0)
-            {
-                List<PropertyInfo> properties = new List<PropertyInfo>();
-                foreach (var property in subProperties)
-                {
-                    var has = (bool)typeof(DomainAggregationsBuilder<>).MakeGenericType(property.PropertyType).GetProperty(nameof(HasAggregation)).GetValue(null);
-                    if (has)
-                        properties.Add(property);
-                }
-                subProperties = properties;
-                if (properties.Count > 0)
-                    HasAggregation = true;
-            }
+            //var subProperties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(t => t.PropertyType != typeof(string) && t.PropertyType != typeof(object) && t.CanRead && t.GetGetMethod().IsVirtual && t.GetCustomAttribute<IgnoreAggregateAttribute>() == null).ToList();
+            //if (subProperties.Count > 0)
+            //{
+            //    List<PropertyInfo> properties = new List<PropertyInfo>();
+            //    foreach (var property in subProperties)
+            //    {
+            //        var has = (bool)typeof(DomainAggregationsBuilder<>).MakeGenericType(property.PropertyType).GetProperty(nameof(HasAggregation)).GetValue(null);
+            //        if (has)
+            //            properties.Add(property);
+            //    }
+            //    subProperties = properties;
+            //    if (properties.Count > 0)
+            //        HasAggregation = true;
+            //}
             if (HasAggregation)
-                BuildType(aggregationProperties, subProperties);
+                BuildType(aggregates);
         }
 
         private static readonly MethodInfo _UnwrapMethodInfo = typeof(TaskExtensions).GetMethods().First(t => t.Name == nameof(TaskExtensions.Unwrap) && t.IsGenericMethodDefinition);
 
-        private static void BuildType(List<PropertyInfo> aggregationProperties, List<PropertyInfo> subProperties)
+        private static void BuildType(AggregateAttribute[] aggregates)
         {
             var type = typeof(T);
             var typeBuilder = Module.DefineType("Wodsoft.ComBoost.Aggregation.Dynamic." + type.Name + "_" + type.GetHashCode(), TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Sealed, type);
@@ -96,81 +97,111 @@ namespace Wodsoft.ComBoost.Aggregation
             aggregateAsyncILGenerator.Emit(OpCodes.Newobj, typeof(List<Task>).GetConstructor(Array.Empty<Type>()));
             aggregateAsyncILGenerator.Emit(OpCodes.Stloc, tasksVariable);
 
-            foreach (var property in aggregationProperties)
+            foreach (var aggregateAttribute in aggregates)
             {
-                var aggregateAttribute = property.GetCustomAttribute<AggregateAttribute>();
+                List<PropertyInfo> properties = new List<PropertyInfo>();
+                foreach (var propertyName in aggregateAttribute.KeyProperties)
+                {
+                    var property = type.GetProperty(propertyName);
+                    if (property == null)
+                        throw new ArgumentException($"Could not find property \"{propertyName}\" to aggregate.");
+                    if (!property.CanRead)
+                        throw new NotSupportedException($"Property \"{propertyName}\" does not support read.");
+                    properties.Add(property);
+                }
                 if (aggregateAttribute.IsSelfIgnored)
                 {
-                    var overrideProperty = typeBuilder.DefineProperty(property.Name, property.Attributes, property.PropertyType, null);
-
-                    var getMethod = property.GetGetMethod();
-                    var overrideGetMethod = typeBuilder.DefineMethod(getMethod.Name, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.SpecialName);
-                    overrideGetMethod.SetReturnType(getMethod.ReturnType);
-                    var overrideGetILGenerator = overrideGetMethod.GetILGenerator();
-                    overrideGetILGenerator.Emit(OpCodes.Ldarg_0);
-                    overrideGetILGenerator.Emit(OpCodes.Call, getMethod);
-                    overrideGetILGenerator.Emit(OpCodes.Ret);
-
-                    var setMethod = property.GetSetMethod();
-                    var overrideSetMethod = typeBuilder.DefineMethod(setMethod.Name, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.SpecialName);
-                    overrideSetMethod.SetParameters(property.PropertyType);
-                    var overrideSetILGenerator = overrideSetMethod.GetILGenerator();
-                    overrideSetILGenerator.Emit(OpCodes.Ldarg_0);
-                    overrideSetILGenerator.Emit(OpCodes.Ldarg_1);
-                    overrideSetILGenerator.Emit(OpCodes.Call, setMethod);
-                    overrideSetILGenerator.Emit(OpCodes.Ret);
-
-                    //overrideMethod.SetCustomAttribute
-                    foreach (var extension in Extensions)
+                    foreach (var property in properties)
                     {
-                        foreach (var att in extension.CreateIgnoredPropertyAttribute())
+                        var overrideProperty = typeBuilder.DefineProperty(property.Name, property.Attributes, property.PropertyType, null);
+
+                        var getMethod = property.GetGetMethod();
+                        var overrideGetMethod = typeBuilder.DefineMethod(getMethod.Name, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.SpecialName);
+                        overrideGetMethod.SetReturnType(getMethod.ReturnType);
+                        var overrideGetILGenerator = overrideGetMethod.GetILGenerator();
+                        overrideGetILGenerator.Emit(OpCodes.Ldarg_0);
+                        overrideGetILGenerator.Emit(OpCodes.Call, getMethod);
+                        overrideGetILGenerator.Emit(OpCodes.Ret);
+
+                        var setMethod = property.GetSetMethod();
+                        var overrideSetMethod = typeBuilder.DefineMethod(setMethod.Name, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.SpecialName);
+                        overrideSetMethod.SetParameters(property.PropertyType);
+                        var overrideSetILGenerator = overrideSetMethod.GetILGenerator();
+                        overrideSetILGenerator.Emit(OpCodes.Ldarg_0);
+                        overrideSetILGenerator.Emit(OpCodes.Ldarg_1);
+                        overrideSetILGenerator.Emit(OpCodes.Call, setMethod);
+                        overrideSetILGenerator.Emit(OpCodes.Ret);
+
+                        //overrideMethod.SetCustomAttribute
+                        foreach (var extension in Extensions)
                         {
-                            overrideProperty.SetCustomAttribute(att);
+                            foreach (var att in extension.CreateIgnoredPropertyAttribute())
+                            {
+                                overrideProperty.SetCustomAttribute(att);
+                            }
                         }
+                        //typeBuilder.DefineMethodOverride(overrideMethod, getMethod);
+                        overrideProperty.SetGetMethod(overrideGetMethod);
+                        overrideProperty.SetSetMethod(overrideSetMethod);
                     }
-                    //typeBuilder.DefineMethodOverride(overrideMethod, getMethod);
-                    overrideProperty.SetGetMethod(overrideGetMethod);
-                    overrideProperty.SetSetMethod(overrideSetMethod);
                 }
 
-                Type underlyingType = Nullable.GetUnderlyingType(property.PropertyType);
-                var keyVariable = aggregateAsyncILGenerator.DeclareLocal(property.PropertyType);
+                var valuesVariable = aggregateAsyncILGenerator.DeclareLocal(typeof(object[]));
+                aggregateAsyncILGenerator.Emit(OpCodes.Ldc_I4, properties.Count);
+                aggregateAsyncILGenerator.Emit(OpCodes.Newarr, typeof(object));
+                aggregateAsyncILGenerator.Emit(OpCodes.Stloc, valuesVariable);
                 var endLabel = aggregateAsyncILGenerator.DefineLabel();
-                //Read property
-                aggregateAsyncILGenerator.Emit(OpCodes.Ldarg_0);
-                aggregateAsyncILGenerator.Emit(OpCodes.Callvirt, property.GetGetMethod());
-                aggregateAsyncILGenerator.Emit(OpCodes.Stloc, keyVariable);
-                if (property.PropertyType.IsClass || underlyingType != null)
+
+                foreach (var property in properties)
                 {
-                    //Check if key property has value
-                    if (property.PropertyType.IsValueType)
+                    Type underlyingType = Nullable.GetUnderlyingType(property.PropertyType);
+                    var keyVariable = aggregateAsyncILGenerator.DeclareLocal(property.PropertyType);
+                    //Read property
+                    aggregateAsyncILGenerator.Emit(OpCodes.Ldarg_0);
+                    aggregateAsyncILGenerator.Emit(OpCodes.Callvirt, property.GetGetMethod());
+                    aggregateAsyncILGenerator.Emit(OpCodes.Stloc, keyVariable);
+                    if (property.PropertyType.IsClass || underlyingType != null)
                     {
-                        aggregateAsyncILGenerator.Emit(OpCodes.Ldloca, keyVariable);
-                        aggregateAsyncILGenerator.Emit(OpCodes.Call, property.PropertyType.GetProperty("HasValue").GetMethod);
+                        //Check if key property has value
+                        if (property.PropertyType.IsValueType)
+                        {
+                            aggregateAsyncILGenerator.Emit(OpCodes.Ldloca, keyVariable);
+                            aggregateAsyncILGenerator.Emit(OpCodes.Call, property.PropertyType.GetProperty("HasValue").GetMethod);
+                        }
+                        else
+                            aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, keyVariable);
+                        //aggregateAsyncILGenerator.Emit(OpCodes.Ldstr, "No need to aggregate.");
+                        //aggregateAsyncILGenerator.Emit(OpCodes.Call, typeof(Debug).GetMethod("WriteLine", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null));
+                        aggregateAsyncILGenerator.Emit(OpCodes.Brfalse, endLabel);
+                    }
+                    aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, valuesVariable);
+                    aggregateAsyncILGenerator.Emit(OpCodes.Ldc_I4, properties.IndexOf(property));
+                    if (underlyingType == null)
+                    {
+                        aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, keyVariable);
+                        if (property.PropertyType.IsValueType)
+                            aggregateAsyncILGenerator.Emit(OpCodes.Box, property.PropertyType);
                     }
                     else
-                        aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, keyVariable);
-                    aggregateAsyncILGenerator.Emit(OpCodes.Ldstr, "No need to aggregate.");
-                    aggregateAsyncILGenerator.Emit(OpCodes.Call, typeof(Debug).GetMethod("WriteLine", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null));
-                    aggregateAsyncILGenerator.Emit(OpCodes.Brfalse, endLabel);
+                    {
+                        aggregateAsyncILGenerator.Emit(OpCodes.Ldloca, keyVariable);
+                        aggregateAsyncILGenerator.Emit(OpCodes.Call, property.PropertyType.GetProperty("Value").GetMethod);
+                        aggregateAsyncILGenerator.Emit(OpCodes.Box, underlyingType);
+                    }
+                    //values[i] = value;
+                    aggregateAsyncILGenerator.Emit(OpCodes.Stelem_Ref);
                 }
                 //if has value
                 //tasks.Add(...);
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, tasksVariable);
-                var getAggregationMethod = typeof(IDomainAggregator).GetMethod(nameof(IDomainAggregator.GetAggregationAsync)).MakeGenericMethod(aggregateAttribute.AggregationType, underlyingType ?? property.PropertyType);
-                //aggregator.GetAggregation<T,TKey>(keyVariable)
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldarg_1);
-                if (underlyingType != null)
-                {
-                    aggregateAsyncILGenerator.Emit(OpCodes.Ldloca, keyVariable);
-                    aggregateAsyncILGenerator.Emit(OpCodes.Call, property.PropertyType.GetProperty("Value").GetMethod);
-                }
-                else
-                    aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, keyVariable);
+                var getAggregationMethod = typeof(IDomainAggregator).GetMethod(nameof(IDomainAggregator.GetAggregationAsync)).MakeGenericMethod(aggregateAttribute.AggregationType);
+                //aggregator.GetAggregation<T>(keyVariable)
+                aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, valuesVariable);
                 aggregateAsyncILGenerator.Emit(OpCodes.Callvirt, getAggregationMethod);
 
                 //Define ContinueWith method
-                var continueMethod = typeBuilder.DefineMethod("continue_" + property.Name, MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot, null, new Type[] { getAggregationMethod.ReturnType });
+                var continueMethod = typeBuilder.DefineMethod("continue_" + aggregateAttribute.AggregationName, MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot, null, new Type[] { getAggregationMethod.ReturnType });
                 var continueILGenerator = continueMethod.GetILGenerator();
                 var continueNotFaultLabel = continueILGenerator.DefineLabel();
                 continueILGenerator.Emit(OpCodes.Ldarg_1);
@@ -183,13 +214,12 @@ namespace Wodsoft.ComBoost.Aggregation
                 continueILGenerator.MarkLabel(continueNotFaultLabel);
 
 
-                var ignoreAttribute = property.GetCustomAttribute<IgnoreAggregateAttribute>();
                 Type nestType;
                 if (aggregateAttribute.AggregationType == type)
                     nestType = typeBuilder;
                 else
                     nestType = (Type)typeof(DomainAggregationsBuilder<>).MakeGenericType(aggregateAttribute.AggregationType).GetProperty(nameof(AggregationType), BindingFlags.Public | BindingFlags.Static).GetValue(null);
-                if (ignoreAttribute == null && nestType != null)
+                if (aggregateAttribute.IsNestAggregate && nestType != null)
                 {
                     //var returnMethod = typeBuilder.DefineMethod("return_" + property.Name, MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot, aggregateAttribute.AggregationType, new Type[] { typeof(Task), typeof(object) });
                     //var returnILGenerator = returnMethod.GetILGenerator();
@@ -208,7 +238,7 @@ namespace Wodsoft.ComBoost.Aggregation
                     //returnILGenerator.Emit(OpCodes.Castclass, aggregateAttribute.AggregationType);
                     //returnILGenerator.Emit(OpCodes.Ret);
 
-                    var nestMethod = typeBuilder.DefineMethod("nest_" + property.Name, MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot, getAggregationMethod.ReturnType, new Type[] { getAggregationMethod.ReturnType, typeof(object) });
+                    var nestMethod = typeBuilder.DefineMethod("nest_" + aggregateAttribute.AggregationName, MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot, getAggregationMethod.ReturnType, new Type[] { getAggregationMethod.ReturnType, typeof(object) });
                     //.ContinueWith(nest_..., aggregator).Unwrap()
                     aggregateAsyncILGenerator.Emit(OpCodes.Ldarg_0);
                     aggregateAsyncILGenerator.Emit(OpCodes.Ldftn, nestMethod);

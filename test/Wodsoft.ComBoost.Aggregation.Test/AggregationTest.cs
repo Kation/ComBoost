@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,11 +51,13 @@ namespace Wodsoft.ComBoost.Aggregation.Test
                         })
                         .AddMockService(()=> orgServiceMock, builder=>
                         {
-                            builder.AddService<IDomainAggregatorService<Organization, Guid>>();
+                            builder.AddService<IDomainAggregatorService<Organization>>();
                         })
                         .AddMock();
                     services.AddAutoMapper(config =>
                     {
+                        config.AddExpressionMapping();
+
                         config.CreateMap<UserEntity, User>();
                     });
                 })
@@ -68,11 +71,13 @@ namespace Wodsoft.ComBoost.Aggregation.Test
                     services.AddComBoost()
                         .AddLocalService(builder =>
                         {
-                            builder.AddAggregatorService<Guid, OrganizationEntity, Organization>();
+                            builder.AddAggregatorService<OrganizationEntity, Organization>();
                         })
                         .AddMock();
                     services.AddAutoMapper(config =>
                     {
+                        config.AddExpressionMapping();
+
                         config.CreateMap<OrganizationEntity, Organization>();
                     });
                 })

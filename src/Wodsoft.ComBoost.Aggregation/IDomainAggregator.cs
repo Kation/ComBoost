@@ -11,6 +11,6 @@ namespace Wodsoft.ComBoost.Aggregation
 
         Task<object> AggregateAsync(object value, Type valueType);
 
-        Task<T> GetAggregationAsync<T, TKey>(TKey id);
+        Task<T> GetAggregationAsync<T>(params object[] keys);
     }
 }

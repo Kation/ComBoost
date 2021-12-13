@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Aggregation.Caching
 {
-    public class DomainAggregatorMemoryCacheProvider<T, TKey> : IDomainAggregatorProvider<T, TKey>
+    public class DomainAggregatorMemoryCacheProvider<T> : IDomainAggregatorProvider<T>
     {
         private IMemoryCache _cache;
         private DomainAggregatorMemoryCacheOptions _options;
@@ -18,9 +18,9 @@ namespace Wodsoft.ComBoost.Aggregation.Caching
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public Task<T> GetAsync(TKey key, DomainAggregatorExecutionPipeline<T> next)
+        public Task<T> GetAsync(object[] keys, DomainAggregatorExecutionPipeline<T> next)
         {
-            var keyName = $"{_options.Prefix}{typeof(T).FullName}_{key}";
+            var keyName = $"{_options.Prefix}{typeof(T).FullName}_{string.Join("_", keys)}";
             var value = _cache.Get<T>(keyName);
             if (value != null || next == null)
                 return Task.FromResult(value);

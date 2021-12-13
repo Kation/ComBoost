@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Aggregation
 {
-    public interface IDomainAggregatorService<T, TKey> : IDomainTemplate
+    public interface IDomainAggregatorService<T> : IDomainTemplate
     {
-        Task<T> GetAsync(TKey id);
+        Task<T> GetAsync(string[] keys);
     }
 }

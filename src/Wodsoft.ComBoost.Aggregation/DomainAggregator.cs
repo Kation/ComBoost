@@ -45,9 +45,9 @@ namespace Wodsoft.ComBoost.Aggregation
             return aggregation.AggregateAsync(this).ContinueWith(task => (object)aggregation);
         }
 
-        public async Task<T> GetAggregationAsync<T, TKey>(TKey id)
+        public async Task<T> GetAggregationAsync<T>(object[] keys)
         {
-            var providers = _services.GetServices<IDomainAggregatorProvider<T, TKey>>().ToArray();
+            var providers = _services.GetServices<IDomainAggregatorProvider<T>>().ToArray();
             if (providers.Length == 0)
                 return default;
             DomainAggregatorExecutionPipeline<T> pipeline = null;
@@ -55,7 +55,7 @@ namespace Wodsoft.ComBoost.Aggregation
             {
                 var next = pipeline;
                 var index = i;
-                pipeline = () => providers[index].GetAsync(id, next);
+                pipeline = () => providers[index].GetAsync(keys, next);
             }
             return await pipeline();
         }

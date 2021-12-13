@@ -17,7 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IComBoostAggregationBuilder UseAggregatorService(this IComBoostAggregationBuilder builder)
         {
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IDomainAggregatorProvider<,>), typeof(DomainAggregatorProvider<,>)));
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IDomainAggregatorProvider<>), typeof(DomainAggregatorProvider<>)));
             return new ComBoostAggregationBuilder(builder.Services);
         }
     }

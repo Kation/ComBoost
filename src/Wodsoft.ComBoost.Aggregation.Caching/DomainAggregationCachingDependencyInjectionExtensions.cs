@@ -15,7 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddMemoryCache();
             if (setupAction != null)
                 builder.Services.PostConfigure(setupAction);
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IDomainAggregatorProvider<,>), typeof(DomainAggregatorMemoryCacheProvider<,>)));
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IDomainAggregatorProvider<>), typeof(DomainAggregatorMemoryCacheProvider<>)));
             return new ComBoostAggregationBuilder(builder.Services);
         }
 
@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (setupAction != null)
                 builder.Services.PostConfigure(setupAction);
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IDomainAggregatorProvider<,>), typeof(DomainAggregatorDistributedCacheProvider<,>)));
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IDomainAggregatorProvider<>), typeof(DomainAggregatorDistributedCacheProvider<>)));
             return new ComBoostAggregationBuilder(builder.Services);
         }
     }

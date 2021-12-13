@@ -92,8 +92,6 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             while (type.GetTypeInfo().Assembly.IsDynamic)
                 type = type.GetTypeInfo().BaseType;
-            if (!typeof(IEntity).IsAssignableFrom(type))
-                throw new NotSupportedException("该类型没有继承IEntity接口。");
             IEntityMetadata metadata = _Metadata.GetOrAdd(type, s =>
             {
                 var metadataField = type.GetField("Metadata", BindingFlags.Static | BindingFlags.Public);
