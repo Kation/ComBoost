@@ -62,16 +62,6 @@ namespace Wodsoft.ComBoost
             }
 
             public TService Service { get; }
-
-            protected IList<IDomainServiceFilter> GetFilters(string methodName)
-            {
-                List<IDomainServiceFilter> items = new List<IDomainServiceFilter>();
-                items.AddRange(Context.GetService<IOptions<DomainFilterOptions>>().Value.Filters);
-                var serviceFilterOptions = Context.GetService<IOptionsMonitor<DomainFilterOptions<TService>>>();
-                items.AddRange(serviceFilterOptions.CurrentValue.Filters);
-                items.AddRange(serviceFilterOptions.Get(methodName).Filters);
-                return items;
-            }
         }
     }
 
