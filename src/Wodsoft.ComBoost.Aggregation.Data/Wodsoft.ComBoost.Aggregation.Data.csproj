@@ -7,7 +7,7 @@
   <Import Project="../../common.props" />
 
   <ItemGroup>
-    <ProjectReference Include="..\Wodsoft.ComBoost.Aggregation\Wodsoft.ComBoost.Aggregation.csproj" />
+    <ProjectReference Include="..\Wodsoft.ComBoost.Aggregation.Core\Wodsoft.ComBoost.Aggregation.Core.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.Grpc.Client\Wodsoft.ComBoost.Grpc.Client.csproj" />
   </ItemGroup>

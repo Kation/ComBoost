@@ -5,5 +5,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <Import Project="../../common.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.Core\Wodsoft.ComBoost.Core.csproj" />
+  </ItemGroup>
 
 </Project>
