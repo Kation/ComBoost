@@ -39,6 +39,24 @@ namespace Wodsoft.ComBoost
 
         public IComBoostLocalBuilder LocalBuilder { get; }
 
+        public IComBoostLocalServiceBuilder<TService> UseEventHandler<TArgs>(DomainServiceEventHandler<TArgs> handler) where TArgs : DomainServiceEventArgs
+        {
+            Services.PostConfigure<DomainServiceEventManagerOptions<TService>>(options => options.AddEventHandler(handler));
+            return this;
+        }
+
+        public IComBoostLocalServiceBuilder<TService> UseEventHandler<THandler, TArgs>()
+            where THandler : IDomainServiceEventHandler<TArgs>, new()
+            where TArgs : DomainServiceEventArgs
+        {
+            Services.PostConfigure<DomainServiceEventManagerOptions<TService>>(options =>
+            {
+                var handler = new THandler();
+                options.AddEventHandler<TArgs>(handler.Handle);
+            });
+            return this;
+        }
+
         public IComBoostLocalServiceBuilder<TService> UseFilter<T>(params string[] methods)
             where T : class, IDomainServiceFilter, new()
         {

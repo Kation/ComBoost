@@ -20,4 +20,10 @@ namespace Wodsoft.ComBoost
 
         internal Dictionary<Type, Delegate> GetEvents() => _events;
     }
+
+    public class DomainServiceEventManagerOptions<T> : DomainServiceEventManagerOptions
+        where T : class, IDomainService
+    {
+
+    }
 }

@@ -82,6 +82,22 @@ namespace Wodsoft.ComBoost
             }
         }
 
+        internal virtual void AddEventHandler(Type type, Delegate handler)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+            if (handler == null)
+                throw new ArgumentNullException(nameof(handler));
+            lock (_Events)
+            {
+                _Events.TryGetValue(type, out var d);
+                if (d == null)
+                    _Events[type] = handler;
+                else
+                    _Events[type] = Delegate.Combine(d, handler);
+            }
+        }
+
         /// <summary>
         /// 移除事件处理器。
         /// </summary>
@@ -95,10 +111,22 @@ namespace Wodsoft.ComBoost
             lock (_Events)
             {
                 Delegate d = GetEventDelegate<T>();
-                if (d == null)
-                    SetEventDelegate<T>(handler);
-                else
+                if (d != null)
                     SetEventDelegate<T>(Delegate.Remove(d, handler));
+            }
+        }
+
+        internal virtual void RemoveEventHandler(Type type, Delegate handler)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+            if (handler == null)
+                throw new ArgumentNullException(nameof(handler));
+            lock (_Events)
+            {
+                _Events.TryGetValue(type, out var d);
+                if (d != null)
+                    _Events[type] = Delegate.Remove(d, handler);
             }
         }
 

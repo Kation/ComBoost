@@ -25,6 +25,9 @@ namespace Wodsoft.ComBoost
             {
                 DomainService = domainService;
                 DomainContext = domainContext;
+                var events = domainContext.GetService<IOptions<DomainServiceEventManagerOptions<TDomainService>>>().Value.GetEvents();
+                foreach (var e in events)
+                    domainContext.EventManager.AddEventHandler(e.Key, e.Value);
             }
 
             public TDomainService DomainService { get; }
