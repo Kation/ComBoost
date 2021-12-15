@@ -26,5 +26,16 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             return builder.AddService<DomainAggregatorEntityService<TEntity, TDto>>().UseTemplate<IDomainAggregatorService<TDto>>();
         }
+
+        public static IComBoostLocalServiceBuilder<EntityDomainService<TEntity, TListDto, TCreateDto, TEditDto, TRemoveDto>> AddEntityService<TEntity, TListDto, TCreateDto, TEditDto, TRemoveDto>(this IComBoostLocalServiceBuilder<EntityDomainService<TEntity, TListDto, TCreateDto, TEditDto, TRemoveDto>> builder)
+            where TEntity : class, IEntity
+            where TListDto : class, IEntityDTO
+            where TCreateDto : class, IEntityDTO
+            where TEditDto : class, IEntityDTO
+            where TRemoveDto : class
+        {
+            
+            return builder;
+        }
     }
 }

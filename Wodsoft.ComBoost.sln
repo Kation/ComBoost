@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30225.117
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{42E2F6CA-200F-471D-B92A-4D0961AB35E8}"
 EndProject
@@ -90,9 +90,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Aggregatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Aggregation.Test", "test\Wodsoft.ComBoost.Aggregation.Test\Wodsoft.ComBoost.Aggregation.Test.csproj", "{EE5B4D7C-C518-492F-8B3B-D1617F87A08A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.Aggregation.Json", "src\Wodsoft.ComBoost.Aggregation.Json\Wodsoft.ComBoost.Aggregation.Json.csproj", "{B9C7A664-245B-43C7-B00D-8B90DAA778F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Aggregation.Json", "src\Wodsoft.ComBoost.Aggregation.Json\Wodsoft.ComBoost.Aggregation.Json.csproj", "{B9C7A664-245B-43C7-B00D-8B90DAA778F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.Aggregation.NewtonsoftJson", "src\Wodsoft.ComBoost.Aggregation.NewtonsoftJson\Wodsoft.ComBoost.Aggregation.NewtonsoftJson.csproj", "{CB805225-45B7-4462-BD86-A618C4E56467}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Aggregation.NewtonsoftJson", "src\Wodsoft.ComBoost.Aggregation.NewtonsoftJson\Wodsoft.ComBoost.Aggregation.NewtonsoftJson.csproj", "{CB805225-45B7-4462-BD86-A618C4E56467}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Aggregation.Core", "src\Wodsoft.ComBoost.Aggregation.Core\Wodsoft.ComBoost.Aggregation.Core.csproj", "{958F33D4-45DB-4576-B506-2D28ACE1BE69}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Aggregation.Caching.Data", "src\Wodsoft.ComBoost.Aggregation.Caching.Data\Wodsoft.ComBoost.Aggregation.Caching.Data.csproj", "{6BD0352F-4532-4D12-B445-5CF85ACB7547}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.Data.Distributed", "src\Wodsoft.ComBoost.Data.Distributed\Wodsoft.ComBoost.Data.Distributed.csproj", "{58620E18-0281-4C61-9B6F-82AFFB76B59C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -548,6 +554,42 @@ Global
 		{CB805225-45B7-4462-BD86-A618C4E56467}.Release|ARM.Build.0 = Release|Any CPU
 		{CB805225-45B7-4462-BD86-A618C4E56467}.Release|x86.ActiveCfg = Release|Any CPU
 		{CB805225-45B7-4462-BD86-A618C4E56467}.Release|x86.Build.0 = Release|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Debug|ARM.Build.0 = Debug|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Debug|x86.Build.0 = Debug|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Release|ARM.ActiveCfg = Release|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Release|ARM.Build.0 = Release|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Release|x86.ActiveCfg = Release|Any CPU
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69}.Release|x86.Build.0 = Release|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Debug|ARM.Build.0 = Debug|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Debug|x86.Build.0 = Debug|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Release|ARM.ActiveCfg = Release|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Release|ARM.Build.0 = Release|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Release|x86.ActiveCfg = Release|Any CPU
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547}.Release|x86.Build.0 = Release|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Debug|ARM.Build.0 = Debug|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Debug|x86.Build.0 = Debug|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Release|ARM.ActiveCfg = Release|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Release|ARM.Build.0 = Release|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Release|x86.ActiveCfg = Release|Any CPU
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -593,6 +635,9 @@ Global
 		{EE5B4D7C-C518-492F-8B3B-D1617F87A08A} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
 		{B9C7A664-245B-43C7-B00D-8B90DAA778F8} = {8CD0BFB3-4317-44C0-921A-8062FA141CA8}
 		{CB805225-45B7-4462-BD86-A618C4E56467} = {8CD0BFB3-4317-44C0-921A-8062FA141CA8}
+		{958F33D4-45DB-4576-B506-2D28ACE1BE69} = {8CD0BFB3-4317-44C0-921A-8062FA141CA8}
+		{6BD0352F-4532-4D12-B445-5CF85ACB7547} = {8CD0BFB3-4317-44C0-921A-8062FA141CA8}
+		{58620E18-0281-4C61-9B6F-82AFFB76B59C} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACC3A7A0-05C5-40E9-ABE8-98770CA245F0}
