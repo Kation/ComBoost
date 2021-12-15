@@ -35,6 +35,7 @@ jobs:
         dotnet pack -c Release src/Wodsoft.ComBoost.Core/Wodsoft.ComBoost.Core.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Data/Wodsoft.ComBoost.Data.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Data.Core/Wodsoft.ComBoost.Data.Core.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Data.Distributed/Wodsoft.ComBoost.Data.Distributed.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Distributed/Wodsoft.ComBoost.Distributed.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Distributed.CAP/Wodsoft.ComBoost.Distributed.CAP.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Distributed.RabbitMQ/Wodsoft.ComBoost.Distributed.RabbitMQ.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
@@ -49,6 +50,8 @@ jobs:
         dotnet pack -c Release src/Wodsoft.ComBoost.Grpc.Client/Wodsoft.ComBoost.Grpc.Client.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation/Wodsoft.ComBoost.Aggregation.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Caching/Wodsoft.ComBoost.Aggregation.Caching.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Caching.Data/Wodsoft.ComBoost.Aggregation.Caching.Data.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Core/Wodsoft.ComBoost.Aggregation.Core.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Data/Wodsoft.ComBoost.Aggregation.Data.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Json/Wodsoft.ComBoost.Aggregation.Json.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Mvc/Wodsoft.ComBoost.Aggregation.Mvc.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build

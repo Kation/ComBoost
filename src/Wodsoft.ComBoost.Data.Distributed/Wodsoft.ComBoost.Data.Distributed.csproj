@@ -1,8 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>ComBoost分布式数据模块。</Description>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+  <Import Project="../../common.props" />
 
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.csproj" />
