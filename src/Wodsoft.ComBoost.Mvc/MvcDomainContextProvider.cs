@@ -10,7 +10,7 @@ namespace Wodsoft.ComBoost.Mvc
 {
     public class MvcDomainContextProvider : HttpDomainContextProvider
     {
-        public MvcDomainContextProvider(IActionContextAccessor actionContextAccessor) : base(actionContextAccessor?.ActionContext.HttpContext)
+        public MvcDomainContextProvider(IActionContextAccessor actionContextAccessor) : base(actionContextAccessor?.ActionContext?.HttpContext)
         {
             ActionContext = actionContextAccessor?.ActionContext;
         }
