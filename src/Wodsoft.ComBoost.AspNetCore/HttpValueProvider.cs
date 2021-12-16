@@ -41,7 +41,7 @@ namespace Wodsoft.ComBoost.AspNetCore
             {
                 ValueSelectors.Add(new HttpJsonValueSelector(httpContext));
             }
-            ValueSelectors.Add(new HttpHeaderValueSelector(httpContext));
+            //ValueSelectors.Add(new HttpHeaderValueSelector(httpContext));
         }
 
         /// <summary>
