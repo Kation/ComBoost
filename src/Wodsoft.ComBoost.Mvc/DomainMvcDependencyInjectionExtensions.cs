@@ -36,7 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IComBoostBuilder AddMvc(this IComBoostBuilder builder)
         {
-            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.AddContextProvider<MvcDomainContextProvider>(200));
+            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.TryAddContextProvider<MvcDomainContextProvider>(200));
             builder.Services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();            
             return builder;
         }

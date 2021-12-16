@@ -39,12 +39,17 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        [Obsolete("It is already add a empty context provider when use AddComBoost.")]
+        public static IComBoostBuilder ClearDomainContextProvider(this IComBoostBuilder builder)
+        {
+            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.ClearContextProvider());
+            return builder;
+        }
+
         public static IComBoostBuilder AddEmptyContextProvider(this IComBoostBuilder builder)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
-            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.AddContextProvider<EmptyDomainContextProvider>(1000));
+            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.TryAddContextProvider<EmptyDomainContextProvider>(1000));
             return builder;
         }
 

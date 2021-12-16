@@ -21,6 +21,8 @@ namespace Wodsoft.ComBoost
 
         public IDomainContext GetContext()
         {
+            if (_providers.Count == 0)
+                throw new NotSupportedException("There is no domain context provider configured.");
             for (int i = 0; i < _providers.Count; i++)
             {
                 var type = _providers[i];

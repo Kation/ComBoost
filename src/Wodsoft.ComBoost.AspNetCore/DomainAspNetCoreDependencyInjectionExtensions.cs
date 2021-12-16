@@ -32,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             builder.Services.AddRouting();
             builder.Services.AddHttpContextAccessor();
-            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.AddContextProvider<HttpDomainContextProvider>(500));
+            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.TryAddContextProvider<HttpDomainContextProvider>(500));
             builder.Services.TryAddScoped<IExecutionResultHandler, DefaultExecutionResultHandler>();
             builder.Services.PostConfigure<AuthenticationProviderOptions>(options => options.AddHandler<AspNetCoreAuthenticationHandler>(500));
             if (builderConfigure != null)

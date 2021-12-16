@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Text;
 
 namespace Wodsoft.ComBoost
@@ -19,6 +20,12 @@ namespace Wodsoft.ComBoost
         }
 
         public IReadOnlyList<Type> Providers { get; }
+
+        public void ClearContextProvider()
+        {
+            _orders.Clear();
+            _providers.Clear();
+        }
 
         public void AddContextProvider<T>(int order = 0)
             where T : class, IDomainContextProvider
@@ -38,6 +45,15 @@ namespace Wodsoft.ComBoost
                     _providers.Insert(i, typeof(T));
                 }
             }
+        }
+
+        public void TryAddContextProvider<T>(int order = 0)
+            where T : class, IDomainContextProvider
+        {
+            var type = typeof(T);
+            if (_providers.Contains(type))
+                return;
+            AddContextProvider<T>(order);
         }
     }
 }
