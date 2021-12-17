@@ -6,6 +6,7 @@
   <Import Project="../../common.props" />
 
   <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.Distributed\Wodsoft.ComBoost.Distributed.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.Security\Wodsoft.ComBoost.Security.csproj" />
   </ItemGroup>

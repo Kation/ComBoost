@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -40,6 +41,32 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builderConfigure));
             builderConfigure(new ComBoostMockServiceBuilder(builder.Services, () => hostGetter().Services));
             return builder;
+        }
+
+        public static IComBoostDistributedBuilder UseInMemory(this IComBoostDistributedBuilder builder)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDomainDistributedEventProvider, MockInMemoryEventProvider>());
+            return builder;
+        }
+
+        public static IComBoostDistributedBuilder UseInMemory(this IComBoostDistributedBuilder builder, Action<MockInMemoryEventOptions> optionsConfigure)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (optionsConfigure == null)
+                throw new ArgumentNullException(nameof(optionsConfigure));
+            builder.Services.PostConfigure(optionsConfigure);
+            return UseInMemory(builder);
+        }
+
+        public static IComBoostDistributedBuilder UseInMemory(this IComBoostDistributedBuilder builder, object instanceKey)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            builder.Services.PostConfigure<MockInMemoryEventOptions>(options => options.InstanceKey = instanceKey);
+            return UseInMemory(builder);
         }
     }
 }
