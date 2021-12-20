@@ -50,6 +50,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             _CachedEntityContext.Add(typeof(T), context);
             return context;
         }
+
+        public IDatabaseTransaction CreateTransaction()
+        {
+            return new DatabaseTransaction(InnerContext.Database.BeginTransaction());
+        }
     }
     public class DatabaseContext<TDbContext> : DatabaseContext
         where TDbContext : DbContext

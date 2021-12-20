@@ -12,6 +12,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.ObjectModel;
+using System.Transactions;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -51,6 +52,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             _CachedEntityContext.Add(typeof(T), context);
             return context;
         }
+
+        public IDatabaseTransaction CreateTransaction()
+        {
+            return new DatabaseTransaction(InnerContext.Database.BeginTransaction());
+        }
     }
 
     public class DatabaseContext<TDbContext> : DatabaseContext
@@ -67,7 +73,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public DatabaseContext(TDbContext context) : base(context)
         {
-            
+
         }
 
         public override IEnumerable<Type> SupportTypes => _supportTypes;

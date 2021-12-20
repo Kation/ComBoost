@@ -28,5 +28,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         /// <returns>返回受影响的行数。</returns>
         Task<int> SaveAsync();
+
+        /// <summary>
+        /// Create a transcation.
+        /// </summary>
+        /// <returns></returns>
+        IDatabaseTransaction CreateTransaction();
     }
 }
