@@ -19,24 +19,19 @@ namespace Wodsoft.ComBoost.Security
             _handlers = options.Value.Handlers;
         }
 
-        private ClaimsPrincipal _user;
         public async Task<ClaimsPrincipal> GetUserAsync()
         {
-            if (_user != null)
-                return _user;
             for (int i = 0; i < _handlers.Count; i++)
             {
                 IAuthenticationHandler handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(_serviceProvider, _handlers[i]);
                 var result = await handler.AuthenticateAsync();
                 if (result.IsSuccess)
                 {
-                    _user = result.Principal;
-                    return _user;
+                    return result.Principal;
                 }
             }
             ClaimsIdentity identity = new ClaimsIdentity("Anonymous");
-            _user = new ClaimsPrincipal(identity);
-            return _user;
+            return new ClaimsPrincipal(identity);
         }
     }
 }
