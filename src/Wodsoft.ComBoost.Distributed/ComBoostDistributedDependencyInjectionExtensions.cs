@@ -33,5 +33,12 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IDomainRpcServerResponseHandler, T>());
             return builder;
         }
+
+        public static IComBoostLocalBuilder AddDistributedEventPublisher<TArgs>(this IComBoostLocalBuilder builder)
+            where TArgs : DomainServiceEventArgs
+        {
+            builder.AddEventHandler<DomainDistributedEventPublisher<TArgs>, TArgs>();
+            return builder;
+        }
     }
 }
