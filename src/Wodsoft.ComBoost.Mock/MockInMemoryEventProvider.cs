@@ -75,6 +75,12 @@ namespace Wodsoft.ComBoost.Mock
                 return;
             var tasks = handlers.Select(t => t(args)).ToArray();
             await Task.WhenAll(tasks);
+            var eventType = typeof(T);
+            foreach (var monitor in _monitors)
+            {
+                if (monitor.EventType == eventType)
+                    monitor.Fired();
+            }
         }
 
         public MockInMemoryEventMonitor RegisterEventMonitor<T>()
