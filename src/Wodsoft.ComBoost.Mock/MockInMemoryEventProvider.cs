@@ -15,6 +15,7 @@ namespace Wodsoft.ComBoost.Mock
         private MockInMemoryInstance _instance;
         private MockInMemoryEventOptions _options;
         private IServiceProvider _serviceProvider;
+        private List<MockInMemoryEventMonitor> _monitors;
 
         public MockInMemoryEventProvider(IServiceProvider serviceProvider, IOptions<MockInMemoryEventOptions> options)
         {
@@ -50,7 +51,7 @@ namespace Wodsoft.ComBoost.Mock
             if (features.Contains(DomainDistributedEventFeatures.Group))
                 group = _options.GroupName;
             else
-                group = null;
+                group = string.Empty;
             _instance.AddEventHandler(new MockInMemoryEventHandler<T>(args =>
             {
                 var scope = _serviceProvider.CreateScope();
@@ -71,6 +72,22 @@ namespace Wodsoft.ComBoost.Mock
                 throw new InvalidOperationException($"There is no event handler for \"{typeof(T).FullName}\".");
             var tasks = handlers.Select(t => t(args)).ToArray();
             await Task.WhenAll(tasks);
+        }
+
+        public MockInMemoryEventMonitor RegisterEventMonitor<T>()
+            where T : DomainServiceEventArgs
+        {
+            var monitor = new MockInMemoryEventMonitor(typeof(T));
+            monitor.Disposed += Monitor_Disposed;
+            _monitors.Add(monitor);
+            return monitor;
+        }
+
+        private void Monitor_Disposed(object sender, EventArgs e)
+        {
+            var monitor = (MockInMemoryEventMonitor)sender;
+            monitor.Disposed -= Monitor_Disposed;
+            _monitors.Remove(monitor);
         }
 
         public override void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
