@@ -22,6 +22,7 @@ namespace Wodsoft.ComBoost.Mock
             _serviceProvider = serviceProvider;
             _options = options.Value;
             _instance = MockInMemoryInstance.GetInstance(options.Value.InstanceKey);
+            _monitors = new List<MockInMemoryEventMonitor>();
         }
 
         public override bool CanHandleEvent<T>(IReadOnlyList<string> features)
