@@ -71,6 +71,8 @@ namespace Wodsoft.ComBoost.Mock
             bool must = features.Contains(DomainDistributedEventFeatures.MustHandle);
             if (must && (handlers == null || handlers.Count == 0))
                 throw new InvalidOperationException($"There is no event handler for \"{typeof(T).FullName}\".");
+            if (handlers == null)
+                return;
             var tasks = handlers.Select(t => t(args)).ToArray();
             await Task.WhenAll(tasks);
         }
