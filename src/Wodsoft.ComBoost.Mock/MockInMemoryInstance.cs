@@ -54,7 +54,7 @@ namespace Wodsoft.ComBoost.Mock
                 return null;
             if (item.Count == 0)
                 return null;
-            if (item.TryGetValue(null, out var list))
+            if (item.TryGetValue(string.Empty, out var list))
             {
                 if (list.Count == 0)
                     return null;
