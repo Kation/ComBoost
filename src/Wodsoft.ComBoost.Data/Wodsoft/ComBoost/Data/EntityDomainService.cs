@@ -69,6 +69,7 @@ namespace Wodsoft.ComBoost.Data
         {
             var entity = entityContext.Create();
             mapper.Map(dto, entity);
+            await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
             var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
             UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>();
             model.Item = dto;
@@ -97,6 +98,7 @@ namespace Wodsoft.ComBoost.Data
             {
                 var entity = entityContext.Create();
                 mapper.Map(dto, entity);
+                await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
                 var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
                 List<ValidationResult> results = new List<ValidationResult>();
                 if (Validator.TryValidateObject(dto, validationContext, results, true))
@@ -136,8 +138,9 @@ namespace Wodsoft.ComBoost.Data
             var entity = await entityContext.GetAsync(keys);
             if (entity == null)
                 throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
-            await RaiseEvent(new EntityEditMapEventArgs<TEntity, TEditDTO>(entity, dto));
-            mapper.Map(dto, entity); ;
+            await RaiseEvent(new EntityPreMapEventArgs<TEntity, TEditDTO>(entity, dto));
+            mapper.Map(dto, entity);
+            await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
             var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
             UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>();
             model.Item = dto;
@@ -172,8 +175,9 @@ namespace Wodsoft.ComBoost.Data
                 var entity = await entityContext.GetAsync(keys);
                 if (entity == null)
                     throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
-                await RaiseEvent(new EntityEditMapEventArgs<TEntity, TEditDTO>(entity, dto));
+                await RaiseEvent(new EntityPreMapEventArgs<TEntity, TEditDTO>(entity, dto));
                 mapper.Map(dto, entity);
+                await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
                 var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
                 List<ValidationResult> results = new List<ValidationResult>();
                 if (Validator.TryValidateObject(dto, validationContext, results, true))
