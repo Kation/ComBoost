@@ -20,12 +20,12 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
         private IConnection _connection;
         private ConcurrentDictionary<string, IModel> _channels = new ConcurrentDictionary<string, IModel>();
         private Dictionary<string, AsyncEventingBasicConsumer> _consumers = new Dictionary<string, AsyncEventingBasicConsumer>();
-        private DomainRabbitMQEventOptions _options;
+        private DomainRabbitMQOptions _options;
         private IServiceProvider _serviceProvider;
         private DomainServiceDistributedEventOptions _eventOptions;
         private ILogger _logger;
 
-        public DomainRabbitMQEventProvider(IDomainRabbitMQProvider provider, IOptions<DomainRabbitMQEventOptions> options, IOptions<DomainServiceDistributedEventOptions> eventOptions, IServiceProvider serviceProvider,
+        public DomainRabbitMQEventProvider(IDomainRabbitMQProvider provider, IOptions<DomainRabbitMQOptions> options, IOptions<DomainServiceDistributedEventOptions> eventOptions, IServiceProvider serviceProvider,
             ILogger<DomainRabbitMQEventProvider> logger)
         {
             if (provider == null)
@@ -92,16 +92,19 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             string queueName;
             if (features.Contains(DomainDistributedEventFeatures.HandleOnce))
             {
+                var args = new Dictionary<string, object>();
+                if (_options.UseQuorum)
+                    args["x-queue-type"] = "quorum";
                 if (features.Contains(DomainDistributedEventFeatures.Group))
                 {
                     channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
                     queueName = name + "_" + _eventOptions.GroupName;
-                    channel.QueueDeclare(queueName, true, false, false, null);
+                    channel.QueueDeclare(queueName, true, false, false, args);
                     channel.QueueBind(queueName, name + "_EXCHANGE", "");
                 }
                 else
                 {
-                    channel.QueueDeclare(name, true, false, false, null);
+                    channel.QueueDeclare(name, true, false, false, args);
                     queueName = name;
                 }
             }
@@ -114,6 +117,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             if (features.Contains(DomainDistributedEventFeatures.Delay))
             {
                 var args = new Dictionary<string, object>();
+                if (_options.UseQuorum)
+                    args["x-queue-type"] = "quorum";
                 args["x-dead-letter-exchange"] = name + "_EXCHANGE";
                 if (features.Contains(DomainDistributedEventFeatures.HandleOnce) && !features.Contains(DomainDistributedEventFeatures.Group))
                 {
@@ -166,8 +171,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             var name = _options.Prefix + GetTypeName<T>();
             return _channels.GetOrAdd(name, type =>
             {
+                var args = new Dictionary<string, object>();
+                if (_options.UseQuorum)
+                    args["x-queue-type"] = "quorum";
                 var channel = _connection.CreateModel();
-                channel.QueueDeclare(name, true, false, false, null);
+                channel.QueueDeclare(name, true, false, false, args);
                 return channel;
             });
         }

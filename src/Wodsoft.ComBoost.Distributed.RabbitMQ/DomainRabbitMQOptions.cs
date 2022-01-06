@@ -19,6 +19,12 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
 
         public int Port { get; set; }
 
+        public string Prefix { get; set; }
+
+        public ushort PrefetchCount { get; set; } = 10;
+
+        public bool UseQuorum { get; set; } = true;
+
         public Action<IConnectionFactory> FactoryConfigure { get; set; }
     }
 }
