@@ -11,23 +11,17 @@ namespace System.ComponentModel
     {
         public UpdateModel()
         {
-            _ErrorMessage = new Dictionary<string, string>();
+            _ErrorMessage = new List<KeyValuePair<string, string>>();
         }
 
         public bool IsSuccess { get; set; }
 
-        private Dictionary<string, string> _ErrorMessage;
-        public IDictionary<string, string> ErrorMessage
-        {
-            get
-            {
-                return _ErrorMessage;
-            }
-        }
+        private List<KeyValuePair<string, string>> _ErrorMessage;
+        public IList<KeyValuePair<string, string>> ErrorMessage => _ErrorMessage;
     }
 
     public class UpdateModel<T> : UpdateModel, IUpdateModel<T>
     {
-        public T Result { get; set; }
+        public T Item { get; set; }
     }
 }

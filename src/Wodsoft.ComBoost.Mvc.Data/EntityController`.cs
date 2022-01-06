@@ -94,7 +94,10 @@ namespace Wodsoft.ComBoost.Mvc
 
         protected virtual IActionResult OnCreateModelCreated(IUpdateModel<TCreateDTO> model)
         {
-            return View(model);
+            if (model.IsSuccess)
+                return RedirectToAction("Index");
+            else
+                return View(new EditModel<TCreateDTO>(model));
         }
 
         #endregion
@@ -166,7 +169,10 @@ namespace Wodsoft.ComBoost.Mvc
 
         protected virtual IActionResult OnEditModelCreated(IUpdateModel<TEditDTO> model)
         {
-            return View(model);
+            if (model.IsSuccess)
+                return RedirectToAction("Index");
+            else
+                return View(new EditModel<TEditDTO>(model));
         }
 
         #endregion

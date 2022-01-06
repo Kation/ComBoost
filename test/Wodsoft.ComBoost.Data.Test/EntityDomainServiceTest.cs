@@ -70,12 +70,12 @@ namespace Wodsoft.ComBoost.Data.Test
                     Password = "123456"
                 });
                 Assert.True(model.IsSuccess);
-                Assert.NotNull(model.Result);
-                Assert.NotEqual(Guid.Empty, model.Result.Id);
-                Assert.Equal(model.Result.CreationDate, model.Result.ModificationDate);
-                user = model.Result;
+                Assert.NotNull(model.Item);
+                Assert.NotEqual(Guid.Empty, model.Item.Id);
+                Assert.Equal(model.Item.CreationDate, model.Item.ModificationDate);
+                user = model.Item;
             });
-
+             
             await mock.RunAsync(async sp =>
             {
                 var template = sp.GetRequiredService<IEntityDomainTemplate<UserDto>>();
@@ -89,9 +89,9 @@ namespace Wodsoft.ComBoost.Data.Test
                 var template = sp.GetRequiredService<IEntityDomainTemplate<UserDto>>();
                 var model = await template.Edit(user);
                 Assert.True(model.IsSuccess);
-                Assert.NotNull(model.Result);
-                Assert.NotEqual(model.Result.CreationDate, model.Result.ModificationDate);
-                Assert.Equal("New Name", model.Result.DisplayName);
+                Assert.NotNull(model.Item);
+                Assert.NotEqual(model.Item.CreationDate, model.Item.ModificationDate);
+                Assert.Equal("New Name", model.Item.DisplayName);
             });
 
             await mock.RunAsync(async sp =>
@@ -105,6 +105,50 @@ namespace Wodsoft.ComBoost.Data.Test
                 var template = sp.GetRequiredService<IEntityDomainTemplate<UserDto>>();
                 var viewModel = await template.List();
                 Assert.Empty(viewModel.Items);
+            });
+        }
+
+        [Fact]
+        public async Task ValidationTest()
+        {
+            var mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase("Wodsoft.ComBoost.Data.Test"));
+                    services.AddEFCoreContext<DataContext>();
+                    services.AddComBoost()
+                        .AddLocalService(builder =>
+                        {
+                            builder.AddEntityService<UserEntity, UserDto>();
+                        })
+                        .AddMock();
+                    services.AddAutoMapper(config =>
+                    {
+                        config.CreateMap<UserEntity, UserDto>()
+                            .ForMember(t => t.Password, options => options.Ignore());
+                        config.CreateMap<UserDto, UserEntity>()
+                            .ForMember(t => t.Password, options => options.Ignore())
+                            .AfterMap((dto, entity) =>
+                            {
+                                if (!string.IsNullOrEmpty(dto.Password))
+                                    entity.SetPassword(dto.Password);
+                            });
+                    });
+                })
+                .Build();
+
+            await mock.RunAsync(async sp =>
+            {
+                var template = sp.GetRequiredService<IEntityDomainTemplate<UserDto>>();
+                var model = await template.Create(new UserDto
+                {
+                    UserName = "test1",
+                    Email = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+                    Password = "123456"
+                });
+                Assert.False(model.IsSuccess);
+                Assert.True(model.ErrorMessage.Any(t => t.Key == nameof(UserDto.DisplayName)));
+                Assert.True(model.ErrorMessage.Any(t => t.Key == nameof(UserDto.Email)));
             });
         }
     }

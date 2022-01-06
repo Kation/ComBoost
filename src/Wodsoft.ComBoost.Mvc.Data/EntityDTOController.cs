@@ -79,6 +79,24 @@ namespace Wodsoft.ComBoost.Mvc
             return Ok(model);
         }
 
+        [HttpPost]
+        public virtual async Task<IActionResult> CreateRange([FromBody] TCreateDTO[] dtos)
+        {
+            var model = await CreateRangeEntity(dtos);
+            return OnCreateRangeModelCreated(model);
+        }
+
+        protected virtual Task<IUpdateRangeModel<TCreateDTO>> CreateRangeEntity(TCreateDTO[] dtos)
+        {
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            return domain.CreateRange(dtos);
+        }
+
+        protected virtual IActionResult OnCreateRangeModelCreated(IUpdateRangeModel<TCreateDTO> model)
+        {
+            return Ok(model);
+        }
+
         #endregion
 
         #region Edit
@@ -101,6 +119,24 @@ namespace Wodsoft.ComBoost.Mvc
             return Ok(model);
         }
 
+        [HttpPut]
+        public virtual async Task<IActionResult> EditRange([FromBody] TEditDTO[] dtos)
+        {
+            var model = await EditRangeEntity(dtos);
+            return OnEditRangeModelCreated(model);
+        }
+
+        protected virtual Task<IUpdateRangeModel<TEditDTO>> EditRangeEntity(TEditDTO[] dtos)
+        {
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            return domain.EditRange(dtos);
+        }
+
+        protected virtual IActionResult OnEditRangeModelCreated(IUpdateRangeModel<TEditDTO> model)
+        {
+            return Ok(model);
+        }
+
         #endregion
 
         #region Remove
@@ -108,19 +144,37 @@ namespace Wodsoft.ComBoost.Mvc
         [HttpDelete]
         public virtual async Task<IActionResult> Remove([FromQuery] TRemoveDTO dto)
         {
-            var model = await RemoveEntity(dto);
-            return OnRemoveModelCreated(model);
+            await RemoveEntity(dto);
+            return OnRemoveModelCreated();
         }
 
-        protected virtual Task<IUpdateModel> RemoveEntity(TRemoveDTO dto)
+        protected virtual Task RemoveEntity(TRemoveDTO dto)
         {
             var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
             return domain.Remove(dto);
         }
 
-        protected virtual IActionResult OnRemoveModelCreated(IUpdateModel model)
+        protected virtual IActionResult OnRemoveModelCreated()
         {
-            return Ok(model);
+            return NoContent();
+        }
+
+        [HttpDelete]
+        public virtual async Task<IActionResult> RemoveRange([FromQuery] TRemoveDTO[] dtos)
+        {
+            await RemoveRangeEntity(dtos);
+            return OnRemoveRangeModelCreated();
+        }
+
+        protected virtual Task RemoveRangeEntity(TRemoveDTO[] dtos)
+        {
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            return domain.RemoveRange(dtos);
+        }
+
+        protected virtual IActionResult OnRemoveRangeModelCreated()
+        {
+            return NoContent();
         }
 
         #endregion

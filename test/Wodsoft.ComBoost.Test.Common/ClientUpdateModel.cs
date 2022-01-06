@@ -7,10 +7,10 @@ namespace Wodsoft.ComBoost.Test
 {
     public class ClientUpdateModel<T> : IUpdateModel<T>
     {
-        public T Result { get; set; }
+        public T Item { get; set; }
 
         public bool IsSuccess { get; set; }
 
-        public IDictionary<string, string> ErrorMessage { get; set; }
+        public IList<KeyValuePair<string, string>> ErrorMessage { get; set; }
     }
 }

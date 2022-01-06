@@ -23,8 +23,14 @@ namespace Wodsoft.ComBoost.Data
 
         Task<IUpdateModel<TCreateDTO>> Create(TCreateDTO dto);
 
+        Task<IUpdateRangeModel<TCreateDTO>> CreateRange(TCreateDTO[] dtos);
+
         Task<IUpdateModel<TEditDTO>> Edit(TEditDTO dto);
 
+        Task<IUpdateRangeModel<TEditDTO>> EditRange(TEditDTO[] dtos);
+
         Task Remove(TRemoveDTO dto);
+
+        Task RemoveRange(TRemoveDTO[] dtos);
     }
 }

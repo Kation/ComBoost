@@ -10,11 +10,11 @@ namespace System.ComponentModel
     {
         bool IsSuccess { get; }
 
-        IDictionary<string, string> ErrorMessage { get; }
+        IList<KeyValuePair<string, string>> ErrorMessage { get; }
     }
 
     public interface IUpdateModel<T> : IUpdateModel
     {
-        T Result { get; }
+        T Item { get; }
     }
 }

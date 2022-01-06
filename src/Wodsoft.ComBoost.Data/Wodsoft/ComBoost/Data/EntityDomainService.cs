@@ -69,20 +69,57 @@ namespace Wodsoft.ComBoost.Data
         {
             var entity = entityContext.Create();
             mapper.Map(dto, entity);
+            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
+            UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>();
+            model.Item = dto;
+            List<ValidationResult> results = new List<ValidationResult>();
+            if (!Validator.TryValidateObject(dto, validationContext, results, true))
+            {
+                model.IsSuccess = false;
+                foreach (var result in results)
+                    model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
+                return model;
+            }
             entityContext.Add(entity);
             await RaiseEvent(new EntityPreCreateEventArgs<TEntity>(entity));
             await entityContext.Database.SaveAsync();
             await RaiseEvent(new EntityCreatedEventArgs<TEntity>(entity));
-            UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>();
-            model.Result = dto;
             model.IsSuccess = true;
             mapper.Map(entity, dto);
             return model;
         }
 
-        protected virtual void OnCreateModelCreated(EntityEditModel<TCreateDTO> model)
+        public virtual async Task<IUpdateRangeModel<TCreateDTO>> CreateRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TCreateDTO[] dtos)
         {
-
+            UpdateRangeModel<TCreateDTO> model = new UpdateRangeModel<TCreateDTO>();
+            Dictionary<TCreateDTO, TEntity> entities = new Dictionary<TCreateDTO, TEntity>();
+            foreach (var dto in dtos)
+            {
+                var entity = entityContext.Create();
+                mapper.Map(dto, entity);
+                var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
+                List<ValidationResult> results = new List<ValidationResult>();
+                if (Validator.TryValidateObject(dto, validationContext, results, true))
+                {
+                    entityContext.Add(entity);
+                    await RaiseEvent(new EntityPreCreateEventArgs<TEntity>(entity));
+                    entities.Add(dto, entity);
+                    model.AddItem(dto);
+                }
+                else
+                {
+                    model.AddItem(dto, results.Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage)).ToList());
+                }
+            }
+            if (!model.IsSuccess)
+                return model;
+            await entityContext.Database.SaveAsync();
+            foreach (var entity in entities)
+            {
+                await RaiseEvent(new EntityCreatedEventArgs<TEntity>(entity.Value));
+                mapper.Map(entity.Value, entity.Key);
+            }
+            return model;
         }
 
         #endregion
@@ -100,21 +137,66 @@ namespace Wodsoft.ComBoost.Data
             if (entity == null)
                 throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
             await RaiseEvent(new EntityEditMapEventArgs<TEntity, TEditDTO>(entity, dto));
-            mapper.Map(dto, entity);
+            mapper.Map(dto, entity); ;
+            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
+            UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>();
+            model.Item = dto;
+            List<ValidationResult> results = new List<ValidationResult>();
+            if (!Validator.TryValidateObject(dto, validationContext, results, true))
+            {
+                model.IsSuccess = false;
+                foreach (var result in results)
+                    model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
+                return model;
+            }
             entityContext.Update(entity);
             await RaiseEvent(new EntityPreEditEventArgs<TEntity>(entity));
             await entityContext.Database.SaveAsync();
             await RaiseEvent(new EntityEditedEventArgs<TEntity>(entity));
-            UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>();
-            model.Result = dto;
             model.IsSuccess = true;
             mapper.Map(entity, dto);
             return model;
         }
 
-        protected virtual void OnEditModelCreated(EntityEditModel<TEditDTO> model)
+        public virtual async Task<IUpdateRangeModel<TEditDTO>> EditRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TEditDTO[] dtos)
         {
-
+            UpdateRangeModel<TEditDTO> model = new UpdateRangeModel<TEditDTO>();
+            Dictionary<TEditDTO, TEntity> entities = new Dictionary<TEditDTO, TEntity>();
+            foreach (var dto in dtos)
+            {
+                var mappedEntity = mapper.Map<TEntity>(dto);
+                var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
+                var keys = new object[keyProperties.Count];
+                for (int i = 0; i < keyProperties.Count; i++)
+                    keys[i] = keyProperties[i].GetValue(mappedEntity);
+                var entity = await entityContext.GetAsync(keys);
+                if (entity == null)
+                    throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+                await RaiseEvent(new EntityEditMapEventArgs<TEntity, TEditDTO>(entity, dto));
+                mapper.Map(dto, entity);
+                var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
+                List<ValidationResult> results = new List<ValidationResult>();
+                if (Validator.TryValidateObject(dto, validationContext, results, true))
+                {
+                    entityContext.Update(entity);
+                    await RaiseEvent(new EntityPreEditEventArgs<TEntity>(entity));
+                    entities.Add(dto, entity);
+                    model.AddItem(dto);
+                }
+                else
+                {
+                    model.AddItem(dto, results.Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage)).ToList());
+                }
+            }
+            if (!model.IsSuccess)
+                return model;
+            await entityContext.Database.SaveAsync();
+            foreach (var entity in entities)
+            {
+                await RaiseEvent(new EntityEditedEventArgs<TEntity>(entity.Value));
+                mapper.Map(entity.Value, entity.Key);
+            }
+            return model;
         }
 
         #endregion
@@ -135,6 +217,28 @@ namespace Wodsoft.ComBoost.Data
             entityContext.Remove(entity);
             await entityContext.Database.SaveAsync();
             await RaiseEvent(new EntityRemovedEventArgs<TEntity>(entity));
+        }
+
+        public virtual async Task RemoveRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TRemoveDTO[] dtos)
+        {
+            List<TEntity> entities = new List<TEntity>();
+            foreach (var dto in dtos)
+            {
+                var mappedEntity = mapper.Map<TEntity>(dto);
+                var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
+                var keys = new object[keyProperties.Count];
+                for (int i = 0; i < keyProperties.Count; i++)
+                    keys[i] = keyProperties[i].GetValue(mappedEntity);
+                var entity = await entityContext.GetAsync(keys);
+                if (entity == null)
+                    throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+                await RaiseEvent(new EntityPreRemoveEventArgs<TEntity>(entity));
+                entityContext.Remove(entity);
+                entities.Add(entity);
+            }
+            await entityContext.Database.SaveAsync();
+            foreach (var entity in entities)
+                await RaiseEvent(new EntityRemovedEventArgs<TEntity>(entity));
         }
 
         #endregion

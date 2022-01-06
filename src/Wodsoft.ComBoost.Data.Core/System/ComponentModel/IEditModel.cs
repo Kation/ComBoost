@@ -10,6 +10,8 @@ namespace System.ComponentModel
         /// Get or set the item to edit.
         /// </summary>
         object Item { get; }
+
+        IList<KeyValuePair<string, string>> ErrorMessage { get; }
     }
 
     public interface IEditModel<out T>: IEditModel

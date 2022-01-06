@@ -60,7 +60,7 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
             var updateModel = JsonSerializer.Deserialize<ClientUpdateModel<UserDto>>(await response.Content.ReadAsStringAsync(), serializerOptions);
             Assert.True(updateModel.IsSuccess);
             Assert.Empty(updateModel.ErrorMessage);
-            Assert.Equal(newUser.Id, updateModel.Result.Id);
+            Assert.Equal(newUser.Id, updateModel.Item.Id);
 
             viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user"), serializerOptions);
             Assert.Single(viewModel.Items);
@@ -72,7 +72,7 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
             updateModel = JsonSerializer.Deserialize<ClientUpdateModel<UserDto>>(await response.Content.ReadAsStringAsync(), serializerOptions);
             Assert.True(updateModel.IsSuccess);
             Assert.Empty(updateModel.ErrorMessage);
-            Assert.Equal(newUser.Id, updateModel.Result.Id);
+            Assert.Equal(newUser.Id, updateModel.Item.Id);
 
             viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user"), serializerOptions);
             Assert.Single(viewModel.Items);
@@ -82,7 +82,7 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
             updateModel = JsonSerializer.Deserialize<ClientUpdateModel<UserDto>>(await response.Content.ReadAsStringAsync(), serializerOptions);
             Assert.True(updateModel.IsSuccess);
             Assert.Empty(updateModel.ErrorMessage);
-            Assert.Null(updateModel.Result);
+            Assert.Null(updateModel.Item);
 
             viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user"), serializerOptions);
             Assert.Empty(viewModel.Items);
