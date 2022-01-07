@@ -8,6 +8,8 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.Transactions;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -22,7 +24,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new ArgumentNullException(nameof(dbset));
             Database = database;
             DbSet = dbset;
-            Metadata = EntityDescriptor.GetMetadata<T>(); 
+            Metadata = EntityDescriptor.GetMetadata<T>();
         }
 
         public DbSet<T> DbSet { get; private set; }
@@ -72,6 +74,45 @@ namespace Wodsoft.ComBoost.Data.Entity
                 return new WrappedAsyncQueryable<T>(DbSet);
             else
                 return new WrappedAsyncQueryable<T>(DbSet.AsNoTracking());
+        }
+
+        public IQueryable<TChildren> QueryChildren<TChildren>(T item, Expression<Func<T, ICollection<TChildren>>> childrenSelector)
+            where TChildren : class
+        {
+#pragma warning disable EF1001 // Internal EF Core API usage.
+            var entry = new EntityEntry<T>(((IDbContextDependencies)Database.InnerContext).StateManager.GetOrCreateEntry(item));
+#pragma warning restore EF1001 // Internal EF Core API usage.
+            var state = entry.State;
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Unchanged;
+            var query = (IQueryable<TChildren>)entry.Collection(((MemberExpression)childrenSelector.Body).Member.Name).Query();
+            if (Database.TrackEntity)
+                query = new WrappedAsyncQueryable<TChildren>(query);
+            else
+                query = new WrappedAsyncQueryable<TChildren>(query.AsNoTracking());
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Detached;
+            return query;
+        }
+
+        public async Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty>> propertySelector)
+            where TProperty : class
+        {
+#pragma warning disable EF1001 // Internal EF Core API usage.
+            var entry = new EntityEntry<T>(((IDbContextDependencies)Database.InnerContext).StateManager.GetOrCreateEntry(item));
+#pragma warning restore EF1001 // Internal EF Core API usage.
+            var state = entry.State;
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Unchanged;
+            var reference = entry.Reference(propertySelector);
+            TProperty propertyValue;
+            if (Database.TrackEntity)
+                propertyValue = await reference.Query().FirstOrDefaultAsync();
+            else
+                propertyValue = await reference.Query().AsNoTracking().FirstOrDefaultAsync();
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Detached;
+            Metadata.GetProperty(reference.Metadata.Name).SetValue(item, propertyValue);
         }
 
         public void Remove(T item)

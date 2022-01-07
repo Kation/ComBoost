@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost.Test.Entities
 
         public decimal ValueDecimal { get; set; }
 
-        public Guid? IncludeId;
+        public Guid? IncludeId { get; set; }
         private IncludeEntity _include;
         public IncludeEntity Include { get => _include; set { _include = value; IncludeId = value?.Id ?? Guid.Empty; } }
 

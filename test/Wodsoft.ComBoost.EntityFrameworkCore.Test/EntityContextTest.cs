@@ -124,6 +124,11 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
             return new DatabaseContext<DataContext>(dataContext);
         }
 
+        private IDatabaseContext CreateNewDatabaseContext([CallerMemberName] string callerName = null)
+        {
+            return new DatabaseContext<DataContext>(new DataContext(Microsoft.EntityFrameworkCore.InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<DataContext>(), callerName).Options));
+        }
+
         [Fact]
         public async Task MaxTest()
         {
@@ -348,6 +353,31 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
             var count = await entityContext.Query().Where(t => t.ValueInt == 5).SelectMany(t => t.Items).CountAsync();
             var items = await entityContext.Query().SelectMany(t => t.Items, (t, x) => x.Name).ToArrayAsync();
             Assert.Equal(2, items.Length);
+        }
+
+        [Fact]
+        public async Task QueryCollectionTest()
+        {
+            SeedData();
+            var databaseContext = CreateNewDatabaseContext();
+            var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>();
+            var item = await entityContext.Query().Where(t => t.Items.Any()).FirstOrDefaultAsync();
+            Assert.NotNull(item);
+            var itemsCount = await entityContext.QueryChildren(item, t => t.Items).CountAsync();
+            Assert.Equal(2, itemsCount);
+        }
+
+        [Fact]
+        public async Task QueryPropertyTest()
+        {
+            SeedData();
+            var databaseContext = CreateNewDatabaseContext();
+            var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>();
+            var item = await entityContext.Query().Where(t => t.Include != null).FirstOrDefaultAsync();
+            Assert.NotNull(item);
+            Assert.Null(item.Include);
+            await entityContext.LoadPropertyAsync(item, t => t.Include);
+            Assert.NotNull(item.Include);
         }
     }
 }

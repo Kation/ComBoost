@@ -85,5 +85,15 @@ namespace Wodsoft.ComBoost.Data.Entity
                 return (T)task.Result;
             });
         }
+
+        public IQueryable<TChildren> QueryChildren<TChildren>(T item, Expression<Func<T, ICollection<TChildren>>> childrenSelector) where TChildren : class
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty>> propertySelector) where TProperty : class
+        {
+            throw new NotSupportedException();
+        }
     }
 }
