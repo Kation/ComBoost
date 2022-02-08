@@ -35,7 +35,7 @@ namespace Wodsoft.ComBoost
             _Keys = null;
         }
 
-        private ValueKeyCollection _Keys;
+        private ValueKeyCollection? _Keys;
         public virtual IValueKeyCollection Keys
         {
             get
@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost
             }
         }
 
-        protected virtual object GetValue(string name)
+        protected virtual object? GetValue(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -58,14 +58,14 @@ namespace Wodsoft.ComBoost
             return null;
         }
 
-        public virtual object GetValue(string name, Type valueType)
+        public virtual object? GetValue(string name, Type valueType)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
             if (valueType == null)
                 throw new ArgumentNullException(nameof(valueType));
             
-            object value = GetValue(name);
+            object? value = GetValue(name);
             if (value == null)
             {
                 if (!_Alias.TryGetValue(name, out string aliasName))

@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return new ComBoostBuilder(services);
         }
 
-        public static IComBoostBuilder AddLocalService(this IComBoostBuilder builder, Action<IComBoostLocalBuilder> localBuilderConfigure = null)
+        public static IComBoostBuilder AddLocalService(this IComBoostBuilder builder, Action<IComBoostLocalBuilder>? localBuilderConfigure = null)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));

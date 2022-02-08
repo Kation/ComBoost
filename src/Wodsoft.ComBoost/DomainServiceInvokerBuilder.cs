@@ -21,10 +21,15 @@ namespace Wodsoft.ComBoost
         public abstract class DomainServiceInvoker<TDomainService>
             where TDomainService : class, IDomainService
         {
+            protected IDomainExecutionContext _executionContext;
+
             protected DomainServiceInvoker(TDomainService domainService, IDomainContext domainContext)
             {
+                if (domainService.Context == null)
+                    throw new InvalidOperationException("Domain service not initialized.");
                 DomainService = domainService;
                 DomainContext = domainContext;
+                _executionContext = domainService.Context;
                 var events = domainContext.GetService<IOptions<DomainServiceEventManagerOptions<TDomainService>>>().Value.GetEvents();
                 foreach (var e in events)
                     domainContext.EventManager.AddEventHandler(e.Key, e.Value);
@@ -34,7 +39,7 @@ namespace Wodsoft.ComBoost
 
             public IDomainContext DomainContext { get; }
 
-            private static Dictionary<string, List<IDomainServiceFilter>> _Filters;
+            private static Dictionary<string, List<IDomainServiceFilter>>? _Filters;
 
             protected abstract Task ExecuteAsync();
 
@@ -45,33 +50,32 @@ namespace Wodsoft.ComBoost
                         .ToDictionary(t => t.Name, t =>
                         {
                             List<IDomainServiceFilter> filters = new List<IDomainServiceFilter>();
-                            filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions>>().Value.Filters);
+                            filters.AddRange(DomainContext.GetService<IOptions<DomainFilterOptions>>().Value.Filters);
                             filters.AddRange(typeof(TDomainService).GetCustomAttributes().OfType<IDomainServiceFilter>());
-                            filters.AddRange(DomainService.Context.DomainContext.GetService<IOptions<DomainFilterOptions<TDomainService>>>().Value.Filters);
+                            filters.AddRange(DomainContext.GetService<IOptions<DomainFilterOptions<TDomainService>>>().Value.Filters);
                             filters.AddRange(t.GetCustomAttributes().OfType<IDomainServiceFilter>());
-                            filters.AddRange(DomainService.Context.DomainContext.GetService<IOptionsMonitor<DomainFilterOptions<TDomainService>>>().Get(t.Name).Filters);
+                            filters.AddRange(DomainContext.GetService<IOptionsMonitor<DomainFilterOptions<TDomainService>>>().Get(t.Name).Filters);
                             return filters;
                         });
-                return _Filters[DomainService.Context.DomainMethod.Name];
+                return _Filters[_executionContext.DomainMethod.Name];
             }
 
             protected DomainExecutionPipeline MakePipeline()
             {
                 var globalFilters = GetFilters();
                 DomainExecutionPipeline pipeline = ExecuteAsync;
-                var filters = DomainService.Context.DomainContext.Filter;
-                var context = DomainService.Context;
+                var filters = DomainContext.Filter;
                 for (int i = filters.Count - 1; i >= 0; i--)
                 {
                     var next = pipeline;
                     var index = i;
-                    pipeline = () => filters[index].OnExecutionAsync(context, next);
+                    pipeline = () => filters[index].OnExecutionAsync(_executionContext, next);
                 }
                 for (int i = globalFilters.Count - 1; i >= 0; i--)
                 {
                     var next = pipeline;
                     var index = i;
-                    pipeline = () => globalFilters[index].OnExecutionAsync(context, next);
+                    pipeline = () => globalFilters[index].OnExecutionAsync(_executionContext, next);
                 }
                 return pipeline;
             }
@@ -80,7 +84,7 @@ namespace Wodsoft.ComBoost
             {
                 if (task.IsFaulted)
                     System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
-                DomainService.Context.Done();
+                _executionContext.Done();
             }
 
             protected Task RunPipeline()
@@ -96,17 +100,17 @@ namespace Wodsoft.ComBoost
             {
             }
 
-            private TResult result;
+            private TResult? result;
 
             protected void HandleResult(Task<TResult> task)
             {
                 if (task.IsFaulted)
                     System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
                 result = task.Result;
-                DomainService.Context.Done(result);
+                _executionContext.Done(result);
             }
 
-            protected TResult ReturnResult(Task task)
+            protected TResult? ReturnResult(Task task)
             {
                 if (task.IsFaulted)
                     System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();

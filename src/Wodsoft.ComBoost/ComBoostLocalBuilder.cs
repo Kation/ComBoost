@@ -16,7 +16,7 @@ namespace Wodsoft.ComBoost
 
         public IServiceCollection Services { get; }
 
-        public event EventHandler<ComBoostLocalBuilderEventArgs> ServiceAdded;
+        public event EventHandler<ComBoostLocalBuilderEventArgs>? ServiceAdded;
 
         public IComBoostLocalBuilder AddEventHandler<THandler, TArgs>()
             where THandler : IDomainServiceEventHandler<TArgs>, new()

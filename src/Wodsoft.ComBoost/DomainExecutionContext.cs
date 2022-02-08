@@ -53,11 +53,11 @@ namespace Wodsoft.ComBoost
         private MethodInfo _Method;
         public MethodInfo DomainMethod { get { return _Method; } }
 
-        private object[] _ParameterValues;
-        public object[] ParameterValues { get { return _ParameterValues; } }
+        private object?[] _ParameterValues;
+        public object?[] ParameterValues { get { return _ParameterValues; } }
 
         private ParameterInfo[] _Parameters;
-        public object GetParameterValue(ParameterInfo parameter)
+        public object? GetParameterValue(ParameterInfo parameter)
         {
             int index = Array.IndexOf(_Parameters, parameter);
             if (index == -1)
@@ -65,7 +65,7 @@ namespace Wodsoft.ComBoost
             return _ParameterValues[index];
         }
 
-        private object[] GetParameters()
+        private object?[] GetParameters()
         {
             return _Parameters.Select(t =>
             {
@@ -84,13 +84,13 @@ namespace Wodsoft.ComBoost
             IsCompleted = true;
         }
 
-        public void Done(object result)
+        public void Done(object? result)
         {
             Result = result;
             IsCompleted = true;
         }
 
-        public object Result { get; set; }
+        public object? Result { get; set; }
 
         public bool IsAborted { get { return DomainContext.ServiceAborted.IsCancellationRequested; } }
 

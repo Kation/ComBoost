@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>ComBoost框架基础。</Description>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <Import Project="../../common.props" />
 
