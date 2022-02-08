@@ -7,7 +7,7 @@ namespace Wodsoft.ComBoost
 {
     public class DomainContextEventManager : DomainServiceEventManager
     {
-        private IDomainServiceEventManager _Parent;
+        private IDomainServiceEventManager? _Parent;
         public DomainContextEventManager()
         {
         }

@@ -18,6 +18,6 @@ namespace Wodsoft.ComBoost
         /// <param name="context">领域上下文。</param>
         /// <param name="parameter">参数信息。</param>
         /// <returns>返回值。</returns>
-        public abstract object GetValue(IDomainContext context, ParameterInfo parameter);
+        public abstract object? GetValue(IDomainContext context, ParameterInfo parameter);
     }
 }

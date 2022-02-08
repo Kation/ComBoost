@@ -17,9 +17,9 @@ namespace Wodsoft.ComBoost
         /// <param name="provider">值提供器。</param>
         /// <param name="name">名称。</param>
         /// <returns>返回值。</returns>
-        public static T GetValue<T>(this IValueProvider provider, string name)
+        public static T? GetValue<T>(this IValueProvider provider, string name)
         {
-            object value = provider.GetValue(name, typeof(T));
+            object? value = provider.GetValue(name, typeof(T));
             if (value == null)
                 return default(T);
             return (T)value;
@@ -34,7 +34,7 @@ namespace Wodsoft.ComBoost
         /// <returns>返回值。</returns>
         public static object GetRequiredValue(this IValueProvider valueProvider, string name, Type valueType)
         {
-            object value = valueProvider.GetValue(name, valueType);
+            object? value = valueProvider.GetValue(name, valueType);
             if (value == null)
                 throw new ArgumentException("找不到所需值。", name);
             return value;
@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost
         /// <returns>返回值。</returns>
         public static T GetRequiredValue<T>(this IValueProvider valueProvider, string name)
         {
-            object value = valueProvider.GetValue(name, typeof(T));
+            object? value = valueProvider.GetValue(name, typeof(T));
             if (value == null)
                 throw new ArgumentException("找不到所需值。", name);
             return (T)value;

@@ -15,6 +15,7 @@ namespace Wodsoft.ComBoost
         /// 异步执行。
         /// </summary>
         /// <param name="context">领域执行上下文。</param>
+        /// <param name="next">下一步委托。</param>
         /// <returns>异步任务。</returns>
         public virtual Task OnExecutionAsync(IDomainExecutionContext context, DomainExecutionPipeline next)
         {

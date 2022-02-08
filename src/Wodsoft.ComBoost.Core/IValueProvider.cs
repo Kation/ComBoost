@@ -16,7 +16,7 @@ namespace Wodsoft.ComBoost
         /// <param name="name">名称。</param>
         /// <param name="valueType">值类型。</param>
         /// <returns>返回值。</returns>
-        object GetValue(string name, Type valueType);
+        object? GetValue(string name, Type valueType);
 
         /// <summary>
         /// 获取存在的键集合。

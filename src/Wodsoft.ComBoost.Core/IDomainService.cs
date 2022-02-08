@@ -14,7 +14,7 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取领域执行上下文。
         /// </summary>
-        IDomainExecutionContext Context { get; }
+        IDomainExecutionContext? Context { get; }
 
         /// <summary>
         /// 初始化领域服务。

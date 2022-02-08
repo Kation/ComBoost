@@ -37,7 +37,7 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 自定义来源名称。
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 获取是否必须存在值。默认为True。
@@ -47,7 +47,7 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取或设置默认值。
         /// </summary>
-        public object DefaultValue { get; set; }
+        public object? DefaultValue { get; set; }
 
         /// <summary>
         /// 获取值。
@@ -55,10 +55,10 @@ namespace Wodsoft.ComBoost
         /// <param name="context">领域执行上下文。</param>
         /// <param name="parameter">参数信息。</param>
         /// <returns>返回值。</returns>
-        public override object GetValue(IDomainContext context, ParameterInfo parameter)
+        public override object? GetValue(IDomainContext context, ParameterInfo parameter)
         {
             IValueProvider provider = context.GetRequiredService<IValueProvider>();
-            object value = provider.GetValue(Name ?? parameter.Name, parameter.ParameterType);
+            object? value = provider.GetValue(Name ?? parameter.Name, parameter.ParameterType);
             if (value == null)
                 if (DefaultValue != null || parameter.HasDefaultValue)
                     value = DefaultValue ?? parameter.DefaultValue;

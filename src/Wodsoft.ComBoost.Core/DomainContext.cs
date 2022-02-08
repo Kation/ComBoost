@@ -24,7 +24,7 @@ namespace Wodsoft.ComBoost
             EventManager = new DomainContextEventManager(serviceProvider.GetRequiredService<IDomainServiceEventManager>());
         }
 
-        private dynamic _DataBag;
+        private dynamic? _DataBag;
         public virtual dynamic DataBag
         {
             get

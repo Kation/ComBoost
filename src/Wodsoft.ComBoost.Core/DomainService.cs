@@ -9,13 +9,15 @@ namespace Wodsoft.ComBoost
 {
     public class DomainService : IDomainService
     {
-        public IDomainExecutionContext Context { get; private set; }
+        public IDomainExecutionContext? Context { get; private set; }
 
         #region 引发事件
 
         protected virtual Task RaiseEvent<TArgs>(TArgs e)
             where TArgs : DomainServiceEventArgs
         {
+            if (Context == null)
+                throw new NotSupportedException("Domain service not initialized.");
             return Context.DomainContext.EventManager.RaiseEvent(Context, e);
         }
 

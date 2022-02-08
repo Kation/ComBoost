@@ -167,7 +167,6 @@ namespace Wodsoft.ComBoost
                 return;
             _Disposed = true;
             _Events.Clear();
-            _Events = null;
         }
 
         #endregion

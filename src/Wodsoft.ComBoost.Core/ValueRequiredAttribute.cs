@@ -38,6 +38,6 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取值类型。
         /// </summary>
-        public Type Type { get; private set; }
+        public Type? Type { get; private set; }
     }
 }

@@ -29,14 +29,14 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取执行方法参数数组。
         /// </summary>
-        object[] ParameterValues { get; }
+        object?[] ParameterValues { get; }
 
         /// <summary>
         /// 获取执行参数值。
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        object GetParameterValue(ParameterInfo parameter);
+        object? GetParameterValue(ParameterInfo parameter);
 
         /// <summary>
         /// 结束执行。
@@ -47,12 +47,12 @@ namespace Wodsoft.ComBoost
         /// 结束执行。
         /// </summary>
         /// <param name="result">执行结果。</param>
-        void Done(object result);
+        void Done(object? result);
 
         /// <summary>
         /// 获取执行结果。
         /// </summary>
-        object Result { get; }
+        object? Result { get; }
 
         /// <summary>
         /// 获取是否中断。

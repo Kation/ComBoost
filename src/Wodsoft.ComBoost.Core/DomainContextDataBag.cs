@@ -34,7 +34,7 @@ namespace Wodsoft.ComBoost
         {
             if (indexes.Length > 1)
                 throw new NotSupportedException();
-            string key = indexes[0] as string;
+            string? key = indexes[0] as string;
             if (key == null)
                 throw new NotSupportedException();
             _Data.TryGetValue(key, out result);
@@ -45,7 +45,7 @@ namespace Wodsoft.ComBoost
         {
             if (indexes.Length > 1)
                 throw new NotSupportedException();
-            string key = indexes[0] as string;
+            string? key = indexes[0] as string;
             if (key == null)
                 throw new NotSupportedException();
             if (_Data.ContainsKey(key))
