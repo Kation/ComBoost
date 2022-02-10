@@ -17,5 +17,12 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <param name="type">实体类型。</param>
         /// <returns>返回实体元数据。</returns>
         IEntityMetadata GetMetadata(Type type);
+
+        /// <summary>
+        /// 获取实体元数据。
+        /// </summary>
+        /// <typeparam name="T">实体类型。</typeparam>
+        /// <returns>返回实体元数据。</returns>
+        IEntityMetadata GetMetadata<T>();
     }
 }

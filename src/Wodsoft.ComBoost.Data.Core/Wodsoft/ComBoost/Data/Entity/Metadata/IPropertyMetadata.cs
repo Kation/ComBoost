@@ -65,10 +65,10 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         string? CustomType { get; }
 
-        /// <summary>
-        /// Get the property is base on upload file.
-        /// </summary>
-        bool IsFileUpload { get; }
+        ///// <summary>
+        ///// Get the property is base on upload file.
+        ///// </summary>
+        //bool IsFileUpload { get; }
 
         /// <summary>
         /// Get is the property must has data.
@@ -77,55 +77,55 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         
         bool IsKey { get; }
 
-        /// <summary>
-        /// Get is the property hidden while creating.
-        /// </summary>
-        bool IsHiddenOnCreate { get; }
+        ///// <summary>
+        ///// Get is the property hidden while creating.
+        ///// </summary>
+        //bool IsHiddenOnCreate { get; }
 
-        /// <summary>
-        /// Get is the property hidden while edit.
-        /// </summary>
-        bool IsHiddenOnEdit { get; }
+        ///// <summary>
+        ///// Get is the property hidden while edit.
+        ///// </summary>
+        //bool IsHiddenOnEdit { get; }
 
-        /// <summary>
-        /// Get is the property hidden in viewlist.
-        /// </summary>
-        bool IsHiddenOnView { get; }
+        ///// <summary>
+        ///// Get is the property hidden in viewlist.
+        ///// </summary>
+        //bool IsHiddenOnView { get; }
 
-        /// <summary>
-        /// Get is the property hidden in detail.
-        /// </summary>
-        bool IsHiddenOnDetail { get; }
+        ///// <summary>
+        ///// Get is the property hidden in detail.
+        ///// </summary>
+        //bool IsHiddenOnDetail { get; }
 
         /// <summary>
         /// Get the order of property.
         /// </summary>
         int Order { get; }
 
-        /// <summary>
-        /// Get is the property search able.
-        /// </summary>
-        bool Searchable { get; }
+        ///// <summary>
+        ///// Get is the property search able.
+        ///// </summary>
+        //bool Searchable { get; }
 
-        /// <summary>
-        /// Get is property allow anonymous operate.
-        /// </summary>
-        bool AllowAnonymous { get; }
+        ///// <summary>
+        ///// Get is property allow anonymous operate.
+        ///// </summary>
+        //bool AllowAnonymous { get; }
 
-        /// <summary>
-        /// Get the roles to view property.
-        /// </summary>
-        IEnumerable<object> ViewRoles { get; }
+        ///// <summary>
+        ///// Get the roles to view property.
+        ///// </summary>
+        //IEnumerable<object> ViewRoles { get; }
 
-        /// <summary>
-        /// Get the roles to edit property.
-        /// </summary>
-        IEnumerable<object> AddRoles { get; }
+        ///// <summary>
+        ///// Get the roles to edit property.
+        ///// </summary>
+        //IEnumerable<object> AddRoles { get; }
 
-        /// <summary>
-        /// Get the roles to edit property.
-        /// </summary>
-        IEnumerable<object> EditRoles { get; }
+        ///// <summary>
+        ///// Get the roles to edit property.
+        ///// </summary>
+        //IEnumerable<object> EditRoles { get; }
 
         /// <summary>
         /// Get is the property can get value.

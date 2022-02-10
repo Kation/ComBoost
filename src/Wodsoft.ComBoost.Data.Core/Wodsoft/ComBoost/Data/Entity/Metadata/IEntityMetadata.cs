@@ -31,7 +31,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// 获取默认显示属性。
         /// </summary>
-        IPropertyMetadata DisplayProperty { get; }
+        IPropertyMetadata? DisplayProperty { get; }
 
         /// <summary>
         /// 获取默认排序属性。
@@ -53,55 +53,55 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         IReadOnlyList<IPropertyMetadata> Properties { get; }
 
-        /// <summary>
-        /// 获取列表属性。
-        /// </summary>
-        IReadOnlyList<IPropertyMetadata> ViewProperties { get; }
+        ///// <summary>
+        ///// 获取列表属性。
+        ///// </summary>
+        //IReadOnlyList<IPropertyMetadata> ViewProperties { get; }
 
-        /// <summary>
-        /// 获取创建属性。
-        /// </summary>
-        IReadOnlyList<IPropertyMetadata> CreateProperties { get; }
+        ///// <summary>
+        ///// 获取创建属性。
+        ///// </summary>
+        //IReadOnlyList<IPropertyMetadata> CreateProperties { get; }
 
-        /// <summary>
-        /// 获取编辑属性。
-        /// </summary>
-        IReadOnlyList<IPropertyMetadata> EditProperties { get; }
+        ///// <summary>
+        ///// 获取编辑属性。
+        ///// </summary>
+        //IReadOnlyList<IPropertyMetadata> EditProperties { get; }
 
-        /// <summary>
-        /// 获取搜索属性。
-        /// </summary>
-        IReadOnlyList<IPropertyMetadata> SearchProperties { get; }
+        ///// <summary>
+        ///// 获取搜索属性。
+        ///// </summary>
+        //IReadOnlyList<IPropertyMetadata> SearchProperties { get; }
 
-        /// <summary>
-        /// 获取详情属性。
-        /// </summary>
-        IReadOnlyList<IPropertyMetadata> DetailProperties { get; }
+        ///// <summary>
+        ///// 获取详情属性。
+        ///// </summary>
+        //IReadOnlyList<IPropertyMetadata> DetailProperties { get; }
 
-        /// <summary>
-        /// 获取是否允许匿名访问。
-        /// </summary>
-        bool AllowAnonymous { get; }
+        ///// <summary>
+        ///// 获取是否允许匿名访问。
+        ///// </summary>
+        //bool AllowAnonymous { get; }
 
-        /// <summary>
-        /// 获取列表角色。
-        /// </summary>
-        IEnumerable<object> ViewRoles { get; }
+        ///// <summary>
+        ///// 获取列表角色。
+        ///// </summary>
+        //IEnumerable<object> ViewRoles { get; }
 
-        /// <summary>
-        /// 获取新增角色。
-        /// </summary>
-        IEnumerable<object> AddRoles { get; }
+        ///// <summary>
+        ///// 获取新增角色。
+        ///// </summary>
+        //IEnumerable<object> AddRoles { get; }
 
-        /// <summary>
-        /// 获取编辑角色。
-        /// </summary>
-        IEnumerable<object> EditRoles { get; }
+        ///// <summary>
+        ///// 获取编辑角色。
+        ///// </summary>
+        //IEnumerable<object> EditRoles { get; }
 
-        /// <summary>
-        /// 获取删除角色。
-        /// </summary>
-        IEnumerable<object> RemoveRoles { get; }
+        ///// <summary>
+        ///// 获取删除角色。
+        ///// </summary>
+        //IEnumerable<object> RemoveRoles { get; }
 
         /// <summary>
         /// 获取属性。
