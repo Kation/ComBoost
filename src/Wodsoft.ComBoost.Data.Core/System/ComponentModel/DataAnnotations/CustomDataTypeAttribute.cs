@@ -43,7 +43,7 @@ namespace System.ComponentModel.DataAnnotations
         /// <summary>
         /// Get the custom type of property.
         /// </summary>
-        public string Custom { get; private set; }
+        public string? Custom { get; private set; }
 
         /// <summary>
         /// Get the property is base on upload file.

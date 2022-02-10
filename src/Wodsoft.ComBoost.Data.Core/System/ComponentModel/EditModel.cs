@@ -4,10 +4,8 @@ using System.Text;
 
 namespace System.ComponentModel
 {
-    public class EditModel<T> : NotifyBase, IEditModel<T>
+    public class EditModel<T> : IEditModel<T>
     {
-        public EditModel() { }
-
         public EditModel(T item)
         {
             Item = item;
@@ -17,13 +15,13 @@ namespace System.ComponentModel
         public EditModel(IUpdateModel<T> updateModel)
         {
             Item = updateModel.Item;
-            ErrorMessage = updateModel.ErrorMessage;
+            ErrorMessage = new List<KeyValuePair<string, string>>();
         }
 
-        public T Item { get { return (T)GetValue(); } set { SetValue(value); } }
+        public T Item { get; }
 
         public IList<KeyValuePair<string, string>> ErrorMessage { get; }
 
-        object IEditModel.Item => Item;
+        object IEditModel.Item => Item!;
     }
 }

@@ -14,7 +14,7 @@ namespace System.ComponentModel
         /// <summary>
         /// 获取内容项。
         /// </summary>
-        IReadOnlyList<object> Items { get; }
+        IReadOnlyList<object>? Items { get; }
 
         /// <summary>
         /// 设置每页显示个数选项。
@@ -55,6 +55,6 @@ namespace System.ComponentModel
         /// <summary>
         /// 获取内容项。
         /// </summary>
-        new IReadOnlyList<T> Items { get; }
+        new IReadOnlyList<T>? Items { get; }
     }
 }

@@ -35,11 +35,6 @@ namespace System.ComponentModel
 
     public class UpdateRangeModelItem<T> : IUpdateRangeModelItem<T>
     {
-        public UpdateRangeModelItem()
-        {
-            ErrorMessage = new List<KeyValuePair<string, string>>();
-        }
-
         public UpdateRangeModelItem(T value)
         {
             Value = value;

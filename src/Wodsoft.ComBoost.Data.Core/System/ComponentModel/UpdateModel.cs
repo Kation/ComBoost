@@ -22,6 +22,11 @@ namespace System.ComponentModel
 
     public class UpdateModel<T> : UpdateModel, IUpdateModel<T>
     {
-        public T Item { get; set; }
+        public UpdateModel(T value)
+        {
+            Item = value;
+        }
+
+        public T Item { get; }
     }
 }

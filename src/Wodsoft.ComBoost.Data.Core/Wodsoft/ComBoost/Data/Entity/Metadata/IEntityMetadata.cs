@@ -41,7 +41,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// 获取默认父级属性。
         /// </summary>
-        IPropertyMetadata ParentProperty { get; }
+        IPropertyMetadata? ParentProperty { get; }
 
         /// <summary>
         /// 获取是否倒序排序。
@@ -108,7 +108,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <param name="name">属性名。</param>
         /// <returns>返回元数据。如果不存在则返回空。</returns>
-        IPropertyMetadata GetProperty(string name);
+        IPropertyMetadata? GetProperty(string name);
 
         /// <summary>
         /// 获取数据字典。

@@ -34,7 +34,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 if (!propertyInfo.PropertyType.GetTypeInfo().IsValueType && propertyInfo.PropertyType.GetTypeInfo().IsGenericType)
                     IsHiddenOnView = true;
 
-            string customType;
+            string? customType;
             bool isFileUpload;
             Type = propertyInfo.GetCustomDataType(out customType, out isFileUpload);
             CustomType = customType;
@@ -80,7 +80,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             return Property.GetCustomAttributes<T>(true).ToArray();
         }
 
-        private Func<object, object> _GetValue;
+        private Func<object, object>? _GetValue;
         /// <summary>
         /// Get property value from an entity.
         /// </summary>
@@ -90,10 +90,10 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             if (!CanGet)
                 throw new NotSupportedException("Property doen't support get method.");
-            return _GetValue(entity);
+            return _GetValue!(entity);
         }
 
-        private Action<object, object> _SetValue;
+        private Action<object, object>? _SetValue;
         /// <summary>
         /// Set property value to an entity.
         /// </summary>
@@ -103,7 +103,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             if (!CanSet)
                 throw new NotSupportedException("Property doen't support set method.");
-            _SetValue(entity, value);
+            _SetValue!(entity, value);
         }
 
         /// <summary>

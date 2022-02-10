@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
@@ -31,6 +32,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         [Hide]
         [Key]
+        [AllowNull]
         public virtual T Id { get; set; }
 
         /// <summary>

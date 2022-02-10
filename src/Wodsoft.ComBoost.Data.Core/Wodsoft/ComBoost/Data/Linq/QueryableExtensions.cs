@@ -32,7 +32,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             where T : IEntity
             where M : IEntity, T
         {
-            WrappedQueryable<T, M> wrapped = queryable as WrappedQueryable<T, M>;
+            WrappedQueryable<T, M>? wrapped = queryable as WrappedQueryable<T, M>;
             if (wrapped == null)
                 throw new NotSupportedException("不支持的类型。");
             WrappedQueryableProvider<T, M> provider = wrapped.Provider;

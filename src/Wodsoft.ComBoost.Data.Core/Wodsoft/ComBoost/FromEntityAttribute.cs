@@ -29,7 +29,7 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取自定义来源名称。
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 获取是否为必须。
@@ -42,7 +42,7 @@ namespace Wodsoft.ComBoost
         /// <param name="context">领域上下文。</param>
         /// <param name="parameter">参数信息。</param>
         /// <returns>返回值。</returns>
-        public override object GetValue(IDomainContext context, ParameterInfo parameter)
+        public override object? GetValue(IDomainContext context, ParameterInfo parameter)
         {
             var metadata = EntityDescriptor.GetMetadata(parameter.ParameterType);
             IValueProvider provider = context.GetRequiredService<IValueProvider>();
@@ -53,7 +53,7 @@ namespace Wodsoft.ComBoost
             var keyType = metadata.KeyProperties[0].ClrType;
             if (keyType.GetTypeInfo().IsValueType)
                 keyType = typeof(Nullable<>).MakeGenericType(keyType);
-            object value = provider.GetValue(Name ?? parameter.Name, keyType);
+            object? value = provider.GetValue(Name ?? parameter.Name, keyType);
             if (value == null)
                 if (IsRequired)
                     throw new DomainServiceException(new ArgumentNullException(parameter.Name, "获取" + (Name ?? parameter.Name) + "实体的值为空。"));

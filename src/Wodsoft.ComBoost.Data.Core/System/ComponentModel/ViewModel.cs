@@ -12,7 +12,7 @@ namespace System.ComponentModel
     /// 视图模型。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ViewModel<T> : NotifyBase, IViewModel<T>
+    public class ViewModel<T> : IViewModel<T>
         where T : class
     {
         /// <summary>
@@ -35,7 +35,8 @@ namespace System.ComponentModel
                 throw new ArgumentException("不能小于0。", "size");
             CurrentSize = size;
             PageSizeOption = Pagination.DefaultPageSizeOption;
-            Queryable = queryable ?? throw new ArgumentNullException("queryable");
+            _Queryable = queryable ?? throw new ArgumentNullException("queryable");
+            CurrentPage = page;
         }
 
         private IQueryable<T> _Queryable;
@@ -54,24 +55,24 @@ namespace System.ComponentModel
         }
 
         /// <inheritdoc />
-        public int[] PageSizeOption { get { return (int[])GetValue(); } set { SetValue(value); } }
+        public int[] PageSizeOption { get; set; }
 
         /// <inheritdoc />
-        public int TotalPage { get { return (int)GetValue(); } set { SetValue(value); } }
+        public int TotalPage { get; set; }
 
         /// <inheritdoc />
-        public int CurrentSize { get { return (int)GetValue(); } set { SetValue(value); } }
+        public int CurrentSize { get; set; }
 
         /// <inheritdoc />
-        public int CurrentPage { get { return (int)GetValue(); } set { SetValue(value); } }
+        public int CurrentPage { get; set; }
 
-        IReadOnlyList<object> IViewModel.Items { get { return Items; } }
-
-        /// <inheritdoc />
-        public IReadOnlyList<T> Items { get { return (IReadOnlyList<T>)GetValue(); } set { SetValue(value); } }
+        IReadOnlyList<object>? IViewModel.Items { get { return Items; } }
 
         /// <inheritdoc />
-        public int TotalCount { get { return (int)GetValue(); } set { SetValue(value); } }
+        public IReadOnlyList<T>? Items { get; set; }
+
+        /// <inheritdoc />
+        public int TotalCount { get; set; }
 
         /// <inheritdoc />
         public void SetPage(int page)

@@ -66,7 +66,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
             var parameter = Expression.Parameter(typeof(T));
-            MemberExpression member = null;
+            MemberExpression? member = null;
             string[] properties = path.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             Type type = context.Metadata.Type;
             for (int i = 0; i < properties.Length; i++)
@@ -106,7 +106,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (context.Metadata.ParentProperty == null)
                 throw new NotSupportedException("该实体不支持父级元素。");
             var parameter = Expression.Parameter(typeof(T));
-            Expression equal = null;
+            Expression? equal = null;
             foreach (object parent in parentIds)
             {
                 var item = Expression.Equal(Expression.Property(Expression.Property(parameter, context.Metadata.ParentProperty.ClrName), typeof(T).GetProperty("Index")), Expression.Constant(parent));

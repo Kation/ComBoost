@@ -21,7 +21,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <param name="customType">Custom type if exists.</param>
         /// <param name="isFileUpload">Is property used to upload.</param>
         /// <returns>Custom data type.</returns>
-        public static CustomDataType GetCustomDataType(this PropertyInfo propertyInfo, out string customType, out bool isFileUpload)
+        public static CustomDataType GetCustomDataType(this PropertyInfo propertyInfo, out string? customType, out bool isFileUpload)
         {
             CustomDataType type = CustomDataType.Default;
             customType = null;

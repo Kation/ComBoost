@@ -33,7 +33,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// 获取属性说明。
         /// </summary>
-        string Description { get; }
+        string? Description { get; }
 
         /// <summary>
         /// 获取是否是唯一值属性。
@@ -63,7 +63,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// Get the custom data type of property.
         /// </summary>
-        string CustomType { get; }
+        string? CustomType { get; }
 
         /// <summary>
         /// Get the property is base on upload file.
@@ -142,7 +142,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <typeparam name="T">Attribute type.</typeparam>
         /// <returns></returns>
-        T GetAttribute<T>() where T : Attribute;
+        T? GetAttribute<T>() where T : Attribute;
 
         /// <summary>
         /// Get attributes from metadata.
@@ -169,6 +169,6 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// Try get PropertyInfo from metadata.
         /// </summary>
         /// <returns>Return value if there can be a PropertyInfo.</returns>
-        PropertyInfo TryGetPropertyInfo();
+        PropertyInfo? TryGetPropertyInfo();
     }
 }

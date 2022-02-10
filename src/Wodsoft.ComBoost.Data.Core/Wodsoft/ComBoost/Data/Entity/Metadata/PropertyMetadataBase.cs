@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// Get the description of property.
         /// </summary>
-        public string Description { get; protected set; }
+        public string? Description { get; protected set; }
 
         /// <summary>
         /// Get the property is distinct.
@@ -74,7 +74,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// Get the custom data type of property.
         /// </summary>
-        public string CustomType { get; protected set; }
+        public string? CustomType { get; protected set; }
 
         /// <summary>
         /// 获取或设置类型转换器。
@@ -158,7 +158,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <typeparam name="T">Attribute type.</typeparam>
         /// <returns></returns>
-        public abstract T GetAttribute<T>() where T : Attribute;
+        public abstract T? GetAttribute<T>() where T : Attribute;
 
         /// <summary>
         /// Get attributes from metadata.
@@ -185,7 +185,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// Try get PropertyInfo from metadata.
         /// </summary>
         /// <returns>Return value if there can be a PropertyInfo.</returns>
-        public abstract PropertyInfo TryGetPropertyInfo();
+        public abstract PropertyInfo? TryGetPropertyInfo();
 
         /// <summary>
         /// Set the metadata of display.
