@@ -71,8 +71,7 @@ namespace Wodsoft.ComBoost.Data
             mapper.Map(dto, entity);
             await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
             var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
-            UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>();
-            model.Item = dto;
+            UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>(dto);
             List<ValidationResult> results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {
@@ -142,8 +141,7 @@ namespace Wodsoft.ComBoost.Data
             mapper.Map(dto, entity);
             await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
             var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
-            UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>();
-            model.Item = dto;
+            UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>(dto);
             List<ValidationResult> results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {

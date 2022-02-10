@@ -46,8 +46,7 @@ namespace Wodsoft.ComBoost.Data
         public virtual async Task<IUpdateModel<TCreateDTO>> Create([FromService] IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> dtoContext, [FromValue] TCreateDTO dto)
         {
             var validationContext = new ValidationContext(dto, Context.DomainContext, null);
-            UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>();
-            model.Item = dto;
+            UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>(dto);
             List<ValidationResult> results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {
@@ -97,8 +96,7 @@ namespace Wodsoft.ComBoost.Data
         public virtual async Task<IUpdateModel<TEditDTO>> Edit([FromService] IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> dtoContext, [FromValue] TEditDTO dto)
         {
             var validationContext = new ValidationContext(dto, Context.DomainContext, null);
-            UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>();
-            model.Item = dto;
+            UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>(dto);
             List<ValidationResult> results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {
