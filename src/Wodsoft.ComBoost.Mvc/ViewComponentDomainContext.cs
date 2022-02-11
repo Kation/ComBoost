@@ -19,7 +19,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         public ViewComponent ViewComponent { get; private set; }
 
-        private MvcValueProvider _ValueProvider;
+        private MvcValueProvider? _ValueProvider;
         protected override HttpValueProvider GetValueProvider()
         {
             if (_ValueProvider == null)

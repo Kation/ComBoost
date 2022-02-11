@@ -2,6 +2,8 @@
   <PropertyGroup>
     <Description>ComBoost用于AspNetCore Mvc的实体模块。</Description>
     <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
     <RootNamespace>Wodsoft.ComBoost.Mvc</RootNamespace>
   </PropertyGroup>
   <Import Project="../../common.props" />

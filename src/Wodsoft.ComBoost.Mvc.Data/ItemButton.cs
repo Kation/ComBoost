@@ -18,7 +18,7 @@ namespace Wodsoft.ComBoost.Mvc
         /// <summary>
         /// Get or set the link delegate.
         /// </summary>
-        public MvcEntityItemButtonLinkDelegate GetLink { get; set; }
+        public MvcEntityItemButtonLinkDelegate? GetLink { get; set; }
 
         /// <inheritdoc />
         public void SetTarget(IServiceProvider provider, object item)
@@ -27,8 +27,8 @@ namespace Wodsoft.ComBoost.Mvc
                 return;
             if (provider == null)
                 throw new NotSupportedException();
-            var accessor = provider.GetService<Microsoft.AspNetCore.Mvc.Infrastructure.IActionContextAccessor>();
-            var urlHelper = provider.GetService<Microsoft.AspNetCore.Mvc.Routing.IUrlHelperFactory>().GetUrlHelper(accessor.ActionContext);
+            var accessor = provider.GetRequiredService<Microsoft.AspNetCore.Mvc.Infrastructure.IActionContextAccessor>();
+            var urlHelper = provider.GetRequiredService<Microsoft.AspNetCore.Mvc.Routing.IUrlHelperFactory>().GetUrlHelper(accessor.ActionContext!);
             Target = GetLink(urlHelper, item);
         }
         

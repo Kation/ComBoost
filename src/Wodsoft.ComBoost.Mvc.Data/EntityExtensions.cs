@@ -40,7 +40,7 @@ namespace Wodsoft.ComBoost.Mvc
                 throw new NotSupportedException();
             var value = expression.Compile()(model.Item);
             var metadata = EntityDescriptor.GetMetadata<TEntity>();
-            var property = metadata.GetProperty(memberExpression.Member.Name);
+            var property = metadata.GetProperty(memberExpression.Member.Name)!;
             return Editor(helper, model.Item, property, value);
         }
 
@@ -57,6 +57,8 @@ namespace Wodsoft.ComBoost.Mvc
         {
             if (helper == null)
                 throw new ArgumentNullException(nameof(helper));
+            if (helper.ViewData.Model == null)
+                throw new ArgumentException("Model could not be null.", nameof(helper));
             if (expression == null)
                 throw new ArgumentNullException(nameof(expression));
             if (!(expression.Body is MemberExpression))
@@ -66,7 +68,7 @@ namespace Wodsoft.ComBoost.Mvc
                 throw new NotSupportedException();
             var value = expression.Compile()(helper.ViewData.Model.Item);
             var metadata = EntityDescriptor.GetMetadata<TEntity>();
-            var property = metadata.GetProperty(memberExpression.Member.Name);
+            var property = metadata.GetProperty(memberExpression.Member.Name)!;
             return Editor(helper, helper.ViewData.Model.Item, property, value);
         }
 
@@ -101,7 +103,7 @@ namespace Wodsoft.ComBoost.Mvc
         /// <param name="entity">实体对象。</param>
         /// <param name="property">属性元数据。</param>
         /// <param name="value">属性值。</param>
-        public static IHtmlContent Editor(this IHtmlHelper helper, IEntity entity, IPropertyMetadata property, object value)
+        public static IHtmlContent Editor(this IHtmlHelper helper, IEntity entity, IPropertyMetadata property, object? value)
         {
             if (helper == null)
                 throw new ArgumentNullException("helper");
@@ -143,7 +145,7 @@ namespace Wodsoft.ComBoost.Mvc
                 throw new NotSupportedException();
             var value = expression.Compile()(model.Item);
             var metadata = EntityDescriptor.GetMetadata<TEntity>();
-            var property = metadata.GetProperty(memberExpression.Member.Name);
+            var property = metadata.GetProperty(memberExpression.Member.Name)!;
             return Viewer(helper, model.Item, property, value);
         }
 
@@ -160,6 +162,8 @@ namespace Wodsoft.ComBoost.Mvc
         {
             if (helper == null)
                 throw new ArgumentNullException(nameof(helper));
+            if (helper.ViewData.Model == null)
+                throw new ArgumentException("Model could not be null.", nameof(helper));
             if (expression == null)
                 throw new ArgumentNullException(nameof(expression));
             if (!(expression.Body is MemberExpression))
@@ -169,7 +173,7 @@ namespace Wodsoft.ComBoost.Mvc
                 throw new NotSupportedException();
             var value = expression.Compile()(helper.ViewData.Model.Item);
             var metadata = EntityDescriptor.GetMetadata<TEntity>();
-            var property = metadata.GetProperty(memberExpression.Member.Name);
+            var property = metadata.GetProperty(memberExpression.Member.Name)!;
             return Viewer(helper, helper.ViewData.Model.Item, property, value);
         }
 
@@ -198,7 +202,7 @@ namespace Wodsoft.ComBoost.Mvc
         /// <param name="entity">实体对象。</param>
         /// <param name="property">属性元数据。</param>
         /// <param name="value">属性值。</param>
-        public static IHtmlContent Viewer(this IHtmlHelper helper, IEntity entity, IPropertyMetadata property, object value)
+        public static IHtmlContent Viewer(this IHtmlHelper helper, IEntity entity, IPropertyMetadata property, object? value)
         {
             if (helper == null)
                 throw new ArgumentNullException("helper");
@@ -238,11 +242,11 @@ namespace Wodsoft.ComBoost.Mvc
                 {
                     var field = fields[i];
                     EnumItem item = new EnumItem();
-                    DisplayAttribute display = field.GetCustomAttribute<DisplayAttribute>();
+                    DisplayAttribute? display = field.GetCustomAttribute<DisplayAttribute>();
                     if (display == null)
                         item.Name = field.Name;
                     else
-                        item.Name = display.Name;
+                        item.Name = display.Name ?? field.Name;
                     item.Value = Convert.ChangeType(field.GetValue(null), enumType);
                     list[i] = item;
                 }
@@ -259,12 +263,12 @@ namespace Wodsoft.ComBoost.Mvc
             /// <summary>
             /// Get or set the item name.
             /// </summary>
-            public string Name { get; set; }
+            public string? Name { get; set; }
 
             /// <summary>
             /// Get or set the item value.
             /// </summary>
-            public object Value { get; set; }
+            public object? Value { get; set; }
         }
     }
 }

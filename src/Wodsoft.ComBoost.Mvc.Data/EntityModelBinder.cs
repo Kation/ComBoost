@@ -15,8 +15,8 @@ namespace Wodsoft.ComBoost.Mvc
     {
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            var modelMetadataProvider = bindingContext.HttpContext.RequestServices.GetService<IModelMetadataProvider>();
-            var modelBinderFactory = bindingContext.HttpContext.RequestServices.GetService<IModelBinderFactory>();
+            var modelMetadataProvider = bindingContext.HttpContext.RequestServices.GetRequiredService<IModelMetadataProvider>();
+            var modelBinderFactory = bindingContext.HttpContext.RequestServices.GetRequiredService<IModelBinderFactory>();
             var metadata = EntityDescriptor.GetMetadata(bindingContext.ModelType);
             var keys = new object[metadata.KeyProperties.Count];
             for(int i = 0; i < keys.Length; i++)
@@ -31,6 +31,11 @@ namespace Wodsoft.ComBoost.Mvc
                 binderContext.Metadata = modelMetadataProvider.GetMetadataForType(property.ClrType);
                 var binder = modelBinderFactory.CreateBinder(binderContext);
                 await binder.BindModelAsync(propertyBindingContext);
+                if (propertyBindingContext.Result.Model == null)
+                {
+                    bindingContext.Result = ModelBindingResult.Failed();
+                    return;
+                }
                 keys[i] = propertyBindingContext.Result.Model;
             }
             var databaseContext = bindingContext.HttpContext.RequestServices.GetRequiredService<IDatabaseContext>();

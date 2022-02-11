@@ -10,9 +10,9 @@ namespace Wodsoft.ComBoost.Mvc
 {
     internal class DomainController
     {
-        internal static Type GetDomainServiceType(Type controllerType)
+        internal static Type? GetDomainServiceType(Type controllerType)
         {
-            while (controllerType.BaseType != typeof(object))
+            while (controllerType.BaseType != null && controllerType.BaseType != typeof(object))
             {
                 controllerType = controllerType.BaseType;
             }
@@ -28,7 +28,7 @@ namespace Wodsoft.ComBoost.Mvc
         where TDomainService : class, IDomainService
     {
         [ControllerContext]
-        public ControllerContext ControllerContext { get; set; }
+        public ControllerContext? ControllerContext { get; set; }
 
         protected virtual TDomainService GetDomainService()
         {

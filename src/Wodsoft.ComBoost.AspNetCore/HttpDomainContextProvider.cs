@@ -12,7 +12,7 @@ namespace Wodsoft.ComBoost.AspNetCore
             HttpContext = httpContextAccessor?.HttpContext;
         }
 
-        protected HttpDomainContextProvider(HttpContext httpContext)
+        protected HttpDomainContextProvider(HttpContext? httpContext)
         {
             HttpContext = httpContext;
         }

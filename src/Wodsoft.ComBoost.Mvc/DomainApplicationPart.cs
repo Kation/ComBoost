@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace Wodsoft.ComBoost.Mvc
@@ -15,8 +16,10 @@ namespace Wodsoft.ComBoost.Mvc
             Types = assembly.GetTypes().Where(t => typeof(IDomainController).IsAssignableFrom(t)).Select(t =>
             {
                 var serviceType = DomainController.GetDomainServiceType(t);
-                return ((Type)typeof(DomainControllerBuilder<,>).MakeGenericType(t, serviceType).GetProperty("ControllerType").GetGetMethod().Invoke(null, null)).GetTypeInfo();
-            }).ToArray();
+                if (serviceType == null)
+                    return null;
+                return ((Type)typeof(DomainControllerBuilder<,>).MakeGenericType(t, serviceType).GetProperty("ControllerType")!.GetValue(null)!).GetTypeInfo();
+            }).Where(t => t != null).Cast<TypeInfo>().ToArray();
         }
 
         public IEnumerable<TypeInfo> Types { get; }

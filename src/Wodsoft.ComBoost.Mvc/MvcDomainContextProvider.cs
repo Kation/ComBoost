@@ -20,7 +20,7 @@ namespace Wodsoft.ComBoost.Mvc
             ActionContext = actionContext;
         }
 
-        protected ActionContext ActionContext { get; }
+        protected ActionContext? ActionContext { get; }
 
         public override bool CanProvide => ActionContext != null;
 

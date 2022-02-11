@@ -111,20 +111,23 @@ namespace Wodsoft.ComBoost.Mvc
             return OnEditModelCreated(model);
         }
 
-        protected virtual async Task<IEditModel<TEditDTO>> CreateEditModel()
+        protected virtual async Task<IEditModel<TEditDTO>?> CreateEditModel()
         {
             var entityContext = HttpContext.RequestServices.GetRequiredService<IEntityContext<TEntity>>();
             var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
-            var entity = await entityContext.GetAsync(await GetKeysFromQuery());
+            var keys = await GetKeysFromQuery();
+            if (keys.Any(t => t == null))
+                return null;
+            var entity = await entityContext.GetAsync();
             var dto = mapper.Map<TEditDTO>(entity);
             IEditModel<TEditDTO> model = new EditModel<TEditDTO>(dto);
             return model;
         }
 
-        protected virtual async Task<object[]> GetKeysFromQuery()
+        protected virtual async Task<object?[]> GetKeysFromQuery()
         {
             var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
-            var keys = new object[keyProperties.Count];
+            var keys = new object?[keyProperties.Count];
             var valueProvider = await CompositeValueProvider.CreateAsync(ControllerContext);
             for (int i = 0; i < keyProperties.Count; i++)
             {
@@ -149,8 +152,10 @@ namespace Wodsoft.ComBoost.Mvc
             return keys;
         }
 
-        protected virtual IActionResult OnEditModelCreated(IEditModel<TEditDTO> model)
+        protected virtual IActionResult OnEditModelCreated(IEditModel<TEditDTO>? model)
         {
+            if (model == null)
+                return NotFound();
             return View(model);
         }
 

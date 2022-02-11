@@ -15,16 +15,16 @@ namespace Wodsoft.ComBoost.Mvc
         /// <summary>
         /// Get or set the value.
         /// </summary>
-        public object Value { get; set; }
+        public object? Value { get; set; }
 
         /// <summary>
         /// Get or set the entity.
         /// </summary>
-        public IEntity Entity { get; set; }
+        public IEntity? Entity { get; set; }
 
         /// <summary>
         /// Get or set the property metadata.
         /// </summary>
-        public IPropertyMetadata Metadata { get; set; }
+        public IPropertyMetadata? Metadata { get; set; }
     }
 }

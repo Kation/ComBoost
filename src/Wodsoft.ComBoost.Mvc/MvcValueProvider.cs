@@ -35,7 +35,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         public ActionContext ActionContext { get; private set; }
 
-        protected override object GetHttpValue(string name, Type valueType)
+        protected override object? GetHttpValue(string name, Type valueType)
         {
             if (valueType == typeof(Stream) && name == "$request")
                 return HttpContext.Request.Body;
@@ -80,7 +80,7 @@ namespace Wodsoft.ComBoost.Mvc
 
         ValueProviderResult Microsoft.AspNetCore.Mvc.ModelBinding.IValueProvider.GetValue(string key)
         {
-            object value = GetHttpValueCore(key);
+            object? value = GetHttpValueCore(key);
             if (value is string)
                 return new ValueProviderResult((string)value);
             else if (value is StringValues)
