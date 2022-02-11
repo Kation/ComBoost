@@ -27,6 +27,8 @@ namespace Wodsoft.ComBoost
             {
                 if (domainService.Context == null)
                     throw new InvalidOperationException("Domain service not initialized.");
+                if (domainService.Context.DomainMethod == null)
+                    throw new NotSupportedException("DomainMethod of DomainExecutionContext could not be null.");
                 DomainService = domainService;
                 DomainContext = domainContext;
                 _executionContext = domainService.Context;
@@ -57,7 +59,7 @@ namespace Wodsoft.ComBoost
                             filters.AddRange(DomainContext.GetService<IOptionsMonitor<DomainFilterOptions<TDomainService>>>().Get(t.Name).Filters);
                             return filters;
                         });
-                return _Filters[_executionContext.DomainMethod.Name];
+                return _Filters[_executionContext.DomainMethod!.Name];
             }
 
             protected DomainExecutionPipeline MakePipeline()

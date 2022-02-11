@@ -131,7 +131,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             var consumer = new AsyncEventingBasicConsumer(channel);
             consumer.Received += async (sender, e) =>
             {
-                var args = JsonSerializer.Deserialize<T>(e.Body.Span);
+                var args = JsonSerializer.Deserialize<T>(e.Body.Span)!;
                 DomainContext domainContext = new EmptyDomainContext(_serviceProvider.CreateScope().ServiceProvider, default(CancellationToken));
                 DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
                 var logger = domainContext.GetRequiredService<ILogger<DomainServiceEventHandler<T>>>();

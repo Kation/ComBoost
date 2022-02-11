@@ -19,12 +19,12 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取上下文相关的领域服务。
         /// </summary>
-        IDomainService DomainService { get; }
+        IDomainService? DomainService { get; }
 
         /// <summary>
         /// 获取执行方法对象信息。
         /// </summary>
-        MethodInfo DomainMethod { get; }
+        MethodInfo? DomainMethod { get; }
 
         /// <summary>
         /// 获取执行方法参数数组。

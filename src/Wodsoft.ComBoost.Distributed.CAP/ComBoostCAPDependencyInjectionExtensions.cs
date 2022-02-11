@@ -15,7 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDomainDistributedEventProvider, DomainCAPEventProvider>(sp => sp.GetService<DomainCAPEventProvider>()));
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDomainDistributedEventProvider, DomainCAPEventProvider>(sp => sp.GetRequiredService<DomainCAPEventProvider>()));
             builder.Services.AddSingleton<DomainCAPEventProvider>();
             builder.Services.AddSingleton<ISubscribeInvoker, DomainSubscribeInvoker>();
             builder.Services.AddSingleton<IConsumerServiceSelector, DomainConsumerServiceSelector>();

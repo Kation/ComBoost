@@ -15,7 +15,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
-        public ConsumerExecutorDescriptor SelectBestCandidate(string key, IReadOnlyList<ConsumerExecutorDescriptor> candidates)
+        public ConsumerExecutorDescriptor? SelectBestCandidate(string key, IReadOnlyList<ConsumerExecutorDescriptor> candidates)
         {
             if (candidates.Count == 0)
                 return null;

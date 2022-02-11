@@ -12,7 +12,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         {
             if (executionContext.Result != null)
             {
-                var type = executionContext.DomainMethod.ReturnType.GetGenericArguments()[0];
+                var type = executionContext.DomainMethod!.ReturnType.GetGenericArguments()[0];
                 httpContext.Response.ContentType = "application/json;charset=utf-8";
                 await System.Text.Json.JsonSerializer.SerializeAsync(httpContext.Response.Body, executionContext.Result, type);
             }

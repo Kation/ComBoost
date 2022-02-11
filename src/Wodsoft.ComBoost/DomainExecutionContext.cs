@@ -39,7 +39,7 @@ namespace Wodsoft.ComBoost
         }
 
         private IDomainService _DomainService;
-        public IDomainService DomainService
+        public IDomainService? DomainService
         {
             get
             {
@@ -51,7 +51,7 @@ namespace Wodsoft.ComBoost
         public IDomainContext DomainContext { get { return _Context; } }
 
         private MethodInfo _Method;
-        public MethodInfo DomainMethod { get { return _Method; } }
+        public MethodInfo? DomainMethod { get { return _Method; } }
 
         private object?[] _ParameterValues;
         public object?[] ParameterValues { get { return _ParameterValues; } }

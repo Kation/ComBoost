@@ -8,7 +8,7 @@ namespace Wodsoft.ComBoost
     public class DomainRpcValueProvider : IConfigurableValueProvider
     {
         private IDomainRpcRequest _request;
-        private Dictionary<string, object> _values = new Dictionary<string, object>();
+        private Dictionary<string, object?> _values = new Dictionary<string, object?>();
         private Dictionary<string, string> _alias = new Dictionary<string, string>();
 
         public DomainRpcValueProvider(IDomainRpcRequest request)
@@ -26,7 +26,7 @@ namespace Wodsoft.ComBoost
             return _values.ContainsKey(name) || _request.Values.ContainsKey(name);
         }
 
-        public object GetValue(string name, Type valueType)
+        public object? GetValue(string name, Type valueType)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -61,7 +61,7 @@ namespace Wodsoft.ComBoost
             _alias[aliasName] = name;
         }
 
-        public void SetValue(string name, object value)
+        public void SetValue(string name, object? value)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));

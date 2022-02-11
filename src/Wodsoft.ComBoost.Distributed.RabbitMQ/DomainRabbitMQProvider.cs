@@ -16,7 +16,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
-        private IConnection _connection;
+        private IConnection? _connection;
         public IConnection GetConnection()
         {
             if (_disposed)

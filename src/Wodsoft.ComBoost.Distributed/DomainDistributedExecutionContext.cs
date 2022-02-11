@@ -14,13 +14,13 @@ namespace Wodsoft.ComBoost
 
         public IDomainContext DomainContext { get; }
 
-        public IDomainService DomainService => null;
+        public IDomainService? DomainService => null;
 
-        public MethodInfo DomainMethod => null;
+        public MethodInfo? DomainMethod => null;
 
-        public object[] ParameterValues => null;
+        public object?[] ParameterValues => Array.Empty<object>();
 
-        public object Result => null;
+        public object? Result => null;
 
         public bool IsAborted => false;
 
@@ -31,12 +31,12 @@ namespace Wodsoft.ComBoost
             throw new NotSupportedException();
         }
 
-        public void Done(object result)
+        public void Done(object? result)
         {
             throw new NotSupportedException();
         }
 
-        public object GetParameterValue(ParameterInfo parameter)
+        public object? GetParameterValue(ParameterInfo parameter)
         {
             throw new NotSupportedException();
         }
