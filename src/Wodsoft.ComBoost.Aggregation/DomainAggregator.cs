@@ -23,7 +23,7 @@ namespace Wodsoft.ComBoost.Aggregation
                 throw new ArgumentNullException(nameof(value));
             if (!DomainAggregationsBuilder<T>.HasAggregation)
                 return Task.FromResult(value);
-            IDomainAggregation aggregation = (IDomainAggregation)DomainAggregationsBuilder<T>.Constructor.Invoke(new object[] { value });
+            IDomainAggregation aggregation = (IDomainAggregation)DomainAggregationsBuilder<T>.Constructor!.Invoke(new object[] { value });
             return aggregation.AggregateAsync(this).ContinueWith(task =>
             {
                 if (task.IsFaulted)
@@ -45,19 +45,19 @@ namespace Wodsoft.ComBoost.Aggregation
             return aggregation.AggregateAsync(this).ContinueWith(task => (object)aggregation);
         }
 
-        public async Task<T> GetAggregationAsync<T>(object[] keys)
+        public async Task<T?> GetAggregationAsync<T>(object[] keys)
         {
             var providers = _services.GetServices<IDomainAggregatorProvider<T>>().ToArray();
             if (providers.Length == 0)
                 return default;
-            DomainAggregatorExecutionPipeline<T> pipeline = null;
+            DomainAggregatorExecutionPipeline<T>? pipeline = null;
             for (int i = providers.Length - 1; i >= 0; i--)
             {
                 var next = pipeline;
                 var index = i;
                 pipeline = () => providers[index].GetAsync(keys, next);
             }
-            return await pipeline();
+            return await pipeline!();
         }
     }
 }

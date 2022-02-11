@@ -16,7 +16,7 @@ namespace Wodsoft.ComBoost.Aggregation
             _services = services ?? throw new ArgumentNullException(nameof(services));
         }
 
-        public async Task<T> GetAsync(object[] keys, DomainAggregatorExecutionPipeline<T> next)
+        public async Task<T?> GetAsync(object[] keys, DomainAggregatorExecutionPipeline<T>? next)
         {
             var scope = _services.CreateScope();
             try

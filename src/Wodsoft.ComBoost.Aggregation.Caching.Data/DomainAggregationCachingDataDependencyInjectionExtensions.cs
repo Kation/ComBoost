@@ -22,10 +22,13 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             builder.AddDistributedEventHandler<ObjectChangedEventArgs<T>>((context, e) =>
             {
-                var options = context.DomainContext.GetService<IOptions<DomainAggregatorMemoryCacheOptions>>();
-                var cache = context.DomainContext.GetService<IMemoryCache>();
-                var keyName = $"{options.Value.Prefix}{typeof(T).FullName}_{string.Join("_", e.Keys)}";
-                cache.Remove(keyName);
+                if (e.Keys != null)
+                {
+                    var options = context.DomainContext.GetRequiredService<IOptions<DomainAggregatorMemoryCacheOptions>>();
+                    var cache = context.DomainContext.GetRequiredService<IMemoryCache>();
+                    var keyName = $"{options.Value.Prefix}{typeof(T).FullName}_{string.Join("_", e.Keys)}";
+                    cache.Remove(keyName);
+                }
                 return Task.CompletedTask;
             });
             return builder;
@@ -36,8 +39,10 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             builder.AddDistributedEventHandler<ObjectChangedEventArgs<T>>((context, e) =>
             {
-                var options = context.DomainContext.GetService<IOptions<DomainAggregatorDistributedCacheOptions>>();
-                var cache = context.DomainContext.GetService<IDistributedCache>();
+                if (e.Keys == null)
+                    return Task.CompletedTask;
+                var options = context.DomainContext.GetRequiredService<IOptions<DomainAggregatorDistributedCacheOptions>>();
+                var cache = context.DomainContext.GetRequiredService<IDistributedCache>();
                 var keyName = $"{options.Value.Prefix}{typeof(T).FullName}_{string.Join("_", e.Keys)}";
                 return cache.RemoveAsync(keyName);
             });

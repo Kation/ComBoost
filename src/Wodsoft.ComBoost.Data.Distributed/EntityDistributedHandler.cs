@@ -29,7 +29,7 @@ namespace Wodsoft.ComBoost.Data.Distributed
             var mapper = context.DomainContext.GetRequiredService<IMapper>();
             var dto = mapper.Map<TDto>(entity);
             var descriptor = EntityDescriptor.GetMetadata<TDto>();
-            var e = new ObjectChangedEventArgs<TDto> { Keys = descriptor.KeyProperties.Select(t => t.GetValue(dto).ToString()).ToArray() };
+            var e = new ObjectChangedEventArgs<TDto> { Keys = descriptor.KeyProperties.Select(t => t.Converter.ConvertToString(t.GetValue(dto))).ToArray() };
             return context.DomainContext.EventManager.RaiseEvent(context, e);
         }
     }

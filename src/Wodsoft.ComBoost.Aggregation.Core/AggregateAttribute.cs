@@ -11,8 +11,6 @@ namespace Wodsoft.ComBoost.Aggregation
         {
             AggregationType = type ?? throw new ArgumentNullException(nameof(type));
             AggregationName = name ?? throw new ArgumentNullException(nameof(name));
-            if (keyProperties == null)
-                throw new ArgumentNullException(nameof(keyProperties));
             if (keyProperties.Length == 0)
                 throw new ArgumentException("Must have a property.");
             KeyProperties = keyProperties;

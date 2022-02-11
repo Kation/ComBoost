@@ -21,7 +21,7 @@ namespace Wodsoft.ComBoost.Aggregation.Caching
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public async Task<T> GetAsync(object[] keys, DomainAggregatorExecutionPipeline<T> next)
+        public async Task<T?> GetAsync(object[] keys, DomainAggregatorExecutionPipeline<T>? next)
         {
             var keyName = $"{_options.Prefix}{typeof(T).FullName}_{string.Join("_", keys)}";
             var data = await _cache.GetAsync(keyName);

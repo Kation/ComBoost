@@ -7,6 +7,6 @@ namespace Wodsoft.ComBoost.Aggregation
 {
     public interface IDomainAggregatorService<T> : IDomainTemplate
     {
-        Task<T> GetAsync(string[] keys);
+        Task<T?> GetAsync(string[] keys);
     }
 }

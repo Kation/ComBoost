@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DomainAggregationCachingDependencyInjectionExtensions
     {
-        public static IComBoostAggregationBuilder UseMemoryCache(this IComBoostAggregationBuilder builder, Action<DomainAggregatorMemoryCacheOptions> setupAction = null)
+        public static IComBoostAggregationBuilder UseMemoryCache(this IComBoostAggregationBuilder builder, Action<DomainAggregatorMemoryCacheOptions>? setupAction = null)
         {
             builder.Services.AddMemoryCache();
             if (setupAction != null)
@@ -26,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="builder"></param>
         /// <param name="setupAction"></param>
         /// <returns></returns>
-        public static IComBoostAggregationBuilder UseDistributedCache(this IComBoostAggregationBuilder builder, Action<DomainAggregatorDistributedCacheOptions> setupAction = null)
+        public static IComBoostAggregationBuilder UseDistributedCache(this IComBoostAggregationBuilder builder, Action<DomainAggregatorDistributedCacheOptions>? setupAction = null)
         {
             if (setupAction != null)
                 builder.Services.PostConfigure(setupAction);

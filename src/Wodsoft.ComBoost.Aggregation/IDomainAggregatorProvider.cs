@@ -7,6 +7,6 @@ namespace Wodsoft.ComBoost.Aggregation
 {
     public interface IDomainAggregatorProvider<T>
     {
-        Task<T> GetAsync(object[] keys, DomainAggregatorExecutionPipeline<T> next);
+        Task<T?> GetAsync(object[] keys, DomainAggregatorExecutionPipeline<T>? next);
     }
 }

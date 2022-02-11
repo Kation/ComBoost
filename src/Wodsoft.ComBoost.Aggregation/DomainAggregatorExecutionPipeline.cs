@@ -5,5 +5,5 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Aggregation
 {
-    public delegate Task<T> DomainAggregatorExecutionPipeline<T>();
+    public delegate Task<T?> DomainAggregatorExecutionPipeline<T>();
 }

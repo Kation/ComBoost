@@ -20,7 +20,7 @@ namespace Wodsoft.ComBoost.Aggregation.Mvc
             {
                 if (jsonResult.Value != null)
                 {
-                    var aggregator = context.HttpContext.RequestServices.GetService<IDomainAggregator>();
+                    var aggregator = context.HttpContext.RequestServices.GetRequiredService<IDomainAggregator>();
                     jsonResult.Value = await AggregateAsync(aggregator, jsonResult.Value);
                 }
             }
@@ -28,7 +28,7 @@ namespace Wodsoft.ComBoost.Aggregation.Mvc
             {
                 if (objectResult.Value != null)
                 {
-                    var aggregator = context.HttpContext.RequestServices.GetService<IDomainAggregator>();
+                    var aggregator = context.HttpContext.RequestServices.GetRequiredService<IDomainAggregator>();
                     objectResult.Value = await AggregateAsync(aggregator, objectResult.Value);
                 }
             }
@@ -39,9 +39,9 @@ namespace Wodsoft.ComBoost.Aggregation.Mvc
             var type = value.GetType();
             if (value is Array arrayValue)
             {
-                var elementType = type.GetElementType();
+                var elementType = type.GetElementType()!;
                 var builderType = typeof(DomainAggregationsBuilder<>).MakeGenericType(elementType);
-                var aggregationType = (Type)builderType.GetProperty(nameof(DomainAggregationsBuilder<object>.AggregationType)).GetValue(null);
+                var aggregationType = (Type)builderType.GetProperty(nameof(DomainAggregationsBuilder<object>.AggregationType))!.GetValue(null)!;
                 if (aggregationType == null)
                     return value;
                 var length = arrayValue.Length;
@@ -51,6 +51,8 @@ namespace Wodsoft.ComBoost.Aggregation.Mvc
                 {
                     var index = i;
                     var item = arrayValue.GetValue(i);
+                    if (item == null)
+                        continue;
                     tasks[index] = aggregator.AggregateAsync(item, elementType).ContinueWith(task =>
                     {
                         array.SetValue(task.Result, index);
@@ -64,15 +66,17 @@ namespace Wodsoft.ComBoost.Aggregation.Mvc
             {
                 var elementType = readOnlyListType.GetGenericArguments()[0];
                 var builderType = typeof(DomainAggregationsBuilder<>).MakeGenericType(elementType);
-                var aggregationType = (Type)builderType.GetProperty(nameof(DomainAggregationsBuilder<object>.AggregationType)).GetValue(null);
+                var aggregationType = (Type)builderType.GetProperty(nameof(DomainAggregationsBuilder<object>.AggregationType))!.GetValue(null)!;
                 if (aggregationType == null)
                     return value;
-                var length = (int)readOnlyListType.GetProperty("Count").GetValue(value);
+                var length = (int)readOnlyListType.GetProperty("Count")!.GetValue(value)!;
                 var array = Array.CreateInstance(aggregationType, length);
                 Task[] tasks = new Task[length];
                 int i = 0;
-                foreach(var item in (IEnumerable)value)
+                foreach (var item in (IEnumerable)value)
                 {
+                    if (item == null)
+                        continue;
                     var index = i;
                     tasks[index] = aggregator.AggregateAsync(item, elementType).ContinueWith(task =>
                     {

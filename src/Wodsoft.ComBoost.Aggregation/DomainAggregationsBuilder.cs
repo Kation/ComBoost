@@ -388,8 +388,8 @@ namespace Wodsoft.ComBoost.Aggregation
 
         public static bool HasAggregation { get; private set; }
 
-        public static Type AggregationType { get; private set; }
+        public static Type? AggregationType { get; private set; }
 
-        internal static ConstructorInfo Constructor { get; private set; }
+        internal static ConstructorInfo? Constructor { get; private set; }
     }
 }
