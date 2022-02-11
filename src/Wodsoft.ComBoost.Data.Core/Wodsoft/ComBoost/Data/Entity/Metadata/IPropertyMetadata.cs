@@ -163,7 +163,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <param name="entity">Entity.</param>
         /// <param name="value">Value.</param>
-        void SetValue(object entity, object value);
+        void SetValue(object entity, object? value);
 
         /// <summary>
         /// Try get PropertyInfo from metadata.

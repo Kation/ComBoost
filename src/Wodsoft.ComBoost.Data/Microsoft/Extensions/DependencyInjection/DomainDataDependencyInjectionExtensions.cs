@@ -47,7 +47,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return AddEntityDtoService<TDTO, TDTO, TDTO, TDTO>(builder);
         }
 
-        public static IServiceCollection AddEntityDtoContext<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>(this IServiceCollection services, Action<EntityDtoContextOptions<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>> optionConfigue = null)
+        public static IServiceCollection AddEntityDtoContext<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>(this IServiceCollection services, Action<EntityDtoContextOptions<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>? optionConfigue = null)
             where TEntity : class, IEntity
             where TListDTO : class, IEntityDTO
             where TCreateDTO : class, IEntityDTO
@@ -59,7 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services.AddScoped<IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>, EntityDtoContext<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
         }
 
-        public static IServiceCollection AddEntityDtoContext<TEntity, TDto>(this IServiceCollection services, Action<EntityDtoContextOptions<TEntity, TDto, TDto, TDto, TDto>> optionConfigue = null)
+        public static IServiceCollection AddEntityDtoContext<TEntity, TDto>(this IServiceCollection services, Action<EntityDtoContextOptions<TEntity, TDto, TDto, TDto, TDto>>? optionConfigue = null)
             where TEntity : class, IEntity
             where TDto : class, IEntityDTO
         {

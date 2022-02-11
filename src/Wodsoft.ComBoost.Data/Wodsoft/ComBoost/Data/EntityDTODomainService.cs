@@ -45,14 +45,15 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task<IUpdateModel<TCreateDTO>> Create([FromService] IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> dtoContext, [FromValue] TCreateDTO dto)
         {
-            var validationContext = new ValidationContext(dto, Context.DomainContext, null);
+            var validationContext = new ValidationContext(dto, Context!.DomainContext, null);
             UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>(dto);
             List<ValidationResult> results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {
                 model.IsSuccess = false;
                 foreach (var result in results)
-                    model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
+                    if (result.ErrorMessage != null)
+                        model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
                 return model;
             }
             await RaiseEvent(new EntityPreCreateEventArgs<TCreateDTO>(dto));
@@ -67,7 +68,7 @@ namespace Wodsoft.ComBoost.Data
             UpdateRangeModel<TCreateDTO> model = new UpdateRangeModel<TCreateDTO>();
             foreach (var dto in dtos)
             {
-                var validationContext = new ValidationContext(dto, Context.DomainContext, null);
+                var validationContext = new ValidationContext(dto, Context!.DomainContext, null);
                 List<ValidationResult> results = new List<ValidationResult>();
                 if (Validator.TryValidateObject(dto, validationContext, results, true))
                 {
@@ -76,7 +77,7 @@ namespace Wodsoft.ComBoost.Data
                 }
                 else
                 {
-                    model.AddItem(dto, results.Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage)).ToList());
+                    model.AddItem(dto, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
                 }
             }
             if (!model.IsSuccess)
@@ -95,14 +96,15 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task<IUpdateModel<TEditDTO>> Edit([FromService] IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> dtoContext, [FromValue] TEditDTO dto)
         {
-            var validationContext = new ValidationContext(dto, Context.DomainContext, null);
+            var validationContext = new ValidationContext(dto, Context!.DomainContext, null);
             UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>(dto);
             List<ValidationResult> results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {
                 model.IsSuccess = false;
                 foreach (var result in results)
-                    model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
+                    if (result.ErrorMessage != null)
+                        model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
                 return model;
             }
             await RaiseEvent(new EntityPreEditEventArgs<TEditDTO>(dto));
@@ -117,7 +119,7 @@ namespace Wodsoft.ComBoost.Data
             UpdateRangeModel<TEditDTO> model = new UpdateRangeModel<TEditDTO>();
             foreach (var dto in dtos)
             {
-                var validationContext = new ValidationContext(dto, Context.DomainContext, null);
+                var validationContext = new ValidationContext(dto, Context!.DomainContext, null);
                 List<ValidationResult> results = new List<ValidationResult>();
                 if (Validator.TryValidateObject(dto, validationContext, results, true))
                 {
@@ -126,7 +128,7 @@ namespace Wodsoft.ComBoost.Data
                 }
                 else
                 {
-                    model.AddItem(dto, results.Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage)).ToList());
+                    model.AddItem(dto, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
                 }
             }
             if (!model.IsSuccess)

@@ -24,7 +24,7 @@ namespace Wodsoft.ComBoost.Mvc
         /// <param name="model">实体编辑模型。</param>
         /// <param name="expression">属性选择表达式。</param>
         /// <returns></returns>
-        public static IHtmlContent Editor<TEntity>(this IHtmlHelper helper, IEntityEditModel<TEntity> model, Expression<Func<TEntity, object>> expression)
+        public static IHtmlContent Editor<TEntity>(this IHtmlHelper helper, IEditModel<TEntity> model, Expression<Func<TEntity, object>> expression)
             where TEntity : class, IEntity, new()
         {
             if (helper == null)
@@ -39,7 +39,8 @@ namespace Wodsoft.ComBoost.Mvc
             if (!(memberExpression.Expression is ParameterExpression))
                 throw new NotSupportedException();
             var value = expression.Compile()(model.Item);
-            var property = model.Metadata.GetProperty(memberExpression.Member.Name);
+            var metadata = EntityDescriptor.GetMetadata<TEntity>();
+            var property = metadata.GetProperty(memberExpression.Member.Name);
             return Editor(helper, model.Item, property, value);
         }
 
@@ -51,7 +52,7 @@ namespace Wodsoft.ComBoost.Mvc
         /// <param name="helper">Html帮助器。</param>
         /// <param name="expression">属性选择表达式。</param>
         /// <returns></returns>
-        public static IHtmlContent Editor<TEntity,TProperty>(this IHtmlHelper<IEntityEditModel<TEntity>> helper, Expression<Func<TEntity,TProperty>> expression)
+        public static IHtmlContent Editor<TEntity,TProperty>(this IHtmlHelper<IEditModel<TEntity>> helper, Expression<Func<TEntity,TProperty>> expression)
             where TEntity : IEntity
         {
             if (helper == null)
@@ -64,7 +65,8 @@ namespace Wodsoft.ComBoost.Mvc
             if (!(memberExpression.Expression is ParameterExpression))
                 throw new NotSupportedException();
             var value = expression.Compile()(helper.ViewData.Model.Item);
-            var property = helper.ViewData.Model.Metadata.GetProperty(memberExpression.Member.Name);
+            var metadata = EntityDescriptor.GetMetadata<TEntity>();
+            var property = metadata.GetProperty(memberExpression.Member.Name);
             return Editor(helper, helper.ViewData.Model.Item, property, value);
         }
 
@@ -125,7 +127,7 @@ namespace Wodsoft.ComBoost.Mvc
         /// <param name="model">实体编辑模型。</param>
         /// <param name="expression">属性选择表达式。</param>
         /// <returns></returns>
-        public static IHtmlContent Viewer<TEntity>(this IHtmlHelper helper, IEntityEditModel<TEntity> model, Expression<Func<TEntity, object>> expression)
+        public static IHtmlContent Viewer<TEntity>(this IHtmlHelper helper, IEditModel<TEntity> model, Expression<Func<TEntity, object>> expression)
             where TEntity : class, IEntity, new()
         {
             if (helper == null)
@@ -140,7 +142,8 @@ namespace Wodsoft.ComBoost.Mvc
             if (!(memberExpression.Expression is ParameterExpression))
                 throw new NotSupportedException();
             var value = expression.Compile()(model.Item);
-            var property = model.Metadata.GetProperty(memberExpression.Member.Name);
+            var metadata = EntityDescriptor.GetMetadata<TEntity>();
+            var property = metadata.GetProperty(memberExpression.Member.Name);
             return Viewer(helper, model.Item, property, value);
         }
 
@@ -152,7 +155,7 @@ namespace Wodsoft.ComBoost.Mvc
         /// <param name="helper">Html帮助器。</param>
         /// <param name="expression">属性选择表达式。</param>
         /// <returns></returns>
-        public static IHtmlContent Viewer<TEntity, TProperty>(this IHtmlHelper<IEntityEditModel<TEntity>> helper, Expression<Func<TEntity, TProperty>> expression)
+        public static IHtmlContent Viewer<TEntity, TProperty>(this IHtmlHelper<IEditModel<TEntity>> helper, Expression<Func<TEntity, TProperty>> expression)
             where TEntity : IEntity
         {
             if (helper == null)
@@ -165,7 +168,8 @@ namespace Wodsoft.ComBoost.Mvc
             if (!(memberExpression.Expression is ParameterExpression))
                 throw new NotSupportedException();
             var value = expression.Compile()(helper.ViewData.Model.Item);
-            var property = helper.ViewData.Model.Metadata.GetProperty(memberExpression.Member.Name);
+            var metadata = EntityDescriptor.GetMetadata<TEntity>();
+            var property = metadata.GetProperty(memberExpression.Member.Name);
             return Viewer(helper, helper.ViewData.Model.Item, property, value);
         }
 

@@ -135,13 +135,13 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             return _GetValue!(entity);
         }
 
-        private Action<object, object>? _SetValue;
+        private Action<object, object?>? _SetValue;
         /// <summary>
         /// Set property value to an entity.
         /// </summary>
         /// <param name="entity">Entity.</param>
         /// <param name="value">Value.</param>
-        public override void SetValue(object entity, object value)
+        public override void SetValue(object entity, object? value)
         {
             if (!CanSet)
                 throw new NotSupportedException("Property doen't support set method.");

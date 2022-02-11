@@ -10,16 +10,16 @@ namespace Wodsoft.ComBoost
 {
     public class EmptyValueProvider : IConfigurableValueProvider
     {
-        private Dictionary<string, object> _Values;
+        private Dictionary<string, object?> _Values;
         private Dictionary<string, string> _Alias;
 
         public EmptyValueProvider()
         {
-            _Values = new Dictionary<string, object>();
+            _Values = new Dictionary<string, object?>();
             _Alias = new Dictionary<string, string>();
         }
 
-        public virtual void SetValue(string name, object value)
+        public virtual void SetValue(string name, object? value)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));

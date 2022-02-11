@@ -104,14 +104,14 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <param name="propertyInfo">Property info.</param>
         /// <returns>The set delegate made of labmda expression.</returns>
-        public static Action<object, object> GetSetMethodDelegate(this PropertyInfo propertyInfo)
+        public static Action<object, object?> GetSetMethodDelegate(this PropertyInfo propertyInfo)
         {
             var objParameter = Expression.Parameter(typeof(object));
             var valueParameter = Expression.Parameter(typeof(object));
             var objConverterParameter = Expression.Convert(objParameter, propertyInfo.DeclaringType);
             var valueConverterParameter = Expression.Convert(valueParameter, propertyInfo.PropertyType);
             var expression = Expression.Call(objConverterParameter, propertyInfo.GetSetMethod(), valueConverterParameter);
-            var lambda = Expression.Lambda<Action<object, object>>(expression, objParameter, valueParameter).Compile();
+            var lambda = Expression.Lambda<Action<object, object?>>(expression, objParameter, valueParameter).Compile();
             return lambda;
         }
     }

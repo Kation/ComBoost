@@ -11,18 +11,18 @@ namespace Wodsoft.ComBoost.Data.Entity
         where TEditDTO : class, IEntityDTO
         where TRemoveDTO : class
     {
-        public Action<TEntity, TCreateDTO> OnAddMapped { get; set; }
+        public Action<TEntity, TCreateDTO>? OnAddMapped { get; set; }
 
-        public Action<TEntity, TCreateDTO> OnAdded { get; set; }
+        public Action<TEntity, TCreateDTO>? OnAdded { get; set; }
 
-        public Action<TEntity, TEditDTO> OnPreUpdateMap { get; set; }
+        public Action<TEntity, TEditDTO>? OnPreUpdateMap { get; set; }
 
-        public Action<TEntity, TEditDTO> OnUpdateMapped { get; set; }
+        public Action<TEntity, TEditDTO>? OnUpdateMapped { get; set; }
 
-        public Action<TEntity, TEditDTO> OnUpdated { get; set; }
+        public Action<TEntity, TEditDTO>? OnUpdated { get; set; }
 
-        public Action<TEntity, TRemoveDTO> OnPreRemove { get; set; }
+        public Action<TEntity, TRemoveDTO>? OnPreRemove { get; set; }
 
-        public Action<TEntity, TRemoveDTO> OnRemoved { get; set; }
+        public Action<TEntity, TRemoveDTO>? OnRemoved { get; set; }
     }
 }

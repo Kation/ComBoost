@@ -91,7 +91,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             throw new NotSupportedException();
         }
 
-        public Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty>> propertySelector) where TProperty : class
+        public Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty?>> propertySelector) where TProperty : class
         {
             throw new NotSupportedException();
         }

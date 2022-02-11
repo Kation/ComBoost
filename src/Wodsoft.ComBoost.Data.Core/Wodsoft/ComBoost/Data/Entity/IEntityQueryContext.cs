@@ -40,7 +40,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         IQueryable<TChildren> QueryChildren<TChildren>(T item, Expression<Func<T, ICollection<TChildren>>> childrenSelector)
             where TChildren : class;
 
-        Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty>> propertySelector)
+        Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty?>> propertySelector)
             where TProperty : class;
     }
 }

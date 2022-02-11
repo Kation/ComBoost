@@ -10,6 +10,6 @@ namespace Wodsoft.ComBoost.Data
     {
         public int DefaultSize { get; set; }
 
-        public int[] PageSizeOption { get; set; }
+        public int[]? PageSizeOption { get; set; }
     }
 }

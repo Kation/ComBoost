@@ -100,10 +100,10 @@ namespace Wodsoft.ComBoost.Data.Entity
                 keyList.Add(keys);
             }
             ParameterExpression parameter = Expression.Parameter(typeof(TEntity), "entity");
-            Expression expression = null;
+            Expression? expression = null;
             foreach (var key in keyList)
             {
-                Expression equal = null;
+                Expression? equal = null;
                 for (int i = 0; i < keyProperties.Count; i++)
                 {
                     var e = Expression.Equal(Expression.Property(parameter, keyProperties[0].ClrName), Expression.Constant(key[i], keyProperties[i].ClrType));
@@ -177,10 +177,10 @@ namespace Wodsoft.ComBoost.Data.Entity
                 keyList.Add(keys);
             }
             ParameterExpression parameter = Expression.Parameter(typeof(TEntity), "entity");
-            Expression expression = null;
+            Expression? expression = null;
             foreach (var key in keyList)
             {
-                Expression equal = null;
+                Expression? equal = null;
                 for (int i = 0; i < keyProperties.Count; i++)
                 {
                     var e = Expression.Equal(Expression.Property(parameter, keyProperties[0].ClrName), Expression.Constant(key[i], keyProperties[i].ClrType));

@@ -70,14 +70,15 @@ namespace Wodsoft.ComBoost.Data
             var entity = entityContext.Create();
             mapper.Map(dto, entity);
             await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
-            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
+            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
             UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>(dto);
             List<ValidationResult> results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {
                 model.IsSuccess = false;
                 foreach (var result in results)
-                    model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
+                    if (result.ErrorMessage != null)
+                        model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
                 return model;
             }
             entityContext.Add(entity);
@@ -98,7 +99,7 @@ namespace Wodsoft.ComBoost.Data
                 var entity = entityContext.Create();
                 mapper.Map(dto, entity);
                 await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
-                var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
+                var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
                 List<ValidationResult> results = new List<ValidationResult>();
                 if (Validator.TryValidateObject(dto, validationContext, results, true))
                 {
@@ -109,7 +110,7 @@ namespace Wodsoft.ComBoost.Data
                 }
                 else
                 {
-                    model.AddItem(dto, results.Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage)).ToList());
+                    model.AddItem(dto, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
                 }
             }
             if (!model.IsSuccess)
@@ -140,14 +141,15 @@ namespace Wodsoft.ComBoost.Data
             await RaiseEvent(new EntityPreMapEventArgs<TEntity, TEditDTO>(entity, dto));
             mapper.Map(dto, entity);
             await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
-            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
+            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
             UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>(dto);
             List<ValidationResult> results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {
                 model.IsSuccess = false;
                 foreach (var result in results)
-                    model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
+                    if (result.ErrorMessage != null)
+                        model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
                 return model;
             }
             entityContext.Update(entity);
@@ -176,7 +178,7 @@ namespace Wodsoft.ComBoost.Data
                 await RaiseEvent(new EntityPreMapEventArgs<TEntity, TEditDTO>(entity, dto));
                 mapper.Map(dto, entity);
                 await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
-                var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context.DomainContext, null);
+                var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
                 List<ValidationResult> results = new List<ValidationResult>();
                 if (Validator.TryValidateObject(dto, validationContext, results, true))
                 {
@@ -187,7 +189,7 @@ namespace Wodsoft.ComBoost.Data
                 }
                 else
                 {
-                    model.AddItem(dto, results.Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage)).ToList());
+                    model.AddItem(dto, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
                 }
             }
             if (!model.IsSuccess)
