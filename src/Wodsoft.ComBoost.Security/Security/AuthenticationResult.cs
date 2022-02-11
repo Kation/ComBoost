@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost.Security
 
         public bool IsSuccess { get; protected set; }
 
-        public ClaimsPrincipal Principal { get; protected set; }
+        public ClaimsPrincipal? Principal { get; protected set; }
 
         public static AuthenticationResult Fail()
         {

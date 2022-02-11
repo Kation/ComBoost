@@ -27,7 +27,7 @@ namespace Wodsoft.ComBoost.Security
                 var result = await handler.AuthenticateAsync();
                 if (result.IsSuccess)
                 {
-                    return result.Principal;
+                    return result.Principal!;
                 }
             }
             ClaimsIdentity identity = new ClaimsIdentity("Anonymous");
