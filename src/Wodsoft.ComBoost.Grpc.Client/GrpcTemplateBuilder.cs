@@ -3,6 +3,7 @@ using Grpc.Net.Client;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -38,6 +39,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 _callOptions = callOptions;
             }
 
+            [AllowNull]
             public IDomainContext Context { get; set; }
 
             public GrpcChannel Channel { get; }
@@ -51,7 +53,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 await HandleResponseAsync(response);
             }
 
-            protected async Task<TValue> InvokeWithReturnValueAsync<TValue>(Method<DomainGrpcRequest, DomainGrpcResponse<TValue>> method)
+            protected async Task<TValue?> InvokeWithReturnValueAsync<TValue>(Method<DomainGrpcRequest, DomainGrpcResponse<TValue>> method)
             {
                 DomainGrpcRequest request = new DomainGrpcRequest();
                 await HandleRequestAsync(request);
@@ -72,7 +74,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 await HandleResponseAsync(response);
             }
 
-            protected async Task<TValue> InvokeWithArgumentsAndReturnValueAsync<TArgs, TValue>(Method<DomainGrpcRequest<TArgs>, DomainGrpcResponse<TValue>> method, TArgs args)
+            protected async Task<TValue?> InvokeWithArgumentsAndReturnValueAsync<TArgs, TValue>(Method<DomainGrpcRequest<TArgs>, DomainGrpcResponse<TValue>> method, TArgs args)
                 where TArgs : new()
             {
                 DomainGrpcRequest<TArgs> request = new DomainGrpcRequest<TArgs>();
@@ -152,7 +154,8 @@ namespace Wodsoft.ComBoost.Grpc.Client
 
                 var parameters = method.GetParameters();
                 //Define request and response type
-                Type requestType, responseType, argumentType;
+                Type requestType, responseType;
+                Type? argumentType;
                 if (method.ReturnType.IsGenericType)
                     responseType = typeof(DomainGrpcResponse<>).MakeGenericType(method.ReturnType.GetGenericArguments());
                 else
@@ -200,7 +203,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 {
                     for (int i = 0; i < parameters.Length; i++)
                         ilGenerator.Emit(OpCodes.Ldarg_S, i + 1);
-                    ilGenerator.Emit(OpCodes.Newobj, argumentType.GetConstructor(parameters.Select(t => t.ParameterType).ToArray()));
+                    ilGenerator.Emit(OpCodes.Newobj, argumentType!.GetConstructor(parameters.Select(t => t.ParameterType).ToArray()));
                     ilGenerator.Emit(OpCodes.Call, _InvokeWithArgumentsAsyncMethodInfo.MakeGenericMethod(argumentType));
                 }
                 else if (parameters.Length == 0 && method.ReturnType != typeof(Task))
@@ -211,7 +214,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 {
                     for (int i = 0; i < parameters.Length; i++)
                         ilGenerator.Emit(OpCodes.Ldarg_S, i + 1);
-                    ilGenerator.Emit(OpCodes.Newobj, argumentType.GetConstructor(parameters.Select(t => t.ParameterType).ToArray()));
+                    ilGenerator.Emit(OpCodes.Newobj, argumentType!.GetConstructor(parameters.Select(t => t.ParameterType).ToArray()));
                     ilGenerator.Emit(OpCodes.Call, _InvokeWithArgumentsAndReturnValueAsyncMethodInfo.MakeGenericMethod(argumentType, method.ReturnType.GetGenericArguments()[0]));
                 }
 

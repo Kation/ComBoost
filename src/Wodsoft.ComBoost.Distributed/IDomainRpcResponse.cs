@@ -6,17 +6,17 @@ namespace Wodsoft.ComBoost
 {
     public interface IDomainRpcResponse
     {
-        string OS { get; }
+        string? OS { get; }
 
         IDictionary<string, byte[]> Headers { get; }
 
-        IDomainRpcTrace Trace { get; }
+        IDomainRpcTrace? Trace { get; }
 
-        IDomainRpcException Exception { get; }
+        IDomainRpcException? Exception { get; }
     }
 
     public interface IDomainRpcResponse<T> : IDomainRpcResponse
     {
-        T Result { get; }
+        T? Result { get; }
     }
 }

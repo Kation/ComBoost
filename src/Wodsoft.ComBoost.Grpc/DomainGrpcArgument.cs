@@ -15,7 +15,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 1)]
-        public T1 Argument1 { get; set; }
+        public T1? Argument1 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2> : DomainGrpcArgument<T1>
@@ -28,7 +28,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 2)]
-        public T2 Argument2 { get; set; }
+        public T2? Argument2 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3> : DomainGrpcArgument<T1, T2>
@@ -41,7 +41,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 3)]
-        public T3 Argument3 { get; set; }
+        public T3? Argument3 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4> : DomainGrpcArgument<T1, T2, T3>
@@ -54,7 +54,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 4)]
-        public T4 Argument4 { get; set; }
+        public T4? Argument4 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5> : DomainGrpcArgument<T1, T2, T3, T4>
@@ -67,7 +67,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 5)]
-        public T5 Argument5 { get; set; }
+        public T5? Argument5 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5, T6> : DomainGrpcArgument<T1, T2, T3, T4, T5>
@@ -80,7 +80,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 6)]
-        public T6 Argument6 { get; set; }
+        public T6? Argument6 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7> : DomainGrpcArgument<T1, T2, T3, T4, T5, T6>
@@ -93,7 +93,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 7)]
-        public T7 Argument7 { get; set; }
+        public T7? Argument7 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8> : DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7>
@@ -106,7 +106,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 8)]
-        public T8 Argument8 { get; set; }
+        public T8? Argument8 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9> : DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8>
@@ -119,7 +119,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 9)]
-        public T9 Argument9 { get; set; }
+        public T9? Argument9 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9>
@@ -132,7 +132,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 10)]
-        public T10 Argument10 { get; set; }
+        public T10? Argument10 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
@@ -146,7 +146,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 11)]
-        public T11 Argument11 { get; set; }
+        public T11? Argument11 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
@@ -160,7 +160,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 12)]
-        public T12 Argument12 { get; set; }
+        public T12? Argument12 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
@@ -174,7 +174,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 13)]
-        public T13 Argument13 { get; set; }
+        public T13? Argument13 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
@@ -188,7 +188,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 14)]
-        public T14 Argument14 { get; set; }
+        public T14? Argument14 { get; set; }
     }
 
     public class DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : DomainGrpcArgument<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
@@ -202,7 +202,7 @@ namespace Wodsoft.ComBoost.Grpc
         }
 
         [DataMember(Order = 15)]
-        public T15 Argument15 { get; set; }
+        public T15? Argument15 { get; set; }
     }
 
     public class DomainGrpcArgumentHelper

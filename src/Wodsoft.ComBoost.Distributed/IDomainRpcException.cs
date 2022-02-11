@@ -14,6 +14,6 @@ namespace Wodsoft.ComBoost
 
         string StackTrace { get; }
 
-        IDomainRpcException InnerException { get; }
+        IDomainRpcException? InnerException { get; }
     }
 }

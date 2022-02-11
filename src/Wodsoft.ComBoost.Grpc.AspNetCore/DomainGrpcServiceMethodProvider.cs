@@ -20,10 +20,10 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
             _options = options.Value;
         }
 
-        private static MethodInfo _CreateInstanceMethodInfo = typeof(ActivatorUtilities).GetMethod("CreateInstance", 1, BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IServiceProvider), typeof(object[]) }, null);
-        private static PropertyInfo _ServicesPropertyInfo = typeof(DomainGrpcDiscoveryService).GetProperty("Services");
+        private static MethodInfo _CreateInstanceMethodInfo = typeof(ActivatorUtilities).GetMethod("CreateInstance", 1, BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IServiceProvider), typeof(object[]) }, null)!;
+        private static PropertyInfo _ServicesPropertyInfo = typeof(DomainGrpcDiscoveryService).GetProperty("Services")!;
         private static ConstructorInfo _GrpcContextConstructorInfo = typeof(DomainGrpcContext).GetConstructors()[0];
-        private static MethodInfo _GetServiceMethodInfo = typeof(ServiceProviderServiceExtensions).GetMethod("GetRequiredService", 1, BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IServiceProvider) }, null);
+        private static MethodInfo _GetServiceMethodInfo = typeof(ServiceProviderServiceExtensions).GetMethod("GetRequiredService", 1, BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IServiceProvider) }, null)!;
 
 
         public void OnServiceMethodDiscovery(ServiceMethodProviderContext<DomainGrpcDiscoveryService> context)
@@ -31,14 +31,14 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
             var contextType = context.GetType();
             foreach (var type in _options.Types)
             {
-                var serviceType = (Type)typeof(DomainGrpcService<>).MakeGenericType(type).GetField("ServiceType", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                var serviceType = (Type)typeof(DomainGrpcService<>).MakeGenericType(type).GetField("ServiceType", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
                 foreach (var method in serviceType.GetTypeInfo().DeclaredMethods)
                 {
                     if (!method.IsPublic || method.IsStatic)
                         continue;
-                    var methodField = serviceType.GetField("_Method_" + method.Name, BindingFlags.NonPublic | BindingFlags.Static);
-                    var methodValue = methodField.GetValue(null);
-                    var addMethod = contextType.GetMethod("AddUnaryMethod").MakeGenericMethod(methodField.FieldType.GetGenericArguments());
+                    var methodField = serviceType.GetField("_Method_" + method.Name, BindingFlags.NonPublic | BindingFlags.Static)!;
+                    var methodValue = methodField.GetValue(null)!;
+                    var addMethod = contextType.GetMethod("AddUnaryMethod")!.MakeGenericMethod(methodField.FieldType.GetGenericArguments());
 
                     var discoveryServiceParameter = Expression.Parameter(typeof(DomainGrpcDiscoveryService));
                     var requestParameter = Expression.Parameter(methodField.FieldType.GetGenericArguments()[0]);
@@ -55,7 +55,7 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
                         //var templateDescriptor = domainGrpcDiscoveryService.Services.GetService<IDomainTemplateDescriptor<T>>();
                         Expression.Assign(templateDescriptorVariable, Expression.Call(_GetServiceMethodInfo.MakeGenericMethod(templateDescriptorVariable.Type), domainContextVaiable)),
                         //var template = templateDescriptor.GetTemplate(domainContext);
-                        Expression.Assign(templateVariable, Expression.Call(templateDescriptorVariable, templateDescriptorVariable.Type.GetMethod("GetTemplate"), domainContextVaiable)),
+                        Expression.Assign(templateVariable, Expression.Call(templateDescriptorVariable, templateDescriptorVariable.Type.GetMethod("GetTemplate")!, domainContextVaiable)),
                         //var service = domainGrpcDiscoveryService.Services.GetService<DomainGrpcService<T>>();
                         Expression.Assign(serviceVariable, Expression.Call(_CreateInstanceMethodInfo.MakeGenericMethod(serviceType), Expression.Property(discoveryServiceParameter, _ServicesPropertyInfo), Expression.NewArrayInit(typeof(object), templateVariable))),
                         //service.{Method}(request, context);

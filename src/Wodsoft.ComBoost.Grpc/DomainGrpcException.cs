@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Wodsoft.Protobuf;
 
@@ -20,16 +21,20 @@ namespace Wodsoft.ComBoost.Grpc
                 InnerException = new DomainGrpcException(ex.InnerException);
         }
 
+        [AllowNull]
         public string Title { get; set; }
 
+        [AllowNull]
         public string Message { get; set; }
 
+        [AllowNull]
         public string Source { get; set; }
 
+        [AllowNull]
         public string StackTrace { get; set; }
 
-        public DomainGrpcException InnerException { get; set; }
-        IDomainRpcException IDomainRpcException.InnerException => InnerException;
+        public DomainGrpcException? InnerException { get; set; }
+        IDomainRpcException? IDomainRpcException.InnerException => InnerException;
 
         protected override int CalculateSize()
         {

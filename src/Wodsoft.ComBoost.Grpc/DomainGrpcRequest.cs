@@ -18,7 +18,7 @@ namespace Wodsoft.ComBoost.Grpc
 
         }
 
-        public string OS { get; set; }
+        public string? OS { get; set; }
 
         private static readonly MapField<string, byte[]>.Codec _HeaderCodec = new MapField<string, byte[]>.Codec(FieldCodec.ForString(10), new ByteArrayCodeGenerator().CreateFieldCodec(2), 18);
         private MapField<string, byte[]> _headers { get; set; } = new MapField<string, byte[]>();
@@ -78,10 +78,12 @@ namespace Wodsoft.ComBoost.Grpc
     public class DomainGrpcRequest<T> : DomainGrpcRequest
         where T : new()
     {
-        public T Argument { get; set; }
+        public T? Argument { get; set; }
 
         protected override int CalculateSize()
         {
+            if (Argument == null)
+                Argument = new T();
             Message<T> message = Argument;
             var size = base.CalculateSize();
             size += 1 + CodedOutputStream.ComputeMessageSize(message);

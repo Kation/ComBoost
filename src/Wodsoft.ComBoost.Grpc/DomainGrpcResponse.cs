@@ -3,6 +3,7 @@ using Google.Protobuf.Collections;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -15,17 +16,17 @@ namespace Wodsoft.ComBoost.Grpc
 {
     public class DomainGrpcResponse : Message, IDomainRpcResponse
     {
-        public string OS { get; set; }
+        public string? OS { get; set; }
 
         private static readonly MapField<string, byte[]>.Codec _HeaderCodec = new MapField<string, byte[]>.Codec(FieldCodec.ForString(10), new ByteArrayCodeGenerator().CreateFieldCodec(2), 18);
         private MapField<string, byte[]> _headers { get; set; } = new MapField<string, byte[]>();
         public IDictionary<string, byte[]> Headers { get => _headers; }
 
-        public DomainGrpcTrace Trace { get; set; }
-        IDomainRpcTrace IDomainRpcResponse.Trace => Trace;
+        public DomainGrpcTrace? Trace { get; set; }
+        IDomainRpcTrace? IDomainRpcResponse.Trace => Trace;
 
-        public DomainGrpcException Exception { get; set; }
-        IDomainRpcException IDomainRpcResponse.Exception => Exception;
+        public DomainGrpcException? Exception { get; set; }
+        IDomainRpcException? IDomainRpcResponse.Exception => Exception;
 
         protected override int CalculateSize()
         {
@@ -93,8 +94,7 @@ namespace Wodsoft.ComBoost.Grpc
 
     public class DomainGrpcResponse<T> : DomainGrpcResponse, IDomainRpcResponse<T>
     {
-        private T _result;
-        public T Result { get => _result; set => _result = value; }
+        public T? Result { get; set; }
 
         protected override int CalculateSize()
         {

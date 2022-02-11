@@ -7,7 +7,7 @@ namespace Wodsoft.ComBoost
 {
     public interface IDomainRpcRequest
     {
-        string OS { get; }
+        string? OS { get; }
 
         IDictionary<string, byte[]> Headers { get; }
 
