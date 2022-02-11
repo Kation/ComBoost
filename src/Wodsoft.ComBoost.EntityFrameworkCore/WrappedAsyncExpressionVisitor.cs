@@ -111,30 +111,30 @@ namespace Wodsoft.ComBoost.Data.Entity
                         case "SingleAsync":
                         case "SingleOrDefaultAsync":
                             return (method.GetParameters().Length == 2 ?
-                                typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(CancellationToken) })
-                                : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(bool))), typeof(CancellationToken) }))
+                                typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(CancellationToken) })!
+                                : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(bool))), typeof(CancellationToken) }))!
                                 .MakeGenericMethod(method.GetGenericArguments());
                         case "AverageAsync":
                         case "SumAsync":
                             return (method.GetParameters().Length == 2 ?
-                                typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, new Type[] { typeof(IQueryable<>).MakeGenericType(method.GetParameters()[0].ParameterType.GetGenericArguments()[0]), typeof(CancellationToken) })
-                                : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), method.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1])), typeof(CancellationToken) }).MakeGenericMethod(method.GetGenericArguments()[0]));
+                                typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, new Type[] { typeof(IQueryable<>).MakeGenericType(method.GetParameters()[0].ParameterType.GetGenericArguments()[0]), typeof(CancellationToken) })!
+                                : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), method.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1])), typeof(CancellationToken) })!.MakeGenericMethod(method.GetGenericArguments()[0]));
                         case "MaxAsync":
                         case "MinAsync":
                             return (method.GetParameters().Length == 2 ?
-                                typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(CancellationToken) }).MakeGenericMethod(method.ReturnType.GetGenericArguments()[0])
-                                : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 2, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1))), typeof(CancellationToken) }).MakeGenericMethod(method.GetGenericArguments()[0], method.ReturnType.GetGenericArguments()[0]));
+                                typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(CancellationToken) })!.MakeGenericMethod(method.ReturnType.GetGenericArguments()[0])
+                                : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 2, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1))), typeof(CancellationToken) })!.MakeGenericMethod(method.GetGenericArguments()[0], method.ReturnType.GetGenericArguments()[0]));
                         case "ToArrayAsync":
                         case "ToListAsync":
-                            return typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name).MakeGenericMethod(method.GetGenericArguments());
+                            return typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name)!.MakeGenericMethod(method.GetGenericArguments());
                         case "ToDictionaryAsync":
                             if (method.GetGenericArguments().Length == 2)
                             {
                                 var type1 = Type.MakeGenericMethodParameter(0);
                                 var type2 = Type.MakeGenericMethodParameter(1);
                                 return (method.GetParameters().Length == 3 ?
-                                    typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 2, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Func<,>).MakeGenericType(type1, type2), typeof(CancellationToken) })
-                                    : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 2, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Func<,>).MakeGenericType(type1, type2), typeof(IEqualityComparer<>).MakeGenericType(type2), typeof(CancellationToken) }))
+                                    typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 2, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Func<,>).MakeGenericType(type1, type2), typeof(CancellationToken) })!
+                                    : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 2, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Func<,>).MakeGenericType(type1, type2), typeof(IEqualityComparer<>).MakeGenericType(type2), typeof(CancellationToken) }))!
                                     .MakeGenericMethod(method.GetGenericArguments());
                             }
                             else
@@ -143,29 +143,29 @@ namespace Wodsoft.ComBoost.Data.Entity
                                 var type2 = Type.MakeGenericMethodParameter(1);
                                 var type3 = Type.MakeGenericMethodParameter(2);
                                 return (method.GetParameters().Length == 4 ?
-                                    typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Func<,>).MakeGenericType(type1, type2), typeof(Func<,>).MakeGenericType(type1, type3), typeof(CancellationToken) })
-                                    : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Func<,>).MakeGenericType(type1, type2), typeof(Func<,>).MakeGenericType(type1, type3), typeof(IEqualityComparer<>).MakeGenericType(type2), typeof(CancellationToken) }))
+                                    typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Func<,>).MakeGenericType(type1, type2), typeof(Func<,>).MakeGenericType(type1, type3), typeof(CancellationToken) })!
+                                    : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IQueryable<>).MakeGenericType(type1), typeof(Func<,>).MakeGenericType(type1, type2), typeof(Func<,>).MakeGenericType(type1, type3), typeof(IEqualityComparer<>).MakeGenericType(type2), typeof(CancellationToken) }))!
                                     .MakeGenericMethod(method.GetGenericArguments());
                             }
                         #endregion
                         #region Include
                         case "Include":
                             return (method.GetGenericArguments().Length == 1 ?
-                                typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(string) })
-                                : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 2, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1))) })
+                                typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(string) })!
+                                : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 2, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1))) })!
                                 ).MakeGenericMethod(method.GetGenericArguments());
                         case "ThenInclude":
                             return (method.GetParameters()[0].ParameterType.GetGenericArguments()[1] == method.GetGenericArguments()[1] ?
-                                typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IIncludableQueryable<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(1), Type.MakeGenericMethodParameter(2))) })
-                                : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IIncludableQueryable<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(IEnumerable<>).MakeGenericType(Type.MakeGenericMethodParameter(1))), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(1), Type.MakeGenericMethodParameter(2))) })
+                                typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IIncludableQueryable<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), Type.MakeGenericMethodParameter(1)), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(1), Type.MakeGenericMethodParameter(2))) })!
+                                : typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 3, new Type[] { typeof(IIncludableQueryable<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(IEnumerable<>).MakeGenericType(Type.MakeGenericMethodParameter(1))), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(1), Type.MakeGenericMethodParameter(2))) })!
                                 ).MakeGenericMethod(method.GetGenericArguments());
                         #endregion
                         default:
-                            return null;
+                            throw new NotSupportedException("Not supported method");
                     }
                 }
                 else
-                    return null;
+                    throw new NotSupportedException("Not supported method");
             });
         }
     }

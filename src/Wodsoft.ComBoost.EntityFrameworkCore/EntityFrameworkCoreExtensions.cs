@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
             foreach (var property in properties)
             {
                 var type = property.PropertyType.GetGenericArguments()[0];
-                var func = (Func<IServiceProvider, object>)Delegate.CreateDelegate(typeof(Func<IServiceProvider, object>), typeof(DatabaseContext<TDbContext>).GetMethod(nameof(DatabaseContext<TDbContext>.GetEntityContextDelegate), BindingFlags.Public | BindingFlags.Static).MakeGenericMethod(type));
+                var func = (Func<IServiceProvider, object>)Delegate.CreateDelegate(typeof(Func<IServiceProvider, object>), typeof(DatabaseContext<TDbContext>).GetMethod(nameof(DatabaseContext<TDbContext>.GetEntityContextDelegate), BindingFlags.Public | BindingFlags.Static)!.MakeGenericMethod(type));
                 services.Add(new ServiceDescriptor(typeof(IEntityContext<>).MakeGenericType(type), func, ServiceLifetime.Scoped));
             }
             return services;

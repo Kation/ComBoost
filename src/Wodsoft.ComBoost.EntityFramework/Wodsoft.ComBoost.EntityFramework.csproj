@@ -3,9 +3,15 @@
     <Description>ComBoost用于EntityFramework实现的实体模块。</Description>
     <TargetFrameworks>net461;netstandard2.1</TargetFrameworks>
     <RootNamespace>Wodsoft.ComBoost.Data.Entity</RootNamespace>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <Import Project="../../common.props" />
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
+    <NoWarn>$(NoWarn);nullable</NoWarn>
+  </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Data.Core\Wodsoft.ComBoost.Data.Core.csproj" />
   </ItemGroup>

@@ -175,21 +175,21 @@ namespace Wodsoft.ComBoost.Data.Entity
             return query;
         }
 
-        public async Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty>> propertySelector) where TProperty : class
+        public async Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty?>> propertySelector) where TProperty : class
         {
             var entry = Database.InnerContext.Entry<T>(item);
             var state = entry.State;
             if (state == EntityState.Detached)
                 entry.State = EntityState.Unchanged;
             var reference = entry.Reference(propertySelector);
-            TProperty propertyValue;
+            TProperty? propertyValue;
             if (Database.TrackEntity)
                 propertyValue = await reference.Query().FirstOrDefaultAsync();
             else
                 propertyValue = await reference.Query().AsNoTracking().FirstOrDefaultAsync();
             if (state == EntityState.Detached)
                 entry.State = EntityState.Detached;
-            Metadata.GetProperty(reference.Name).SetValue(item, propertyValue);
+            Metadata.GetProperty(reference.Name)!.SetValue(item, propertyValue);
         }
     }
 }

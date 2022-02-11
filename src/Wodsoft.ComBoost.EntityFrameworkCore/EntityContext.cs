@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.Transactions;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -39,7 +40,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             foreach (var reference in Database.InnerContext.Entry(item).References)
             {
-                if (reference.CurrentValue != null && reference.TargetEntry.State == EntityState.Detached)
+                if (reference.CurrentValue != null && reference.TargetEntry!.State == EntityState.Detached)
                     reference.TargetEntry.State = EntityState.Unchanged;
             }
         }
@@ -95,7 +96,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             return query;
         }
 
-        public async Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty>> propertySelector)
+        public async Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty?>> propertySelector)
             where TProperty : class
         {
 #pragma warning disable EF1001 // Internal EF Core API usage.
@@ -105,14 +106,14 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (state == EntityState.Detached)
                 entry.State = EntityState.Unchanged;
             var reference = entry.Reference(propertySelector);
-            TProperty propertyValue;
+            TProperty? propertyValue;
             if (Database.TrackEntity)
                 propertyValue = await reference.Query().FirstOrDefaultAsync();
             else
                 propertyValue = await reference.Query().AsNoTracking().FirstOrDefaultAsync();
             if (state == EntityState.Detached)
                 entry.State = EntityState.Detached;
-            Metadata.GetProperty(reference.Metadata.Name).SetValue(item, propertyValue);
+            Metadata.GetProperty(reference.Metadata.Name)!.SetValue(item, propertyValue);
         }
 
         public void Remove(T item)
@@ -144,7 +145,9 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public Task<T> GetAsync(params object[] keys)
         {
+#pragma warning disable CS8619 // 值中的引用类型的为 Null 性与目标类型不匹配。
             return DbSet.FindAsync(keys).AsTask();
+#pragma warning restore CS8619 // 值中的引用类型的为 Null 性与目标类型不匹配。
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -80,7 +81,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                     #region Include
                     case "Include":
                         {
-                            string path;
+                            string? path;
                             if (node.Method.GetGenericArguments().Length == 2)
                             {
                                 if (!TryParsePath(((LambdaExpression)((UnaryExpression)node.Arguments[1]).Operand).Body, out path))
@@ -156,15 +157,15 @@ namespace Wodsoft.ComBoost.Data.Entity
                             return typeof(System.Data.Entity.QueryableExtensions).GetMember(method.Name).Cast<MethodInfo>().Where(t => t.GetGenericArguments().Length == method.GetGenericArguments().Length && t.GetParameters().Length == method.GetParameters().Length).First().MakeGenericMethod(method.GetGenericArguments());
                         #endregion
                         default:
-                            return null;
+                            throw new NotSupportedException("Not supported method");
                     }
                 }
                 else
-                    return null;
+                    throw new NotSupportedException("Not supported method");
             });
         }
 
-        private bool TryParsePath(Expression expression, out string path)
+        private bool TryParsePath(Expression expression, [NotNullWhen(true)] out string? path)
         {
             path = null;
             var withoutConvert = RemoveConvert(expression); // Removes boxing
@@ -174,7 +175,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (memberExpression != null)
             {
                 var thisPart = memberExpression.Member.Name;
-                string parentPart;
+                string? parentPart;
                 if (!TryParsePath(memberExpression.Expression, out parentPart))
                 {
                     return false;
@@ -186,7 +187,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 if (callExpression.Method.Name == "Select"
                     && callExpression.Arguments.Count == 2)
                 {
-                    string parentPart;
+                    string? parentPart;
                     if (!TryParsePath(callExpression.Arguments[0], out parentPart))
                     {
                         return false;
@@ -196,7 +197,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                         var subExpression = callExpression.Arguments[1] as LambdaExpression;
                         if (subExpression != null)
                         {
-                            string thisPart;
+                            string? thisPart;
                             if (!TryParsePath(subExpression.Body, out thisPart))
                             {
                                 return false;
@@ -212,7 +213,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 return false;
             }
 
-            return true;
+            return false;
         }
 
         private Expression RemoveConvert(Expression expression)

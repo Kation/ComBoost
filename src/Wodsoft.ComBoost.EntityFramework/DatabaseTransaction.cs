@@ -24,7 +24,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (_transaction == null)
                 return;
             _transaction.Dispose();
-            _transaction = null;
         }
 
         public void Rollback()

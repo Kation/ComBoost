@@ -3,6 +3,8 @@
     <Description>ComBoost用于EntityFrameworkCore实现的实体模块。</Description>
     <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
     <RootNamespace>Wodsoft.ComBoost.Data.Entity</RootNamespace>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <Import Project="../../common.props" />
 

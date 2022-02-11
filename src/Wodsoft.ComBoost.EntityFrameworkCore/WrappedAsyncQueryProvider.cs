@@ -32,10 +32,10 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IQueryable CreateQuery(Expression expression)
         {
-            return (IQueryable)Activator.CreateInstance(typeof(WrappedAsyncQueryable<>).MakeGenericType(expression.Type.GetGenericArguments()[0]), expression, this);
+            return (IQueryable)Activator.CreateInstance(typeof(WrappedAsyncQueryable<>).MakeGenericType(expression.Type.GetGenericArguments()[0]), expression, this)!;
         }
 
-        public object Execute(Expression expression)
+        public object? Execute(Expression expression)
         {
             expression = new WrappedAsyncExpressionVisitor().Visit(expression);
             return SourceProvider.Execute(expression);
@@ -55,7 +55,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 var visitor = new WrappedAsyncExpressionVisitor();
                 expression = visitor.Visit(expression);
                 methodExpression = (MethodCallExpression)expression;
-                List<object> parameters = new List<object> { SourceProvider.CreateQuery(methodExpression.Arguments[0]) };
+                List<object?> parameters = new List<object?> { SourceProvider.CreateQuery(methodExpression.Arguments[0]) };
                 switch (methodExpression.Method.Name)
                 {
                     case "AllAsync":
@@ -112,20 +112,20 @@ namespace Wodsoft.ComBoost.Data.Entity
             return ((Microsoft.EntityFrameworkCore.Query.IAsyncQueryProvider)SourceProvider).ExecuteAsync<Task<TResult>>(expression, token);
         }
 
-        private static ConcurrentDictionary<MethodInfo, Func<List<object>, Task>> _func = new ConcurrentDictionary<MethodInfo, Func<List<object>, Task>>();
-        private static Func<List<object>, Task> GetFunc(MethodInfo method)
+        private static ConcurrentDictionary<MethodInfo, Func<List<object?>, Task>> _func = new ConcurrentDictionary<MethodInfo, Func<List<object?>, Task>>();
+        private static Func<List<object?>, Task> GetFunc(MethodInfo method)
         {
             return _func.GetOrAdd(method, _ =>
             {
-                ParameterExpression args = Expression.Parameter(typeof(List<object>), "args");
+                ParameterExpression args = Expression.Parameter(typeof(List<object?>), "args");
                 List<Expression> parameters = new List<Expression>();
                 int i = 0;
                 foreach (var p in method.GetParameters())
                 {
-                    parameters.Add(Expression.Convert(Expression.Property(args, args.Type.GetProperty("Item"), Expression.Constant(i)), p.ParameterType));
+                    parameters.Add(Expression.Convert(Expression.Property(args, args.Type.GetProperty("Item")!, Expression.Constant(i)), p.ParameterType));
                     i++;
                 }
-                return Expression.Lambda<Func<List<object>, Task>>(Expression.Call(method, parameters), args).Compile();
+                return Expression.Lambda<Func<List<object?>, Task>>(Expression.Call(method, parameters), args).Compile();
             });
         }
 

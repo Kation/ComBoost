@@ -81,7 +81,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         public static IEntityContext<TEntity> GetEntityContextDelegate<TEntity>(IServiceProvider serviceProvider)
             where TEntity : class, IEntity, new()
         {
-            var dataContext = serviceProvider.GetService<DatabaseContext<TDbContext>>();
+            var dataContext = serviceProvider.GetRequiredService<DatabaseContext<TDbContext>>();
             return dataContext.GetContext<TEntity>();
         }
     }
