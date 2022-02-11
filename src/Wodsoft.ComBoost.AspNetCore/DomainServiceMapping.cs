@@ -6,6 +6,6 @@ namespace Wodsoft.ComBoost.AspNetCore
 {
     public class DomainServiceMapping
     {
-        public Type ServiceType { get; set; }
+        public Type? ServiceType { get; set; }
     }
 }

@@ -35,8 +35,8 @@ namespace Microsoft.AspNetCore.Builder
     {
         private static RequestDelegate DomainServiceDelegate = async httpContext =>
         {
-            var service = (string)httpContext.GetRouteValue("service");
-            var method = (string)httpContext.GetRouteValue("method");
+            var service = (string?)httpContext.GetRouteValue("service");
+            var method = (string?)httpContext.GetRouteValue("method");
             if (string.IsNullOrWhiteSpace(service) || string.IsNullOrWhiteSpace(method))
             {
                 httpContext.Response.StatusCode = 404;
@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.Builder
             }
             service = service.ToLower();
 
-            var optionsFactory = httpContext.RequestServices.GetService<IOptionsFactory<DomainServiceMapping>>();
+            var optionsFactory = httpContext.RequestServices.GetRequiredService<IOptionsFactory<DomainServiceMapping>>();
             var mapping = optionsFactory.Create(service);
             if (mapping == null)
             {
@@ -52,6 +52,8 @@ namespace Microsoft.AspNetCore.Builder
                 await httpContext.Response.WriteAsync($"无法找到对应的领域服务。");
                 return;
             }
+            if (mapping.ServiceType == null)
+                throw new InvalidOperationException("领域服务映射配置没有配置服务类型。");
             IDomainService domainService = (IDomainService)ActivatorUtilities.CreateInstance(httpContext.RequestServices, mapping.ServiceType);
 
             HttpDomainContext context = new HttpDomainContext(httpContext);

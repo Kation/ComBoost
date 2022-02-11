@@ -16,7 +16,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         {
         }
 
-        protected sealed override object GetValueCore(string key)
+        protected sealed override object? GetValueCore(string key)
         {
             var value = GetStringValue(key);
             if (value == StringValues.Empty)

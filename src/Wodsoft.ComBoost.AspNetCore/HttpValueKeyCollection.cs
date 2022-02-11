@@ -8,7 +8,7 @@ namespace Wodsoft.ComBoost.AspNetCore
 {
     public class HttpValueKeyCollection : ValueKeyCollection
     {
-        private Dictionary<string, string> lowerKeys;
+        private Dictionary<string, string>? lowerKeys;
 
         public HttpValueKeyCollection(IEnumerable<string> keys, bool ignoreCase) : base(keys)
         {

@@ -19,7 +19,7 @@ namespace Wodsoft.ComBoost.AspNetCore
 
         public virtual bool CanProvide => HttpContext != null;
 
-        protected HttpContext HttpContext { get; }
+        protected HttpContext? HttpContext { get; }
 
         public virtual IDomainContext GetContext()
         {

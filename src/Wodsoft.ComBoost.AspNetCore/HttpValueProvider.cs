@@ -15,7 +15,7 @@ namespace Wodsoft.ComBoost.AspNetCore
     /// </summary>
     public class HttpValueProvider : IConfigurableValueProvider
     {
-        private Dictionary<string, object> _Values;
+        private Dictionary<string, object?> _Values;
         private Dictionary<string, string> _Alias;
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         {
             if (httpContext == null)
                 throw new ArgumentNullException(nameof(httpContext));
-            _Values = new Dictionary<string, object>();
+            _Values = new Dictionary<string, object?>();
             _Alias = new Dictionary<string, string>();
             ValueSelectors = new List<HttpValueSelector>();
             HttpContext = httpContext;
@@ -59,7 +59,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// </summary>
         public bool IgnoreCase { get; set; }
 
-        private HttpValueKeyCollection _Keys;
+        private HttpValueKeyCollection? _Keys;
         /// <summary>
         /// 获取存在的键集合。
         /// </summary>
@@ -94,14 +94,14 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// <param name="name">名称。</param>
         /// <param name="valueType">值类型。</param>
         /// <returns>返回值。</returns>
-        public virtual object GetValue(string name, Type valueType)
+        public virtual object? GetValue(string name, Type valueType)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
             if (valueType == null)
                 throw new ArgumentNullException(nameof(valueType));
-            object value = GetValueCore(name, valueType);
-            if (value == null && _Alias.TryGetValue(IgnoreCase ? name.ToLower() : name, out string alias))
+            object? value = GetValueCore(name, valueType);
+            if (value == null && _Alias.TryGetValue(IgnoreCase ? name.ToLower() : name, out string? alias))
                 value = GetValueCore(alias, valueType);
             if (value == null)
                 return null;
@@ -115,6 +115,8 @@ namespace Wodsoft.ComBoost.AspNetCore
                 {
                     var currentConverter = TypeDescriptor.GetConverter(currentType);
                     var currentStringValue = currentConverter.ConvertToString(value);
+                    if (currentStringValue == null)
+                        return null;
                     value = converter.ConvertFromString(currentStringValue);
                 }    
             }
@@ -127,7 +129,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// <param name="name">键名。</param>
         /// <param name="valueType">值类型。</param>
         /// <returns>返回值。</returns>
-        protected virtual object GetValueCore(string name, Type valueType)
+        protected virtual object? GetValueCore(string name, Type valueType)
         {
             if (_Values.ContainsKey(IgnoreCase ? name.ToLower() : name))
                 return _Values[IgnoreCase ? name.ToLower() : name];
@@ -140,9 +142,9 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// <param name="name">键名。</param>
         /// <param name="valueType">值类型。</param>
         /// <returns>返回Http值。</returns>
-        protected virtual object GetHttpValue(string name, Type valueType)
+        protected virtual object? GetHttpValue(string name, Type valueType)
         {
-            object value = GetHttpValueCore(name);
+            object? value = GetHttpValueCore(name);
             if (value == null)
                 return null;
             return ConvertValue(value, valueType);
@@ -153,7 +155,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// </summary>
         /// <param name="name">键名。</param>
         /// <returns>返回Http值。</returns>
-        protected virtual object GetHttpValueCore(string name)
+        protected virtual object? GetHttpValueCore(string name)
         {
             foreach (var selector in ValueSelectors)
                 if (selector.ContainsKey(name))
@@ -167,7 +169,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// <param name="value">值。</param>
         /// <param name="targetType">目标类型。</param>
         /// <returns>返回转换后的值。</returns>
-        protected virtual object ConvertValue(object value, Type targetType)
+        protected virtual object? ConvertValue(object value, Type targetType)
         {
             var valueType = value.GetType();
             if (targetType.IsAssignableFrom(valueType))
@@ -199,7 +201,8 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// 设置值。
         /// </summary>
         /// <param name="name">名称。</param>
-        public void SetValue(string name, object value)
+        /// <param name="value">值。</param>
+        public void SetValue(string name, object? value)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));

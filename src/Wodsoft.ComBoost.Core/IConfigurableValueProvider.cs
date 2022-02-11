@@ -14,7 +14,7 @@ namespace Wodsoft.ComBoost
         /// </summary>
         /// <param name="name">名称。</param>
         /// <param name="value">值。</param>
-        void SetValue(string name, object value);
+        void SetValue(string name, object? value);
 
         /// <summary>
         /// 设置别名。

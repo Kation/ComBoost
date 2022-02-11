@@ -13,8 +13,6 @@ namespace Wodsoft.ComBoost.AspNetCore
 {
     public abstract class DomainServiceDescriptor
     {
-        IReadOnlyCollection<IDomainServiceFilter> Filters { get; }
-
         public abstract Task<IDomainExecutionContext> ExecuteAsync(string methodName, IDomainContext context);
 
         public abstract bool ContainsMethod(string methodName);
@@ -46,11 +44,11 @@ namespace Wodsoft.ComBoost.AspNetCore
                     var fromAttribute = parameter.GetCustomAttributes().Where(t => t is FromAttribute).Cast<FromAttribute>().FirstOrDefault();
                     if (fromAttribute == null)
                     {
-                        expression = Expression.Call(valueProviderInput, typeof(IValueProvider).GetMethod(nameof(IValueProvider.GetValue)), Expression.Constant(parameter.Name, typeof(string)), Expression.Constant(parameter.ParameterType, typeof(Type)));
+                        expression = Expression.Call(valueProviderInput, typeof(IValueProvider).GetMethod(nameof(IValueProvider.GetValue))!, Expression.Constant(parameter.Name, typeof(string)), Expression.Constant(parameter.ParameterType, typeof(Type)));
                     }
                     else
                     {
-                        expression = Expression.Call(Expression.Constant(fromAttribute), typeof(FromAttribute).GetMethod(nameof(FromAttribute.GetValue)), contextInput, Expression.Constant(parameter, typeof(ParameterInfo)));
+                        expression = Expression.Call(Expression.Constant(fromAttribute), typeof(FromAttribute).GetMethod(nameof(FromAttribute.GetValue))!, contextInput, Expression.Constant(parameter, typeof(ParameterInfo)));
                     }
                     if (parameter.ParameterType.IsValueType)
                         expression = Expression.Unbox(expression, parameter.ParameterType);
@@ -80,8 +78,8 @@ namespace Wodsoft.ComBoost.AspNetCore
             if (!_Caches.TryGetValue(methodName, out var invoker))
                 throw new InvalidOperationException("不存在的方法名。");
             var service = context.GetRequiredService<T>();
-            await invoker(service, context, context.GetService<IValueProvider>());
-            return service.Context;
+            await invoker(service, context, context.GetRequiredService<IValueProvider>());
+            return service.Context!;
         }
     }
 }

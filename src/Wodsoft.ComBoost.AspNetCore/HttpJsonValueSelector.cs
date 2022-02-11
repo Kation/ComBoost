@@ -24,9 +24,9 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// <summary>
         /// 获取Json根。
         /// </summary>
-        public JsonDocument Root { get; private set; }
+        public JsonDocument? Root { get; private set; }
 
-        private Dictionary<string, string> _Values;
+        private Dictionary<string, string>? _Values;
         protected override string[] GetKeysCore()
         {
             if (_Values == null)
@@ -47,9 +47,11 @@ namespace Wodsoft.ComBoost.AspNetCore
             return _Values.Keys.ToArray();
         }
 
-        protected override object GetValueCore(string key)
+        protected override object? GetValueCore(string key)
         {
-            string value;
+            string? value;
+            if (_Values == null)
+                return null;
             if (_Values.TryGetValue(key, out value))
                 return value;
             return null;

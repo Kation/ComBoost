@@ -39,9 +39,9 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// </summary>
         /// <param name="key">键名。</param>
         /// <returns></returns>
-        protected abstract object GetValueCore(string key);
+        protected abstract object? GetValueCore(string key);
         
-        private string[] _Keys, _LowerKeys;
+        private string[]? _Keys, _LowerKeys;
 
         /// <summary>
         /// 获取或设置是否忽略大小写。
@@ -86,7 +86,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// </summary>
         /// <param name="key">键名。</param>
         /// <returns>返回值。</returns>
-        public object GetValue(string key)
+        public object? GetValue(string key)
         {
             return GetValueCore(key);
         }

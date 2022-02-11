@@ -27,7 +27,7 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// </summary>
         public HttpValueProvider ValueProvider { get { return GetValueProvider(); } }
 
-        private HttpValueProvider _ValueProvider;
+        private HttpValueProvider? _ValueProvider;
         /// <summary>
         /// 获取值提供器。
         /// </summary>

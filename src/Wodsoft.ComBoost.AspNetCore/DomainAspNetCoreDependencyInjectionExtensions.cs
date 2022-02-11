@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DomainAspNetCoreDependencyInjectionExtensions
     {
-        public static void AddDomainServiceMapping<T>(this IComBoostAspNetCoreBuilder builder, string name = null)
+        public static void AddDomainServiceMapping<T>(this IComBoostAspNetCoreBuilder builder, string? name = null)
             where T : class, IDomainService
         {
             if (builder == null)
@@ -28,7 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddTransient<T>();
         }
 
-        public static IComBoostBuilder AddAspNetCore(this IComBoostBuilder builder, Action<IComBoostAspNetCoreBuilder> builderConfigure = null)
+        public static IComBoostBuilder AddAspNetCore(this IComBoostBuilder builder, Action<IComBoostAspNetCoreBuilder>? builderConfigure = null)
         {
             builder.Services.AddRouting();
             builder.Services.AddHttpContextAccessor();
