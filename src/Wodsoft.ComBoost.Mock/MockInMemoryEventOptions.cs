@@ -9,7 +9,7 @@ namespace Wodsoft.ComBoost.Mock
     {
         public object InstanceKey { get; set; } = "Default";
 
-        private string _groupName;
+        private string? _groupName;
         public string GroupName { get => _groupName ?? Assembly.GetEntryAssembly().FullName; set => _groupName = value; }
     }
 }

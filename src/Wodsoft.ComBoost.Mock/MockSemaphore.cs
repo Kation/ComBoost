@@ -17,9 +17,9 @@ namespace Wodsoft.ComBoost.Mock
             _Semaphore = semaphore;
         }
 
-        public Task EnterAsync()
+        public Task EnterAsync(CancellationToken cancellationToken = default)
         {
-            return _Semaphore.WaitAsync();
+            return _Semaphore.WaitAsync(cancellationToken);
         }
 
         public Task<bool> EnterAsync(int timeout)

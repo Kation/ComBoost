@@ -8,7 +8,7 @@ namespace Wodsoft.ComBoost.Mock
 {
     public class MockValueKeyCollection : ValueKeyCollection
     {
-        private Dictionary<string, string> lowerKeys;
+        private Dictionary<string, string>? lowerKeys;
 
         public MockValueKeyCollection(IEnumerable<string> keys, bool ignoreCase) : base(keys)
         {

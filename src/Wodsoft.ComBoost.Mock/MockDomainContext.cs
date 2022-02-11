@@ -14,7 +14,7 @@ namespace Wodsoft.ComBoost.Mock
 
         }
 
-        private MockValueProvider _ValueProvider;
+        private MockValueProvider? _ValueProvider;
         public MockValueProvider ValueProvider
         {
             get

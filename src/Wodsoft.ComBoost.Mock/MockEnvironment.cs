@@ -14,9 +14,9 @@ namespace Wodsoft.ComBoost.Mock
             EnvironmentName = options.Value.EnvironmentName;
         }
 
-        public string EnvironmentName { get; set; }
-        public string ApplicationName { get; set; }
-        public string ContentRootPath { get; set; }
-        public IFileProvider ContentRootFileProvider { get; set; }
+        public string? EnvironmentName { get; set; }
+        public string? ApplicationName { get; set; }
+        public string? ContentRootPath { get; set; }
+        public IFileProvider? ContentRootFileProvider { get; set; }
     }
 }

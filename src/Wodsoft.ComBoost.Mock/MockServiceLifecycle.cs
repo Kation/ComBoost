@@ -25,7 +25,6 @@ namespace Wodsoft.ComBoost.Mock
                 foreach (var item in _disposeActions)
                     item();
                 _disposeActions.Clear();
-                _disposeActions = null;
             }
         }
     }

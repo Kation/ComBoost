@@ -8,8 +8,8 @@ namespace Wodsoft.ComBoost.Mock
 {
     public class MockStorageProvider : IStorageProvider
     {
-        private MockStorage _Storage;
-        private IFileProvider _FileProvider;
+        private MockStorage? _Storage;
+        private IFileProvider? _FileProvider;
 
         public MockStorageProvider() { }
 

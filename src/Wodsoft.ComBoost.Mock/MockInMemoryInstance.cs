@@ -48,7 +48,7 @@ namespace Wodsoft.ComBoost.Mock
             }
         }
 
-        public IReadOnlyList<MockInMemoryEventHandler<T>> GetEventHandlers<T>(bool once) where T : DomainServiceEventArgs
+        public IReadOnlyList<MockInMemoryEventHandler<T>>? GetEventHandlers<T>(bool once) where T : DomainServiceEventArgs
         {
             if (!_handlers.TryGetValue(typeof(T), out var item))
                 return null;
@@ -64,7 +64,7 @@ namespace Wodsoft.ComBoost.Mock
                     return list.ConvertAll(t => (MockInMemoryEventHandler<T>)t);
             }
             else
-                return item.ToArray().Select(t => t.Value.Count > 0 ? (MockInMemoryEventHandler<T>)t.Value[0] : null).Where(t => t != null).ToArray();
+                return item.ToArray().Where(t => t.Value.Count > 0).Select(t => (MockInMemoryEventHandler<T>)t.Value[0]).ToArray();
         }
     }
 }

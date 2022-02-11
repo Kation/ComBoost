@@ -30,7 +30,6 @@ namespace Wodsoft.ComBoost.Mock
             if (!_disposed)
             {
                 _disposed = true;
-                _serviceProvider = null;
             }
         }
 

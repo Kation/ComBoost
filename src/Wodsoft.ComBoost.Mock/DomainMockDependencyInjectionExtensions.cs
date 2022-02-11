@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DomainMockDependencyInjectionExtensions
     {
-        public static IComBoostBuilder AddMock(this IComBoostBuilder builder, Action<IComBoostMockBuilder> builderConfigure = null)
+        public static IComBoostBuilder AddMock(this IComBoostBuilder builder, Action<IComBoostMockBuilder>? builderConfigure = null)
         {
             builder.Services.AddScoped<IDomainContextProvider, MockDomainContextProvider>();
             builder.Services.AddScoped<MockAuthenticationSettings>();

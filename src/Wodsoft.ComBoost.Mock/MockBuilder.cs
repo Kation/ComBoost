@@ -7,12 +7,13 @@ using System.Text;
 
 namespace Wodsoft.ComBoost.Mock
 {
+    [Obsolete]
     public class MockBuilder : IMockBuilder
     {
         private IServiceCollection _services = new ServiceCollection();
         private List<Action<IConfiguration, IServiceCollection>> _serviceConfigures = new List<Action<IConfiguration, IServiceCollection>>();
         private ConfigurationBuilder _configBuilder = new ConfigurationBuilder();
-        private IConfiguration _config;
+        private IConfiguration? _config;
 
         public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
 
@@ -27,7 +28,6 @@ namespace Wodsoft.ComBoost.Mock
             return this;
         }
 
-        [Obsolete]
         public IMock Build()
         {
             _config = _configBuilder.Build();

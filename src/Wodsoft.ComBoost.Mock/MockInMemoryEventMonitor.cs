@@ -53,7 +53,7 @@ namespace Wodsoft.ComBoost.Mock
             _waitTaskSource = new TaskCompletionSource<bool>();
         }
 
-        internal event EventHandler<EventArgs> Disposed;
+        internal event EventHandler<EventArgs>? Disposed;
         private bool _disposed;
         public void Dispose()
         {
