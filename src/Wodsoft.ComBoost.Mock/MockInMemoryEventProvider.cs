@@ -16,6 +16,7 @@ namespace Wodsoft.ComBoost.Mock
         private MockInMemoryEventOptions _options;
         private IServiceProvider _serviceProvider;
         private List<MockInMemoryEventMonitor> _monitors;
+        private Dictionary<Delegate, Delegate> _handlers;
 
         public MockInMemoryEventProvider(IServiceProvider serviceProvider, IOptions<MockInMemoryEventOptions> options)
         {
@@ -23,6 +24,7 @@ namespace Wodsoft.ComBoost.Mock
             _options = options.Value;
             _instance = MockInMemoryInstance.GetInstance(options.Value.InstanceKey);
             _monitors = new List<MockInMemoryEventMonitor>();
+            _handlers = new Dictionary<Delegate, Delegate>();
         }
 
         public override bool CanHandleEvent<T>(IReadOnlyList<string> features)
@@ -53,13 +55,15 @@ namespace Wodsoft.ComBoost.Mock
                 group = _options.GroupName;
             else
                 group = string.Empty;
-            _instance.AddEventHandler(new MockInMemoryEventHandler<T>(args =>
+            var mockHandler = new MockInMemoryEventHandler<T>(args =>
             {
                 var scope = _serviceProvider.CreateScope();
                 DomainContext domainContext = new EmptyDomainContext(scope.ServiceProvider, default(CancellationToken));
                 DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
                 return handler(executionContext, args);
-            }), group);
+            });
+            _handlers.Add(handler, mockHandler);
+            _instance.AddEventHandler(mockHandler, group);
         }
 
         public override async Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
@@ -101,7 +105,13 @@ namespace Wodsoft.ComBoost.Mock
 
         public override void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
         {
-            throw new NotSupportedException();
+            string group;
+            if (features.Contains(DomainDistributedEventFeatures.Group))
+                group = _options.GroupName;
+            else
+                group = string.Empty;
+            if (_handlers.TryGetValue(handler, out var mockHandler))
+                _instance.RemoveEventHandler((MockInMemoryEventHandler<T>)mockHandler, group);
         }
     }
 }
