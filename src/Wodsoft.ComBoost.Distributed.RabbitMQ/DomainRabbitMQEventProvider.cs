@@ -117,8 +117,9 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             if (features.Contains(DomainDistributedEventFeatures.Delay))
             {
                 var args = new Dictionary<string, object>();
-                if (_options.UseQuorum)
-                    args["x-queue-type"] = "quorum";
+                //Quorum does not support message ttl
+                //if (_options.UseQuorum)
+                //    args["x-queue-type"] = "quorum";
                 args["x-dead-letter-exchange"] = name + "_EXCHANGE";
                 if (features.Contains(DomainDistributedEventFeatures.HandleOnce) && !features.Contains(DomainDistributedEventFeatures.Group))
                 {
