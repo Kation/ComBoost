@@ -6,9 +6,9 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public class EntityDtoContextOptions<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>
         where TEntity : class, IEntity
-        where TListDTO : class, IEntityDTO
-        where TCreateDTO : class, IEntityDTO
-        where TEditDTO : class, IEntityDTO
+        where TListDTO : class
+        where TCreateDTO : class
+        where TEditDTO : class
         where TRemoveDTO : class
     {
         public Action<TEntity, TCreateDTO>? OnAddMapped { get; set; }

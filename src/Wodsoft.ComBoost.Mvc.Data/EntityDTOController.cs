@@ -15,21 +15,21 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 namespace Wodsoft.ComBoost.Mvc
 {
     public class EntityDTOController<TDTO> : EntityDTOController<TDTO, TDTO, TDTO, TDTO>
-        where TDTO : class, IEntityDTO
+        where TDTO : class
     {
 
     }
 
     public class EntityDTOController<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : Controller
-        where TListDTO : class, IEntityDTO
-        where TCreateDTO : class, IEntityDTO
-        where TEditDTO : class, IEntityDTO
+        where TListDTO : class
+        where TCreateDTO : class
+        where TEditDTO : class
         where TRemoveDTO : class
     {
         #region List
 
         [HttpGet]
-        public virtual async Task<IActionResult> Index()
+        public virtual async Task<IActionResult> List()
         {
             var model = await CreateListModel();
             return OnListModelCreated(model);

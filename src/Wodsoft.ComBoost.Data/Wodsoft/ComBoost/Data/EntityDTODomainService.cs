@@ -11,9 +11,9 @@ using Wodsoft.ComBoost.Security;
 namespace Wodsoft.ComBoost.Data
 {
     public class EntityDTODomainService<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : DomainService
-        where TListDTO : class, IEntityDTO
-        where TCreateDTO : class, IEntityDTO
-        where TEditDTO : class, IEntityDTO
+        where TListDTO : class
+        where TCreateDTO : class
+        where TEditDTO : class
         where TRemoveDTO : class
     {
         #region List
@@ -27,8 +27,8 @@ namespace Wodsoft.ComBoost.Data
             queryable = e.Queryable;
             bool isOrdered = e.IsOrdered;
             OnListQuery(ref queryable, ref isOrdered);
-            if (!isOrdered)
-                queryable = queryable.OrderByDescending(t => t.CreationDate);
+            //if (!isOrdered)
+            //    queryable = queryable.OrderByDescending(t => t.CreationDate);
             ViewModel<TListDTO> model = new ViewModel<TListDTO>(queryable);
             await RaiseEvent(new EntityQueryModelCreatedEventArgs<TListDTO>(model));
             return model;

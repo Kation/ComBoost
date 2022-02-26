@@ -8,13 +8,13 @@ using Wodsoft.ComBoost.Data.Entity;
 namespace Wodsoft.ComBoost.Data
 {
     public interface IEntityDTODomainTemplate<TDto> : IEntityDTODomainTemplate<TDto, TDto, TDto, TDto>
-        where TDto : class, IEntityDTO
+        where TDto : class
     { }
 
     public interface IEntityDTODomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : IDomainTemplate
-        where TListDTO : class, IEntityDTO
-        where TCreateDTO : class, IEntityDTO
-        where TEditDTO : class, IEntityDTO
+        where TListDTO : class
+        where TCreateDTO : class
+        where TEditDTO : class
         where TRemoveDTO : class
     {
         Task<IViewModel<TListDTO>> List();

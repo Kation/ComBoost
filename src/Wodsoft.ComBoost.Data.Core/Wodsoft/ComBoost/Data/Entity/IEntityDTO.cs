@@ -4,16 +4,8 @@ using System.Text;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public interface IEntityDTO
+    public interface IEntityDTO : IHaveCreationDate, IHaveModificationDate
     {
-        /// <summary>
-        /// 获取或设置创建时间。
-        /// </summary>
-        DateTimeOffset CreationDate { get; set; }
 
-        /// <summary>
-        /// 获取或设置修改时间。
-        /// </summary>
-        DateTimeOffset ModificationDate { get; set; }
     }
 }

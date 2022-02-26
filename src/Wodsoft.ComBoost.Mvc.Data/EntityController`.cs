@@ -17,9 +17,9 @@ namespace Wodsoft.ComBoost.Mvc
 {
     public class EntityController<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : Controller
         where TEntity : class, IEntity
-        where TListDTO : class, IEntityDTO
-        where TCreateDTO : class, IEntityDTO
-        where TEditDTO : class, IEntityDTO
+        where TListDTO : class
+        where TCreateDTO : class
+        where TEditDTO : class
         where TRemoveDTO : class
     {
         #region List

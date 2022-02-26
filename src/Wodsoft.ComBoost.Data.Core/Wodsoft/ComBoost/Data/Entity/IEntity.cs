@@ -8,7 +8,7 @@ namespace Wodsoft.ComBoost.Data.Entity
     /// <summary>
     /// 实体定义接口。
     /// </summary>
-    public interface IEntity : IEntityDTO
+    public interface IEntity
     {
         /// <summary>
         /// 创建时。

@@ -24,9 +24,9 @@ namespace Wodsoft.ComBoost.Data
 
     public class EntityDomainService<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : DomainService
         where TEntity : class, IEntity
-        where TListDTO : class, IEntityDTO
-        where TCreateDTO : class, IEntityDTO
-        where TEditDTO : class, IEntityDTO
+        where TListDTO : class
+        where TCreateDTO : class
+        where TEditDTO : class
         where TRemoveDTO : class
     {
         #region List
@@ -40,12 +40,8 @@ namespace Wodsoft.ComBoost.Data
             queryable = entityQueryEventArgs.Queryable;
             bool isOrdered = entityQueryEventArgs.IsOrdered;
             OnListQuery(ref queryable, ref isOrdered);
-            if (!isOrdered)
-                queryable = queryable.OrderByDescending(t => t.CreationDate);
             var dtoQueryable = queryable.ProjectTo<TListDTO>(mapper.ConfigurationProvider);
             OnListQuery(ref dtoQueryable, ref isOrdered);
-            if (!isOrdered)
-                queryable = queryable.OrderByDescending(t => t.CreationDate);
             ViewModel<TListDTO> model = new ViewModel<TListDTO>(dtoQueryable);
             await RaiseEvent(new EntityQueryModelCreatedEventArgs<TListDTO>(model));
             return model;

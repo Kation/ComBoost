@@ -14,9 +14,9 @@ namespace Wodsoft.ComBoost.Data.Entity
 {
     public class EntityDtoContext<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>
         where TEntity : class, IEntity
-        where TListDTO : class, IEntityDTO
-        where TCreateDTO : class, IEntityDTO
-        where TEditDTO : class, IEntityDTO
+        where TListDTO : class
+        where TCreateDTO : class
+        where TEditDTO : class
         where TRemoveDTO : class
     {
         private IEntityContext<TEntity> _context;
@@ -157,7 +157,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             _options.OnUpdated?.Invoke(entity, item);
         }
 
-        public async Task UpdateRange(IEnumerable<TEditDTO> items)
+        public async Task UpdateRange(params TEditDTO[] items)
         {
             var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
             var keyList = new List<object[]>();

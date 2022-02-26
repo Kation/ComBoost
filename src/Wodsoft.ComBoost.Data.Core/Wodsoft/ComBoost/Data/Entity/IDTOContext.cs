@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Wodsoft.ComBoost.Data.Entity
 {
     public interface IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>
-        where TListDTO : class, IEntityDTO
-        where TCreateDTO : class, IEntityDTO
-        where TEditDTO : class, IEntityDTO
+        where TListDTO : class
+        where TCreateDTO : class
+        where TEditDTO : class
         where TRemoveDTO : class
     {
         IQueryable<TListDTO> Query();
@@ -34,18 +34,18 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// 编辑实体数据到数据库。
         /// </summary>
         /// <param name="items">要编辑的实体映射对象。</param>
-        Task UpdateRange(IEnumerable<TEditDTO> items);
+        Task UpdateRange(params TEditDTO[] items);
 
         /// <summary>
         /// 从数据库删除实体。
         /// </summary>
-        /// <param name="dto">要删除的实体映射对象。</param>
-        Task Remove(TRemoveDTO dto);
+        /// <param name="item">要删除的实体映射对象。</param>
+        Task Remove(TRemoveDTO item);
 
         /// <summary>
         /// 从数据库删除实体。
         /// </summary>
-        /// <param name="dtos">要删除的实体映射对象数组。</param>
-        Task RemoveRange(params TRemoveDTO[] dtos);
+        /// <param name="items">要删除的实体映射对象数组。</param>
+        Task RemoveRange(params TRemoveDTO[] items);
     }
 }

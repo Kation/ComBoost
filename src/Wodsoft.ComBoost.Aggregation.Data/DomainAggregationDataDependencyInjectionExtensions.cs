@@ -29,12 +29,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IComBoostLocalServiceBuilder<EntityDomainService<TEntity, TListDto, TCreateDto, TEditDto, TRemoveDto>> AddEntityService<TEntity, TListDto, TCreateDto, TEditDto, TRemoveDto>(this IComBoostLocalServiceBuilder<EntityDomainService<TEntity, TListDto, TCreateDto, TEditDto, TRemoveDto>> builder)
             where TEntity : class, IEntity
-            where TListDto : class, IEntityDTO
-            where TCreateDto : class, IEntityDTO
-            where TEditDto : class, IEntityDTO
+            where TListDto : class
+            where TCreateDto : class
+            where TEditDto : class
             where TRemoveDto : class
-        {
-            
+        {            
             return builder;
         }
     }
