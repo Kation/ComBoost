@@ -21,17 +21,12 @@ namespace Wodsoft.ComBoost
         public abstract class DomainServiceInvoker<TDomainService>
             where TDomainService : class, IDomainService
         {
-            protected IDomainExecutionContext _executionContext;
+            protected IDomainExecutionContext? _executionContext;
 
             protected DomainServiceInvoker(TDomainService domainService, IDomainContext domainContext)
             {
-                if (domainService.Context == null)
-                    throw new InvalidOperationException("Domain service not initialized.");
-                if (domainService.Context.DomainMethod == null)
-                    throw new NotSupportedException("DomainMethod of DomainExecutionContext could not be null.");
                 DomainService = domainService;
                 DomainContext = domainContext;
-                _executionContext = domainService.Context;
                 var events = domainContext.GetService<IOptions<DomainServiceEventManagerOptions<TDomainService>>>().Value.GetEvents();
                 foreach (var e in events)
                     domainContext.EventManager.AddEventHandler(e.Key, e.Value);
@@ -59,7 +54,7 @@ namespace Wodsoft.ComBoost
                             filters.AddRange(DomainContext.GetService<IOptionsMonitor<DomainFilterOptions<TDomainService>>>().Get(t.Name).Filters);
                             return filters;
                         });
-                return _Filters[_executionContext.DomainMethod!.Name];
+                return _Filters[_executionContext!.DomainMethod!.Name];
             }
 
             protected DomainExecutionPipeline MakePipeline()
@@ -71,13 +66,13 @@ namespace Wodsoft.ComBoost
                 {
                     var next = pipeline;
                     var index = i;
-                    pipeline = () => filters[index].OnExecutionAsync(_executionContext, next);
+                    pipeline = () => filters[index].OnExecutionAsync(_executionContext!, next);
                 }
                 for (int i = globalFilters.Count - 1; i >= 0; i--)
                 {
                     var next = pipeline;
                     var index = i;
-                    pipeline = () => globalFilters[index].OnExecutionAsync(_executionContext, next);
+                    pipeline = () => globalFilters[index].OnExecutionAsync(_executionContext!, next);
                 }
                 return pipeline;
             }
@@ -86,11 +81,12 @@ namespace Wodsoft.ComBoost
             {
                 if (task.IsFaulted)
                     System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
-                _executionContext.Done();
+                _executionContext!.Done();
             }
 
             protected Task RunPipeline()
             {
+                _executionContext = DomainService.Context;
                 return MakePipeline()();
             }
         }
@@ -102,21 +98,21 @@ namespace Wodsoft.ComBoost
             {
             }
 
-            private TResult? result;
+            private TResult? _result;
 
             protected void HandleResult(Task<TResult> task)
             {
                 if (task.IsFaulted)
                     System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
-                result = task.Result;
-                _executionContext.Done(result);
+                _result = task.Result;
+                _executionContext!.Done(_result);
             }
 
             protected TResult? ReturnResult(Task task)
             {
                 if (task.IsFaulted)
                     System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
-                return result;
+                return _result;
             }
         }
     }
