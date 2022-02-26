@@ -9,7 +9,7 @@ using Wodsoft.ComBoost.Test.Models;
 
 namespace Wodsoft.ComBoost.Mvc.Data.Test.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class UserController : EntityDTOController<UserDto, UserDto, UserDto, UserDto>
     {
     }

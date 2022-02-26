@@ -21,16 +21,16 @@ namespace Wodsoft.ComBoost.Aggregation.Test
     [Collection("AggregationTest")]
     public class AggregationTest
     {
-        [Fact]
-        public void ExportDll()
-        {
-            var userType = DomainAggregationsBuilder<User>.AggregationType;
-            var orgType = DomainAggregationsBuilder<Organization>.AggregationType;
+        //[Fact]
+        //public void ExportDll()
+        //{
+        //    var userType = DomainAggregationsBuilder<User>.AggregationType;
+        //    var orgType = DomainAggregationsBuilder<Organization>.AggregationType;
 
-            var generator = new Lokad.ILPack.AssemblyGenerator();
-            var bytes = generator.GenerateAssemblyBytes(DomainAggregationsBuilder.Module.Assembly);
-            System.IO.File.WriteAllBytes("dynamic.dll", bytes);
-        }
+        //    var generator = new Lokad.ILPack.AssemblyGenerator();
+        //    var bytes = generator.GenerateAssemblyBytes(DomainAggregationsBuilder.Module.Assembly);
+        //    System.IO.File.WriteAllBytes("dynamic.dll", bytes);
+        //}
 
         [Fact]
         public async Task User_Organization_Test()

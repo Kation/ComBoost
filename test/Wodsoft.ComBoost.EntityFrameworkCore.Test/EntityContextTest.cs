@@ -18,7 +18,7 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
     {
         private IDatabaseContext SeedData([CallerMemberName] string callerName = null)
         {
-            var dataContext = new DataContext(Microsoft.EntityFrameworkCore.InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<DataContext>(), callerName).Options);
+            var dataContext = new DataContext(Microsoft.EntityFrameworkCore.InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<DataContext>(), "EF" + callerName).Options);
             dataContext.Tests.Add(new ComBoost.Test.Entities.TestEntity
             {
                 Id = Guid.NewGuid(),
@@ -126,7 +126,7 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
 
         private IDatabaseContext CreateNewDatabaseContext([CallerMemberName] string callerName = null)
         {
-            return new DatabaseContext<DataContext>(new DataContext(Microsoft.EntityFrameworkCore.InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<DataContext>(), callerName).Options));
+            return new DatabaseContext<DataContext>(new DataContext(Microsoft.EntityFrameworkCore.InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<DataContext>(), "EF" + callerName).Options));
         }
 
         [Fact]

@@ -147,8 +147,8 @@ namespace Wodsoft.ComBoost.Data.Test
                     Password = "123456"
                 });
                 Assert.False(model.IsSuccess);
-                Assert.True(model.ErrorMessage.Any(t => t.Key == nameof(UserDto.DisplayName)));
-                Assert.True(model.ErrorMessage.Any(t => t.Key == nameof(UserDto.Email)));
+                Assert.Contains(model.ErrorMessage, t => t.Key == nameof(UserDto.DisplayName));
+                Assert.Contains(model.ErrorMessage, t => t.Key == nameof(UserDto.Email));
             });
         }
     }

@@ -43,7 +43,7 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            var viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user"), serializerOptions);
+            var viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user/list"), serializerOptions);
             Assert.Empty(viewModel.Items);
 
             var newUser = new UserDto
@@ -56,35 +56,32 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
             };
 
             var postContent = new StringContent(JsonSerializer.Serialize(newUser, serializerOptions), Encoding.UTF8, "application/json");
-            var response = await client.PostAsync("/api/user", postContent);
+            var response = await client.PostAsync("/api/user/create", postContent);
             var updateModel = JsonSerializer.Deserialize<ClientUpdateModel<UserDto>>(await response.Content.ReadAsStringAsync(), serializerOptions);
             Assert.True(updateModel.IsSuccess);
             Assert.Empty(updateModel.ErrorMessage);
             Assert.Equal(newUser.Id, updateModel.Item.Id);
 
-            viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user"), serializerOptions);
+            viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user/list"), serializerOptions);
             Assert.Single(viewModel.Items);
             Assert.Equal(newUser.DisplayName, viewModel.Items[0].DisplayName);
 
             newUser.DisplayName = "newUsername";
             var putContent = new StringContent(JsonSerializer.Serialize(newUser, serializerOptions), Encoding.UTF8, "application/json");
-            response = await client.PutAsync("/api/user", putContent);
+            response = await client.PutAsync("/api/user/edit", putContent);
             updateModel = JsonSerializer.Deserialize<ClientUpdateModel<UserDto>>(await response.Content.ReadAsStringAsync(), serializerOptions);
             Assert.True(updateModel.IsSuccess);
             Assert.Empty(updateModel.ErrorMessage);
             Assert.Equal(newUser.Id, updateModel.Item.Id);
 
-            viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user"), serializerOptions);
+            viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user/list"), serializerOptions);
             Assert.Single(viewModel.Items);
             Assert.Equal(newUser.DisplayName, viewModel.Items[0].DisplayName);
 
-            response = await client.DeleteAsync("/api/user?id=" + newUser.Id);
-            updateModel = JsonSerializer.Deserialize<ClientUpdateModel<UserDto>>(await response.Content.ReadAsStringAsync(), serializerOptions);
-            Assert.True(updateModel.IsSuccess);
-            Assert.Empty(updateModel.ErrorMessage);
-            Assert.Null(updateModel.Item);
+            response = await client.DeleteAsync("/api/user/remove?id=" + newUser.Id);
+            Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);
 
-            viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user"), serializerOptions);
+            viewModel = JsonSerializer.Deserialize<ClientViewModel<UserDto>>(await client.GetStringAsync("/api/user/list"), serializerOptions);
             Assert.Empty(viewModel.Items);
         }
     }
