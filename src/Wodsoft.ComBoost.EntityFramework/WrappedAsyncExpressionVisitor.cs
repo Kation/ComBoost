@@ -175,6 +175,11 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (memberExpression != null)
             {
                 var thisPart = memberExpression.Member.Name;
+                if (memberExpression.Expression is ParameterExpression)
+                {
+                    path = thisPart;
+                    return true;
+                }
                 string? parentPart;
                 if (!TryParsePath(memberExpression.Expression, out parentPart))
                 {
