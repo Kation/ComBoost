@@ -156,7 +156,25 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public Task<T> GetAsync(params object[] keys)
         {
-            return DbSet.FindAsync(keys);
+            if (Database.TrackEntity)
+                return DbSet.FindAsync(keys);
+            else
+            {
+                ParameterExpression parameter = Expression.Parameter(typeof(T));
+                Expression? expression = null;
+                if (Metadata.KeyProperties.Count != keys.Length)
+                    throw new InvalidOperationException("Length of keys is difference to entity.");
+                for (int i = 0; i < Metadata.KeyProperties.Count; i++)
+                {
+                    var equal = Expression.Equal(Expression.Property(parameter, Metadata.KeyProperties[i].ClrName), Expression.Constant(keys[i]));
+                    if (expression == null)
+                        expression = equal;
+                    else
+                        expression = Expression.AndAlso(expression, equal);
+                }
+                var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
+                return DbSet.AsNoTracking().Where(lambda).FirstOrDefaultAsync();
+            }
         }
 
         public IQueryable<TChildren> QueryChildren<TChildren>(T item, Expression<Func<T, ICollection<TChildren>>> childrenSelector) where TChildren : class
