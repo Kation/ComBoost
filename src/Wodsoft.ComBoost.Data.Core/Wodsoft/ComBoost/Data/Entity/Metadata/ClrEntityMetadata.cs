@@ -40,11 +40,19 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             var keys = Properties.Where(t => t.IsKey).ToArray();
             if (keys.Length == 0)
             {
-                var key = GetProperty("Id") ?? GetProperty("ID") ?? GetProperty("Index") ?? GetProperty(Type.Name + "Id") ?? GetProperty(Type.Name + "ID");
-                if (key != null)
-                    KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(new IPropertyMetadata[] { key });
+                var multipleKeyAttribute = type.GetCustomAttribute<MultipleKeyAttribute>();
+                if (multipleKeyAttribute == null && multipleKeyAttribute.Keys.Length != 0)
+                {
+                    var key = GetProperty("Id") ?? GetProperty("ID") ?? GetProperty("Index") ?? GetProperty(Type.Name + "Id") ?? GetProperty(Type.Name + "ID");
+                    if (key != null)
+                        KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(new IPropertyMetadata[] { key });
+                    else
+                        throw new NotSupportedException($"Type \"{Type.FullName}\" does not contains key property.");
+                }
                 else
-                    throw new NotSupportedException($"Type \"{Type.FullName}\" does not contains key property.");
+                {
+                    KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(multipleKeyAttribute.Keys.Select(t => GetProperty(t) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not contains key property.")).ToArray());
+                }
             }
             else
             {
