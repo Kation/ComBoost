@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
@@ -14,7 +15,7 @@ namespace Wodsoft.ComBoost
         /// 异步进入信号。
         /// </summary>
         /// <returns>返回异步任务。</returns>
-        Task EnterAsync();
+        Task EnterAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// 异步尝试进入信号。
