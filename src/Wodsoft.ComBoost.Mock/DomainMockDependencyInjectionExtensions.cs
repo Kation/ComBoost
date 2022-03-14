@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -23,6 +24,10 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 builderConfigure(new ComBoostMockBuilder(builder.Services));
             }
+            builder.Services.AddLogging(builder =>
+            {
+                builder.AddDebug();
+            });
             return builder;
         }
 

@@ -82,6 +82,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     else
                         channel.BasicPublish(name + "_EXCHANGE", "", properties, JsonSerializer.SerializeToUtf8Bytes(args));
                 }
+                _logger.LogInformation("RabbitMQ event publish successfully.");
             });
         }
 
@@ -132,22 +133,26 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             var consumer = new AsyncEventingBasicConsumer(channel);
             consumer.Received += async (sender, e) =>
             {
+
                 var args = JsonSerializer.Deserialize<T>(e.Body.Span)!;
                 DomainContext domainContext = new EmptyDomainContext(_serviceProvider.CreateScope().ServiceProvider, default(CancellationToken));
                 DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
                 var logger = domainContext.GetRequiredService<ILogger<DomainServiceEventHandler<T>>>();
-                try
+                using (logger.BeginScope(new DomainRabbitMQLogState(typeof(T).FullName, e.Exchange, e.Redelivered, e.DeliveryTag)))
                 {
-                    await handler(executionContext, args);
-                    channel.BasicAck(e.DeliveryTag, false);
-                    logger.LogInformation("RabbitMQ event handle successfully.");
-                }
-                catch (Exception ex)
-                {
-                    channel.BasicNack(e.DeliveryTag, false, true);
-                    logger.LogError(ex, "RabbitMQ event handle error.");
-                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
-                    throw;
+                    try
+                    {
+                        await handler(executionContext, args);
+                        channel.BasicAck(e.DeliveryTag, false);
+                        logger.LogInformation("RabbitMQ event handle successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        channel.BasicNack(e.DeliveryTag, false, true);
+                        logger.LogError(ex, "RabbitMQ event handle error.");
+                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
+                        throw;
+                    }
                 }
             };
             channel.BasicConsume(queueName, false, consumer);

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
@@ -60,7 +61,12 @@ namespace Wodsoft.ComBoost
             protected DomainExecutionPipeline MakePipeline()
             {
                 var globalFilters = GetFilters();
-                DomainExecutionPipeline pipeline = ExecuteAsync;
+                DomainExecutionPipeline pipeline = async () =>
+                {
+                    var logger = DomainContext.GetRequiredService<ILogger<TDomainService>>();
+                    using (logger.BeginScope(new DomainServiceInvokerLogState(typeof(TDomainService), _executionContext.DomainMethod)))
+                        await ExecuteAsync();
+                };
                 var filters = DomainContext.Filter;
                 for (int i = filters.Count - 1; i >= 0; i--)
                 {
