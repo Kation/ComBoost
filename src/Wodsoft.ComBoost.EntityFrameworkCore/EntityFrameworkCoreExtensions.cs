@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using Wodsoft.ComBoost.Data.Entity;
+using Wodsoft.ComBoost.Data.Entity.Metadata;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -23,6 +25,18 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.Add(new ServiceDescriptor(typeof(IEntityContext<>).MakeGenericType(type), func, ServiceLifetime.Scoped));
             }
             return services;
+        }
+    }
+}
+
+namespace Microsoft.EntityFrameworkCore
+{
+    public static class DomainEntityFrameworkExtensions
+    {
+        public static KeyBuilder<T> UseMetadataKeys<T>(this EntityTypeBuilder<T> builder)
+            where T : class
+        {
+            return builder.HasKey(EntityDescriptor.GetMetadata<T>().KeyProperties.Select(t => t.ClrName).ToArray());
         }
     }
 }
