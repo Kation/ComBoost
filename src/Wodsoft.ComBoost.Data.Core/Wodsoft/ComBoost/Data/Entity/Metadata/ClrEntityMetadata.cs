@@ -41,7 +41,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             if (keys.Length == 0)
             {
                 var multipleKeyAttribute = type.GetCustomAttribute<MultipleKeyAttribute>();
-                if (multipleKeyAttribute == null && multipleKeyAttribute.Keys.Length != 0)
+                if (multipleKeyAttribute == null || multipleKeyAttribute.Keys.Length == 0)
                 {
                     var key = GetProperty("Id") ?? GetProperty("ID") ?? GetProperty("Index") ?? GetProperty(Type.Name + "Id") ?? GetProperty(Type.Name + "ID");
                     if (key != null)
