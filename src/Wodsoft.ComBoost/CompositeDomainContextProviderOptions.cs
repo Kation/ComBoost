@@ -37,14 +37,14 @@ namespace Wodsoft.ComBoost
                 return;
             }
             int count = _providers.Count;
-            for (int i = 0; i < count; i++)
+            int i = 0;
+            for (; i < count; i++)
             {
                 if (_orders[i] > order)
-                {
-                    _orders.Insert(i, order);
-                    _providers.Insert(i, typeof(T));
-                }
+                    break;
             }
+            _orders.Insert(i, order);
+            _providers.Insert(i, typeof(T));
         }
 
         public void TryAddContextProvider<T>(int order = 0)
