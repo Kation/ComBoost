@@ -37,11 +37,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             if (parent != null)
                 ParentProperty = GetProperty(parent.PropertyName) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not contains parent property \"{parent.PropertyName}\".");
 
-            var keys = Properties.Where(t => t.IsKey).ToArray();
-            if (keys.Length == 0)
+            var multipleKeyAttribute = type.GetCustomAttribute<MultipleKeyAttribute>();
+            if (multipleKeyAttribute == null || multipleKeyAttribute.Keys.Length == 0)
             {
-                var multipleKeyAttribute = type.GetCustomAttribute<MultipleKeyAttribute>();
-                if (multipleKeyAttribute == null || multipleKeyAttribute.Keys.Length == 0)
+                var keys = Properties.Where(t => t.IsKey).ToArray();
+                if (keys.Length == 0)
                 {
                     var key = GetProperty("Id") ?? GetProperty("ID") ?? GetProperty("Index") ?? GetProperty(Type.Name + "Id") ?? GetProperty(Type.Name + "ID");
                     if (key != null)
@@ -51,12 +51,12 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 }
                 else
                 {
-                    KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(multipleKeyAttribute.Keys.Select(t => GetProperty(t) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not contains key property.")).ToArray());
+                    KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(keys);
                 }
             }
             else
             {
-                KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(keys);
+                KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(multipleKeyAttribute.Keys.Select(t => GetProperty(t) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not contains key property.")).ToArray());
             }
 
             DisplayColumnAttribute displayColumn = Type.GetTypeInfo().GetCustomAttribute<DisplayColumnAttribute>();
