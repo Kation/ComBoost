@@ -351,5 +351,21 @@ namespace Wodsoft.ComBoost.EntityFramework.Test
             await entityContext.LoadPropertyAsync(item, t=> t.Include);
             Assert.NotNull(item.Include);
         }
+
+        [Fact]
+        public async Task AsTrackingTest()
+        {
+            var databaseContext = SeedData();
+            var entityContext = databaseContext.GetContext<TestEntity>();
+            await entityContext.Query().AsTracking().ToArrayAsync();
+        }
+
+        [Fact]
+        public async Task AsNoTrackingTest()
+        {
+            var databaseContext = SeedData();
+            var entityContext = databaseContext.GetContext<TestEntity>();
+            await entityContext.Query().AsNoTracking().ToArrayAsync();
+        }
     }
 }

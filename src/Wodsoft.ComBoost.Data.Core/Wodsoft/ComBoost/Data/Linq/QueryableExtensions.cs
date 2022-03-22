@@ -1557,5 +1557,33 @@ namespace Wodsoft.ComBoost.Data.Linq
         }
 
         #endregion
+
+        #region Track
+
+        private static readonly MethodInfo _AsTrackingMethodInfo
+            = typeof(QueryableExtensions)
+                .GetTypeInfo().GetDeclaredMethod(nameof(AsTracking));
+        public static IQueryable<TSource> AsTracking<TSource>(this IQueryable<TSource> source)
+        {
+            return source.Provider.CreateQuery<TSource>(
+                        Expression.Call(
+                            instance: null,
+                            method: _AsTrackingMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            arguments: new[] { source.Expression }));
+        }
+
+        private static readonly MethodInfo _AsNoTrackingMethodInfo
+            = typeof(QueryableExtensions)
+                .GetTypeInfo().GetDeclaredMethod(nameof(AsTracking));
+        public static IQueryable<TSource> AsNoTracking<TSource>(this IQueryable<TSource> source)
+        {
+            return source.Provider.CreateQuery<TSource>(
+                        Expression.Call(
+                            instance: null,
+                            method: _AsNoTrackingMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            arguments: new[] { source.Expression }));
+        }
+
+        #endregion
     }
 }

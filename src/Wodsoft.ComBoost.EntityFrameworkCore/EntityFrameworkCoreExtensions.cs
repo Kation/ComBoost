@@ -12,10 +12,10 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DomainEntityFrameworkCoreExtensions
     {
-        public static IServiceCollection AddEFCoreContext<TDbContext>(this IServiceCollection services)
+        public static IServiceCollection AddEFCoreContext<TDbContext>(this IServiceCollection services, bool trackEntity = true)
             where TDbContext : DbContext
         {
-            services.AddScoped<DatabaseContext<TDbContext>>();
+            services.AddScoped(sp => new DatabaseContext<TDbContext>(sp.GetRequiredService<TDbContext>()) { TrackEntity = trackEntity });
             var properties = typeof(TDbContext).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(t => t.CanRead && t.CanWrite && t.PropertyType.IsConstructedGenericType && t.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>)).ToArray();
             foreach (var property in properties)

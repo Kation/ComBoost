@@ -83,6 +83,13 @@ namespace Wodsoft.ComBoost.Data.Entity
                             return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
                         }
                     #endregion
+                    #region Tracking
+                    case "AsTracking":
+                    case "AsNoTracking":
+                        {
+                            return Expression.Call(MapMethod(node.Method), Visit(node.Arguments[0]));
+                        }
+                    #endregion
                     default:
                         throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
                 }
@@ -127,6 +134,9 @@ namespace Wodsoft.ComBoost.Data.Entity
                         case "ToArrayAsync":
                         case "ToListAsync":
                             return typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name)!.MakeGenericMethod(method.GetGenericArguments());
+                        case "AsTracking":
+                        case "AsNoTracking":
+                            return typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) })!.MakeGenericMethod(method.GetGenericArguments());
                         case "ToDictionaryAsync":
                             if (method.GetGenericArguments().Length == 2)
                             {

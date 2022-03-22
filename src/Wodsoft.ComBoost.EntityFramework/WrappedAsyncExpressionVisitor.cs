@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Objects;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
@@ -96,6 +97,16 @@ namespace Wodsoft.ComBoost.Data.Entity
                             return queryable.Expression;
                         }
                     #endregion
+                    #region Tracking
+                    case "AsTracking":
+                        {
+                            return Visit(node.Arguments[0]);
+                        }
+                    case "AsNoTracking":
+                        {
+                            return Expression.Call(MapMethod(node.Method), Visit(node.Arguments[0]));
+                        }
+                    #endregion
                     default:
                         throw new NotSupportedException($"Can not support method \"{node.Method.DeclaringType}.{node.Method.Name}\".");
                 }
@@ -152,6 +163,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                                 : typeof(System.Data.Entity.QueryableExtensions).GetMember(method.Name).Cast<MethodInfo>().Where(t => t.GetParameters().Length == 3).First().MakeGenericMethod(method.GetGenericArguments()[0], method.ReturnType.GetGenericArguments()[0]));
                         case "ToArrayAsync":
                         case "ToListAsync":
+                        case "AsNoTracking":
                             return typeof(System.Data.Entity.QueryableExtensions).GetMember(method.Name).Cast<MethodInfo>().Where(t => t.IsGenericMethod && t.GetParameters().Length == method.GetParameters().Length).First().MakeGenericMethod(method.GetGenericArguments());
                         case "ToDictionaryAsync":
                             return typeof(System.Data.Entity.QueryableExtensions).GetMember(method.Name).Cast<MethodInfo>().Where(t => t.GetGenericArguments().Length == method.GetGenericArguments().Length && t.GetParameters().Length == method.GetParameters().Length).First().MakeGenericMethod(method.GetGenericArguments());
