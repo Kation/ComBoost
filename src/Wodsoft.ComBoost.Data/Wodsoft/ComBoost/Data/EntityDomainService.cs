@@ -34,7 +34,7 @@ namespace Wodsoft.ComBoost.Data
         [EntityViewModelFilter]
         public virtual async Task<IViewModel<TListDTO>> List([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper)
         {
-            var queryable = entityContext.Query();
+            var queryable = entityContext.Query().AsNoTracking();
             var entityQueryEventArgs = new EntityQueryEventArgs<TEntity>(queryable);
             await RaiseEvent(entityQueryEventArgs);
             queryable = entityQueryEventArgs.Queryable;
