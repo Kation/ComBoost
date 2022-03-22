@@ -16,7 +16,7 @@ using System.Transactions;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public abstract class DatabaseContext : IDatabaseContext
+    public abstract class DatabaseContext : ITrackableDatabaseContext
     {
         private static ConcurrentDictionary<Type, IEnumerable<Type>> _CachedSupportTypes;
         private Dictionary<Type, object> _CachedEntityContext;
