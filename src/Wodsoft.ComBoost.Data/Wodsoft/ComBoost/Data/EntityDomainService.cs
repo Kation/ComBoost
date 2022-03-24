@@ -12,7 +12,6 @@ using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Wodsoft.ComBoost.Data.Linq;
 using AutoMapper.QueryableExtensions;
-using System.Linq.Expressions;
 
 namespace Wodsoft.ComBoost.Data
 {
@@ -43,19 +42,6 @@ namespace Wodsoft.ComBoost.Data
             OnListQuery(ref queryable, ref isOrdered);
             var dtoQueryable = queryable.ProjectTo<TListDTO>(mapper.ConfigurationProvider);
             OnListQuery(ref dtoQueryable, ref isOrdered);
-            if (!isOrdered)
-            {
-                var sortProperty = EntityDescriptor.GetMetadata<TListDTO>().SortProperty;
-                if (sortProperty != null)
-                {
-                    var parameter = Expression.Parameter(typeof(TListDTO));
-                    dynamic express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(TListDTO), sortProperty.ClrType), Expression.Property(parameter, sortProperty.ClrName), parameter);
-                    if (EntityDescriptor.GetMetadata<TListDTO>().IsSortDescending)
-                        dtoQueryable = Queryable.OrderByDescending(dtoQueryable, express);
-                    else
-                        dtoQueryable = Queryable.OrderBy(dtoQueryable, express);
-                }
-            }
             ViewModel<TListDTO> model = new ViewModel<TListDTO>(dtoQueryable);
             await RaiseEvent(new EntityQueryModelCreatedEventArgs<TListDTO>(model));
             return model;
@@ -75,13 +61,13 @@ namespace Wodsoft.ComBoost.Data
 
         #region Create
 
-        public virtual async Task<IUpdateModel<TListDTO>> Create([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TCreateDTO dto)
+        public virtual async Task<IUpdateModel<TCreateDTO>> Create([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TCreateDTO dto)
         {
             var entity = entityContext.Create();
             mapper.Map(dto, entity);
             await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
             var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
-            UpdateModel<TListDTO> model = new UpdateModel<TListDTO>();
+            UpdateModel<TCreateDTO> model = new UpdateModel<TCreateDTO>(dto);
             List<ValidationResult> results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {
@@ -96,32 +82,31 @@ namespace Wodsoft.ComBoost.Data
             await entityContext.Database.SaveAsync();
             await RaiseEvent(new EntityCreatedEventArgs<TEntity>(entity));
             model.IsSuccess = true;
-            model.Item = mapper.Map<TListDTO>(entity);
+            mapper.Map(entity, dto);
             return model;
         }
 
-        public virtual async Task<IUpdateRangeModel<TListDTO>> CreateRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TCreateDTO[] dtos)
+        public virtual async Task<IUpdateRangeModel<TCreateDTO>> CreateRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TCreateDTO[] dtos)
         {
-            UpdateRangeModel<TListDTO> model = new UpdateRangeModel<TListDTO>();
-            Dictionary<TListDTO, TEntity> entities = new Dictionary<TListDTO, TEntity>();
+            UpdateRangeModel<TCreateDTO> model = new UpdateRangeModel<TCreateDTO>();
+            Dictionary<TCreateDTO, TEntity> entities = new Dictionary<TCreateDTO, TEntity>();
             foreach (var dto in dtos)
             {
+                var entity = entityContext.Create();
+                mapper.Map(dto, entity);
+                await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
                 var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
                 List<ValidationResult> results = new List<ValidationResult>();
                 if (Validator.TryValidateObject(dto, validationContext, results, true))
                 {
-                    var entity = entityContext.Create();
-                    mapper.Map(dto, entity);
-                    await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
                     entityContext.Add(entity);
                     await RaiseEvent(new EntityPreCreateEventArgs<TEntity>(entity));
-                    var listDto = mapper.Map<TListDTO>(entity);
-                    entities.Add(listDto, entity);
-                    model.AddItem(listDto);
+                    entities.Add(dto, entity);
+                    model.AddItem(dto);
                 }
                 else
                 {
-                    model.AddItem(null, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
+                    model.AddItem(dto, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
                 }
             }
             if (!model.IsSuccess)
@@ -139,7 +124,7 @@ namespace Wodsoft.ComBoost.Data
 
         #region Edit
 
-        public virtual async Task<IUpdateModel<TListDTO>> Edit([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TEditDTO dto)
+        public virtual async Task<IUpdateModel<TEditDTO>> Edit([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TEditDTO dto)
         {
             var mappedEntity = mapper.Map<TEntity>(dto);
             var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
@@ -153,7 +138,7 @@ namespace Wodsoft.ComBoost.Data
             mapper.Map(dto, entity);
             await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
             var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
-            UpdateModel<TListDTO> model = new UpdateModel<TListDTO>();
+            UpdateModel<TEditDTO> model = new UpdateModel<TEditDTO>(dto);
             List<ValidationResult> results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {
@@ -168,40 +153,39 @@ namespace Wodsoft.ComBoost.Data
             await entityContext.Database.SaveAsync();
             await RaiseEvent(new EntityEditedEventArgs<TEntity>(entity));
             model.IsSuccess = true;
-            model.Item = mapper.Map<TListDTO>(entity);
+            mapper.Map(entity, dto);
             return model;
         }
 
-        public virtual async Task<IUpdateRangeModel<TListDTO>> EditRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TEditDTO[] dtos)
+        public virtual async Task<IUpdateRangeModel<TEditDTO>> EditRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TEditDTO[] dtos)
         {
-            UpdateRangeModel<TListDTO> model = new UpdateRangeModel<TListDTO>();
-            Dictionary<TListDTO, TEntity> entities = new Dictionary<TListDTO, TEntity>();
+            UpdateRangeModel<TEditDTO> model = new UpdateRangeModel<TEditDTO>();
+            Dictionary<TEditDTO, TEntity> entities = new Dictionary<TEditDTO, TEntity>();
             foreach (var dto in dtos)
             {
+                var mappedEntity = mapper.Map<TEntity>(dto);
+                var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
+                var keys = new object[keyProperties.Count];
+                for (int i = 0; i < keyProperties.Count; i++)
+                    keys[i] = keyProperties[i].GetValue(mappedEntity);
+                var entity = await entityContext.GetAsync(keys);
+                if (entity == null)
+                    throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+                await RaiseEvent(new EntityPreMapEventArgs<TEntity, TEditDTO>(entity, dto));
+                mapper.Map(dto, entity);
+                await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
                 var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
                 List<ValidationResult> results = new List<ValidationResult>();
                 if (Validator.TryValidateObject(dto, validationContext, results, true))
                 {
-                    var mappedEntity = mapper.Map<TEntity>(dto);
-                    var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
-                    var keys = new object[keyProperties.Count];
-                    for (int i = 0; i < keyProperties.Count; i++)
-                        keys[i] = keyProperties[i].GetValue(mappedEntity);
-                    var entity = await entityContext.GetAsync(keys);
-                    if (entity == null)
-                        throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
-                    await RaiseEvent(new EntityPreMapEventArgs<TEntity, TEditDTO>(entity, dto));
-                    mapper.Map(dto, entity);
-                    await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
                     entityContext.Update(entity);
                     await RaiseEvent(new EntityPreEditEventArgs<TEntity>(entity));
-                    var listDto = mapper.Map<TListDTO>(entity);
-                    entities.Add(listDto, entity);
-                    model.AddItem(listDto);
+                    entities.Add(dto, entity);
+                    model.AddItem(dto);
                 }
                 else
                 {
-                    model.AddItem(null, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
+                    model.AddItem(dto, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
                 }
             }
             if (!model.IsSuccess)
