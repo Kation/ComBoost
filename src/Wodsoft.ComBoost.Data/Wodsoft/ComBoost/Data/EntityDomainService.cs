@@ -12,6 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Wodsoft.ComBoost.Data.Linq;
 using AutoMapper.QueryableExtensions;
+using System.Linq.Expressions;
 
 namespace Wodsoft.ComBoost.Data
 {
@@ -42,6 +43,19 @@ namespace Wodsoft.ComBoost.Data
             OnListQuery(ref queryable, ref isOrdered);
             var dtoQueryable = queryable.ProjectTo<TListDTO>(mapper.ConfigurationProvider);
             OnListQuery(ref dtoQueryable, ref isOrdered);
+            if (!isOrdered)
+            {
+                var sortProperty = EntityDescriptor.GetMetadata<TListDTO>().SortProperty;
+                if (sortProperty != null)
+                {
+                    var parameter = Expression.Parameter(typeof(TListDTO));
+                    dynamic express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(TListDTO), sortProperty.ClrType), Expression.Property(parameter, sortProperty.ClrName), parameter);
+                    if (EntityDescriptor.GetMetadata<TListDTO>().IsSortDescending)
+                        dtoQueryable = Queryable.OrderByDescending(dtoQueryable, express);
+                    else
+                        dtoQueryable = Queryable.OrderBy(dtoQueryable, express);
+                }
+            }
             ViewModel<TListDTO> model = new ViewModel<TListDTO>(dtoQueryable);
             await RaiseEvent(new EntityQueryModelCreatedEventArgs<TListDTO>(model));
             return model;

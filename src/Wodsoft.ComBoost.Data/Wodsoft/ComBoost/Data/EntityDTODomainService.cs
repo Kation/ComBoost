@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
+using Wodsoft.ComBoost.Data.Entity.Metadata;
 using Wodsoft.ComBoost.Security;
 
 namespace Wodsoft.ComBoost.Data
@@ -27,8 +29,19 @@ namespace Wodsoft.ComBoost.Data
             queryable = e.Queryable;
             bool isOrdered = e.IsOrdered;
             OnListQuery(ref queryable, ref isOrdered);
-            //if (!isOrdered)
-            //    queryable = queryable.OrderByDescending(t => t.CreationDate);
+            if (!isOrdered)
+            {
+                var sortProperty = EntityDescriptor.GetMetadata<TListDTO>().SortProperty;
+                if (sortProperty != null)
+                {
+                    var parameter = Expression.Parameter(typeof(TListDTO));
+                    dynamic express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(TListDTO), sortProperty.ClrType), Expression.Property(parameter, sortProperty.ClrName), parameter);
+                    if (EntityDescriptor.GetMetadata<TListDTO>().IsSortDescending)
+                        queryable = Queryable.OrderByDescending(queryable, express);
+                    else
+                        queryable = Queryable.OrderBy(queryable, express);
+                }
+            }
             ViewModel<TListDTO> model = new ViewModel<TListDTO>(queryable);
             await RaiseEvent(new EntityQueryModelCreatedEventArgs<TListDTO>(model));
             return model;
