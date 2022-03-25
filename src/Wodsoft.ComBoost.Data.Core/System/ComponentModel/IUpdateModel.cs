@@ -15,6 +15,6 @@ namespace System.ComponentModel
 
     public interface IUpdateModel<T> : IUpdateModel
     {
-        T Item { get; }
+        T? Item { get; }
     }
 }

@@ -16,17 +16,18 @@ namespace System.ComponentModel
         private readonly List<IUpdateRangeModelItem<T>> _items;
         private readonly ReadOnlyCollection<IUpdateRangeModelItem<T>> _readOnlyItems;
         public IReadOnlyList<IUpdateRangeModelItem<T>> Items => _readOnlyItems;
+        IReadOnlyList<IUpdateRangeModelItem> IUpdateRangeModel.Items => Items;
 
         public bool IsSuccess { get; set; } = true;
 
-        public void AddItem(T item, IList<KeyValuePair<string, string>> errorMessage)
+        public void AddItem(T? item, IList<KeyValuePair<string, string>> errorMessage)
         {
             var model = new UpdateRangeModelItem<T>(item, errorMessage);
             _items.Add(model);
             IsSuccess = IsSuccess && errorMessage.Count == 0;
         }
 
-        public void AddItem(T item)
+        public void AddItem(T? item)
         {
             var model = new UpdateRangeModelItem<T>(item);
             _items.Add(model);
@@ -35,19 +36,19 @@ namespace System.ComponentModel
 
     public class UpdateRangeModelItem<T> : IUpdateRangeModelItem<T>
     {
-        public UpdateRangeModelItem(T value)
+        public UpdateRangeModelItem(T? value)
         {
             Value = value;
             ErrorMessage = new List<KeyValuePair<string, string>>();
         }
 
-        public UpdateRangeModelItem(T value, IList<KeyValuePair<string, string>> errorMessage)
+        public UpdateRangeModelItem(T? value, IList<KeyValuePair<string, string>> errorMessage)
         {
             Value = value;
             ErrorMessage = errorMessage;
         }
 
-        public T Value { get; set; }
+        public T? Value { get; set; }
 
         public IList<KeyValuePair<string, string>> ErrorMessage { get; set; }
     }

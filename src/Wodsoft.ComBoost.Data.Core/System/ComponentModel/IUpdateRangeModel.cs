@@ -7,17 +7,22 @@ namespace System.ComponentModel
     public interface IUpdateRangeModel
     {
         bool IsSuccess { get; }
+
+        IReadOnlyList<IUpdateRangeModelItem> Items { get; }
     }
 
     public interface IUpdateRangeModel<T> : IUpdateRangeModel
     {
-        IReadOnlyList<IUpdateRangeModelItem<T>> Items { get; }
+        new IReadOnlyList<IUpdateRangeModelItem<T>> Items { get; }
     }
 
-    public interface IUpdateRangeModelItem<T>
+    public interface IUpdateRangeModelItem
     {
-        T Value { get; }
-
         IList<KeyValuePair<string, string>> ErrorMessage { get; }
+    }
+
+    public interface IUpdateRangeModelItem<T> : IUpdateRangeModelItem
+    {
+        T? Value { get; }
     }
 }

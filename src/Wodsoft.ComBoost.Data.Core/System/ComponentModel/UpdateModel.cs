@@ -11,13 +11,13 @@ namespace System.ComponentModel
     {
         public UpdateModel()
         {
-            _ErrorMessage = new List<KeyValuePair<string, string>>();
+            _errorMessage = new List<KeyValuePair<string, string>>();
         }
 
         public bool IsSuccess { get; set; }
 
-        private List<KeyValuePair<string, string>> _ErrorMessage;
-        public IList<KeyValuePair<string, string>> ErrorMessage => _ErrorMessage;
+        private List<KeyValuePair<string, string>> _errorMessage;
+        public IList<KeyValuePair<string, string>> ErrorMessage => _errorMessage;
     }
 
     public class UpdateModel<T> : UpdateModel, IUpdateModel<T>
@@ -27,6 +27,8 @@ namespace System.ComponentModel
             Item = value;
         }
 
-        public T Item { get; }
+        public UpdateModel() { }
+
+        public T? Item { get; set; }
     }
 }

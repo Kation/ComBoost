@@ -12,12 +12,6 @@ namespace System.ComponentModel
             ErrorMessage = new List<KeyValuePair<string, string>>();
         }
 
-        public EditModel(IUpdateModel<T> updateModel)
-        {
-            Item = updateModel.Item;
-            ErrorMessage = new List<KeyValuePair<string, string>>();
-        }
-
         public T Item { get; }
 
         public IList<KeyValuePair<string, string>> ErrorMessage { get; }

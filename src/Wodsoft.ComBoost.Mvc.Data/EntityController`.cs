@@ -83,21 +83,21 @@ namespace Wodsoft.ComBoost.Mvc
         public virtual async Task<IActionResult> Create(TCreateDTO dto)
         {
             var model = await CreateEntity(dto);
-            return OnCreateModelCreated(model);
+            return OnCreateModelCreated(model, dto);
         }
 
-        protected virtual Task<IUpdateModel<TCreateDTO>> CreateEntity(TCreateDTO dto)
+        protected virtual Task<IUpdateModel<TListDTO>> CreateEntity(TCreateDTO dto)
         {
             var domain = HttpContext.RequestServices.GetRequiredService<IEntityDomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
             return domain.Create(dto);
         }
 
-        protected virtual IActionResult OnCreateModelCreated(IUpdateModel<TCreateDTO> model)
+        protected virtual IActionResult OnCreateModelCreated(IUpdateModel<TListDTO> model, TCreateDTO createDto)
         {
             if (model.IsSuccess)
                 return RedirectToAction("Index");
             else
-                return View(new EditModel<TCreateDTO>(model));
+                return View(new EditModel<TCreateDTO>(createDto));
         }
 
         #endregion
@@ -163,21 +163,21 @@ namespace Wodsoft.ComBoost.Mvc
         public virtual async Task<IActionResult> Edit(TEditDTO dto)
         {
             var model = await EditEntity(dto);
-            return OnEditModelCreated(model);
+            return OnEditModelCreated(model, dto);
         }
 
-        protected virtual Task<IUpdateModel<TEditDTO>> EditEntity(TEditDTO dto)
+        protected virtual Task<IUpdateModel<TListDTO>> EditEntity(TEditDTO dto)
         {
             var domain = HttpContext.RequestServices.GetRequiredService<IEntityDomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
             return domain.Edit(dto);
         }
 
-        protected virtual IActionResult OnEditModelCreated(IUpdateModel<TEditDTO> model)
+        protected virtual IActionResult OnEditModelCreated(IUpdateModel<TListDTO> model, TEditDTO editDto)
         {
             if (model.IsSuccess)
                 return RedirectToAction("Index");
             else
-                return View(new EditModel<TEditDTO>(model));
+                return View(new EditModel<TEditDTO>(editDto));
         }
 
         #endregion

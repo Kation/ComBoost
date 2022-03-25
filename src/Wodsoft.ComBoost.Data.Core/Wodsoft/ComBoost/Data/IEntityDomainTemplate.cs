@@ -21,13 +21,13 @@ namespace Wodsoft.ComBoost.Data
 
         Task<IViewModel<TListDTO>> List(int page, int size);
 
-        Task<IUpdateModel<TCreateDTO>> Create(TCreateDTO dto);
+        Task<IUpdateModel<TListDTO>> Create(TCreateDTO dto);
 
-        Task<IUpdateRangeModel<TCreateDTO>> CreateRange(TCreateDTO[] dtos);
+        Task<IUpdateRangeModel<TListDTO>> CreateRange(TCreateDTO[] dtos);
 
-        Task<IUpdateModel<TEditDTO>> Edit(TEditDTO dto);
+        Task<IUpdateModel<TListDTO>> Edit(TEditDTO dto);
 
-        Task<IUpdateRangeModel<TEditDTO>> EditRange(TEditDTO[] dtos);
+        Task<IUpdateRangeModel<TListDTO>> EditRange(TEditDTO[] dtos);
 
         Task Remove(TRemoveDTO dto);
 
