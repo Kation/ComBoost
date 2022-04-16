@@ -67,19 +67,19 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             return EntityDescriptor<TEntity>.Descriptor.GetMetadata<TEntity>();
         }
 
-        private ConcurrentDictionary<Type, IEntityMetadata> _Metadata;
+        private ConcurrentDictionary<Type, IEntityMetadata> _metadata;
 
         /// <summary>
         /// 实例化实体解释器。
         /// </summary>
         public EntityDescriptor()
         {
-            _Metadata = new ConcurrentDictionary<Type, IEntityMetadata>();
+            _metadata = new ConcurrentDictionary<Type, IEntityMetadata>();
         }
 
         IEntityMetadata IEntityDescriptor.GetMetadata(Type type)
         {
-            return (IEntityMetadata)typeof(EntityDescriptor<>).MakeGenericType(typeof(Type)).GetProperty("Metadata").GetValue(null);
+            return (IEntityMetadata)typeof(EntityDescriptor<>).MakeGenericType(type).GetProperty("Metadata").GetValue(null);
         }
 
         IEntityMetadata IEntityDescriptor.GetMetadata<T>()
