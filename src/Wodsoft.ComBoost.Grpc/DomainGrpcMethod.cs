@@ -3,6 +3,7 @@ using Grpc.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 using Wodsoft.Protobuf;
 
@@ -16,30 +17,58 @@ namespace Wodsoft.ComBoost.Grpc
         {
             return new Method<TRequest, TResponse>(MethodType.Unary, serviceName, methodName, new Marshaller<TRequest>((request) =>
             {
-                MemoryStream stream = new MemoryStream();
-                var output = new CodedOutputStream(stream, true);
-                output.WriteRawMessage(request);
-                output.Flush();
-                return stream.ToArray();
+                try
+                {
+                    MemoryStream stream = new MemoryStream();
+                    var output = new CodedOutputStream(stream, true);
+                    output.WriteRawMessage(request);
+                    output.Flush();
+                    return stream.ToArray();
+                }
+                catch (Exception ex)
+                {
+                    throw new SerializationException($"Fail to serialize \"{typeof(TRequest).FullName}\".", ex);
+                }
             }, (data) =>
             {
-                var input = new CodedInputStream(data);
-                var value = new TRequest();
-                input.ReadRawMessage(value);
-                return value;
+                try
+                {
+                    var input = new CodedInputStream(data);
+                    var value = new TRequest();
+                    input.ReadRawMessage(value);
+                    return value;
+                }
+                catch (Exception ex)
+                {
+                    throw new SerializationException($"Fail to deserialize \"{typeof(TRequest).FullName}\".", ex);
+                }
             }), new Marshaller<TResponse>((response) =>
             {
-                MemoryStream stream = new MemoryStream();
-                var output = new CodedOutputStream(stream, true);
-                output.WriteRawMessage(response);
-                output.Flush();
-                return stream.ToArray();
+                try
+                {
+                    MemoryStream stream = new MemoryStream();
+                    var output = new CodedOutputStream(stream, true);
+                    output.WriteRawMessage(response);
+                    output.Flush();
+                    return stream.ToArray();
+                }
+                catch (Exception ex)
+                {
+                    throw new SerializationException($"Fail to serialize \"{typeof(TResponse).FullName}\".", ex);
+                }
             }, (data) =>
             {
-                var input = new CodedInputStream(data);
-                var value = new TResponse();
-                input.ReadRawMessage(value);
-                return value;
+                try
+                {
+                    var input = new CodedInputStream(data);
+                    var value = new TResponse();
+                    input.ReadRawMessage(value);
+                    return value;
+                }
+                catch (Exception ex)
+                {
+                    throw new SerializationException($"Fail to deserialize \"{typeof(TResponse).FullName}\".", ex);
+                }
             }));
         }
     }
