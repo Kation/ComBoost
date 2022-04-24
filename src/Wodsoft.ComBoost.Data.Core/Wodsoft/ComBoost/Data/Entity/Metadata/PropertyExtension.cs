@@ -42,9 +42,9 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 //    type = CustomDataType.Other;
                 //    customType = "ValueFilter";
                 //}
-                if (propertyType.GetTypeInfo().IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    propertyType = propertyType.GetGenericArguments()[0];
-                else if (propertyType == typeof(DateTime))
+                if (Nullable.GetUnderlyingType(propertyType) != null)
+                    propertyType = Nullable.GetUnderlyingType(propertyType);
+                if (propertyType == typeof(DateTime))
                     type = CustomDataType.Date;
                 else if (propertyType == typeof(TimeSpan))
                     type = CustomDataType.Time;
