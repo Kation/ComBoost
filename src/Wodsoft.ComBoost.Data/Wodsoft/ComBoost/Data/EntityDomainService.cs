@@ -160,6 +160,8 @@ namespace Wodsoft.ComBoost.Data
             var entity = await entityContext.GetAsync(keys);
             if (entity == null)
                 throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+            if (!entity.IsEditAllowed)
+                throw new DomainServiceException(new InvalidOperationException("Entity does not allowed to edit."));
             await RaiseEvent(new EntityPreMapEventArgs<TEntity, TEditDTO>(entity, dto));
             mapper.Map(dto, entity);
             await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
@@ -190,6 +192,8 @@ namespace Wodsoft.ComBoost.Data
                     var entity = await entityContext.GetAsync(keys);
                     if (entity == null)
                         throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+                    if (!entity.IsEditAllowed)
+                        throw new DomainServiceException(new InvalidOperationException("Entity does not allowed to edit."));
                     await RaiseEvent(new EntityPreMapEventArgs<TEntity, TEditDTO>(entity, dto));
                     mapper.Map(dto, entity);
                     await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
@@ -229,6 +233,8 @@ namespace Wodsoft.ComBoost.Data
             var entity = await entityContext.GetAsync(keys);
             if (entity == null)
                 throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+            if (!entity.IsRemoveAllowed)
+                throw new DomainServiceException(new InvalidOperationException("Entity does not allowed to remove."));
             await RaiseEvent(new EntityPreRemoveEventArgs<TEntity>(entity));
             entityContext.Remove(entity);
             await entityContext.Database.SaveAsync();
@@ -248,6 +254,8 @@ namespace Wodsoft.ComBoost.Data
                 var entity = await entityContext.GetAsync(keys);
                 if (entity == null)
                     throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+                if (!entity.IsRemoveAllowed)
+                    throw new DomainServiceException(new InvalidOperationException("Entity does not allowed to remove."));
                 await RaiseEvent(new EntityPreRemoveEventArgs<TEntity>(entity));
                 entityContext.Remove(entity);
                 entities.Add(entity);
