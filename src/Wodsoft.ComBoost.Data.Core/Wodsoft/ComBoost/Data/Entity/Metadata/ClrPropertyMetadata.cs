@@ -38,12 +38,21 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                     Name = display.Name;
                 ShortName = display.ShortName == null ? Name : display.ShortName;
                 Description = display.Description;
-                Order = display.GetOrder().HasValue ? display.Order : 0;
+                Order = display.GetOrder() ?? 0;
             }
             else
             {
-                Name = ClrName;
-                ShortName = Name;
+                var description = GetAttribute<DescriptionAttribute>();
+                if (description != null)
+                {
+                    Name = description.Description;
+                    ShortName = Name;
+                }
+                else
+                {
+                    Name = ClrName;
+                    ShortName = Name;
+                }
             }
 
 
