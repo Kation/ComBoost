@@ -118,7 +118,7 @@ namespace Wodsoft.ComBoost.Mvc
             var keys = await GetKeysFromQuery();
             if (keys.Any(t => t == null))
                 return null;
-            var entity = await entityContext.GetAsync();
+            var entity = await entityContext.GetAsync(keys);
             var dto = mapper.Map<TEditDTO>(entity);
             IEditModel<TEditDTO> model = new EditModel<TEditDTO>(dto);
             return model;
@@ -140,7 +140,7 @@ namespace Wodsoft.ComBoost.Mvc
                 var bindingContext = DefaultModelBindingContext.CreateBindingContext(ControllerContext, valueProvider, context.Metadata, context.BindingInfo, property.ClrName);
                 try
                 {
-                    binder.BindModelAsync(bindingContext).Wait();
+                    await binder.BindModelAsync(bindingContext);
                     if (bindingContext.Result.IsModelSet)
                         keys[i] = bindingContext.Result.Model;
                 }
