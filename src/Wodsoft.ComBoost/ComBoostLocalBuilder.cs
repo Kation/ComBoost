@@ -42,7 +42,7 @@ namespace Wodsoft.ComBoost
         public IComBoostLocalServiceBuilder<T> AddService<T>() where T : class, IDomainService
         {
             var builder = new ComBoostLocalServiceBuilder<T>(Services, this);
-            ServiceAdded?.Invoke(this, new ComBoostLocalBuilderEventArgs(typeof(T)));
+            ServiceAdded?.Invoke(this, new ComBoostLocalBuilderEventArgs(typeof(T), this));
             return builder;
         }
     }
