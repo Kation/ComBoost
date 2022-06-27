@@ -65,7 +65,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             bool isFileUpload;
             Type = propertyInfo.GetCustomDataType(out customType, out isFileUpload);
             CustomType = customType;
-            Converter = TypeDescriptor.GetConverter(ClrType);
+            var typeConverterAttribute = propertyInfo.GetCustomAttribute<TypeConverterAttribute>();
+            if (typeConverterAttribute == null)
+                Converter = TypeDescriptor.GetConverter(ClrType);
+            else
+                Converter = (TypeConverter)Activator.CreateInstance(System.Type.GetType(typeConverterAttribute.ConverterTypeName));
 
             IsKey = GetAttribute<KeyAttribute>() != null;
             IsRequired = GetAttribute<RequiredAttribute>() != null || (ClrType.GetTypeInfo().IsValueType && !ClrType.GetTypeInfo().IsGenericType);
