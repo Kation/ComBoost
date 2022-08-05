@@ -138,7 +138,7 @@ namespace Wodsoft.ComBoost
             foreach (var method in methods)
             {
                 //Get service method what template invoke to
-                var serviceMethod = serviceType.GetMethod(method.Name);
+                var serviceMethod = serviceType.GetMethod(method.Name, BindingFlags.Public | BindingFlags.Instance);
                 if (serviceMethod == null)
                     throw new NotSupportedException($"Domain service \"{serviceType.FullName}\" does not implement method \"{method}\".");
                 if (serviceMethod.ReturnType != method.ReturnType)
