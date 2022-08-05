@@ -143,6 +143,8 @@ namespace Wodsoft.ComBoost
                     throw new NotSupportedException($"Domain service \"{serviceType.FullName}\" does not implement method \"{method}\".");
                 if (serviceMethod.ReturnType != method.ReturnType)
                     throw new NotSupportedException($"Return type of {method.DeclaringType.FullName}.{method.Name}({string.Join(",", method.GetParameters().Select(t => t.ParameterType.Name))}) does not equal {serviceMethod.DeclaringType.FullName}.{serviceMethod.Name}({string.Join(",", serviceMethod.GetParameters().Select(t => t.ParameterType.Name))})");
+                if (!serviceMethod.ReturnType.IsSubclassOf(typeof(Task)))
+                    throw new NotSupportedException($"Return type of {method.DeclaringType.FullName}.{method.Name} must be a Task.");
 
                 //Create method for class
                 var methodBuilder = _AgentBuilder.DefineMethod(method.Name,
