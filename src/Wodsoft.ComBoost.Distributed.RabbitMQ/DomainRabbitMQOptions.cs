@@ -26,5 +26,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
         public bool UseQuorum { get; set; } = true;
 
         public Action<IConnectionFactory>? FactoryConfigure { get; set; }
+
+        public bool IsCriticalHealthState { get; set; } = true;
     }
 }

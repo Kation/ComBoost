@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.Builder
 {
     public static class DomainAspNetCoreEndpointExtensions
     {
-        private static RequestDelegate DomainServiceDelegate = async httpContext =>
+        private static RequestDelegate _DomainServiceDelegate = async httpContext =>
         {
             var service = (string?)httpContext.GetRouteValue("service");
             var method = (string?)httpContext.GetRouteValue("method");
@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.Builder
         {
             if (endpoint == null)
                 throw new ArgumentNullException(nameof(endpoint));
-            endpoint.Map("/{service}/{method}", DomainServiceDelegate);
+            endpoint.Map("/{service}/{method}", _DomainServiceDelegate);
         }
 #endif
 
@@ -85,9 +85,39 @@ namespace Microsoft.AspNetCore.Builder
         {
             if (app == null)
                 throw new ArgumentNullException(nameof(app));
-            var handler = new RouteHandler(DomainServiceDelegate);
+            var handler = new RouteHandler(_DomainServiceDelegate);
             var routeBuilder = new RouteBuilder(app, handler);
             routeBuilder.MapRoute("Domain Service Route", "{service}/{method}");
+            var router = routeBuilder.Build();
+            app.UseRouter(router);
+        }
+
+
+        private static RequestDelegate _HealthCheckDelegate = httpContext =>
+        {
+            var providers = httpContext.RequestServices.GetServices<IHealthStateProvider>();
+            if (providers.Any())
+            {
+                var state = providers.Max(t => t.State);
+                if (state != HealthState.Healthy)
+                    httpContext.Response.StatusCode = 503;
+                else
+                    httpContext.Response.StatusCode = 203;
+            }
+            else
+            {
+                httpContext.Response.StatusCode = 203;
+            }
+            return Task.CompletedTask;
+        };
+
+        public static void UseHealthCheck(this IApplicationBuilder app, string path)
+        {
+            if (app == null)
+                throw new ArgumentNullException(nameof(app));
+            var handler = new RouteHandler(_HealthCheckDelegate);
+            var routeBuilder = new RouteBuilder(app, handler);
+            routeBuilder.MapRoute("Health Check Route", path);
             var router = routeBuilder.Build();
             app.UseRouter(router);
         }

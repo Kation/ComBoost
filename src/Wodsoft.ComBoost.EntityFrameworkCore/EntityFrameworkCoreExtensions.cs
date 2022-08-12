@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Wodsoft.ComBoost;
 using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 
@@ -16,6 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
             where TDbContext : DbContext
         {
             services.AddScoped(sp => new DatabaseContext<TDbContext>(sp.GetRequiredService<TDbContext>()) { TrackEntity = trackEntity });
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IHealthStateProvider, DatabaseHealthStateProvider<TDbContext>>());
             var properties = typeof(TDbContext).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(t => t.CanRead && t.CanWrite && t.PropertyType.IsConstructedGenericType && t.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>)).ToArray();
             foreach (var property in properties)
