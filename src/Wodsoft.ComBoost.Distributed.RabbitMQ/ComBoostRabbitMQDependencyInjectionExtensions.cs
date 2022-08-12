@@ -26,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.PostConfigure(optionsConfigure);
             builder.Services.AddSingleton<DomainRabbitMQProvider>();
             builder.Services.AddSingleton<IDomainRabbitMQProvider>(sp => sp.GetService<DomainRabbitMQProvider>());
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IHealthStateProvider>(sp => sp.GetService<DomainRabbitMQProvider>()));
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IHealthStateProvider, DomainRabbitMQProvider>(sp => sp.GetService<DomainRabbitMQProvider>()));
             return UseRabbitMQ(builder);
         }
 
@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.PostConfigure<DomainRabbitMQOptions>(options => options.ConnectionString = connectionString);
             builder.Services.AddSingleton<DomainRabbitMQProvider>();
             builder.Services.AddSingleton<IDomainRabbitMQProvider>(sp => sp.GetService<DomainRabbitMQProvider>());
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IHealthStateProvider>(sp => sp.GetService<DomainRabbitMQProvider>()));
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IHealthStateProvider, DomainRabbitMQProvider>(sp => sp.GetService<DomainRabbitMQProvider>()));
             return UseRabbitMQ(builder);
         }
     }
