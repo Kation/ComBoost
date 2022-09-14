@@ -9,9 +9,9 @@
   <Import Project="../../common.props" />
 
   <ItemGroup>
-    <PackageReference Include="Grpc.Core.Api" Version="2.41.0" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.48.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
-    <PackageReference Include="Wodsoft.Protobuf.Wrapper" Version="1.0.4" />
+    <PackageReference Include="Wodsoft.Protobuf.Wrapper" Version="1.0.5" />
   </ItemGroup>
 
   <ItemGroup>
