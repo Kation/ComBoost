@@ -14,8 +14,6 @@ namespace Wodsoft.ComBoost.AspNetCore
         {
             if (accessor == null)
                 throw new ArgumentNullException(nameof(accessor));
-            if (accessor.HttpContext == null)
-                throw new ArgumentException("当前环境不存在Http上下文。", "accessor");
             Context = accessor.HttpContext;
         }
 
@@ -23,6 +21,8 @@ namespace Wodsoft.ComBoost.AspNetCore
 
         public Task<AuthenticationResult> AuthenticateAsync()
         {
+            if (Context == null)
+                return Task.FromResult(AuthenticationResult.Fail());
             return Task.FromResult(AuthenticationResult.Success(Context.User));
         }
     }
