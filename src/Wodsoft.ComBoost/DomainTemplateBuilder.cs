@@ -146,15 +146,15 @@ namespace Wodsoft.ComBoost
                 if (!typeof(Task).IsAssignableFrom(serviceMethod.ReturnType))
                     throw new NotSupportedException($"Return type of {method.DeclaringType.FullName}.{method.Name} must be a Task.");
 
+                var parameters = method.GetParameters();
                 //Create method for class
                 var methodBuilder = _AgentBuilder.DefineMethod(method.Name,
                     MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual,
-                    method.ReturnType, method.GetParameters().Select(t => t.ParameterType).ToArray());
-                var parameters = method.GetParameters();
+                    method.ReturnType, parameters.Select(t => t.ParameterType).ToArray());
                 //Define parameters
                 for (int i = 0; i < parameters.Length; i++)
                 {
-                    var parameterBuilder = methodBuilder.DefineParameter(i, parameters[i].Attributes, parameters[i].Name);
+                    var parameterBuilder = methodBuilder.DefineParameter(i + 1, parameters[i].Attributes, parameters[i].Name);
                     if (parameters[i].HasDefaultValue)
                         parameterBuilder.SetConstant(parameters[i].DefaultValue);
                 }
