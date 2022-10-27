@@ -152,15 +152,13 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         {
                             channel.BasicNack(e.DeliveryTag, false, true);
                             logger.LogError(ex, "RabbitMQ event handle error.");
-                            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex);
-                            throw;
                         }
                     }
                 }
                 catch (Exception ex)
                 {
+                    logger.LogError(ex, "RabbitMQ operation error.");
                     channel.BasicNack(e.DeliveryTag, false, true);
-                    logger.LogError(ex, "RabbitMQ event handle error.");
                 }
             };
             channel.BasicConsume(queueName, false, consumer);
