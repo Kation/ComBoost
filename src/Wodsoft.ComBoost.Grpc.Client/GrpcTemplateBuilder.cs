@@ -186,7 +186,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 //Define parameters
                 for (int i = 0; i < parameters.Length; i++)
                 {
-                    var parameterBuilder = methodBuilder.DefineParameter(i, parameters[i].Attributes, parameters[i].Name);
+                    var parameterBuilder = methodBuilder.DefineParameter(i + 1, parameters[i].Attributes, parameters[i].Name);
                     if (parameters[i].HasDefaultValue)
                         parameterBuilder.SetConstant(parameters[i].DefaultValue);
                 }
