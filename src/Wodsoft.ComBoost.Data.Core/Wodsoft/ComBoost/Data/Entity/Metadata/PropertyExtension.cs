@@ -45,7 +45,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 if (Nullable.GetUnderlyingType(propertyType) != null)
                     propertyType = Nullable.GetUnderlyingType(propertyType);
                 if (propertyType == typeof(DateTime) || propertyType == typeof(DateTimeOffset))
-                    type = CustomDataType.Date;
+                    type = CustomDataType.DateTime;
                 else if (propertyType == typeof(TimeSpan))
                     type = CustomDataType.Time;
                 else if (propertyType == typeof(bool))
