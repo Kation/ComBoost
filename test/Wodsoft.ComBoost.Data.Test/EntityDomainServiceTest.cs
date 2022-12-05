@@ -24,7 +24,7 @@ namespace Wodsoft.ComBoost.Data.Test
             var mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase("Wodsoft.ComBoost.Data.Test"));
+                    services.AddDbContext<DataContext>();
                     services.AddEFCoreContext<DataContext>();
                     services.AddComBoost()
                         .AddLocalService(builder =>
@@ -46,6 +46,11 @@ namespace Wodsoft.ComBoost.Data.Test
                     });
                 })
                 .Build();
+
+            mock.Run(sp =>
+            {
+                sp.GetRequiredService<DataContext>().Database.EnsureCreated();
+            });
 
             await mock.RunAsync(async sp =>
             {
@@ -114,7 +119,7 @@ namespace Wodsoft.ComBoost.Data.Test
             var mock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase("Wodsoft.ComBoost.Data.Test"));
+                    services.AddDbContext<DataContext>(options => options.UseSqlite("Filename=:memory:"));
                     services.AddEFCoreContext<DataContext>();
                     services.AddComBoost()
                         .AddLocalService(builder =>

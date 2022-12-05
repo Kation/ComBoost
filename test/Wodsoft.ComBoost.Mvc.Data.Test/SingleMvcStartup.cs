@@ -18,7 +18,7 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddDbContext<DataContext>(options=> options.UseInMemoryDatabase("Wodsoft.ComBoost.Mvc.Data.Test"));
+            services.AddDbContext<DataContext>();
             services.AddEFCoreContext<DataContext>();
             services.AddEntityDtoContext<UserEntity, UserDto>();
             services.AddComBoost()

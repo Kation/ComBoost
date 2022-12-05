@@ -1,4 +1,4 @@
-﻿//using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Formats.Asn1;
@@ -18,7 +18,8 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
     {
         private IDatabaseContext SeedData([CallerMemberName] string callerName = null)
         {
-            var dataContext = new DataContext(Microsoft.EntityFrameworkCore.InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<DataContext>(), "EF" + callerName).Options);
+            var dataContext = new DataContext();
+            dataContext.Database.EnsureCreated();
             dataContext.Tests.Add(new ComBoost.Test.Entities.TestEntity
             {
                 Id = Guid.NewGuid(),
@@ -126,7 +127,9 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
 
         private IDatabaseContext CreateNewDatabaseContext([CallerMemberName] string callerName = null)
         {
-            return new DatabaseContext<DataContext>(new DataContext(Microsoft.EntityFrameworkCore.InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<DataContext>(), "EF" + callerName).Options));
+            var dataContext = new DataContext();
+            dataContext.Database.EnsureCreated();
+            return new DatabaseContext<DataContext>(dataContext);
         }
 
         [Fact]
@@ -378,6 +381,26 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
             Assert.Null(item.Include);
             await entityContext.LoadPropertyAsync(item, t => t.Include);
             Assert.NotNull(item.Include);
+        }
+
+        [Fact]
+        public async Task DeleteTest()
+        {
+            var databaseContext = SeedData();
+            var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>();
+            Assert.Equal(7, await entityContext.Query().CountAsync());
+            Assert.Equal(2, await entityContext.Query().Where(t => t.ValueInt == 1).DeleteAsync());
+            Assert.Equal(5, await entityContext.Query().CountAsync());
+        }
+
+        [Fact]
+        public async Task UpdateTest()
+        {
+            var databaseContext = SeedData();
+            var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>(); 
+            Assert.Equal(0, await entityContext.Query().CountAsync(t => t.ValueFloat == 99f));
+            Assert.Equal(2, await entityContext.Query().Where(t => t.ValueInt == 1).UpdateAsync(t => t.Property(x => x.ValueFloat, x => 99f).Property(x => x.ValueDouble, x => 99d)));
+            Assert.Equal(2, await entityContext.Query().CountAsync(t => t.ValueFloat == 99f));
         }
     }
 }

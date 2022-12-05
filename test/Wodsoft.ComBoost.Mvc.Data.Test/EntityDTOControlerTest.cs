@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -31,6 +32,11 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
                 })
                 .StartAsync();
             var client = host.GetTestClient();
+
+            using (var scope = host.GetTestServer().Services.CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<DataContext>().Database.EnsureCreated();
+            }
 
             //Wodsoft.ComBoost.Grpc.AspNetCore.DomainGrpcService.GetAssembly();
             //var generator = new Lokad.ILPack.AssemblyGenerator();

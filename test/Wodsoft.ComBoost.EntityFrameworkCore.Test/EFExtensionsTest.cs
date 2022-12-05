@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
     {
         private IDatabaseContext SeedData([CallerMemberName] string callerName = null)
         {
-            var dataContext = new DataContext(Microsoft.EntityFrameworkCore.InMemoryDbContextOptionsExtensions.UseInMemoryDatabase(new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<DataContext>(), "EFExtensions" + callerName).Options);
+            var dataContext = new DataContext();
             dataContext.Tests.Add(new ComBoost.Test.Entities.TestEntity
             {
                 Id = Guid.NewGuid(),
