@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace Wodsoft.ComBoost
@@ -18,6 +19,13 @@ namespace Wodsoft.ComBoost
                 if (SyntaxHelper.IsSameFullName(attributeSyntax.Name, "Wodsoft.ComBoost.AutoTemplateAttribute", true))
                 {
                     Attributes.Add(attributeSyntax);
+                }
+                else
+                {
+                    var name = attributeSyntax.Name.ToString();
+                    var className = name.Split('.').Last();
+                    if (className == "AutoTemplateAttribute" || className == "AutoTemplate")
+                        Attributes.Add(attributeSyntax);
                 }
             }
         }

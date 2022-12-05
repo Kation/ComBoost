@@ -53,20 +53,21 @@ namespace Wodsoft.ComBoost.Test
         }
 
         [Fact]
-        public void AsyncTest()
+        public void NoStaticUsingTest()
         {
             var sourceCode = @"
 using System;
 using System.Threading.Tasks;
+using static System.Console;
 
 namespace Wodsoft.ComBoost.Test
 {
     [AutoTemplate]
     public partial class GreeterService : DomainService
     {
-        public async Task Test(Guid id)
+        public Task Test(Guid id)
         {
-
+            return Task.CompletedTask;
         }
     }
 }
@@ -82,6 +83,44 @@ namespace Wodsoft.ComBoost.Test
     public partial interface IGreeterService : global::Wodsoft.ComBoost.IDomainTemplate
     {
         Task Test(Guid id);
+    }
+
+    [global::Wodsoft.ComBoost.DomainTemplateImplementer(typeof(IGreeterService))]
+    public partial class GreeterService { }
+}";
+            Assert.Equal(generatedCode, texts[0]);
+        }
+
+        [Fact]
+        public void AsyncTest()
+        {
+            var sourceCode = @"
+using System;
+using System.Threading.Tasks;
+
+namespace Wodsoft.ComBoost.Test
+{
+    [AutoTemplate]
+    public partial class GreeterService : DomainService
+    {
+        public async Task<string> Test([FromValue] Guid id)
+        {
+            return string.Empty;
+        }
+    }
+}
+";
+            var texts = Run<DomainTemplateSourceGenerator>(sourceCode);
+            Assert.Single(texts);
+            var generatedCode = @"// ComBoost auto generated domain template interface.
+using System;
+using System.Threading.Tasks;
+
+namespace Wodsoft.ComBoost.Test
+{
+    public partial interface IGreeterService : global::Wodsoft.ComBoost.IDomainTemplate
+    {
+        Task<string> Test(Guid id);
     }
 
     [global::Wodsoft.ComBoost.DomainTemplateImplementer(typeof(IGreeterService))]
@@ -602,7 +641,7 @@ namespace Wodsoft.ComBoost.Test
         }
 
         [Fact]
-        public void DoNotGenerateTest()
+        public void DoNotGenerateTest1()
         {
             var sourceCode = @"
 using System;
@@ -631,6 +670,73 @@ namespace Test.ABC
 ";
             var texts = Run<DomainTemplateSourceGenerator>(sourceCode);
             Assert.Empty(texts);
+        }
+
+        [Fact]
+        public void DoNotGenerateTest2()
+        {
+            var sourceCode = @"
+using System;
+using System.Threading.Tasks;
+
+namespace Test.ABC
+{
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
+    public class AutoTemplateAttribute : Attribute { }
+
+    [AutoTemplate]
+    public class GreeterService : Wodsoft.ComBoost.DomainService
+    {
+        public Task Test1(Guid id)
+        {
+            return Task.CompletedTask;
+        }
+    }
+}
+";
+            var texts = Run<DomainTemplateSourceGenerator>(sourceCode);
+            Assert.Empty(texts);
+        }
+
+        [Fact]
+        public void GlobalUsingTest()
+        {
+            var sourceCode = @"
+using System;
+using System.Threading.Tasks;
+
+namespace Test.ABC
+{
+    [AutoTemplate]
+    public partial class GreeterService : DomainService
+    {
+        public Task Test(Guid id)
+        {
+            return Task.CompletedTask;
+        }
+    }
+}
+";
+
+            var globalUsing = @"global using Wodsoft.ComBoost;";
+
+            var texts = Run<DomainTemplateSourceGenerator>(sourceCode, globalUsing);
+            Assert.Single(texts);
+            var generatedCode = @"// ComBoost auto generated domain template interface.
+using System;
+using System.Threading.Tasks;
+
+namespace Test.ABC
+{
+    public partial interface IGreeterService : global::Wodsoft.ComBoost.IDomainTemplate
+    {
+        Task Test(Guid id);
+    }
+
+    [global::Wodsoft.ComBoost.DomainTemplateImplementer(typeof(IGreeterService))]
+    public partial class GreeterService { }
+}";
+            Assert.Equal(generatedCode, texts[0]);
         }
 
         private static List<string> Run<T>(params string[] sources) where T : ISourceGenerator, new()

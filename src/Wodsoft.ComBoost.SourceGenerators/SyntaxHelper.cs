@@ -27,6 +27,8 @@ namespace Wodsoft.ComBoost
                     var f = name.Substring(0, i);
                     foreach (UsingDirectiveSyntax item in ((Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax)nameSyntax.SyntaxTree.GetRoot()).Usings)
                     {
+                        if (!item.StaticKeyword.IsKind(SyntaxKind.None))
+                            continue;
                         if (item.Alias != null)
                         {
                             if (item.Alias.Name.ToString() == f)
@@ -67,6 +69,8 @@ namespace Wodsoft.ComBoost
                 var name = identifierName.Identifier.ValueText;
                 foreach (UsingDirectiveSyntax item in ((Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax)nameSyntax.SyntaxTree.GetRoot()).Usings)
                 {
+                    if (!item.StaticKeyword.IsKind(SyntaxKind.None))
+                        continue;
                     if (item.Alias != null)
                     {
                         if (item.Name.ToString() == fullname && name == item.Alias.Name.ToString())
@@ -135,6 +139,8 @@ namespace Wodsoft.ComBoost
                 {
                     foreach (UsingDirectiveSyntax item in ((Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax)qualifiedName.SyntaxTree.GetRoot()).Usings)
                     {
+                        if (!item.StaticKeyword.IsKind(SyntaxKind.None))
+                            continue;
                         if (item.Alias != null)
                         {
                             if (item.Alias.Name.ToString() == aliasSyntax.Alias.Identifier.Text)
@@ -165,6 +171,14 @@ namespace Wodsoft.ComBoost
                 return genericSyntax.Identifier.Text;
             else
                 throw new NotSupportedException();
+        }
+
+        public static bool IsSameFullName(TypeSyntax nameSyntax, string fullName, SemanticModel model)
+        {
+            var typeInfo = model.GetTypeInfo(nameSyntax);
+            if (typeInfo.Type == null)
+                return false;
+            return typeInfo.Type.ContainingNamespace + "." + typeInfo.Type.Name == fullName;
         }
     }
 }

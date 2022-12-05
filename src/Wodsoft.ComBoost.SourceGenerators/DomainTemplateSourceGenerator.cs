@@ -20,6 +20,9 @@ namespace Wodsoft.ComBoost
             {
                 foreach (var attrSyntax in receiver.Attributes)
                 {
+                    var model = context.Compilation.GetSemanticModel(attrSyntax.SyntaxTree);
+                    if (!SyntaxHelper.IsSameFullName(attrSyntax.Name, "Wodsoft.ComBoost.AutoTemplateAttribute", model))
+                        continue;
                     var classSyntax = attrSyntax.FirstAncestorOrSelf<ClassDeclarationSyntax>();
                     if (classSyntax == null)
                         continue;
@@ -62,6 +65,8 @@ namespace Wodsoft.ComBoost
                     builder.AppendLine("// ComBoost auto generated domain template interface.");
                     foreach (UsingDirectiveSyntax item in ((Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax)attrSyntax.SyntaxTree.GetRoot()).Usings)
                     {
+                        if (!item.StaticKeyword.IsKind(SyntaxKind.None))
+                            continue;
                         if (item.Alias != null)
                             builder.AppendLine($"using {item.Alias.Name} = {item.Name};");
                         else
@@ -79,7 +84,7 @@ namespace Wodsoft.ComBoost
                     var methods = classSyntax.Members.OfType<MethodDeclarationSyntax>().Select(method =>
                     {
                         AttributeSyntax attr;
-                        var query = method.AttributeLists.SelectMany(t => t.Attributes).Where(t => SyntaxHelper.IsSameFullName(t.Name, "Wodsoft.ComBoost.AutoTemplateMethodAttribute", true));
+                        var query = method.AttributeLists.SelectMany(t => t.Attributes).Where(t => SyntaxHelper.IsSameFullName(t.Name, "Wodsoft.ComBoost.AutoTemplateMethodAttribute", model));
                         if (group == null)
                             attr = query.FirstOrDefault(t => t.ArgumentList == null || t.ArgumentList.Arguments.Count == 0 || t.ArgumentList.Arguments.All(x => x.NameEquals.Name.Identifier.ValueText != "Group"));
                         else
@@ -103,12 +108,6 @@ namespace Wodsoft.ComBoost
                             IsExcluded = isExcluded
                         };
                     });
-                    //if (group != null)
-                    //    methods = methods.Where(t => t.AttributeLists.SelectMany(x => x.Attributes)
-                    //        .Any(x => SyntaxHelper.IsSameFullName(x.Name, "AutoTemplateMethodAttribute", true) &&
-                    //                  x.ArgumentList != null &&
-                    //                  x.ArgumentList.Arguments.Any(y => y.NameEquals.Name.Identifier.ValueText == "Group" &&
-                    //                                                  y.Expression is LiteralExpressionSyntax literal && literal.Token.ValueText == group)));
                     if (methods.Any())
                     {
                         if (methods.Any(t => t.IsIncluded == true))
@@ -120,7 +119,7 @@ namespace Wodsoft.ComBoost
                             if ((methodSyntax.Modifiers.Count == 1 && methodSyntax.Modifiers[0].IsKind(SyntaxKind.PublicKeyword)) ||
                                 (methodSyntax.Modifiers.Count == 2 && methodSyntax.Modifiers.Any(t => t.IsKind(SyntaxKind.PublicKeyword)) && methodSyntax.Modifiers.Any(t => t.IsKind(SyntaxKind.AsyncKeyword))))
                             {
-                                if (SyntaxHelper.IsSameFullName(methodSyntax.ReturnType, "System.Threading.Tasks.Task", false))
+                                if (SyntaxHelper.IsSameFullName(methodSyntax.ReturnType, "System.Threading.Tasks.Task", model))
                                 {
                                     builder.Append($"        {methodSyntax.ReturnType} {methodSyntax.Identifier.Text}(");
                                     bool prepend = false;
@@ -128,7 +127,7 @@ namespace Wodsoft.ComBoost
                                     {
                                         if (parameter.AttributeLists.Count == 0 ||
                                             parameter.AttributeLists.SelectMany(t => t.Attributes)
-                                            .Any(t => SyntaxHelper.IsSameFullName(t.Name, "Wodsoft.ComBoost.FromValueAttribute", true)))
+                                            .Any(t => SyntaxHelper.IsSameFullName(t.Name, "Wodsoft.ComBoost.FromValueAttribute", model)))
                                         {
                                             if (prepend)
                                                 builder.Append(", ");
