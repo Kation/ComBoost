@@ -383,24 +383,24 @@ namespace Wodsoft.ComBoost.EntityFrameworkCore.Test
             Assert.NotNull(item.Include);
         }
 
-        [Fact]
-        public async Task DeleteTest()
-        {
-            var databaseContext = SeedData();
-            var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>();
-            Assert.Equal(7, await entityContext.Query().CountAsync());
-            Assert.Equal(2, await entityContext.Query().Where(t => t.ValueInt == 1).DeleteAsync());
-            Assert.Equal(5, await entityContext.Query().CountAsync());
-        }
+        //[Fact]
+        //public async Task DeleteTest()
+        //{
+        //    var databaseContext = SeedData();
+        //    var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>();
+        //    Assert.Equal(7, await entityContext.Query().CountAsync());
+        //    Assert.Equal(2, await entityContext.Query().Where(t => t.ValueInt == 1).DeleteAsync());
+        //    Assert.Equal(5, await entityContext.Query().CountAsync());
+        //}
 
-        [Fact]
-        public async Task UpdateTest()
-        {
-            var databaseContext = SeedData();
-            var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>(); 
-            Assert.Equal(0, await entityContext.Query().CountAsync(t => t.ValueFloat == 99f));
-            Assert.Equal(2, await entityContext.Query().Where(t => t.ValueInt == 1).UpdateAsync(t => t.Property(x => x.ValueFloat, x => 99f).Property(x => x.ValueDouble, x => 99d)));
-            Assert.Equal(2, await entityContext.Query().CountAsync(t => t.ValueFloat == 99f));
-        }
+        //[Fact]
+        //public async Task UpdateTest()
+        //{
+        //    var databaseContext = SeedData();
+        //    var entityContext = (EntityContext<TestEntity>)databaseContext.GetContext<TestEntity>(); 
+        //    Assert.Equal(0, await entityContext.Query().CountAsync(t => t.ValueFloat == 99f));
+        //    Assert.Equal(2, await entityContext.Query().Where(t => t.ValueInt == 1).UpdateAsync(t => t.Property(x => x.ValueFloat, x => 99f).Property(x => x.ValueDouble, x => 99d)));
+        //    Assert.Equal(2, await entityContext.Query().CountAsync(t => t.ValueFloat == 99f));
+        //}
     }
 }
