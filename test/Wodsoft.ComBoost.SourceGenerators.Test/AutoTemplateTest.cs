@@ -53,6 +53,44 @@ namespace Wodsoft.ComBoost.Test
         }
 
         [Fact]
+        public void AsyncTest()
+        {
+            var sourceCode = @"
+using System;
+using System.Threading.Tasks;
+
+namespace Wodsoft.ComBoost.Test
+{
+    [AutoTemplate]
+    public partial class GreeterService : DomainService
+    {
+        public async Task Test(Guid id)
+        {
+
+        }
+    }
+}
+";
+            var texts = Run<DomainTemplateSourceGenerator>(sourceCode);
+            Assert.Single(texts);
+            var generatedCode = @"// ComBoost auto generated domain template interface.
+using System;
+using System.Threading.Tasks;
+
+namespace Wodsoft.ComBoost.Test
+{
+    public partial interface IGreeterService : global::Wodsoft.ComBoost.IDomainTemplate
+    {
+        Task Test(Guid id);
+    }
+
+    [global::Wodsoft.ComBoost.DomainTemplateImplementer(typeof(IGreeterService))]
+    public partial class GreeterService { }
+}";
+            Assert.Equal(generatedCode, texts[0]);
+        }
+
+        [Fact]
         public void PrivateMethodTest()
         {
             var sourceCode = @"
@@ -561,6 +599,38 @@ namespace Wodsoft.ComBoost.Test
     }
 }";
             Assert.Equal(generatedCode2, texts[1]);
+        }
+
+        [Fact]
+        public void DoNotGenerateTest()
+        {
+            var sourceCode = @"
+using System;
+using System.Threading.Tasks;
+using Wodsoft.ComBoost;
+
+namespace Test.ABC
+{
+    public interface IGreeterService { }
+
+    [DomainTemplateImplementer(typeof(""IGreeterService""))]
+    public class GreeterService : DomainService
+    {
+        public Task Test1(Guid id)
+        {
+            return Task.CompletedTask;
+        }
+
+        [AutoTemplateMethod(IsExcluded = true)]
+        public Task Test2(Guid id)
+        {
+            return Task.CompletedTask;
+        }
+    }
+}
+";
+            var texts = Run<DomainTemplateSourceGenerator>(sourceCode);
+            Assert.Empty(texts);
         }
 
         private static List<string> Run<T>(params string[] sources) where T : ISourceGenerator, new()

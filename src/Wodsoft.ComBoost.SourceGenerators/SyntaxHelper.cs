@@ -78,7 +78,8 @@ namespace Wodsoft.ComBoost
                         {
                             if (isAttribute && !name.EndsWith("Attribute"))
                                 name += "Attribute";
-                            return true;
+                            if (name == fullname.Substring(nsIndex + 1))
+                                return true;
                         }
                     }
                 }

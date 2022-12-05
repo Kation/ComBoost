@@ -117,7 +117,8 @@ namespace Wodsoft.ComBoost
                             methods = methods.Where(t => t.IsExcluded != true);
                         foreach (var methodSyntax in methods.Select(t => t.Method))
                         {
-                            if (methodSyntax.Modifiers.Count == 1 && methodSyntax.Modifiers[0].IsKind(SyntaxKind.PublicKeyword))
+                            if ((methodSyntax.Modifiers.Count == 1 && methodSyntax.Modifiers[0].IsKind(SyntaxKind.PublicKeyword)) ||
+                                (methodSyntax.Modifiers.Count == 2 && methodSyntax.Modifiers.Any(t => t.IsKind(SyntaxKind.PublicKeyword)) && methodSyntax.Modifiers.Any(t => t.IsKind(SyntaxKind.AsyncKeyword))))
                             {
                                 if (SyntaxHelper.IsSameFullName(methodSyntax.ReturnType, "System.Threading.Tasks.Task", false))
                                 {
