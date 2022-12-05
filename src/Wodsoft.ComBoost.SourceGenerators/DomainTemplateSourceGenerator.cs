@@ -67,6 +67,8 @@ namespace Wodsoft.ComBoost
                     {
                         if (!item.StaticKeyword.IsKind(SyntaxKind.None))
                             continue;
+                        if (!item.GlobalKeyword.IsKind(SyntaxKind.None))
+                            continue;
                         if (item.Alias != null)
                             builder.AppendLine($"using {item.Alias.Name} = {item.Name};");
                         else
