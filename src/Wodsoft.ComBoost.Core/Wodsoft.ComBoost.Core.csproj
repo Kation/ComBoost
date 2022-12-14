@@ -11,10 +11,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" PrivateAssets="all" GeneratePathProperty="true"/>
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.4.0" PrivateAssets="all" GeneratePathProperty="true"/>
-    <BuildOutputInPackage Include="$(PKGMicrosoft_CodeAnalysis_CSharp)\lib\netstandard2.0\Microsoft.CodeAnalysis.CSharp.dll" TargetPath="/analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.dll"/>
-    <BuildOutputInPackage Include="$(PKGMicrosoft_CodeAnalysis_Common)\lib\netstandard2.0\Microsoft.CodeAnalysis.dll" TargetPath="/analyzers/dotnet/cs/Microsoft.CodeAnalysis.dll"/>
   </ItemGroup>
 
   <ItemGroup>
