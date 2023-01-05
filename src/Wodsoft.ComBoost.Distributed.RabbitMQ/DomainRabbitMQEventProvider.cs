@@ -131,9 +131,24 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             }
             channel.BasicQos(0, _options.PrefetchCount, false);
             var consumer = new AsyncEventingBasicConsumer(channel);
+            var logger = _serviceProvider.GetRequiredService<ILogger<DomainServiceEventHandler<T>>>();
+            consumer.ConsumerCancelled += (sender, e) =>
+            {
+                logger.LogError($"RabbitMQ consumer of \"{typeof(T).FullName}\" cancelled.");
+                return Task.CompletedTask;
+            };
+            consumer.Shutdown += (sender, e) =>
+            {
+                logger.LogError($"RabbitMQ consumer of \"{typeof(T).FullName}\" shutdown. " + e.ReplyText);
+                return Task.CompletedTask;
+            };
+            consumer.Unregistered += (sender, e) =>
+            {
+                logger.LogError($"RabbitMQ consumer of \"{typeof(T).FullName}\" unregistered.");
+                return Task.CompletedTask;
+            };
             consumer.Received += async (sender, e) =>
             {
-                var logger = _serviceProvider.GetRequiredService<ILogger<DomainServiceEventHandler<T>>>();
                 try
                 {
                     using (logger.BeginScope(new DomainRabbitMQLogState(typeof(T).FullName, e.Exchange, e.Redelivered, e.DeliveryTag)))
