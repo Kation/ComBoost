@@ -13,5 +13,7 @@ namespace Wodsoft.ComBoost
         public const string Delay = "DELAY";
 
         public const string Group = "GROUP";
+
+        public const string Retry = "RETRY";
     }
 }

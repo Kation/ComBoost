@@ -37,5 +37,10 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
         {
             return RaiseEvent(new HandleGroupDelayEventArgs { Text = text, Delay = 5000 });
         }
+
+        public Task FireHandleOnceRetry([FromValue] string text)
+        {
+            return RaiseEvent(new HandleOnceRetryEventArgs { Text = text });
+        }
     }
 }

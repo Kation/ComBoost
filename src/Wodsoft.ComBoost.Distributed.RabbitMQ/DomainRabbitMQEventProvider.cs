@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -75,6 +76,19 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     name += "_DELAY";
                     channel.BasicPublish("", name, properties, JsonSerializer.SerializeToUtf8Bytes(args));
                 }
+                else if (features.Contains(DomainDistributedEventFeatures.Retry) && args is IDomainDistributedRetryEvent retryEvent && retryEvent.RetryCount != 0)
+                {
+                    var retryTimesAttribute = typeof(T).GetCustomAttribute<DomainDistributedEventRetryTimesAttribute>();
+                    if (retryTimesAttribute == null)
+                        throw new InvalidOperationException("A distributed event can retry means that must have \"DomainDistributedEventRetryTimesAttribute\" attribute.");
+                    if (retryEvent.RetryCount > retryTimesAttribute.Times.Length)
+                    {
+                        _logger.LogWarning("RabbitMQ event retry count more than limit.");
+                        return;
+                    }
+                    name += "_RETRY_" + retryTimesAttribute.Times[retryEvent.RetryCount - 1];
+                    channel.BasicPublish("", name, properties, JsonSerializer.SerializeToUtf8Bytes(args));
+                }
                 else
                 {
                     if (features.Contains(DomainDistributedEventFeatures.HandleOnce) && !features.Contains(DomainDistributedEventFeatures.Group))
@@ -129,6 +143,30 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 }
                 channel.QueueDeclare(name + "_DELAY", true, false, false, args);
             }
+            else if (features.Contains(DomainDistributedEventFeatures.Retry))
+            {
+                var retryTimesAttribute = typeof(T).GetCustomAttribute<DomainDistributedEventRetryTimesAttribute>();
+                if (retryTimesAttribute == null)
+                    throw new InvalidOperationException("A distributed event can retry means that must have \"DomainDistributedEventRetryTimesAttribute\" attribute.");
+                if (features.Contains(DomainDistributedEventFeatures.HandleOnce) && !features.Contains(DomainDistributedEventFeatures.Group))
+                {
+                    channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
+                    channel.QueueBind(name, name + "_EXCHANGE", "");
+                }
+                for (int i = 0; i < retryTimesAttribute.Times.Length; i++)
+                {
+                    var time = retryTimesAttribute.Times[i];
+                    if (i > 0 && time == retryTimesAttribute.Times[i - 1])
+                        continue;
+                    var args = new Dictionary<string, object>();
+                    //Quorum does not support message ttl
+                    //if (_options.UseQuorum)
+                    //    args["x-queue-type"] = "quorum";
+                    args["x-message-ttl"] = time;
+                    args["x-dead-letter-exchange"] = name + "_EXCHANGE";
+                    channel.QueueDeclare(name + "_RETRY_" + time, true, false, false, args);
+                }
+            }
             channel.BasicQos(0, _options.PrefetchCount, false);
             var consumer = new AsyncEventingBasicConsumer(channel);
             var logger = _serviceProvider.GetRequiredService<ILogger<DomainServiceEventHandler<T>>>();
@@ -144,7 +182,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             };
             consumer.Unregistered += (sender, e) =>
             {
-                logger.LogError($"RabbitMQ consumer of \"{typeof(T).FullName}\" unregistered.");
+                logger.LogInformation($"RabbitMQ consumer of \"{typeof(T).FullName}\" unregistered.");
                 return Task.CompletedTask;
             };
             consumer.Received += async (sender, e) =>
@@ -160,14 +198,21 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         try
                         {
                             await handler(executionContext, args);
-                            channel.BasicAck(e.DeliveryTag, false);
-                            logger.LogInformation("RabbitMQ event handle successfully.");
                         }
                         catch (Exception ex)
                         {
-                            channel.BasicNack(e.DeliveryTag, false, true);
+                            if (args is IDomainDistributedRetryEvent retryEvent)
+                            {
+                                retryEvent.RetryCount++;
+                                logger.LogError(ex, "RabbitMQ event handle error and going to retry it.");
+                                await SendEventAsync(args, features);
+                            }
+                            else
+                                channel.BasicNack(e.DeliveryTag, false, true);
                             logger.LogError(ex, "RabbitMQ event handle error.");
                         }
+                        channel.BasicAck(e.DeliveryTag, false);
+                        logger.LogInformation("RabbitMQ event handle successfully.");
                     }
                 }
                 catch (Exception ex)
@@ -212,12 +257,15 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             var type = typeof(T);
             bool result = true;
             bool must = false;
+            bool retry = false;
+            bool once = false;
             foreach (var feature in features)
             {
                 switch (feature)
                 {
                     case DomainDistributedEventFeatures.HandleOnce:
                         result = true;
+                        once = true;
                         break;
                     case DomainDistributedEventFeatures.MustHandle:
                         must = true;
@@ -228,10 +276,16 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     case DomainDistributedEventFeatures.Group:
                         result = true;
                         break;
+                    case DomainDistributedEventFeatures.Retry:
+                        result = true;
+                        retry = true;
+                        break;
                     default:
                         return false;
                 }
             }
+            if (retry & !once)
+                return false;
             return result && must;
         }
     }
