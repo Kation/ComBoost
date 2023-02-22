@@ -173,6 +173,14 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             consumer.ConsumerCancelled += (sender, e) =>
             {
                 logger.LogError($"RabbitMQ consumer of \"{typeof(T).FullName}\" cancelled.");
+                try
+                {
+                    channel.BasicConsume(queueName, false, consumer);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, $"RabbitMQ consumer of \"{typeof(T).FullName}\" retry consume failed.");
+                }
                 return Task.CompletedTask;
             };
             consumer.Shutdown += (sender, e) =>
@@ -195,9 +203,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         var args = JsonSerializer.Deserialize<T>(e.Body.Span)!;
                         DomainContext domainContext = new EmptyDomainContext(_serviceProvider.CreateScope().ServiceProvider, default(CancellationToken));
                         DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
+                        bool isSuccess = false;
                         try
                         {
                             await handler(executionContext, args);
+                            isSuccess = true;
                         }
                         catch (Exception ex)
                         {
@@ -211,8 +221,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                                 channel.BasicNack(e.DeliveryTag, false, true);
                             logger.LogError(ex, "RabbitMQ event handle error.");
                         }
-                        channel.BasicAck(e.DeliveryTag, false);
-                        logger.LogInformation("RabbitMQ event handle successfully.");
+                        if (isSuccess)
+                        {
+                            channel.BasicAck(e.DeliveryTag, false);
+                            logger.LogInformation("RabbitMQ event handle successfully.");
+                        }
                     }
                 }
                 catch (Exception ex)
