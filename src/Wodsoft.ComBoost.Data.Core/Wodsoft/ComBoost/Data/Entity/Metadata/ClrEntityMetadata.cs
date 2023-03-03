@@ -56,7 +56,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             }
             else
             {
-                KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(multipleKeyAttribute.Keys.Select(t => GetProperty(t) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not contains key property.")).ToArray());
+                KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(multipleKeyAttribute.Keys.Select(t => GetProperty(t) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not exist key property \"{t}\".")).ToArray());
             }
 
             DisplayColumnAttribute displayColumn = Type.GetTypeInfo().GetCustomAttribute<DisplayColumnAttribute>();
