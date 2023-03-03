@@ -47,6 +47,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// <summary>
         /// 获取是否是新创建的实体。
         /// </summary>
+        [Obsolete("No used anymore.")]
         bool IsNewCreated { get; }
     }
 }

@@ -47,12 +47,14 @@ namespace Wodsoft.ComBoost.Data.Entity
         [Hide]
         public virtual bool IsRemoveAllowed { get { return true; } }
 
+        [Obsolete]
         bool IEntity.IsNewCreated { get { return IsNewCreated; } }
 
         /// <summary>
         /// 获取是否是新创建的实体。
         /// </summary>
-        protected abstract bool IsNewCreated { get; }
+        [Obsolete("No used anymore.")]
+        protected virtual bool IsNewCreated => false;
 
         /// <summary>
         /// 创建完毕。
