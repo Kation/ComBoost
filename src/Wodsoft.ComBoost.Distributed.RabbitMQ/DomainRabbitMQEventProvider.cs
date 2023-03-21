@@ -173,14 +173,6 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             consumer.ConsumerCancelled += (sender, e) =>
             {
                 logger.LogError($"RabbitMQ consumer of \"{typeof(T).FullName}\" cancelled.");
-                try
-                {
-                    channel.BasicConsume(queueName, false, consumer);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, $"RabbitMQ consumer of \"{typeof(T).FullName}\" retry consume failed.");
-                }
                 return Task.CompletedTask;
             };
             consumer.Shutdown += (sender, e) =>
@@ -191,6 +183,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             consumer.Unregistered += (sender, e) =>
             {
                 logger.LogInformation($"RabbitMQ consumer of \"{typeof(T).FullName}\" unregistered.");
+                return Task.CompletedTask;
+            };
+            consumer.Registered += (sender, e) =>
+            {
+                logger.LogInformation($"RabbitMQ consumer of \"{typeof(T).FullName}\" registered.");
                 return Task.CompletedTask;
             };
             consumer.Received += async (sender, e) =>
@@ -215,7 +212,18 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                             {
                                 retryEvent.RetryCount++;
                                 logger.LogError(ex, "RabbitMQ event handle error and going to retry it.");
-                                await SendEventAsync(args, features);
+                                bool retrySuccess = false;
+                                try
+                                {
+                                    await SendEventAsync(args, features);
+                                    retrySuccess = true;
+                                }
+                                catch
+                                {
+                                    channel.BasicNack(e.DeliveryTag, false, true);
+                                }
+                                if (retrySuccess)
+                                    channel.BasicAck(e.DeliveryTag, false);
                             }
                             else
                                 channel.BasicNack(e.DeliveryTag, false, true);
