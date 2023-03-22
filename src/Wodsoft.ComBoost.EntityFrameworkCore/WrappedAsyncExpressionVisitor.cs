@@ -54,9 +54,42 @@ namespace Wodsoft.ComBoost.Data.Entity
                         }
                     case "ToArrayAsync":
                     case "ToListAsync":
+                    case "DeleteAsync":
                         {
                             var method = MapMethod(node.Method);
                             return Expression.Call(method, Visit(node.Arguments[0]), node.Arguments[1]);
+                        }
+                    case "UpdateAsync":
+                        {
+#if NET6_0
+                            var method = MapMethod(node.Method);
+                            var updateCaller = (LambdaExpression)((ConstantExpression)node.Arguments[1]).Value!;
+                            var callType = typeof(SetPropertyCalls<>).MakeGenericType(updateCaller.ReturnType.GetGenericArguments());
+                            ParameterExpression parameterExpression = Expression.Parameter(callType, "c");
+                            Expression originExpression = updateCaller.Body!;
+                            List<(Type, LambdaExpression, LambdaExpression)> properties = new List<(Type, LambdaExpression, LambdaExpression)>();
+                            while (originExpression.NodeType == ExpressionType.Call)
+                            {
+                                MethodCallExpression methodCallExpression = (MethodCallExpression)originExpression;
+                                if (!methodCallExpression.Method.DeclaringType!.IsGenericType || methodCallExpression.Method.DeclaringType.GetGenericTypeDefinition() != typeof(Wodsoft.ComBoost.Data.Linq.UpdateCaller<>))
+                                    throw new NotSupportedException("更新函数内仅支持调用Property方法。");
+                                //methodCallExpression.Arguments[0]
+                                properties.Add((methodCallExpression.Method.GetGenericArguments()[0], (LambdaExpression)methodCallExpression.Arguments[0], (LambdaExpression)methodCallExpression.Arguments[1]));
+                                originExpression = methodCallExpression.Object!;
+                            }
+                            if (originExpression.NodeType != ExpressionType.Parameter)
+                                throw new NotSupportedException("更新函数内仅支持调用Property方法。");
+                            var setParameter = typeof(Func<,>).MakeGenericType(callType.GetGenericArguments()[0], Type.MakeGenericMethodParameter(0));
+                            var setMethod = callType.GetMethod("SetProperty", BindingFlags.Public | BindingFlags.Instance, new Type[] { setParameter, setParameter })!;
+                            Expression? expression = null;
+                            foreach (var property in properties)
+                            {
+                                var setMethodInstance = setMethod.MakeGenericMethod(property.Item1);
+                                expression = Expression.Call(expression ?? parameterExpression, setMethodInstance, property.Item2, property.Item3);
+                            }
+                            return Expression.Call(method, Visit(node.Arguments[0]), Expression.Lambda(typeof(Func<,>).MakeGenericType(callType, callType), expression!, parameterExpression), node.Arguments[2]);
+#endif
+                            throw new NotSupportedException();
                         }
                     case "ToDictionaryAsync":
                         {
@@ -134,6 +167,13 @@ namespace Wodsoft.ComBoost.Data.Entity
                         case "ToArrayAsync":
                         case "ToListAsync":
                             return typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name)!.MakeGenericMethod(method.GetGenericArguments());
+                        case "DeleteAsync":
+                        case "UpdateAsync":
+#if NET6_0
+                            return typeof(RelationalQueryableExtensions).GetMethod("Execute" + method.Name)!.MakeGenericMethod(method.GetGenericArguments());
+#else
+                            throw new NotSupportedException("Not support below .NET 6.");
+#endif
                         case "AsTracking":
                         case "AsNoTracking":
                             return typeof(EntityFrameworkQueryableExtensions).GetMethod(method.Name, 1, new Type[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) })!.MakeGenericMethod(method.GetGenericArguments());

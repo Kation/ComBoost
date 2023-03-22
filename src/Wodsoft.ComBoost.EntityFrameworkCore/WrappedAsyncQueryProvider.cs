@@ -94,7 +94,12 @@ namespace Wodsoft.ComBoost.Data.Entity
                         }
                     case "ToArrayAsync":
                     case "ToListAsync":
+                    case "ExecuteDeleteAsync":
                         parameters.Add(((ConstantExpression)methodExpression.Arguments[1]).Value);
+                        break;
+                    case "ExecuteUpdateAsync":
+                        parameters.Add(((UnaryExpression)methodExpression.Arguments[1]).Operand);
+                        parameters.Add(((ConstantExpression)methodExpression.Arguments[2]).Value);
                         break;
                     case "ToDictionaryAsync":
                         {

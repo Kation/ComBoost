@@ -50,7 +50,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region All
 
-        private static readonly MethodInfo AllAsyncMethodInfo
+        private static readonly MethodInfo _AllAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethod(nameof(AllAsync));
         public static Task<bool> AllAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
@@ -63,7 +63,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<bool>(Expression.Call(
                             instance: null,
-                            method: AllAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AllAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(predicate), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -73,7 +73,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region Any
 
-        private static readonly MethodInfo AnyAsyncMethodInfo
+        private static readonly MethodInfo _AnyAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AnyAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -85,13 +85,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<bool>(Expression.Call(
                             instance: null,
-                            method: AnyAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AnyAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AnyPredicateAsyncMethodInfo
+        private static readonly MethodInfo _AnyPredicateAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AnyAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -105,7 +105,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<bool>(Expression.Call(
                             instance: null,
-                            method: AnyPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AnyPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(predicate), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -115,7 +115,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region Average
 
-        private static readonly MethodInfo AverageLongToDoubleNullableAsyncMethodInfo
+        private static readonly MethodInfo _AverageLongToDoubleNullableAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<double?>) && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1] == typeof(long?));
@@ -129,13 +129,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double?>(Expression.Call(
                             instance: null,
-                            method: AverageLongToDoubleNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AverageLongToDoubleNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageLongToDoubleAsyncMethodInfo
+        private static readonly MethodInfo _AverageLongToDoubleAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<double>) && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1] == typeof(long));
@@ -149,13 +149,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double>(Expression.Call(
                             instance: null,
-                            method: AverageLongToDoubleAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AverageLongToDoubleAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageFloatNullableAsyncMethodInfo
+        private static readonly MethodInfo _AverageFloatNullableAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<float?>));
@@ -169,13 +169,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<float?>(Expression.Call(
                             instance: null,
-                            method: AverageFloatNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AverageFloatNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageFloatAsyncMethodInfo
+        private static readonly MethodInfo _AverageFloatAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<float>));
@@ -189,13 +189,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<float>(Expression.Call(
                             instance: null,
-                            method: AverageFloatAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AverageFloatAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageFloatNullableNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _AverageFloatNullableNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<float?>));
@@ -207,13 +207,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<float?>(Expression.Call(
                             instance: null,
-                            method: AverageFloatNullableNonSelectAsyncMethodInfo,
+                            method: _AverageFloatNullableNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageFloatNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _AverageFloatNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<float>));
@@ -225,13 +225,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<float>(Expression.Call(
                             instance: null,
-                            method: AverageFloatNonSelectAsyncMethodInfo,
+                            method: _AverageFloatNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageDoubleNullableAsyncMethodInfo
+        private static readonly MethodInfo _AverageDoubleNullableAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<double?>) && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1] == typeof(double?));
@@ -245,13 +245,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double?>(Expression.Call(
                             instance: null,
-                            method: AverageDoubleNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AverageDoubleNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageDoubleAsyncMethodInfo
+        private static readonly MethodInfo _AverageDoubleAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<double>) && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1] == typeof(double));
@@ -265,13 +265,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double>(Expression.Call(
                             instance: null,
-                            method: AverageDoubleAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AverageDoubleAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageDoubleNullableNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _AverageDoubleNullableNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<double?>) && t.GetParameters()[0].ParameterType.GetGenericArguments()[0] == typeof(double?));
@@ -283,13 +283,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double?>(Expression.Call(
                             instance: null,
-                            method: AverageDoubleNullableNonSelectAsyncMethodInfo,
+                            method: _AverageDoubleNullableNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageDecimalNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _AverageDecimalNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<decimal>));
@@ -301,13 +301,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<decimal>(Expression.Call(
                             instance: null,
-                            method: AverageDecimalNonSelectAsyncMethodInfo,
+                            method: _AverageDecimalNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageDoubleNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _AverageDoubleNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<double>) && t.GetParameters()[0].ParameterType.GetGenericArguments()[0] == typeof(double));
@@ -319,13 +319,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double>(Expression.Call(
                             instance: null,
-                            method: AverageDoubleNonSelectAsyncMethodInfo,
+                            method: _AverageDoubleNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageDecimalAsyncMethodInfo
+        private static readonly MethodInfo _AverageDecimalAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<decimal>));
@@ -339,13 +339,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<decimal>(Expression.Call(
                             instance: null,
-                            method: AverageDecimalAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AverageDecimalAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageDecimalNullableAsyncMethodInfo
+        private static readonly MethodInfo _AverageDecimalNullableAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<decimal?>));
@@ -359,13 +359,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<decimal?>(Expression.Call(
                             instance: null,
-                            method: AverageDecimalNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AverageDecimalNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageIntToDoubleNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _AverageIntToDoubleNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<double>) && t.GetParameters()[0].ParameterType.GetGenericArguments()[0] == typeof(int));
@@ -377,13 +377,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double>(Expression.Call(
                             instance: null,
-                            method: AverageIntToDoubleNonSelectAsyncMethodInfo,
+                            method: _AverageIntToDoubleNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageIntToDoubleNullableNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _AverageIntToDoubleNullableNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<double?>) && t.GetParameters()[0].ParameterType.GetGenericArguments()[0] == typeof(int?));
@@ -395,13 +395,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double?>(Expression.Call(
                             instance: null,
-                            method: AverageIntToDoubleNullableNonSelectAsyncMethodInfo,
+                            method: _AverageIntToDoubleNullableNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageIntToDoubleAsyncMethodInfo
+        private static readonly MethodInfo _AverageIntToDoubleAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<double>) && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1] == typeof(int));
@@ -415,13 +415,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double>(Expression.Call(
                             instance: null,
-                            method: AverageIntToDoubleAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AverageIntToDoubleAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageIntToDoubleNullableAsyncMethodInfo
+        private static readonly MethodInfo _AverageIntToDoubleNullableAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<double?>) && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1] == typeof(int?));
@@ -435,13 +435,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double?>(Expression.Call(
                             instance: null,
-                            method: AverageIntToDoubleNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _AverageIntToDoubleNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageLongToDoubleNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _AverageLongToDoubleNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<double>) && t.GetParameters()[0].ParameterType.GetGenericArguments()[0] == typeof(long));
@@ -453,13 +453,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double>(Expression.Call(
                             instance: null,
-                            method: AverageLongToDoubleNonSelectAsyncMethodInfo,
+                            method: _AverageLongToDoubleNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageLongToDoubleNullableNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _AverageLongToDoubleNullableNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<double?>) && t.GetParameters()[0].ParameterType.GetGenericArguments()[0] == typeof(int?));
@@ -471,13 +471,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double?>(Expression.Call(
                             instance: null,
-                            method: AverageLongToDoubleNullableNonSelectAsyncMethodInfo,
+                            method: _AverageLongToDoubleNullableNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo AverageDecimalNullableNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _AverageDecimalNullableNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(AverageAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<decimal?>));
@@ -489,7 +489,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<decimal?>(Expression.Call(
                             instance: null,
-                            method: AverageDecimalNullableNonSelectAsyncMethodInfo,
+                            method: _AverageDecimalNullableNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -499,7 +499,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region Count
 
-        private static readonly MethodInfo CountAsyncMethodInfo
+        private static readonly MethodInfo _CountAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(CountAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -511,13 +511,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<int>(Expression.Call(
                             instance: null,
-                            method: CountAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _CountAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo CountPredicateAsyncMethodInfo
+        private static readonly MethodInfo _CountPredicateAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(CountAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -531,13 +531,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<int>(Expression.Call(
                             instance: null,
-                            method: CountPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _CountPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(predicate), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo LongCountAsyncMethodInfo
+        private static readonly MethodInfo _LongCountAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(LongCountAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -549,13 +549,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<long>(Expression.Call(
                             instance: null,
-                            method: LongCountAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _LongCountAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo LongCountPredicateAsyncMethodInfo
+        private static readonly MethodInfo _LongCountPredicateAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(LongCountAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -569,7 +569,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<long>(Expression.Call(
                             instance: null,
-                            method: LongCountPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _LongCountPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(predicate), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -580,7 +580,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region First
 
-        private static readonly MethodInfo FirstAsyncMethodInfo
+        private static readonly MethodInfo _FirstAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(FirstAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -592,13 +592,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: FirstAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _FirstAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo FirstPredicateAsyncMethodInfo
+        private static readonly MethodInfo _FirstPredicateAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(FirstAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -612,13 +612,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: FirstPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _FirstPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(predicate), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo FirstOrDefaultAsyncMethodInfo
+        private static readonly MethodInfo _FirstOrDefaultAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(FirstOrDefaultAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -630,13 +630,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: FirstOrDefaultAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _FirstOrDefaultAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo FirstOrDefaultPredicateAsyncMethodInfo
+        private static readonly MethodInfo _FirstOrDefaultPredicateAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(FirstOrDefaultAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -650,7 +650,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: FirstOrDefaultPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _FirstOrDefaultPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(predicate), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -660,7 +660,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region Last
 
-        private static readonly MethodInfo LastAsyncMethodInfo
+        private static readonly MethodInfo _LastAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(LastAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -672,13 +672,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: LastAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _LastAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo LastPredicateAsyncMethodInfo
+        private static readonly MethodInfo _LastPredicateAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(LastAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -692,13 +692,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: LastPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _LastPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(predicate), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo LastOrDefaultAsyncMethodInfo
+        private static readonly MethodInfo _LastOrDefaultAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(LastOrDefaultAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -710,13 +710,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: LastOrDefaultAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _LastOrDefaultAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo LastOrDefaultPredicateAsyncMethodInfo
+        private static readonly MethodInfo _LastOrDefaultPredicateAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(LastOrDefaultAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -730,7 +730,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: LastOrDefaultPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _LastOrDefaultPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(predicate), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -740,7 +740,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region Max
 
-        private static readonly MethodInfo MaxNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _MaxNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(MaxAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -752,13 +752,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: MaxNonSelectAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _MaxNonSelectAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo MaxAsyncMethodInfo
+        private static readonly MethodInfo _MaxAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(MaxAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -772,7 +772,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TResult>(Expression.Call(
                             instance: null,
-                            method: MaxAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TResult)),
+                            method: _MaxAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TResult)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -782,7 +782,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region Min
 
-        private static readonly MethodInfo MinNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _MinNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(MinAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -794,13 +794,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: MinNonSelectAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _MinNonSelectAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo MinAsyncMethodInfo
+        private static readonly MethodInfo _MinAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(MinAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -814,7 +814,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TResult>(Expression.Call(
                             instance: null,
-                            method: MinAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TResult)),
+                            method: _MinAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TResult)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -824,7 +824,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region Single
 
-        private static readonly MethodInfo SingleAsyncMethodInfo
+        private static readonly MethodInfo _SingleAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SingleAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -836,13 +836,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: SingleAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SingleAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SinglePredicateAsyncMethodInfo
+        private static readonly MethodInfo _SinglePredicateAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SingleAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -856,13 +856,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: SinglePredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SinglePredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(predicate), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SingleOrDefaultAsyncMethodInfo
+        private static readonly MethodInfo _SingleOrDefaultAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SingleOrDefaultAsync))
                 .First(t => t.GetParameters().Length == 2);
@@ -874,13 +874,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: SingleOrDefaultAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SingleOrDefaultAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SingleOrDefaultPredicateAsyncMethodInfo
+        private static readonly MethodInfo _SingleOrDefaultPredicateAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SingleOrDefaultAsync))
                 .First(t => t.GetParameters().Length == 3);
@@ -894,7 +894,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource>(Expression.Call(
                             instance: null,
-                            method: SingleOrDefaultPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SingleOrDefaultPredicateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(predicate), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -904,7 +904,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region Sum
 
-        private static readonly MethodInfo SumFloatAsyncMethodInfo
+        private static readonly MethodInfo _SumFloatAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<float>));
@@ -918,13 +918,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<float>(Expression.Call(
                             instance: null,
-                            method: SumFloatAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SumFloatAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumFloatNullableNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _SumFloatNullableNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<float?>));
@@ -936,13 +936,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<float?>(Expression.Call(
                             instance: null,
-                            method: SumFloatNullableNonSelectAsyncMethodInfo,
+                            method: _SumFloatNullableNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumDecimalNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _SumDecimalNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<decimal>));
@@ -954,13 +954,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<decimal>(Expression.Call(
                             instance: null,
-                            method: SumDecimalNonSelectAsyncMethodInfo,
+                            method: _SumDecimalNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumDecimalNullableNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _SumDecimalNullableNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<decimal?>));
@@ -972,13 +972,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<decimal?>(Expression.Call(
                             instance: null,
-                            method: SumDecimalNullableNonSelectAsyncMethodInfo,
+                            method: _SumDecimalNullableNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumDecimalAsyncMethodInfo
+        private static readonly MethodInfo _SumDecimalAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<decimal>));
@@ -992,13 +992,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<decimal>(Expression.Call(
                             instance: null,
-                            method: SumDecimalAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SumDecimalAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumDecimalNullableAsyncMethodInfo
+        private static readonly MethodInfo _SumDecimalNullableAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<decimal?>));
@@ -1012,13 +1012,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<decimal?>(Expression.Call(
                             instance: null,
-                            method: SumDecimalNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SumDecimalNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumIntNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _SumIntNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<int>));
@@ -1030,13 +1030,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<int>(Expression.Call(
                             instance: null,
-                            method: SumIntNonSelectAsyncMethodInfo,
+                            method: _SumIntNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumIntNullableNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _SumIntNullableNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<int?>));
@@ -1048,13 +1048,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<int?>(Expression.Call(
                             instance: null,
-                            method: SumIntNullableNonSelectAsyncMethodInfo,
+                            method: _SumIntNullableNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumIntAsyncMethodInfo
+        private static readonly MethodInfo _SumIntAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<int>));
@@ -1068,13 +1068,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<int>(Expression.Call(
                             instance: null,
-                            method: SumIntAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SumIntAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumFloatNullableAsyncMethodInfo
+        private static readonly MethodInfo _SumFloatNullableAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<float?>));
@@ -1088,13 +1088,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<float?>(Expression.Call(
                             instance: null,
-                            method: SumFloatNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SumFloatNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumLongNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _SumLongNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<long>));
@@ -1106,13 +1106,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<long>(Expression.Call(
                             instance: null,
-                            method: SumLongNonSelectAsyncMethodInfo,
+                            method: _SumLongNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumIntNullableAsyncMethodInfo
+        private static readonly MethodInfo _SumIntNullableAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<int?>));
@@ -1126,13 +1126,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<int?>(Expression.Call(
                             instance: null,
-                            method: SumIntNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SumIntNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumDoubleAsyncMethodInfo
+        private static readonly MethodInfo _SumDoubleAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<double>) && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1] == typeof(double));
@@ -1146,13 +1146,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double>(Expression.Call(
                             instance: null,
-                            method: SumDoubleAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SumDoubleAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumFloatNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _SumFloatNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<float>));
@@ -1164,13 +1164,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<float>(Expression.Call(
                             instance: null,
-                            method: SumFloatNonSelectAsyncMethodInfo,
+                            method: _SumFloatNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumDoubleNullableAsyncMethodInfo
+        private static readonly MethodInfo _SumDoubleNullableAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<double?>) && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1] == typeof(double?));
@@ -1184,13 +1184,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double?>(Expression.Call(
                             instance: null,
-                            method: SumDoubleNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SumDoubleNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumLongAsyncMethodInfo
+        private static readonly MethodInfo _SumLongAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<long>) && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1] == typeof(long));
@@ -1204,13 +1204,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<long>(Expression.Call(
                             instance: null,
-                            method: SumLongAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SumLongAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumLongNullableAsyncMethodInfo
+        private static readonly MethodInfo _SumLongNullableAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => t.IsGenericMethod && t.ReturnType == typeof(Task<long?>) && t.GetParameters()[1].ParameterType.GetGenericArguments()[0].GetGenericArguments()[1] == typeof(long?));
@@ -1224,13 +1224,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<long?>(Expression.Call(
                             instance: null,
-                            method: SumLongNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _SumLongNullableAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Quote(selector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumDoubleNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _SumDoubleNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<double>) && t.GetParameters()[0].ParameterType.GetGenericArguments()[0] == typeof(double));
@@ -1242,13 +1242,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double>(Expression.Call(
                             instance: null,
-                            method: SumDoubleNonSelectAsyncMethodInfo,
+                            method: _SumDoubleNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumDoubleNullableNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _SumDoubleNullableNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<double?>) && t.GetParameters()[0].ParameterType.GetGenericArguments()[0] == typeof(double?));
@@ -1260,13 +1260,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<double?>(Expression.Call(
                             instance: null,
-                            method: SumDoubleNullableNonSelectAsyncMethodInfo,
+                            method: _SumDoubleNullableNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo SumLongNullableNonSelectAsyncMethodInfo
+        private static readonly MethodInfo _SumLongNullableNonSelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(SumAsync))
                 .First(t => !t.IsGenericMethod && t.ReturnType == typeof(Task<long?>) && t.GetParameters()[0].ParameterType.GetGenericArguments()[0] == typeof(long?));
@@ -1278,7 +1278,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<long?>(Expression.Call(
                             instance: null,
-                            method: SumLongNullableNonSelectAsyncMethodInfo,
+                            method: _SumLongNullableNonSelectAsyncMethodInfo,
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -1288,7 +1288,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region ToArray
 
-        private static readonly MethodInfo ToArrayAsyncMethodInfo
+        private static readonly MethodInfo _ToArrayAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethod(nameof(ToArrayAsync));
         public static Task<TSource[]> ToArrayAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
@@ -1299,7 +1299,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<TSource[]>(Expression.Call(
                             instance: null,
-                            method: ToArrayAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _ToArrayAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -1309,7 +1309,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region ToDictionary
 
-        private static readonly MethodInfo ToDictionaryAsyncMethodInfo
+        private static readonly MethodInfo _ToDictionaryAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(ToDictionaryAsync))
                 .First(t => t.GetGenericArguments().Length == 2 && t.GetParameters().Length == 3);
@@ -1323,13 +1323,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<Dictionary<TKey, TSource>>(Expression.Call(
                             instance: null,
-                            method: ToDictionaryAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TKey)),
+                            method: _ToDictionaryAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TKey)),
                             arguments: new[] { source.Expression, Expression.Constant(keySelector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo ToDictionaryWithComparerAsyncMethodInfo
+        private static readonly MethodInfo _ToDictionaryWithComparerAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(ToDictionaryAsync))
                 .First(t => t.GetGenericArguments().Length == 2 && t.GetParameters().Length == 4);
@@ -1345,13 +1345,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<Dictionary<TKey, TSource>>(Expression.Call(
                             instance: null,
-                            method: ToDictionaryWithComparerAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TKey)),
+                            method: _ToDictionaryWithComparerAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TKey)),
                             arguments: new[] { source.Expression, Expression.Constant(keySelector), Expression.Constant(comparer), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo ToDictionarySelectAsyncMethodInfo
+        private static readonly MethodInfo _ToDictionarySelectAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(ToDictionaryAsync))
                 .First(t => t.GetGenericArguments().Length == 3 && t.GetParameters().Length == 4);
@@ -1367,13 +1367,13 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<Dictionary<TKey, TElement>>(Expression.Call(
                             instance: null,
-                            method: ToDictionarySelectAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TKey), typeof(TElement)),
+                            method: _ToDictionarySelectAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TKey), typeof(TElement)),
                             arguments: new[] { source.Expression, Expression.Constant(keySelector), Expression.Constant(elementSelector), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
         }
 
-        private static readonly MethodInfo ToDictionarySelectWithComparerAsyncMethodInfo
+        private static readonly MethodInfo _ToDictionarySelectWithComparerAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(ToDictionaryAsync))
                 .First(t => t.GetGenericArguments().Length == 3 && t.GetParameters().Length == 5);
@@ -1391,7 +1391,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<Dictionary<TKey, TElement>>(Expression.Call(
                             instance: null,
-                            method: ToDictionarySelectAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TKey), typeof(TElement)),
+                            method: _ToDictionarySelectAsyncMethodInfo.MakeGenericMethod(typeof(TSource), typeof(TKey), typeof(TElement)),
                             arguments: new[] { source.Expression, Expression.Constant(keySelector), Expression.Constant(elementSelector), Expression.Constant(comparer), Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -1402,7 +1402,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region ToList
 
-        private static readonly MethodInfo ToListAsyncMethodInfo
+        private static readonly MethodInfo _ToListAsyncMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethod(nameof(ToListAsync));
         public static Task<List<TSource>> ToListAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
@@ -1413,7 +1413,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             {
                 return provider.ExecuteAsync<List<TSource>>(Expression.Call(
                             instance: null,
-                            method: ToListAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            method: _ToListAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
             }
             throw new NotSupportedException("该查询体不支持此操作。");
@@ -1423,7 +1423,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         #region Include
 
-        private static readonly MethodInfo IncludeMethodInfo
+        private static readonly MethodInfo _IncludeMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(Include))
                 .Single(
@@ -1435,15 +1435,19 @@ namespace Wodsoft.ComBoost.Data.Linq
         public static IIncludableQueryable<TEntity, TProperty> Include<TEntity, TProperty>(this IQueryable<TEntity> source, Expression<Func<TEntity, TProperty>> navigationPropertyPath)
             where TEntity : class
         {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (navigationPropertyPath == null)
+                throw new ArgumentNullException(nameof(navigationPropertyPath));
             return new AsyncIncludableQueryableWrapper<TEntity, TProperty>(
                 source.Provider.CreateQuery<TEntity>(
                         Expression.Call(
                             instance: null,
-                            method: IncludeMethodInfo.MakeGenericMethod(typeof(TEntity), typeof(TProperty)),
+                            method: _IncludeMethodInfo.MakeGenericMethod(typeof(TEntity), typeof(TProperty)),
                             arguments: new[] { source.Expression, Expression.Quote(navigationPropertyPath) })));
         }
 
-        private static readonly MethodInfo StringIncludeMethodInfo
+        private static readonly MethodInfo _StringIncludeMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(Include))
                 .Single(
@@ -1452,16 +1456,20 @@ namespace Wodsoft.ComBoost.Data.Linq
         public static IQueryable<TEntity> Include<TEntity>(this IQueryable<TEntity> source, string navigationPropertyPath)
             where TEntity : class
         {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (navigationPropertyPath == null)
+                throw new ArgumentNullException(nameof(navigationPropertyPath));
             return new AsyncQueryableWrapper<TEntity>(
                 source.Provider.CreateQuery<TEntity>(
                         Expression.Call(
                             instance: null,
-                            method: StringIncludeMethodInfo.MakeGenericMethod(typeof(TEntity)),
+                            method: _StringIncludeMethodInfo.MakeGenericMethod(typeof(TEntity)),
                             arg0: source.Expression,
                             arg1: Expression.Constant(navigationPropertyPath))));
         }
 
-        private static readonly MethodInfo ThenIncludeAfterEnumerableMethodInfo
+        private static readonly MethodInfo _ThenIncludeAfterEnumerableMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(ThenInclude))
                 .Where(mi => mi.GetGenericArguments().Count() == 3)
@@ -1473,7 +1481,7 @@ namespace Wodsoft.ComBoost.Data.Linq
                             && typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
                     });
 
-        private static readonly MethodInfo ThenIncludeAfterReferenceMethodInfo
+        private static readonly MethodInfo _ThenIncludeAfterReferenceMethodInfo
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(ThenInclude))
                 .Single(
@@ -1484,25 +1492,37 @@ namespace Wodsoft.ComBoost.Data.Linq
             this IIncludableQueryable<TEntity, IEnumerable<TPreviousProperty>> source,
             Expression<Func<TPreviousProperty, TProperty>> navigationPropertyPath)
             where TEntity : class
-            => new AsyncIncludableQueryableWrapper<TEntity, TProperty>(
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (navigationPropertyPath == null)
+                throw new ArgumentNullException(nameof(navigationPropertyPath));
+            return new AsyncIncludableQueryableWrapper<TEntity, TProperty>(
                 source.Provider.CreateQuery<TEntity>(
                     Expression.Call(
                         instance: null,
-                        method: ThenIncludeAfterEnumerableMethodInfo.MakeGenericMethod(
+                        method: _ThenIncludeAfterEnumerableMethodInfo.MakeGenericMethod(
                             typeof(TEntity), typeof(TPreviousProperty), typeof(TProperty)),
                         arguments: new[] { source.Expression, Expression.Quote(navigationPropertyPath) })));
+        }
 
         public static IIncludableQueryable<TEntity, TProperty> ThenInclude<TEntity, TPreviousProperty, TProperty>(
             this IIncludableQueryable<TEntity, TPreviousProperty> source,
             Expression<Func<TPreviousProperty, TProperty>> navigationPropertyPath)
             where TEntity : class
-            => new AsyncIncludableQueryableWrapper<TEntity, TProperty>(
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (navigationPropertyPath == null)
+                throw new ArgumentNullException(nameof(navigationPropertyPath));
+            return new AsyncIncludableQueryableWrapper<TEntity, TProperty>(
                 source.Provider.CreateQuery<TEntity>(
                     Expression.Call(
                         instance: null,
-                        method: ThenIncludeAfterReferenceMethodInfo.MakeGenericMethod(
+                        method: _ThenIncludeAfterReferenceMethodInfo.MakeGenericMethod(
                             typeof(TEntity), typeof(TPreviousProperty), typeof(TProperty)),
                         arguments: new[] { source.Expression, Expression.Quote(navigationPropertyPath) })));
+        }
 
         private class AsyncIncludableQueryableWrapper<TEntity, TProperty> : IIncludableQueryable<TEntity, TProperty>
         {
@@ -1582,6 +1602,46 @@ namespace Wodsoft.ComBoost.Data.Linq
                             instance: null,
                             method: _AsNoTrackingMethodInfo.MakeGenericMethod(typeof(TSource)),
                             arguments: new[] { source.Expression }));
+        }
+
+        #endregion
+
+        #region Execute
+
+        private static readonly MethodInfo _DeleteAsyncMethodInfo
+            = typeof(QueryableExtensions)
+                .GetTypeInfo().GetDeclaredMethod(nameof(DeleteAsync));
+        public static Task<int> DeleteAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (source.Provider is IWrappedAsyncQueryProvider provider)
+            {
+                return provider.ExecuteAsync<int>(Expression.Call(
+                            instance: null,
+                            method: _DeleteAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            arguments: new[] { source.Expression, Expression.Constant(cancellationToken) }), cancellationToken);
+            }
+            throw new NotSupportedException("该查询体不支持此操作。");
+        }
+
+        private static readonly MethodInfo _UpdateAsyncMethodInfo
+            = typeof(QueryableExtensions)
+                .GetTypeInfo().GetDeclaredMethod(nameof(UpdateAsync));
+        public static Task<int> UpdateAsync<TSource>(this IQueryable<TSource> source, Expression<Func<UpdateCaller<TSource>, UpdateCaller<TSource>>> updater, CancellationToken cancellationToken = default)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (updater == null)
+                throw new ArgumentNullException(nameof(updater));
+            if (source.Provider is IWrappedAsyncQueryProvider provider)
+            {
+                return provider.ExecuteAsync<int>(Expression.Call(
+                            instance: null,
+                            method: _UpdateAsyncMethodInfo.MakeGenericMethod(typeof(TSource)),
+                            arguments: new[] { source.Expression, Expression.Constant(updater), Expression.Constant(cancellationToken) }), cancellationToken);
+            }
+            throw new NotSupportedException("该查询体不支持此操作。");
         }
 
         #endregion
