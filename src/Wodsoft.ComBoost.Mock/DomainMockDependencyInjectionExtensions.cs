@@ -3,6 +3,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using Wodsoft.ComBoost;
 using Wodsoft.ComBoost.Mock;
@@ -72,6 +74,27 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             builder.Services.PostConfigure<MockInMemoryEventOptions>(options => options.InstanceKey = instanceKey);
             return UseInMemory(builder);
+        }
+
+        private readonly static MethodInfo _AddServiceMethod = typeof(IComBoostMockServiceBuilder).GetMethod("AddService");
+        public static IComBoostMockServiceBuilder AddServiceInAssembly(this IComBoostMockServiceBuilder builder, string serviceName, Assembly assembly)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (serviceName == null)
+                throw new ArgumentNullException(nameof(serviceName));
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.IsInterface && !type.IsGenericTypeDefinition && type.GetInterfaces().Any(t => t == typeof(IDomainTemplate)))
+                {
+                    var attr = type.GetCustomAttribute<DomainDistributedServiceAttribute>();
+                    if (attr != null && attr.ServiceName == serviceName)
+                        _AddServiceMethod.MakeGenericMethod(type).Invoke(builder, Array.Empty<object>());
+                }
+            }
+            return builder;
         }
     }
 }

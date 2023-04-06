@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using Wodsoft.ComBoost;
 using Wodsoft.ComBoost.AspNetCore;
@@ -22,6 +24,27 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IComBoostGrpcBuilder AddAuthenticationPassthrough(this IComBoostGrpcBuilder builder)
         {            
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDomainRpcServerRequestHandler, DomainGrpcServerAuthenticationPassthroughRequestHandler>());
+            return builder;
+        }
+
+        private readonly static MethodInfo _AddTemplateMethod = typeof(IComBoostGrpcBuilder).GetMethod("AddTemplate")!;
+        public static IComBoostGrpcBuilder AddTemplateInAssembly(this IComBoostGrpcBuilder builder, string serviceName, Assembly assembly)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (serviceName == null)
+                throw new ArgumentNullException(nameof(serviceName));
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.IsInterface && !type.IsGenericTypeDefinition && type.GetInterfaces().Any(t => t == typeof(IDomainTemplate)))
+                {
+                    var attr = type.GetCustomAttribute<DomainDistributedServiceAttribute>();
+                    if (attr != null && attr.ServiceName == serviceName)
+                        _AddTemplateMethod.MakeGenericMethod(type).Invoke(builder, Array.Empty<object>());
+                }
+            }
             return builder;
         }
     }

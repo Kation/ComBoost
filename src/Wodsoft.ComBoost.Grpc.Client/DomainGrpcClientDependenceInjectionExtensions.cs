@@ -1,7 +1,10 @@
-﻿using Grpc.Net.Client;
+﻿using Grpc.Core;
+using Grpc.Net.Client;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using Wodsoft.ComBoost;
 using Wodsoft.ComBoost.Grpc.Client;
@@ -35,6 +38,27 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IComBoostGrpcServiceBuilder AddService(this IComBoostGrpcBuilder builder, Uri address, GrpcChannelOptions options)
         {
             return builder.AddService(address, sp => options);
+        }
+
+        private readonly static MethodInfo _UseTemplateMethod = typeof(IComBoostGrpcServiceBuilder).GetMethod("UseTemplate");
+        public static IComBoostGrpcServiceBuilder UseTemplateInAssembly(this IComBoostGrpcServiceBuilder builder, string serviceName, Assembly assembly, CallOptions callOptions = default)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (serviceName == null)
+                throw new ArgumentNullException(nameof(serviceName));
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.IsInterface && !type.IsGenericTypeDefinition && type.GetInterfaces().Any(t=>t == typeof(IDomainTemplate)))
+                {
+                    var attr = type.GetCustomAttribute<DomainDistributedServiceAttribute>();
+                    if (attr != null && attr.ServiceName == serviceName)
+                        _UseTemplateMethod.MakeGenericMethod(type).Invoke(builder, new object[] { callOptions });
+                }
+            }
+            return builder;
         }
     }
 }
