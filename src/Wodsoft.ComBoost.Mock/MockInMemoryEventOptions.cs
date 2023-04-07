@@ -12,6 +12,6 @@ namespace Wodsoft.ComBoost.Mock
         private string? _groupName;
         public string GroupName { get => _groupName ?? Assembly.GetEntryAssembly().FullName; set => _groupName = value; }
 
-        public bool ThrowExceptionForMustHandleEventWhenNull { get; set; } = true;
+        public bool ThrowExceptionForMustHandleEventWhenNull { get; set; } = false;
     }
 }
