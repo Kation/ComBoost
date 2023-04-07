@@ -73,7 +73,7 @@ namespace Wodsoft.ComBoost.Mock
             bool once = features.Contains(DomainDistributedEventFeatures.HandleOnce);
             var handlers = _instance.GetEventHandlers<T>(once);
             bool must = features.Contains(DomainDistributedEventFeatures.MustHandle);
-            if (must && (handlers == null || handlers.Count == 0))
+            if (must && _options.ThrowExceptionForMustHandleEventWhenNull && (handlers == null || handlers.Count == 0))
                 throw new InvalidOperationException($"There is no event handler for \"{typeof(T).FullName}\".");
             if (handlers == null)
                 return;
