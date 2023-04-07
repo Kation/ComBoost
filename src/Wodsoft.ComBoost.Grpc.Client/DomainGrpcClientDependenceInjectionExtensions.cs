@@ -51,11 +51,27 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(assembly));
             foreach (var type in assembly.GetTypes())
             {
-                if (type.IsInterface && !type.IsGenericTypeDefinition && type.GetInterfaces().Any(t=>t == typeof(IDomainTemplate)))
+                if (type.IsInterface && !type.IsGenericTypeDefinition && type.GetInterfaces().Any(t => t == typeof(IDomainTemplate)))
                 {
                     var attr = type.GetCustomAttribute<DomainDistributedServiceAttribute>();
                     if (attr != null && attr.ServiceName == serviceName)
                         _UseTemplateMethod.MakeGenericMethod(type).Invoke(builder, new object[] { callOptions });
+                }
+            }
+            return builder;
+        }
+
+        public static IComBoostGrpcServiceBuilder UseTemplateInAssembly(this IComBoostGrpcServiceBuilder builder, Assembly assembly, CallOptions callOptions = default)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.IsInterface && !type.IsGenericTypeDefinition && type.GetInterfaces().Any(t => t == typeof(IDomainTemplate)))
+                {
+                    _UseTemplateMethod.MakeGenericMethod(type).Invoke(builder, new object[] { callOptions });
                 }
             }
             return builder;

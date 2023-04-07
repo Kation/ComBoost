@@ -96,5 +96,21 @@ namespace Microsoft.Extensions.DependencyInjection
             }
             return builder;
         }
+
+        public static IComBoostMockServiceBuilder AddServiceInAssembly(this IComBoostMockServiceBuilder builder, Assembly assembly)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.IsInterface && !type.IsGenericTypeDefinition && type.GetInterfaces().Any(t => t == typeof(IDomainTemplate)))
+                {
+                    _AddServiceMethod.MakeGenericMethod(type).Invoke(builder, Array.Empty<object>());
+                }
+            }
+            return builder;
+        }
     }
 }

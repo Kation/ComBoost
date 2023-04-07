@@ -22,7 +22,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         public static IComBoostGrpcBuilder AddAuthenticationPassthrough(this IComBoostGrpcBuilder builder)
-        {            
+        {
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDomainRpcServerRequestHandler, DomainGrpcServerAuthenticationPassthroughRequestHandler>());
             return builder;
         }
@@ -43,6 +43,22 @@ namespace Microsoft.Extensions.DependencyInjection
                     var attr = type.GetCustomAttribute<DomainDistributedServiceAttribute>();
                     if (attr != null && attr.ServiceName == serviceName)
                         _AddTemplateMethod.MakeGenericMethod(type).Invoke(builder, Array.Empty<object>());
+                }
+            }
+            return builder;
+        }
+
+        public static IComBoostGrpcBuilder AddTemplateInAssembly(this IComBoostGrpcBuilder builder, Assembly assembly)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.IsInterface && !type.IsGenericTypeDefinition && type.GetInterfaces().Any(t => t == typeof(IDomainTemplate)))
+                {
+                    _AddTemplateMethod.MakeGenericMethod(type).Invoke(builder, Array.Empty<object>());
                 }
             }
             return builder;
