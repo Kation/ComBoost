@@ -79,6 +79,13 @@ namespace Microsoft.AspNetCore.Builder
                 throw new ArgumentNullException(nameof(endpoint));
             endpoint.Map("/{service}/{method}", _DomainServiceDelegate);
         }
+        
+        public static void MapHealthCheck(this IEndpointRouteBuilder endpoint, string path)
+        {
+            if (endpoint == null)
+                throw new ArgumentNullException(nameof(endpoint));
+            endpoint.Map(path, _HealthCheckDelegate);
+        }
 #endif
 
         public static void UseDomainService(this IApplicationBuilder app)
@@ -111,7 +118,7 @@ namespace Microsoft.AspNetCore.Builder
             return Task.CompletedTask;
         };
 
-        public static void UseHealthCheck(this IApplicationBuilder app, string path)
+        public static void UseHealthCheck(this IApplicationBuilder app, string path = "/healthz")
         {
             if (app == null)
                 throw new ArgumentNullException(nameof(app));
