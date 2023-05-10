@@ -8,5 +8,11 @@ namespace Wodsoft.ComBoost
     public interface IComBoostBuilder
     {
         IServiceCollection Services { get; }
+
+        IReadOnlyList<IDomainModule> Modules { get; }
+
+        void AddModule<TModule>() where TModule : IDomainModule, new();
+
+        event EventHandler<DomainModuleAddedEventArgs> ModuleAdded;
     }
 }

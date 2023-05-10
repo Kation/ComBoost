@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Wodsoft.ComBoost;
 
@@ -16,7 +17,11 @@ namespace Microsoft.Extensions.DependencyInjection
             if (distributedBuilderCongifure == null)
                 throw new ArgumentNullException(nameof(distributedBuilderCongifure));
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, DomainDistributedEventService>());
-            distributedBuilderCongifure(new ComBoostDistributedBuilder(builder.Services));
+            var distributedBuilder = new ComBoostDistributedBuilder(builder.Services);
+            foreach (var module in builder.Modules)
+                if (module is IDomainDistributedModule distributedModule)
+                    distributedModule.ConfigureDistributedServices(distributedBuilder);
+            distributedBuilderCongifure(distributedBuilder);
             return builder;
         }
 

@@ -30,12 +30,14 @@ namespace Microsoft.Extensions.DependencyInjection
             return new ComBoostBuilder(services);
         }
 
-        public static IComBoostBuilder AddLocalService(this IComBoostBuilder builder, Action<IComBoostLocalBuilder>? localBuilderConfigure = null)
+        public static IComBoostBuilder AddLocalService(this IComBoostBuilder builder, Action<IComBoostLocalBuilder> localBuilderConfigure)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
-            if (localBuilderConfigure != null)
-                localBuilderConfigure(new ComBoostLocalBuilder(builder.Services));
+            var localBuilder = new ComBoostLocalBuilder(builder.Services);
+            foreach (var module in builder.Modules)
+                module.ConfigureDomainServices(localBuilder);
+            localBuilderConfigure(localBuilder);
             return builder;
         }
 
@@ -76,6 +78,17 @@ namespace Microsoft.Extensions.DependencyInjection
                         typeof(IComBoostLocalBuilder).GetMethod(nameof(IComBoostLocalBuilder.AddEventHandler)).MakeGenericMethod(item, item.GetGenericArguments()[0]).Invoke(builder, Array.Empty<object>());
                     }
                 }
+            }
+            return builder;
+        }
+
+        private static readonly MethodInfo _AddServiceMethod = typeof(IComBoostLocalBuilder).GetMethod("AddService", BindingFlags.Public | BindingFlags.Static);
+        public static IComBoostLocalBuilder AddServiceFromAssembly(this IComBoostLocalBuilder builder, Assembly assembly)
+        {
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.GetInterfaces().Any(t => t == typeof(IDomainService)))
+                    _AddServiceMethod.MakeGenericMethod(type).Invoke(builder, null);
             }
             return builder;
         }
