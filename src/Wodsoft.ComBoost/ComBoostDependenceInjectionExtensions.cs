@@ -82,7 +82,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        private static readonly MethodInfo _AddServiceMethod = typeof(IComBoostLocalBuilder).GetMethod("AddService", BindingFlags.Public | BindingFlags.Static);
+        private static readonly MethodInfo _AddServiceMethod = typeof(IComBoostLocalBuilder).GetMethod("AddService", BindingFlags.Public | BindingFlags.Instance);
         public static IComBoostLocalBuilder AddServiceFromAssembly(this IComBoostLocalBuilder builder, Assembly assembly)
         {
             foreach (var type in assembly.GetTypes())
