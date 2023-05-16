@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Test
 {
-    [DomainDistributedService("TestService")]
+    //[DomainDistributedService("TestService")]
     public interface IGreeterTemplate : IDomainTemplate
     {
         [DomainValue("longValue", 100L)]
