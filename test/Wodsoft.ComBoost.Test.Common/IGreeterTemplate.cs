@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Test
 {
+    [DomainDistributedService("TestService")]
     public interface IGreeterTemplate : IDomainTemplate
     {
+        [DomainValue("longValue", 100L)]
         Task<HelloResponse> SayHi(HelloRequest request);
 
         Task<string> Hello();

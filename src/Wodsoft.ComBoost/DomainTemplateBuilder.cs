@@ -165,6 +165,7 @@ namespace Wodsoft.ComBoost
                 var values = ilGenerator.DeclareLocal(typeof(Dictionary<string, object>));
                 ilGenerator.Emit(OpCodes.Newobj, _DictionaryConstructor);
                 ilGenerator.Emit(OpCodes.Stloc, values);
+                List<string> parameterNames = new List<string>();
                 //Set each parameter value into values. values.Add(parameter name, parameter value)
                 for (int i = 0; i < parameters.Length; i++)
                 {
@@ -173,6 +174,71 @@ namespace Wodsoft.ComBoost
                     ilGenerator.Emit(OpCodes.Ldarg_S, (byte)(i + 1));
                     if (parameters[i].ParameterType.IsValueType)
                         ilGenerator.Emit(OpCodes.Box, parameters[i].ParameterType);
+                    ilGenerator.Emit(OpCodes.Call, _DictionaryAdd);
+                    parameterNames.Add(parameters[i].Name);
+                }
+                
+                var valueAttributes = method.GetCustomAttributes<DomainValueAttribute>();
+                foreach(var valueAttribute in valueAttributes)
+                {
+                    if (parameterNames.Contains(valueAttribute.Name))
+                        continue;
+                    parameterNames.Add(valueAttribute.Name);
+
+                    ilGenerator.Emit(OpCodes.Ldloc, values);
+                    ilGenerator.Emit(OpCodes.Ldstr, valueAttribute.Name);
+                    switch (valueAttribute.Type)
+                    {
+                        case TypeCode.Boolean:
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (bool)valueAttribute.Value ? 1 : 0);
+                            ilGenerator.Emit(OpCodes.Box, typeof(bool));
+                            break;
+                        case TypeCode.Byte:
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (byte)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Box, typeof(byte));
+                            break;
+                        case TypeCode.SByte:
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (sbyte)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Box, typeof(sbyte));
+                            break;
+                        case TypeCode.Int16:
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (short)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Box, typeof(short));
+                            break;
+                        case TypeCode.Int32:
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (int)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Box, typeof(int));
+                            break;
+                        case TypeCode.Int64:
+                            ilGenerator.Emit(OpCodes.Ldc_I8, (long)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Box, typeof(long));
+                            break;
+                        case TypeCode.UInt16:
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (ushort)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Box, typeof(ushort));
+                            break;
+                        case TypeCode.UInt32:
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (int)(uint)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Box, typeof(uint));
+                            break;
+                        case TypeCode.UInt64:
+                            ilGenerator.Emit(OpCodes.Ldc_I8, (long)(ulong)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Box, typeof(ulong));
+                            break;
+                        case TypeCode.Single:
+                            ilGenerator.Emit(OpCodes.Ldc_R4, (float)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Box, typeof(float));
+                            break;
+                        case TypeCode.Double:
+                            ilGenerator.Emit(OpCodes.Ldc_R8, (double)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Box, typeof(double));
+                            break;
+                        case TypeCode.String:
+                            ilGenerator.Emit(OpCodes.Ldstr, (string)valueAttribute.Value);
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
                     ilGenerator.Emit(OpCodes.Call, _DictionaryAdd);
                 }
 

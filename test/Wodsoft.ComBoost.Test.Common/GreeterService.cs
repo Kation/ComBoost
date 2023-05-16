@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Test
 {
+    [DomainTemplateImplementer(typeof(IGreeterTemplate))]
     public class GreeterService : DomainService
     {
-        public Task<HelloResponse> SayHi([FromValue] HelloRequest request)
+        public Task<HelloResponse> SayHi([FromValue] HelloRequest request, [FromValue(false)] long longValue)
         {
             return Task.FromResult(new HelloResponse { Answer = $"Hi {request.Name}." });
         }
