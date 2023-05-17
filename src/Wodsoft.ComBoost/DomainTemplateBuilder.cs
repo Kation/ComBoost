@@ -177,9 +177,9 @@ namespace Wodsoft.ComBoost
                     ilGenerator.Emit(OpCodes.Call, _DictionaryAdd);
                     parameterNames.Add(parameters[i].Name);
                 }
-                
+
                 var valueAttributes = method.GetCustomAttributes<DomainValueAttribute>();
-                foreach(var valueAttribute in valueAttributes)
+                foreach (var valueAttribute in valueAttributes)
                 {
                     if (parameterNames.Contains(valueAttribute.Name))
                         continue;
@@ -187,58 +187,52 @@ namespace Wodsoft.ComBoost
 
                     ilGenerator.Emit(OpCodes.Ldloc, values);
                     ilGenerator.Emit(OpCodes.Ldstr, valueAttribute.Name);
-                    switch (valueAttribute.Type)
+                    switch (valueAttribute.TypeCode)
                     {
                         case TypeCode.Boolean:
                             ilGenerator.Emit(OpCodes.Ldc_I4, (bool)valueAttribute.Value ? 1 : 0);
-                            ilGenerator.Emit(OpCodes.Box, typeof(bool));
                             break;
                         case TypeCode.Byte:
                             ilGenerator.Emit(OpCodes.Ldc_I4, (byte)valueAttribute.Value);
-                            ilGenerator.Emit(OpCodes.Box, typeof(byte));
+                            break;
+                        case TypeCode.Char:
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (char)valueAttribute.Value);
                             break;
                         case TypeCode.SByte:
                             ilGenerator.Emit(OpCodes.Ldc_I4, (sbyte)valueAttribute.Value);
-                            ilGenerator.Emit(OpCodes.Box, typeof(sbyte));
                             break;
                         case TypeCode.Int16:
                             ilGenerator.Emit(OpCodes.Ldc_I4, (short)valueAttribute.Value);
-                            ilGenerator.Emit(OpCodes.Box, typeof(short));
                             break;
                         case TypeCode.Int32:
                             ilGenerator.Emit(OpCodes.Ldc_I4, (int)valueAttribute.Value);
-                            ilGenerator.Emit(OpCodes.Box, typeof(int));
                             break;
                         case TypeCode.Int64:
                             ilGenerator.Emit(OpCodes.Ldc_I8, (long)valueAttribute.Value);
-                            ilGenerator.Emit(OpCodes.Box, typeof(long));
                             break;
                         case TypeCode.UInt16:
                             ilGenerator.Emit(OpCodes.Ldc_I4, (ushort)valueAttribute.Value);
-                            ilGenerator.Emit(OpCodes.Box, typeof(ushort));
                             break;
                         case TypeCode.UInt32:
                             ilGenerator.Emit(OpCodes.Ldc_I4, (int)(uint)valueAttribute.Value);
-                            ilGenerator.Emit(OpCodes.Box, typeof(uint));
                             break;
                         case TypeCode.UInt64:
                             ilGenerator.Emit(OpCodes.Ldc_I8, (long)(ulong)valueAttribute.Value);
-                            ilGenerator.Emit(OpCodes.Box, typeof(ulong));
                             break;
                         case TypeCode.Single:
                             ilGenerator.Emit(OpCodes.Ldc_R4, (float)valueAttribute.Value);
-                            ilGenerator.Emit(OpCodes.Box, typeof(float));
                             break;
                         case TypeCode.Double:
                             ilGenerator.Emit(OpCodes.Ldc_R8, (double)valueAttribute.Value);
-                            ilGenerator.Emit(OpCodes.Box, typeof(double));
                             break;
                         case TypeCode.String:
                             ilGenerator.Emit(OpCodes.Ldstr, (string)valueAttribute.Value);
                             break;
                         default:
-                            throw new NotSupportedException();
+                            throw new NotSupportedException($"Not support type \"{valueAttribute.TypeCode}\".");
                     }
+                    if (valueAttribute.Type.IsValueType)
+                        ilGenerator.Emit(OpCodes.Box, valueAttribute.Type);
                     ilGenerator.Emit(OpCodes.Call, _DictionaryAdd);
                 }
 

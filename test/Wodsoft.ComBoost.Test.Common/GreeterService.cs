@@ -9,7 +9,7 @@ namespace Wodsoft.ComBoost.Test
     [DomainTemplateImplementer(typeof(IGreeterTemplate))]
     public class GreeterService : DomainService
     {
-        public Task<HelloResponse> SayHi([FromValue] HelloRequest request, [FromValue(false)] long longValue)
+        public Task<HelloResponse> SayHi([FromValue] HelloRequest request, [FromValue(false)] InvokeType invokeType)
         {
             return Task.FromResult(new HelloResponse { Answer = $"Hi {request.Name}." });
         }

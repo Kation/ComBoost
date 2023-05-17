@@ -8,7 +8,7 @@ namespace Wodsoft.ComBoost.Test
     //[DomainDistributedService("TestService")]
     public interface IGreeterTemplate : IDomainTemplate
     {
-        [DomainValue("longValue", 100L)]
+        [DomainValue("invokeType", InvokeType.Test)]
         Task<HelloResponse> SayHi(HelloRequest request);
 
         Task<string> Hello();
