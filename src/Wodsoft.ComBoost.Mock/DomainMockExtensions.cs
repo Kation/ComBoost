@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration.EnvironmentVariables;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,21 @@ namespace Wodsoft.ComBoost.Mock
             {
                 action(scope.ServiceProvider);
             }
+        }
+
+        public static Task RunAsDomainMethodAsync(this IHost host, Func<IDomainExecutionContext, Task> action)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                var context = new DomainDistributedExecutionContext(new EmptyDomainContext(scope.ServiceProvider, default));
+                return action(context);
+            }
+        }
+
+        public static Task RaiseEvent<T>(this IHost host, T args)
+            where T : DomainServiceEventArgs
+        {
+            return RunAsDomainMethodAsync(host, context => context.DomainContext.EventManager.RaiseEvent(context, args));
         }
 
         public static void SetIdentity(this IServiceProvider services, Func<ClaimsIdentity> identityBuilder)
