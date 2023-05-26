@@ -13,5 +13,7 @@ namespace Wodsoft.ComBoost.Mock
         public string GroupName { get => _groupName ?? Assembly.GetEntryAssembly().FullName; set => _groupName = value; }
 
         public bool ThrowExceptionForMustHandleEventWhenNull { get; set; } = false;
+
+        public bool IsAsyncEvent { get; set; } = false;
     }
 }

@@ -15,15 +15,14 @@ namespace Wodsoft.ComBoost.Mock
         private MockInMemoryInstance _instance;
         private MockInMemoryEventOptions _options;
         private IServiceProvider _serviceProvider;
-        private List<MockInMemoryEventMonitor> _monitors;
         private Dictionary<Delegate, Delegate> _handlers;
+        private static List<Task> _Tasks = new List<Task>();
 
         public MockInMemoryEventProvider(IServiceProvider serviceProvider, IOptions<MockInMemoryEventOptions> options)
         {
             _serviceProvider = serviceProvider;
             _options = options.Value;
             _instance = MockInMemoryInstance.GetInstance(options.Value.InstanceKey);
-            _monitors = new List<MockInMemoryEventMonitor>();
             _handlers = new Dictionary<Delegate, Delegate>();
         }
 
@@ -50,20 +49,23 @@ namespace Wodsoft.ComBoost.Mock
 
         public override void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
         {
-            string group;
-            if (features.Contains(DomainDistributedEventFeatures.Group))
-                group = _options.GroupName;
-            else
-                group = string.Empty;
-            var mockHandler = new MockInMemoryEventHandler<T>(args =>
+            lock (this)
             {
-                var scope = _serviceProvider.CreateScope();
-                DomainContext domainContext = new EmptyDomainContext(scope.ServiceProvider, default(CancellationToken));
-                DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
-                return handler(executionContext, args);
-            });
-            _handlers.Add(handler, mockHandler);
-            _instance.AddEventHandler(mockHandler, group);
+                string group;
+                if (features.Contains(DomainDistributedEventFeatures.Group))
+                    group = _options.GroupName;
+                else
+                    group = string.Empty;
+                var mockHandler = new MockInMemoryEventHandler<T>(args =>
+                {
+                    var scope = _serviceProvider.CreateScope();
+                    DomainContext domainContext = new EmptyDomainContext(scope.ServiceProvider, default(CancellationToken));
+                    DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
+                    return handler(executionContext, args);
+                });
+                _handlers.Add(handler, mockHandler);
+                _instance.AddEventHandler(mockHandler, group);
+            }
         }
 
         public override async Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
@@ -78,40 +80,50 @@ namespace Wodsoft.ComBoost.Mock
             if (handlers == null)
                 return;
             var tasks = handlers.Select(t => t(args)).ToArray();
-            await Task.WhenAll(tasks);
-            var eventType = typeof(T);
-            foreach (var monitor in _monitors)
+            if (_options.IsAsyncEvent)
             {
-                if (monitor.EventType == eventType)
-                    monitor.Fired();
+                lock (tasks)
+                    _Tasks.AddRange(tasks);
+                _ = Task.WhenAll(tasks).ContinueWith(task =>
+                {
+                    lock (tasks)
+                    {
+                        foreach (var taks in tasks)
+                            if (!task.IsFaulted)
+                                _Tasks.Remove(task);
+                    }
+                });
+            }
+            else
+            {
+                await Task.WhenAll(tasks);
             }
         }
 
-        public MockInMemoryEventMonitor RegisterEventMonitor<T>()
-            where T : DomainServiceEventArgs
+        public static Task WaitEventsAsync()
         {
-            var monitor = new MockInMemoryEventMonitor(typeof(T));
-            monitor.Disposed += Monitor_Disposed;
-            _monitors.Add(monitor);
-            return monitor;
-        }
-
-        private void Monitor_Disposed(object sender, EventArgs e)
-        {
-            var monitor = (MockInMemoryEventMonitor)sender;
-            monitor.Disposed -= Monitor_Disposed;
-            _monitors.Remove(monitor);
+            Task[] tasks;
+            lock (_Tasks)
+            {
+                if (_Tasks.Count == 0)
+                    return Task.CompletedTask;
+                tasks = _Tasks.ToArray();
+            }
+            return Task.WhenAll(tasks);
         }
 
         public override void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
         {
-            string group;
-            if (features.Contains(DomainDistributedEventFeatures.Group))
-                group = _options.GroupName;
-            else
-                group = string.Empty;
-            if (_handlers.TryGetValue(handler, out var mockHandler))
-                _instance.RemoveEventHandler((MockInMemoryEventHandler<T>)mockHandler, group);
+            lock (this)
+            {
+                string group;
+                if (features.Contains(DomainDistributedEventFeatures.Group))
+                    group = _options.GroupName;
+                else
+                    group = string.Empty;
+                if (_handlers.TryGetValue(handler, out var mockHandler))
+                    _instance.RemoveEventHandler((MockInMemoryEventHandler<T>)mockHandler, group);
+            }
         }
     }
 }
