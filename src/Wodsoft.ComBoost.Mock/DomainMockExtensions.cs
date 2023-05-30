@@ -36,6 +36,51 @@ namespace Wodsoft.ComBoost.Mock
             }
         }
 
+        public static Task RunAsDomainMethodAsync<TService>(this IHost host, Func<IDomainExecutionContext, TService, Task> action)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                var context = new DomainDistributedExecutionContext(new EmptyDomainContext(scope.ServiceProvider, default));
+                return action(context, scope.ServiceProvider.GetRequiredService<TService>());
+            }
+        }
+
+        public static Task RunAsDomainMethodAsync<TService1, TService2>(this IHost host, Func<IDomainExecutionContext, TService1, TService2, Task> action)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                var context = new DomainDistributedExecutionContext(new EmptyDomainContext(scope.ServiceProvider, default));
+                return action(context,
+                    scope.ServiceProvider.GetRequiredService<TService1>(),
+                    scope.ServiceProvider.GetRequiredService<TService2>());
+            }
+        }
+
+        public static Task RunAsDomainMethodAsync<TService1, TService2, TService3>(this IHost host, Func<IDomainExecutionContext, TService1, TService2, TService3, Task> action)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                var context = new DomainDistributedExecutionContext(new EmptyDomainContext(scope.ServiceProvider, default));
+                return action(context,
+                    scope.ServiceProvider.GetRequiredService<TService1>(),
+                    scope.ServiceProvider.GetRequiredService<TService2>(),
+                    scope.ServiceProvider.GetRequiredService<TService3>());
+            }
+        }
+
+        public static Task RunAsDomainMethodAsync<TService1, TService2, TService3, TService4>(this IHost host, Func<IDomainExecutionContext, TService1, TService2, TService3, TService4, Task> action)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                var context = new DomainDistributedExecutionContext(new EmptyDomainContext(scope.ServiceProvider, default));
+                return action(context,
+                    scope.ServiceProvider.GetRequiredService<TService1>(),
+                    scope.ServiceProvider.GetRequiredService<TService2>(),
+                    scope.ServiceProvider.GetRequiredService<TService3>(),
+                    scope.ServiceProvider.GetRequiredService<TService4>());
+            }
+        }
+
         public static Task RaiseEvent<T>(this IHost host, T args)
             where T : DomainServiceEventArgs
         {
