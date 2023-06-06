@@ -13,9 +13,17 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(name));
             Name = name;
             Type = value.GetType();
-            var valueType = Enum.GetUnderlyingType(Type);
-            Value = Convert.ChangeType(value, valueType);
-            TypeCode = Type.GetTypeCode(valueType);
+            if (Type.IsEnum)
+            {
+                var valueType = Enum.GetUnderlyingType(Type);
+                Value = Convert.ChangeType(value, valueType);
+                TypeCode = Type.GetTypeCode(valueType);
+            }
+            else
+            {
+                Value = value;
+                TypeCode = Type.GetTypeCode(Type);
+            }
         }
 
         public string Name { get; }
