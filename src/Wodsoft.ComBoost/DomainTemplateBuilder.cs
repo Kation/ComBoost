@@ -193,16 +193,16 @@ namespace Wodsoft.ComBoost
                             ilGenerator.Emit(OpCodes.Ldc_I4, (bool)valueAttribute.Value ? 1 : 0);
                             break;
                         case TypeCode.Byte:
-                            ilGenerator.Emit(OpCodes.Ldc_I4, (byte)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (int)(byte)valueAttribute.Value);
                             break;
                         case TypeCode.Char:
-                            ilGenerator.Emit(OpCodes.Ldc_I4, (char)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (int)(char)valueAttribute.Value);
                             break;
                         case TypeCode.SByte:
-                            ilGenerator.Emit(OpCodes.Ldc_I4, (sbyte)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (int)(sbyte)valueAttribute.Value);
                             break;
                         case TypeCode.Int16:
-                            ilGenerator.Emit(OpCodes.Ldc_I4, (short)valueAttribute.Value);
+                            ilGenerator.Emit(OpCodes.Ldc_I4, (int)(short)valueAttribute.Value);
                             break;
                         case TypeCode.Int32:
                             ilGenerator.Emit(OpCodes.Ldc_I4, (int)valueAttribute.Value);
