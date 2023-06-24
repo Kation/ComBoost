@@ -42,5 +42,15 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
         {
             return RaiseEvent(new HandleOnceRetryEventArgs { Text = text });
         }
+
+        public Task FireHandleSingle([FromValue] string text)
+        {
+            return RaiseEvent(new HandleSingleEventArgs { Text = text });
+        }
+
+        public Task FireHandleGroupSingle([FromValue] string text)
+        {
+            return RaiseEvent(new HandleGroupSingleEventArgs { Text = text });
+        }
     }
 }

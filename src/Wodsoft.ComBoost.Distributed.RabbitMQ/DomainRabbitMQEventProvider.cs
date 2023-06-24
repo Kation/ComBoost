@@ -107,6 +107,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 var args = new Dictionary<string, object>();
                 if (_options.UseQuorum)
                     args["x-queue-type"] = "quorum";
+                if (features.Contains(DomainDistributedEventFeatures.SignelHandler))
+                    args["x-single-active-consumer"] = true;
                 if (features.Contains(DomainDistributedEventFeatures.Group))
                 {
                     channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
@@ -129,9 +131,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             if (features.Contains(DomainDistributedEventFeatures.Delay))
             {
                 var args = new Dictionary<string, object>();
-                //Quorum does not support message ttl
-                //if (_options.UseQuorum)
-                //    args["x-queue-type"] = "quorum";
+                if (_options.UseQuorum)
+                    args["x-queue-type"] = "quorum";
                 args["x-dead-letter-exchange"] = name + "_EXCHANGE";
                 if (features.Contains(DomainDistributedEventFeatures.HandleOnce) && !features.Contains(DomainDistributedEventFeatures.Group))
                 {
@@ -158,9 +159,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     if (i > 0 && time == retryTimesAttribute.Times[i - 1])
                         continue;
                     var args = new Dictionary<string, object>();
-                    //Quorum does not support message ttl
-                    //if (_options.UseQuorum)
-                    //    args["x-queue-type"] = "quorum";
+                    if (_options.UseQuorum)
+                        args["x-queue-type"] = "quorum";
                     args["x-message-ttl"] = time;
                     args["x-dead-letter-exchange"] = name + "_EXCHANGE";
                     channel.QueueDeclare(name + "_RETRY_" + time, true, false, false, args);
@@ -268,7 +268,9 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 var args = new Dictionary<string, object>();
                 if (_options.UseQuorum)
                     args["x-queue-type"] = "quorum";
-                var channel = _connection.CreateModel();
+                if (features.Contains(DomainDistributedEventFeatures.SignelHandler))
+                    args["x-single-active-consumer"] = true;
+                var channel = _connection!.CreateModel();
                 channel.QueueDeclare(name, true, false, false, args);
                 return channel;
             });
@@ -301,6 +303,9 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     case DomainDistributedEventFeatures.Retry:
                         result = true;
                         retry = true;
+                        break;
+                    case DomainDistributedEventFeatures.SignelHandler:
+                        result = true;
                         break;
                     default:
                         return false;

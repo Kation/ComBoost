@@ -21,6 +21,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
         volatile int _handleOnceDelayCount = 0;
         volatile int _handleMoreDelayCount = 0;
         volatile int _handleOnceRetryCount = 0;
+        volatile int _handleSingleCount = 0;
+        volatile int _handleGroupSingleCount = 0;
 
         [Fact]
         public async Task HandleOnceTest()
@@ -683,6 +685,212 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             await client1Mock.StopAsync();
             await client2Mock.StopAsync();
+            await serviceMock.StopAsync();
+        }
+
+        [Fact]
+        public async Task HandleSingleTest()
+        {
+            var serviceMock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddLocalService(builder =>
+                        {
+                            builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
+                        })
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventPublisher<HandleSingleEventArgs>();
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            string text = "Hello";
+
+
+            var client1Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleSingleEventArgs>(async (context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    await Task.Delay(2000);
+                                    _handleSingleCount++;
+                                });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            var client2Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleSingleEventArgs>(async (context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    await Task.Delay(2000);
+                                    _handleSingleCount++;
+                                });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            await serviceMock.StartAsync();
+            await client1Mock.StartAsync();
+            await client2Mock.StartAsync();
+
+            await serviceMock.RunAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IEventTestService>();
+                await service.FireHandleSingle(text);
+                await service.FireHandleSingle(text);
+            });
+
+            await Task.Delay(3000);
+            Assert.Equal(1, _handleSingleCount);
+
+            await Task.Delay(2000);
+            Assert.Equal(2, _handleSingleCount);
+
+            await client1Mock.StopAsync();
+            await client2Mock.StopAsync();
+            await serviceMock.StopAsync();
+
+        }
+
+        [Fact]
+        public async Task HandleGroupSingleTest()
+        {
+            var serviceMock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddLocalService(builder =>
+                        {
+                            builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
+                        })
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventPublisher<HandleGroupSingleEventArgs>();
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            string text = "Hello";
+
+            var group1Client1Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupSingleEventArgs>(async (context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    await Task.Delay(2000);
+                                    _handleGroupSingleCount++;
+                                })
+                                .WithGroupName("group1");
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            var group1Client2Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupSingleEventArgs>(async (context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    await Task.Delay(2000);
+                                    _handleGroupSingleCount++;
+                                })
+                                .WithGroupName("group1");
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            var group2Client1Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupSingleEventArgs>(async (context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    await Task.Delay(2000);
+                                    _handleGroupSingleCount++;
+                                })
+                                .WithGroupName("group2");
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            var group2Client2Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupSingleEventArgs>(async (context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    await Task.Delay(2000);
+                                    _handleGroupSingleCount++;
+                                })
+                                .WithGroupName("group2");
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            await serviceMock.StartAsync();
+            await group1Client1Mock.StartAsync();
+            await group1Client2Mock.StartAsync();
+            await group2Client1Mock.StartAsync();
+            await group2Client2Mock.StartAsync();
+
+            await serviceMock.RunAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IEventTestService>();
+                await service.FireHandleGroupSingle(text);
+                await service.FireHandleGroupSingle(text);
+            });
+
+            await Task.Delay(3000);
+            Assert.Equal(2, _handleGroupSingleCount);
+
+            await Task.Delay(2000);
+            Assert.Equal(4, _handleGroupSingleCount);
+
+            await group1Client1Mock.StopAsync();
+            await group1Client2Mock.StopAsync();
+            await group2Client1Mock.StopAsync();
+            await group2Client2Mock.StopAsync();
             await serviceMock.StopAsync();
         }
     }
