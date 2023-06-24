@@ -13,10 +13,10 @@ namespace Wodsoft.ComBoost
 
         protected virtual string GetTypeName<T>()
         {
-            return _typeNames.GetOrAdd(typeof(T), type => GetTypeName(type));
+            return _TypeNames.GetOrAdd(typeof(T), type => GetTypeName(type));
         }
 
-        private static ConcurrentDictionary<Type, string> _typeNames = new ConcurrentDictionary<Type, string>();
+        private static ConcurrentDictionary<Type, string> _TypeNames = new ConcurrentDictionary<Type, string>();
         public static string GetTypeName(Type type)
         {
             var name = type.Namespace + "." + type.Name;
@@ -32,5 +32,9 @@ namespace Wodsoft.ComBoost
         public abstract void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
 
         public abstract bool CanHandleEvent<T>(IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+
+        public abstract Task StartAsync();
+
+        public abstract Task StopAsync();
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,34 +16,11 @@ namespace Wodsoft.ComBoost
 
         public IServiceCollection Services { get; }
 
-        public IComBoostDistributedBuilder AddDistributedEventHandler<THandler, TArgs>()
-            where THandler : IDomainServiceEventHandler<TArgs>, new()
-            where TArgs : DomainServiceEventArgs
+        IComBoostDistributedEventProviderBuilder<TProvider> IComBoostDistributedBuilder.UseEventProvider<TProvider>(params object[] parameters)
         {
-            Services.PostConfigure<DomainServiceDistributedEventOptions>(options =>
-            {
-                var handler = new THandler();
-                options.AddEventHandler<TArgs>(handler.Handle);
-            });
-            return this;
-        }
-
-        public IComBoostDistributedBuilder AddDistributedEventHandler<TArgs>(DomainServiceEventHandler<TArgs> handler) where TArgs : DomainServiceEventArgs
-        {
-            Services.PostConfigure<DomainServiceDistributedEventOptions>(options =>
-            {
-                options.AddEventHandler(handler);
-            });
-            return this;
-        }
-
-        public IComBoostDistributedBuilder WithGroupName(string groupName)
-        {
-            Services.PostConfigure<DomainServiceDistributedEventOptions>(options =>
-            {
-                options.GroupName = groupName;
-            });
-            return this;
+            var builder = new ComBoostDistributedEventProviderBuilder<TProvider>(Services);
+            Services.TryAddEnumerable(ServiceDescriptor.Transient<IHostedService, DomainDistributedEventService<TProvider>>(sp => ActivatorUtilities.CreateInstance<DomainDistributedEventService<TProvider>>(sp, builder.Options, parameters)));
+            return builder;
         }
     }
 }

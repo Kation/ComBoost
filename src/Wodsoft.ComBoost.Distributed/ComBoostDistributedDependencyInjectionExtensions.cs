@@ -16,7 +16,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             if (distributedBuilderCongifure == null)
                 throw new ArgumentNullException(nameof(distributedBuilderCongifure));
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, DomainDistributedEventService>());
             var distributedBuilder = new ComBoostDistributedBuilder(builder.Services);
             foreach (var module in builder.Modules)
                 if (module is IDomainDistributedModule distributedModule)
@@ -36,13 +35,6 @@ namespace Microsoft.Extensions.DependencyInjection
             where T : class, IDomainRpcServerResponseHandler
         {
             builder.Services.TryAddEnumerable(ServiceDescriptor.Scoped<IDomainRpcServerResponseHandler, T>());
-            return builder;
-        }
-
-        public static IComBoostLocalBuilder AddDistributedEventPublisher<TArgs>(this IComBoostLocalBuilder builder)
-            where TArgs : DomainServiceEventArgs
-        {
-            builder.AddEventHandler<DomainDistributedEventPublisher<TArgs>, TArgs>();
             return builder;
         }
     }

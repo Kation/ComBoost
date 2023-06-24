@@ -12,14 +12,14 @@ namespace Wodsoft.ComBoost.Distributed.CAP
     {
         private ICapPublisher _publisher;
         internal Dictionary<Delegate, string> Handlers = new Dictionary<Delegate, string>();
-        private DomainServiceDistributedEventOptions _eventOptions;
+        private DomainServiceDistributedEventOptions<DomainCAPEventProvider> _eventOptions;
         private CapOptions _capOptions;
 
-        public DomainCAPEventProvider(ICapPublisher publisher, IOptions<DomainServiceDistributedEventOptions> eventOptions, IOptions<CapOptions> capOptions)
+        public DomainCAPEventProvider(ICapPublisher publisher, DomainServiceDistributedEventOptions<DomainCAPEventProvider> eventOptions, CapOptions capOptions)
         {
             _publisher = publisher ?? throw new ArgumentNullException(nameof(publisher));
-            _eventOptions = eventOptions?.Value ?? throw new ArgumentNullException(nameof(eventOptions));
-            _capOptions = capOptions?.Value ?? throw new ArgumentNullException(nameof(capOptions));
+            _eventOptions = eventOptions ?? throw new ArgumentNullException(nameof(eventOptions));
+            _capOptions = capOptions ?? throw new ArgumentNullException(nameof(capOptions));
         }
 
         public override void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
@@ -62,6 +62,16 @@ namespace Wodsoft.ComBoost.Distributed.CAP
                 }
             }
             return result;
+        }
+
+        public override Task StartAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task StopAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

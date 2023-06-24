@@ -5,9 +5,11 @@ using System.Text;
 
 namespace Wodsoft.ComBoost
 {
-    public class DomainServiceDistributedEventOptions
+    public class DomainServiceDistributedEventOptions<TProvider>
+        where TProvider : IDomainDistributedEventProvider
     {
-        private Dictionary<Type, Delegate> _events = new Dictionary<Type, Delegate>();
+        private readonly Dictionary<Type, Delegate> _events = new Dictionary<Type, Delegate>();
+        private readonly List<Type> _publishes = new List<Type>();
 
         public void AddEventHandler<T>(DomainServiceEventHandler<T> handler)
             where T : DomainServiceEventArgs
@@ -19,7 +21,16 @@ namespace Wodsoft.ComBoost
                 _events[typeof(T)] = Delegate.Combine(d, handler);
         }
 
-        internal Dictionary<Type, Delegate> GetEvents() => _events;
+        public void AddEventPublisher<T>()
+            where T : DomainServiceEventArgs
+        {
+            var type = typeof(T); 
+            if (!_publishes.Contains(type))
+                _publishes.Add(type);
+        }
+
+        internal Dictionary<Type, Delegate> GetEventHandlers() => _events;
+        internal List<Type> GetEventPublishes() => _publishes;
 
         private string? _groupName;
         public string GroupName { get => _groupName ?? Assembly.GetEntryAssembly().FullName; set => _groupName = value; }

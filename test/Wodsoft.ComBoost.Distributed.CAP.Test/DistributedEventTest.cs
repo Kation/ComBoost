@@ -26,7 +26,6 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                         .AddLocalService(builder =>
                         {
                             builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
-                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleOnceEventArgs>, HandleOnceEventArgs>();
                         })
                         .AddDistributed(builder =>
                         {
@@ -39,7 +38,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                                     options.UserName = "guest";
                                     options.Password = "guest";
                                 });
-                            });
+                            }).AddDistributedEventPublisher<HandleOnceEventArgs>();
                         })
                         .AddMock();                    
                 })
@@ -53,12 +52,6 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleOnceEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleOnceCount++;
-                                return Task.CompletedTask;
-                            });
                             builder.UseCAP(x =>
                             {
                                 x.UseInMemoryStorage();
@@ -68,6 +61,11 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                                     options.UserName = "guest";
                                     options.Password = "guest";
                                 });
+                            }).AddDistributedEventHandler<HandleOnceEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleOnceCount++;
+                                return Task.CompletedTask;
                             });
                         })
                         .AddMock();
@@ -80,12 +78,6 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleOnceEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleOnceCount++;
-                                return Task.CompletedTask;
-                            });
                             builder.UseCAP(x =>
                             {
                                 x.UseInMemoryStorage();
@@ -95,6 +87,11 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                                     options.UserName = "guest";
                                     options.Password = "guest";
                                 });
+                            }).AddDistributedEventHandler<HandleOnceEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleOnceCount++;
+                                return Task.CompletedTask;
                             });
                         })
                         .AddMock();
@@ -130,7 +127,6 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                         .AddLocalService(builder =>
                         {
                             builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
-                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleGroupEventArgs>, HandleGroupEventArgs>();
                         })
                         .AddDistributed(builder =>
                         {
@@ -143,7 +139,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                                     options.UserName = "guest";
                                     options.Password = "guest";
                                 });
-                            });
+                            }).AddDistributedEventPublisher<HandleGroupEventArgs>();
                         })
                         .AddMock();
                 })
@@ -157,13 +153,6 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group1");
-                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
                             builder.UseCAP(x =>
                             {
                                 x.UseInMemoryStorage();
@@ -173,7 +162,12 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                                     options.UserName = "guest";
                                     options.Password = "guest";
                                 });
-                            });
+                            }).AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleGroupCount++;
+                                return Task.CompletedTask;
+                            }).WithGroupName("group1");
                         })
                         .AddMock();
                 })
@@ -185,13 +179,6 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group1");
-                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
                             builder.UseCAP(x =>
                             {
                                 x.UseInMemoryStorage();
@@ -201,7 +188,12 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                                     options.UserName = "guest";
                                     options.Password = "guest";
                                 });
-                            });
+                            }).AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleGroupCount++;
+                                return Task.CompletedTask;
+                            }).WithGroupName("group1");
                         })
                         .AddMock();
                 })
@@ -213,13 +205,6 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group2");
-                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
                             builder.UseCAP(x =>
                             {
                                 x.UseInMemoryStorage();
@@ -229,7 +214,12 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                                     options.UserName = "guest";
                                     options.Password = "guest";
                                 });
-                            });
+                            }).AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleGroupCount++;
+                                return Task.CompletedTask;
+                            }).WithGroupName("group2");
                         })
                         .AddMock();
                 })
@@ -241,13 +231,6 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group2");
-                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
                             builder.UseCAP(x =>
                             {
                                 x.UseInMemoryStorage();
@@ -257,7 +240,12 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                                     options.UserName = "guest";
                                     options.Password = "guest";
                                 });
-                            });
+                            }).AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleGroupCount++;
+                                return Task.CompletedTask;
+                            }).WithGroupName("group2");
                         })
                         .AddMock();
                 })

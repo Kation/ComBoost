@@ -18,28 +18,21 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
 {
     public class DomainRabbitMQEventProvider : DomainDistributedEventProvider
     {
-        private IConnection _connection;
+        private IConnection? _connection;
         private ConcurrentDictionary<string, IModel> _channels = new ConcurrentDictionary<string, IModel>();
         private Dictionary<string, AsyncEventingBasicConsumer> _consumers = new Dictionary<string, AsyncEventingBasicConsumer>();
         private DomainRabbitMQOptions _options;
         private IServiceProvider _serviceProvider;
-        private DomainServiceDistributedEventOptions _eventOptions;
+        private DomainServiceDistributedEventOptions<DomainRabbitMQEventProvider> _eventOptions;
         private ILogger _logger;
 
-        public DomainRabbitMQEventProvider(IDomainRabbitMQProvider provider, IOptions<DomainRabbitMQOptions> options, IOptions<DomainServiceDistributedEventOptions> eventOptions, IServiceProvider serviceProvider,
+        public DomainRabbitMQEventProvider(DomainRabbitMQOptions options, DomainServiceDistributedEventOptions<DomainRabbitMQEventProvider> eventOptions, IServiceProvider serviceProvider,
             ILogger<DomainRabbitMQEventProvider> logger)
         {
-            if (provider == null)
-                throw new ArgumentNullException(nameof(provider));
-            _connection = provider.GetConnection();
             _logger = logger;
-            _connection.ConnectionBlocked += _connection_ConnectionBlocked;
-            _connection.ConnectionUnblocked += _connection_ConnectionUnblocked;
-            _connection.ConnectionShutdown += _connection_ConnectionShutdown;
-            _connection.CallbackException += _connection_CallbackException;
-            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            _eventOptions = eventOptions?.Value ?? throw new ArgumentNullException(nameof(eventOptions));
+            _eventOptions = eventOptions ?? throw new ArgumentNullException(nameof(eventOptions));
         }
 
         private void _connection_CallbackException(object sender, CallbackExceptionEventArgs e)
@@ -64,6 +57,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
 
         public override Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
         {
+            if (_connection == null)
+                throw new InvalidOperationException("未开启RabbitMQ服务。");
             return Task.Run(() =>
             {
                 var name = _options.Prefix + GetTypeName<T>();
@@ -102,6 +97,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
 
         public override void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
         {
+            if (_connection == null)
+                throw new InvalidOperationException("未开启RabbitMQ服务。");
             var name = _options.Prefix + GetTypeName<T>();
             var channel = _connection.CreateModel();
             string queueName;
@@ -138,7 +135,9 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 args["x-dead-letter-exchange"] = name + "_EXCHANGE";
                 if (features.Contains(DomainDistributedEventFeatures.HandleOnce) && !features.Contains(DomainDistributedEventFeatures.Group))
                 {
-                    channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
+                    var exArgs = new Dictionary<string, object>();
+                    exArgs["x-delayed-type"] = "direct";
+                    channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout, true, false, exArgs);
                     channel.QueueBind(name, name + "_EXCHANGE", "");
                 }
                 channel.QueueDeclare(name + "_DELAY", true, false, false, args);
@@ -248,6 +247,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
 
         public override void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
         {
+            if (_connection == null)
+                throw new InvalidOperationException("未开启RabbitMQ服务。");
             var name = _options.Prefix + GetTypeName<T>();
             if (_consumers.TryGetValue(name, out var consumer))
             {
@@ -308,6 +309,46 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             if (retry & !once)
                 return false;
             return result && must;
+        }
+
+        public override Task StartAsync()
+        {
+            if (_connection != null)
+                return Task.CompletedTask;
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.DispatchConsumersAsync = true;
+            if (_options.ConnectionString != null)
+                factory.Uri = new Uri(_options.ConnectionString);
+            if (!string.IsNullOrEmpty(_options.HostName))
+                factory.HostName = _options.HostName;
+            if (!string.IsNullOrEmpty(_options.UserName))
+                factory.HostName = _options.UserName;
+            if (!string.IsNullOrEmpty(_options.Password))
+                factory.HostName = _options.Password;
+            if (!string.IsNullOrEmpty(_options.VirtualHost))
+                factory.HostName = _options.VirtualHost;
+            if (_options.Port != 0)
+                factory.Port = _options.Port;
+            _options.FactoryConfigure?.Invoke(factory);
+            _connection = factory.CreateConnection();
+            _connection.ConnectionBlocked += _connection_ConnectionBlocked;
+            _connection.ConnectionUnblocked += _connection_ConnectionUnblocked;
+            _connection.ConnectionShutdown += _connection_ConnectionShutdown;
+            _connection.CallbackException += _connection_CallbackException;
+            return Task.CompletedTask;
+        }
+
+        public override Task StopAsync()
+        {
+            if (_connection == null)
+                return Task.CompletedTask;
+            _connection.ConnectionBlocked -= _connection_ConnectionBlocked;
+            _connection.ConnectionUnblocked -= _connection_ConnectionUnblocked;
+            _connection.ConnectionShutdown -= _connection_ConnectionShutdown;
+            _connection.CallbackException -= _connection_CallbackException;
+            _connection.Close();
+            _connection.Dispose();
+            return Task.CompletedTask;
         }
     }
 }

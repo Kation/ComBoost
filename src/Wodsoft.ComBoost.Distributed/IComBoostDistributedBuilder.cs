@@ -9,13 +9,30 @@ namespace Wodsoft.ComBoost
     {
         IServiceCollection Services { get; }
 
-        IComBoostDistributedBuilder AddDistributedEventHandler<THandler, TArgs>()
+        IComBoostDistributedEventProviderBuilder<TProvider> UseEventProvider<TProvider>(params object[] parameters)
+            where TProvider : IDomainDistributedEventProvider;
+    }
+
+    public interface IComBoostDistributedEventProviderBuilder
+    {
+        IServiceCollection Services { get; }
+
+        IComBoostDistributedEventProviderBuilder AddDistributedEventHandler<THandler, TArgs>()
             where THandler : IDomainServiceEventHandler<TArgs>, new()
             where TArgs : DomainServiceEventArgs;
 
-        IComBoostDistributedBuilder AddDistributedEventHandler<TArgs>(DomainServiceEventHandler<TArgs> handler)
+        IComBoostDistributedEventProviderBuilder AddDistributedEventHandler<TArgs>(DomainServiceEventHandler<TArgs> handler)
             where TArgs : DomainServiceEventArgs;
 
-        IComBoostDistributedBuilder WithGroupName(string groupName);
+        IComBoostDistributedEventProviderBuilder AddDistributedEventPublisher<TArgs>()
+            where TArgs : DomainServiceEventArgs;
+
+        IComBoostDistributedEventProviderBuilder WithGroupName(string groupName);
+    }
+
+    public interface IComBoostDistributedEventProviderBuilder<TProvider> : IComBoostDistributedEventProviderBuilder
+            where TProvider : IDomainDistributedEventProvider
+    {
+
     }
 }

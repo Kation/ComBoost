@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services;
@@ -31,11 +32,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                         .AddLocalService(builder =>
                         {
                             builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
-                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleOnceEventArgs>, HandleOnceEventArgs>();
                         })
                         .AddDistributed(builder =>
                         {
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventPublisher<HandleOnceEventArgs>();
                         })
                         .AddMock();
                 })
@@ -50,13 +51,13 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleOnceEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleOnceCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleOnceEventArgs>((context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    _handleOnceCount++;
+                                    return Task.CompletedTask;
+                                });
                         })
                         .AddMock();
                 })
@@ -68,18 +69,19 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleOnceEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleOnceCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleOnceEventArgs>((context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    _handleOnceCount++;
+                                    return Task.CompletedTask;
+                                });
                         })
                         .AddMock();
                 })
                 .Build();
 
+            await serviceMock.StartAsync();
             await client1Mock.StartAsync();
             await client2Mock.StartAsync();
 
@@ -93,6 +95,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             await client1Mock.StopAsync();
             await client2Mock.StopAsync();
+            await serviceMock.StopAsync();
 
             Assert.Equal(1, _handleOnceCount);
         }
@@ -107,11 +110,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                         .AddLocalService(builder =>
                         {
                             builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
-                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleMoreEventArgs>, HandleMoreEventArgs>();
                         })
                         .AddDistributed(builder =>
                         {
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventPublisher<HandleMoreEventArgs>();
                         })
                         .AddMock();
                 })
@@ -125,13 +128,13 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleMoreEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleMoreCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleMoreEventArgs>((context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    _handleMoreCount++;
+                                    return Task.CompletedTask;
+                                });
                         })
                         .AddMock();
                 })
@@ -143,18 +146,19 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleMoreEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleMoreCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleMoreEventArgs>((context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    _handleMoreCount++;
+                                    return Task.CompletedTask;
+                                });
                         })
                         .AddMock();
                 })
                 .Build();
 
+            await serviceMock.StartAsync();
             await client1Mock.StartAsync();
             await client2Mock.StartAsync();
 
@@ -168,6 +172,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             await client1Mock.StopAsync();
             await client2Mock.StopAsync();
+            await serviceMock.StopAsync();
 
             Assert.Equal(2, _handleMoreCount);
         }
@@ -182,11 +187,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                         .AddLocalService(builder =>
                         {
                             builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
-                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleOnceDelayEventArgs>, HandleOnceDelayEventArgs>();
                         })
                         .AddDistributed(builder =>
                         {
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventPublisher<HandleOnceDelayEventArgs>();
                         })
                         .AddMock();
                 })
@@ -202,14 +207,14 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleOnceDelayEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleOnceDelayCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleOnceDelayEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleOnceDelayCount++;
+                                    return Task.CompletedTask;
+                                });
                         })
                         .AddMock();
                 })
@@ -221,19 +226,20 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleOnceDelayEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleOnceDelayCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleOnceDelayEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleOnceDelayCount++;
+                                    return Task.CompletedTask;
+                                });
                         })
                         .AddMock();
                 })
                 .Build();
 
+            await serviceMock.StartAsync();
             await client1Mock.StartAsync();
             await client2Mock.StartAsync();
 
@@ -249,6 +255,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             await client1Mock.StopAsync();
             await client2Mock.StopAsync();
+            await serviceMock.StopAsync();
 
             Assert.Equal(1, _handleOnceDelayCount);
         }
@@ -263,11 +270,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                         .AddLocalService(builder =>
                         {
                             builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
-                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleMoreDelayEventArgs>, HandleMoreDelayEventArgs>();
                         })
                         .AddDistributed(builder =>
                         {
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventPublisher<HandleMoreDelayEventArgs>();
                         })
                         .AddMock();
                 })
@@ -283,14 +290,14 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleMoreDelayEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleMoreDelayCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleMoreDelayEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleMoreDelayCount++;
+                                    return Task.CompletedTask;
+                                });
                         })
                         .AddMock();
                 })
@@ -302,19 +309,20 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleMoreDelayEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleMoreDelayCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleMoreDelayEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleMoreDelayCount++;
+                                    return Task.CompletedTask;
+                                });
                         })
                         .AddMock();
                 })
                 .Build();
 
+            await serviceMock.StartAsync();
             await client1Mock.StartAsync();
             await client2Mock.StartAsync();
 
@@ -330,6 +338,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             await client1Mock.StopAsync();
             await client2Mock.StopAsync();
+            await serviceMock.StopAsync();
 
             Assert.Equal(2, _handleMoreDelayCount);
         }
@@ -344,11 +353,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                         .AddLocalService(builder =>
                         {
                             builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
-                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleGroupEventArgs>, HandleGroupEventArgs>();
                         })
                         .AddDistributed(builder =>
                         {
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventPublisher<HandleGroupEventArgs>();
                         })
                         .AddMock();
                 })
@@ -364,15 +373,15 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group1");
-                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleGroupCount++;
+                                    return Task.CompletedTask;
+                                })
+                                .WithGroupName("group1");
                         })
                         .AddMock();
                 })
@@ -384,15 +393,15 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group1");
-                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleGroupCount++;
+                                    return Task.CompletedTask;
+                                })
+                                .WithGroupName("group1");
                         })
                         .AddMock();
                 })
@@ -404,15 +413,15 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group2");
-                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleGroupCount++;
+                                    return Task.CompletedTask;
+                                })
+                                .WithGroupName("group2");
                         })
                         .AddMock();
                 })
@@ -424,20 +433,21 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group2");
-                            builder.AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleGroupCount++;
+                                    return Task.CompletedTask;
+                                })
+                                .WithGroupName("group2");
                         })
                         .AddMock();
                 })
                 .Build();
 
+            await serviceMock.StartAsync();
             await group1Client1Mock.StartAsync();
             await group1Client2Mock.StartAsync();
             await group2Client1Mock.StartAsync();
@@ -456,6 +466,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
             await group1Client2Mock.StopAsync();
             await group2Client1Mock.StopAsync();
             await group2Client2Mock.StopAsync();
+            await serviceMock.StopAsync();
 
             Assert.Equal(2, _handleGroupCount);
         }
@@ -470,11 +481,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                         .AddLocalService(builder =>
                         {
                             builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
-                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleGroupDelayEventArgs>, HandleGroupDelayEventArgs>();
                         })
                         .AddDistributed(builder =>
                         {
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventPublisher<HandleGroupDelayEventArgs>();
                         })
                         .AddMock();
                 })
@@ -490,15 +501,15 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group1");
-                            builder.AddDistributedEventHandler<HandleGroupDelayEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupDelayEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleGroupCount++;
+                                    return Task.CompletedTask;
+                                })
+                                .WithGroupName("group1");
                         })
                         .AddMock();
                 })
@@ -510,15 +521,15 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group1");
-                            builder.AddDistributedEventHandler<HandleGroupDelayEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupDelayEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleGroupCount++;
+                                    return Task.CompletedTask;
+                                })
+                                .WithGroupName("group1");
                         })
                         .AddMock();
                 })
@@ -530,15 +541,15 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group2");
-                            builder.AddDistributedEventHandler<HandleGroupDelayEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupDelayEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleGroupCount++;
+                                    return Task.CompletedTask;
+                                })
+                                .WithGroupName("group2");
                         })
                         .AddMock();
                 })
@@ -550,20 +561,21 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.WithGroupName("group2");
-                            builder.AddDistributedEventHandler<HandleGroupDelayEventArgs>((context, e) =>
-                            {
-                                stopwatch.Stop();
-                                Assert.Equal(text, e.Text);
-                                _handleGroupCount++;
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleGroupDelayEventArgs>((context, e) =>
+                                {
+                                    stopwatch.Stop();
+                                    Assert.Equal(text, e.Text);
+                                    _handleGroupCount++;
+                                    return Task.CompletedTask;
+                                })
+                                .WithGroupName("group2");
                         })
                         .AddMock();
                 })
                 .Build();
 
+            await serviceMock.StartAsync();
             await group1Client1Mock.StartAsync();
             await group1Client2Mock.StartAsync();
             await group2Client1Mock.StartAsync();
@@ -583,6 +595,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
             await group1Client2Mock.StopAsync();
             await group2Client1Mock.StopAsync();
             await group2Client2Mock.StopAsync();
+            await serviceMock.StopAsync();
 
             Assert.Equal(2, _handleGroupCount);
         }
@@ -597,11 +610,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                         .AddLocalService(builder =>
                         {
                             builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
-                            builder.AddEventHandler<DomainDistributedEventPublisher<HandleOnceRetryEventArgs>, HandleOnceRetryEventArgs>();
                         })
                         .AddDistributed(builder =>
                         {
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventPublisher<HandleOnceRetryEventArgs>();
                         })
                         .AddMock();
                 })
@@ -615,15 +628,15 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleOnceRetryEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleOnceRetryCount++;
-                                if (e.RetryCount < 3)
-                                    throw new Exception();
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleOnceRetryEventArgs>((context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    _handleOnceRetryCount++;
+                                    if (e.RetryCount < 3)
+                                        throw new Exception();
+                                    return Task.CompletedTask;
+                                });
                         })
                         .AddMock();
                 })
@@ -635,20 +648,21 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                     services.AddComBoost()
                         .AddDistributed(builder =>
                         {
-                            builder.AddDistributedEventHandler<HandleOnceRetryEventArgs>((context, e) =>
-                            {
-                                Assert.Equal(text, e.Text);
-                                _handleOnceRetryCount++;
-                                if (e.RetryCount < 3)
-                                    throw new Exception();
-                                return Task.CompletedTask;
-                            });
-                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1");
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleOnceRetryEventArgs>((context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    _handleOnceRetryCount++;
+                                    if (e.RetryCount < 3)
+                                        throw new Exception();
+                                    return Task.CompletedTask;
+                                });
                         })
                         .AddMock();
                 })
                 .Build();
 
+            await serviceMock.StartAsync();
             await client1Mock.StartAsync();
             await client2Mock.StartAsync();
 
@@ -669,6 +683,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
 
             await client1Mock.StopAsync();
             await client2Mock.StopAsync();
+            await serviceMock.StopAsync();
         }
     }
 }

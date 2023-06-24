@@ -125,5 +125,15 @@ namespace Wodsoft.ComBoost.Mock
                     _instance.RemoveEventHandler((MockInMemoryEventHandler<T>)mockHandler, group);
             }
         }
+
+        public override Task StartAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        public override Task StopAsync()
+        {
+            return Task.CompletedTask;
+        }
     }
 }
