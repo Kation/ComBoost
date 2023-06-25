@@ -50,30 +50,31 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IComBoostDistributedBuilder UseInMemory(this IComBoostDistributedBuilder builder)
+        public static IComBoostDistributedEventProviderBuilder UseInMemory(this IComBoostDistributedBuilder builder)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDomainDistributedEventProvider, MockInMemoryEventProvider>());
-            return builder;
+            return builder.UseEventProvider<MockInMemoryEventProvider>(new MockInMemoryEventOptions());
         }
 
-        public static IComBoostDistributedBuilder UseInMemory(this IComBoostDistributedBuilder builder, Action<MockInMemoryEventOptions> optionsConfigure)
+        public static IComBoostDistributedEventProviderBuilder UseInMemory(this IComBoostDistributedBuilder builder, Action<MockInMemoryEventOptions> optionsConfigure)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
             if (optionsConfigure == null)
                 throw new ArgumentNullException(nameof(optionsConfigure));
-            builder.Services.PostConfigure(optionsConfigure);
-            return UseInMemory(builder);
+            var options = new MockInMemoryEventOptions();
+            optionsConfigure(options);
+            return builder.UseEventProvider<MockInMemoryEventProvider>(options);
         }
 
-        public static IComBoostDistributedBuilder UseInMemory(this IComBoostDistributedBuilder builder, object instanceKey)
+        public static IComBoostDistributedEventProviderBuilder UseInMemory(this IComBoostDistributedBuilder builder, object instanceKey)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
-            builder.Services.PostConfigure<MockInMemoryEventOptions>(options => options.InstanceKey = instanceKey);
-            return UseInMemory(builder);
+            var options = new MockInMemoryEventOptions();
+            options.InstanceKey = instanceKey;
+            return builder.UseEventProvider<MockInMemoryEventProvider>(options);
         }
 
         private readonly static MethodInfo _AddServiceMethod = typeof(IComBoostMockServiceBuilder).GetMethod("AddService");

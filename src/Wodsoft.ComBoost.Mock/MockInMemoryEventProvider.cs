@@ -14,15 +14,15 @@ namespace Wodsoft.ComBoost.Mock
     {
         private MockInMemoryInstance _instance;
         private MockInMemoryEventOptions _options;
-        private IServiceProvider _serviceProvider;
+        private IServiceScopeFactory _scopeFactory;
         private Dictionary<Delegate, Delegate> _handlers;
         private static List<Task> _Tasks = new List<Task>();
 
-        public MockInMemoryEventProvider(IServiceProvider serviceProvider, IOptions<MockInMemoryEventOptions> options)
+        public MockInMemoryEventProvider(IServiceScopeFactory scopeFactory, MockInMemoryEventOptions options)
         {
-            _serviceProvider = serviceProvider;
-            _options = options.Value;
-            _instance = MockInMemoryInstance.GetInstance(options.Value.InstanceKey);
+            _scopeFactory = scopeFactory;
+            _options = options;
+            _instance = MockInMemoryInstance.GetInstance(options.InstanceKey);
             _handlers = new Dictionary<Delegate, Delegate>();
         }
 
@@ -58,7 +58,7 @@ namespace Wodsoft.ComBoost.Mock
                     group = string.Empty;
                 var mockHandler = new MockInMemoryEventHandler<T>(args =>
                 {
-                    var scope = _serviceProvider.CreateScope();
+                    var scope = _scopeFactory.CreateScope();
                     DomainContext domainContext = new EmptyDomainContext(scope.ServiceProvider, default(CancellationToken));
                     DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
                     return handler(executionContext, args);
