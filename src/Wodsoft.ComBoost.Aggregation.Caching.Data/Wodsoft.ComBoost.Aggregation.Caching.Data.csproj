@@ -9,7 +9,6 @@
   <Import Project="../../common.props" />
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Aggregation.Caching\Wodsoft.ComBoost.Aggregation.Caching.csproj" />
-    <ProjectReference Include="..\Wodsoft.ComBoost.Data.Distributed\Wodsoft.ComBoost.Data.Distributed.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.csproj" />
   </ItemGroup>
 
