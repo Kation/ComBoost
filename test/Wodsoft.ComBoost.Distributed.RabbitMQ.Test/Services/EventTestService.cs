@@ -18,6 +18,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
             return RaiseEvent(new HandleMoreDelayEventArgs { Text = text, Delay = 5000 });
         }
 
+        public Task FireHandleMoreDelayPlugin([FromValue] string text, [FromValue] int delay)
+        {
+            return RaiseEvent(new HandleMoreDelayPluginEventArgs { Text = text, Delay = delay });
+        }
+
         public Task FireHandleOnce([FromValue] string text)
         {
             return RaiseEvent(new HandleOnceEventArgs { Text = text });
@@ -38,9 +43,9 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
             return RaiseEvent(new HandleGroupDelayEventArgs { Text = text, Delay = 5000 });
         }
 
-        public Task FireHandleOnceRetry([FromValue] string text)
+        public Task FireHandleRetry([FromValue] string text)
         {
-            return RaiseEvent(new HandleOnceRetryEventArgs { Text = text });
+            return RaiseEvent(new HandleRetryEventArgs { Text = text });
         }
 
         public Task FireHandleSingle([FromValue] string text)
@@ -51,6 +56,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
         public Task FireHandleGroupSingle([FromValue] string text)
         {
             return RaiseEvent(new HandleGroupSingleEventArgs { Text = text });
+        }
+
+        public Task FireHandleRetryPlugin([FromValue] string text)
+        {
+            return RaiseEvent(new HandleRetryPluginEventArgs { Text = text });
         }
     }
 }

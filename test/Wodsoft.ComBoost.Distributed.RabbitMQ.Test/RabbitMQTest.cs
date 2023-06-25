@@ -20,9 +20,12 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
         volatile int _handleGroupCount = 0;
         volatile int _handleOnceDelayCount = 0;
         volatile int _handleMoreDelayCount = 0;
-        volatile int _handleOnceRetryCount = 0;
+        volatile int _handleRetryCount = 0;
+        volatile int _handleRetryPluginCount = 0;
         volatile int _handleSingleCount = 0;
         volatile int _handleGroupSingleCount = 0;
+        volatile int _handleMoreDelayPluginCount = 0;
+        volatile int _handleGroupRetryCount = 0;
 
         [Fact]
         public async Task HandleOnceTest()
@@ -603,7 +606,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
         }
 
         [Fact]
-        public async Task HandleOnceRetryTest()
+        public async Task HandleRetryTest()
         {
             var serviceMock = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
@@ -616,7 +619,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                         .AddDistributed(builder =>
                         {
                             builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
-                                .AddDistributedEventPublisher<HandleOnceRetryEventArgs>();
+                                .AddDistributedEventPublisher<HandleRetryEventArgs>();
                         })
                         .AddMock();
                 })
@@ -631,10 +634,10 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                         .AddDistributed(builder =>
                         {
                             builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
-                                .AddDistributedEventHandler<HandleOnceRetryEventArgs>((context, e) =>
+                                .AddDistributedEventHandler<HandleRetryEventArgs>((context, e) =>
                                 {
                                     Assert.Equal(text, e.Text);
-                                    _handleOnceRetryCount++;
+                                    _handleRetryCount++;
                                     if (e.RetryCount < 3)
                                         throw new Exception();
                                     return Task.CompletedTask;
@@ -651,10 +654,10 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
                         .AddDistributed(builder =>
                         {
                             builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
-                                .AddDistributedEventHandler<HandleOnceRetryEventArgs>((context, e) =>
+                                .AddDistributedEventHandler<HandleRetryEventArgs>((context, e) =>
                                 {
                                     Assert.Equal(text, e.Text);
-                                    _handleOnceRetryCount++;
+                                    _handleRetryCount++;
                                     if (e.RetryCount < 3)
                                         throw new Exception();
                                     return Task.CompletedTask;
@@ -671,17 +674,17 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
             await serviceMock.RunAsync(async sp =>
             {
                 var service = sp.GetRequiredService<IEventTestService>();
-                await service.FireHandleOnceRetry(text);
+                await service.FireHandleRetry(text);
             });
 
             await Task.Delay(1000);
-            Assert.Equal(1, _handleOnceRetryCount);
+            Assert.Equal(1, _handleRetryCount);
             await Task.Delay(5000);
-            Assert.Equal(2, _handleOnceRetryCount);
+            Assert.Equal(2, _handleRetryCount);
             await Task.Delay(10000);
-            Assert.Equal(3, _handleOnceRetryCount);
+            Assert.Equal(3, _handleRetryCount);
             await Task.Delay(15000);
-            Assert.Equal(4, _handleOnceRetryCount);
+            Assert.Equal(4, _handleRetryCount);
 
             await client1Mock.StopAsync();
             await client2Mock.StopAsync();
@@ -893,5 +896,191 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
             await group2Client2Mock.StopAsync();
             await serviceMock.StopAsync();
         }
+
+        [Fact]
+        public async Task HandleMoreDelayPluginTest()
+        {
+            var serviceMock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddLocalService(builder =>
+                        {
+                            builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
+                        })
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ(options =>
+                            {
+                                options.ConnectionString = "amqp://guest:guest@127.0.0.1";
+                                options.UseDelayedMessagePlugin = true;
+                            }).AddDistributedEventPublisher<HandleMoreDelayPluginEventArgs>();
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            string text = "Hello";
+
+            var client1Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ(options =>
+                            {
+                                options.ConnectionString = "amqp://guest:guest@127.0.0.1";
+                                options.UseDelayedMessagePlugin = true;
+                            })
+                            .AddDistributedEventHandler<HandleMoreDelayPluginEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleMoreDelayPluginCount++;
+                                return Task.CompletedTask;
+                            });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            var client2Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ(options =>
+                            {
+                                options.ConnectionString = "amqp://guest:guest@127.0.0.1";
+                                options.UseDelayedMessagePlugin = true;
+                            })
+                            .AddDistributedEventHandler<HandleMoreDelayPluginEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleMoreDelayPluginCount++;
+                                return Task.CompletedTask;
+                            });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            await serviceMock.StartAsync();
+            await client1Mock.StartAsync();
+            await client2Mock.StartAsync();
+
+            await serviceMock.RunAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IEventTestService>();
+                await service.FireHandleMoreDelayPlugin(text, 5000);
+                await service.FireHandleMoreDelayPlugin(text, 2000);
+            });
+
+            await Task.Delay(3000);
+            Assert.Equal(2, _handleMoreDelayPluginCount);
+            await Task.Delay(3000);
+            Assert.Equal(4, _handleMoreDelayPluginCount);
+
+            await client1Mock.StopAsync();
+            await client2Mock.StopAsync();
+            await serviceMock.StopAsync();
+        }
+
+        [Fact]
+        public async Task HandleRetryPluginTest()
+        {
+            var serviceMock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddLocalService(builder =>
+                        {
+                            builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
+                        })
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ(options =>
+                            {
+                                options.ConnectionString = "amqp://guest:guest@127.0.0.1";
+                                options.UseDelayedMessagePlugin = true;
+                            }).AddDistributedEventPublisher<HandleRetryPluginEventArgs>();
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            string text = "Hello";
+
+            var client1Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ(options =>
+                            {
+                                options.ConnectionString = "amqp://guest:guest@127.0.0.1";
+                                options.UseDelayedMessagePlugin = true;
+                            }).AddDistributedEventHandler<HandleRetryPluginEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleRetryPluginCount++;
+                                if (e.RetryCount < 3)
+                                    throw new Exception();
+                                return Task.CompletedTask;
+                            });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            var client2Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ(options =>
+                            {
+                                options.ConnectionString = "amqp://guest:guest@127.0.0.1";
+                                options.UseDelayedMessagePlugin = true;
+                            }).AddDistributedEventHandler<HandleRetryPluginEventArgs>((context, e) =>
+                            {
+                                Assert.Equal(text, e.Text);
+                                _handleRetryPluginCount++;
+                                if (e.RetryCount < 3)
+                                    throw new Exception();
+                                return Task.CompletedTask;
+                            });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            await serviceMock.StartAsync();
+            await client1Mock.StartAsync();
+            await client2Mock.StartAsync();
+
+            await serviceMock.RunAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IEventTestService>();
+                await service.FireHandleRetryPlugin(text);
+            });
+
+            await Task.Delay(1000);
+            Assert.Equal(1, _handleRetryPluginCount);
+            await Task.Delay(5000);
+            Assert.Equal(2, _handleRetryPluginCount);
+            await Task.Delay(10000);
+            Assert.Equal(3, _handleRetryPluginCount);
+            await Task.Delay(15000);
+            Assert.Equal(4, _handleRetryPluginCount);
+
+            await client1Mock.StopAsync();
+            await client2Mock.StopAsync();
+            await serviceMock.StopAsync();
+        }
+
     }
 }

@@ -67,9 +67,20 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 properties.Persistent = true;
                 if (features.Contains(DomainDistributedEventFeatures.Delay) && args is IDomainDistributedDelayEvent delayEvent)
                 {
-                    properties.Expiration = delayEvent.Delay.ToString();
-                    name += "_DELAY";
-                    channel.BasicPublish("", name, properties, JsonSerializer.SerializeToUtf8Bytes(args));
+                    if (_options.UseDelayedMessagePlugin)
+                    {
+                        Dictionary<string, object> headers = new Dictionary<string, object>();
+                        headers["x-delay"] = delayEvent.Delay;
+                        properties.Headers = headers;
+                        name += "_EXCHANGE";
+                        channel.BasicPublish(name, "", properties, JsonSerializer.SerializeToUtf8Bytes(args));
+                    }
+                    else
+                    {
+                        properties.Expiration = delayEvent.Delay.ToString();
+                        name += "_DELAY";
+                        channel.BasicPublish("", name, properties, JsonSerializer.SerializeToUtf8Bytes(args));
+                    }
                 }
                 else if (features.Contains(DomainDistributedEventFeatures.Retry) && args is IDomainDistributedRetryEvent retryEvent && retryEvent.RetryCount != 0)
                 {
@@ -81,8 +92,19 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         _logger.LogWarning("RabbitMQ event retry count more than limit.");
                         return;
                     }
-                    name += "_RETRY_" + retryTimesAttribute.Times[retryEvent.RetryCount - 1];
-                    channel.BasicPublish("", name, properties, JsonSerializer.SerializeToUtf8Bytes(args));
+                    if (_options.UseDelayedMessagePlugin)
+                    {
+                        Dictionary<string, object> headers = new Dictionary<string, object>();
+                        headers["x-delay"] = retryTimesAttribute.Times[retryEvent.RetryCount - 1];
+                        properties.Headers = headers;
+                        name += "_EXCHANGE";
+                        channel.BasicPublish(name, "", properties, JsonSerializer.SerializeToUtf8Bytes(args));
+                    }
+                    else
+                    {
+                        name += "_RETRY_" + retryTimesAttribute.Times[retryEvent.RetryCount - 1];
+                        channel.BasicPublish("", name, properties, JsonSerializer.SerializeToUtf8Bytes(args));
+                    }
                 }
                 else
                 {
@@ -111,7 +133,16 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     args["x-single-active-consumer"] = true;
                 if (features.Contains(DomainDistributedEventFeatures.Group))
                 {
-                    channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
+                    if (_options.UseDelayedMessagePlugin)
+                    {
+                        var exArgs = new Dictionary<string, object>();
+                        exArgs["x-delayed-type"] = "direct";
+                        channel.ExchangeDeclare(name + "_EXCHANGE", "x-delayed-message", true, false, exArgs);
+                    }
+                    else
+                    {
+                        channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
+                    }
                     queueName = name + "_" + _eventOptions.GroupName;
                     channel.QueueDeclare(queueName, true, false, false, args);
                     channel.QueueBind(queueName, name + "_EXCHANGE", "");
@@ -124,46 +155,82 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             }
             else
             {
-                channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
+                if (features.Contains(DomainDistributedEventFeatures.Delay) && _options.UseDelayedMessagePlugin)
+                {
+                    var args = new Dictionary<string, object>();
+                    args["x-delayed-type"] = "direct";
+                    channel.ExchangeDeclare(name + "_EXCHANGE", "x-delayed-message", true, false, args);
+                }
+                else
+                {
+                    channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
+                }
                 queueName = channel.QueueDeclare().QueueName;
                 channel.QueueBind(queueName, name + "_EXCHANGE", "");
             }
             if (features.Contains(DomainDistributedEventFeatures.Delay))
             {
-                var args = new Dictionary<string, object>();
-                if (_options.UseQuorum)
-                    args["x-queue-type"] = "quorum";
-                args["x-dead-letter-exchange"] = name + "_EXCHANGE";
                 if (features.Contains(DomainDistributedEventFeatures.HandleOnce) && !features.Contains(DomainDistributedEventFeatures.Group))
                 {
-                    var exArgs = new Dictionary<string, object>();
-                    exArgs["x-delayed-type"] = "direct";
-                    channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout, true, false, exArgs);
+                    if (_options.UseDelayedMessagePlugin)
+                    {
+                        var args = new Dictionary<string, object>();
+                        args["x-delayed-type"] = "direct";
+                        channel.ExchangeDeclare(name + "_EXCHANGE", "x-delayed-message", true, false, args);
+                    }
+                    else
+                    {
+                        channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
+                    }
                     channel.QueueBind(name, name + "_EXCHANGE", "");
                 }
-                channel.QueueDeclare(name + "_DELAY", true, false, false, args);
+                if (!_options.UseDelayedMessagePlugin)
+                {
+                    var args = new Dictionary<string, object>();
+                    if (_options.UseQuorum)
+                        args["x-queue-type"] = "quorum";
+                    args["x-dead-letter-exchange"] = name + "_EXCHANGE";
+                    channel.QueueDeclare(name + "_DELAY", true, false, false, args);
+                }
             }
             else if (features.Contains(DomainDistributedEventFeatures.Retry))
             {
                 var retryTimesAttribute = typeof(T).GetCustomAttribute<DomainDistributedEventRetryTimesAttribute>();
                 if (retryTimesAttribute == null)
                     throw new InvalidOperationException("A distributed event can retry means that must have \"DomainDistributedEventRetryTimesAttribute\" attribute.");
-                if (features.Contains(DomainDistributedEventFeatures.HandleOnce) && !features.Contains(DomainDistributedEventFeatures.Group))
+
+                if (_options.UseDelayedMessagePlugin)
+                {
+                    var args = new Dictionary<string, object>();
+                    args["x-delayed-type"] = "direct";
+                    channel.ExchangeDeclare(name + "_EXCHANGE", "x-delayed-message", true, false, args);
+                }
+                else
                 {
                     channel.ExchangeDeclare(name + "_EXCHANGE", ExchangeType.Fanout);
-                    channel.QueueBind(name, name + "_EXCHANGE", "");
                 }
-                for (int i = 0; i < retryTimesAttribute.Times.Length; i++)
+                channel.QueueBind(name, name + "_EXCHANGE", "");
+                if (!_options.UseDelayedMessagePlugin)
                 {
-                    var time = retryTimesAttribute.Times[i];
-                    if (i > 0 && time == retryTimesAttribute.Times[i - 1])
-                        continue;
-                    var args = new Dictionary<string, object>();
-                    if (_options.UseQuorum)
-                        args["x-queue-type"] = "quorum";
-                    args["x-message-ttl"] = time;
-                    args["x-dead-letter-exchange"] = name + "_EXCHANGE";
-                    channel.QueueDeclare(name + "_RETRY_" + time, true, false, false, args);
+                    for (int i = 0; i < retryTimesAttribute.Times.Length; i++)
+                    {
+                        var time = retryTimesAttribute.Times[i];
+                        if (i > 0 && time == retryTimesAttribute.Times[i - 1])
+                            continue;
+                        var args = new Dictionary<string, object>();
+                        if (_options.UseQuorum)
+                            args["x-queue-type"] = "quorum";
+                        args["x-message-ttl"] = time;
+                        if (features.Contains(DomainDistributedEventFeatures.Group))
+                        {
+                            args["x-dead-letter-exchange"] = name + "_EXCHANGE";
+                        }
+                        else
+                        {
+                            args["x-dead-letter-exchange"] = name + "_EXCHANGE";
+                        }
+                        channel.QueueDeclare(name + "_RETRY_" + time, true, false, false, args);
+                    }
                 }
             }
             channel.BasicQos(0, _options.PrefetchCount, false);
@@ -265,13 +332,16 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             var name = _options.Prefix + GetTypeName<T>();
             return _channels.GetOrAdd(name, type =>
             {
-                var args = new Dictionary<string, object>();
-                if (_options.UseQuorum)
-                    args["x-queue-type"] = "quorum";
-                if (features.Contains(DomainDistributedEventFeatures.SignelHandler))
-                    args["x-single-active-consumer"] = true;
                 var channel = _connection!.CreateModel();
-                channel.QueueDeclare(name, true, false, false, args);
+                if (features.Contains(DomainDistributedEventFeatures.HandleOnce))
+                {
+                    var args = new Dictionary<string, object>();
+                    if (_options.UseQuorum)
+                        args["x-queue-type"] = "quorum";
+                    if (features.Contains(DomainDistributedEventFeatures.SignelHandler))
+                        args["x-single-active-consumer"] = true;
+                    channel.QueueDeclare(name, true, false, false, args);
+                }
                 return channel;
             });
         }
@@ -283,6 +353,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             bool must = false;
             bool retry = false;
             bool once = false;
+            bool group = false;
+            bool delay = false;
             foreach (var feature in features)
             {
                 switch (feature)
@@ -296,8 +368,10 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         break;
                     case DomainDistributedEventFeatures.Delay:
                         result = true;
+                        delay = true;
                         break;
                     case DomainDistributedEventFeatures.Group:
+                        group = true;
                         result = true;
                         break;
                     case DomainDistributedEventFeatures.Retry:
@@ -311,7 +385,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         return false;
                 }
             }
-            if (retry & !once)
+            if (retry && !once)
+                return false;
+            if (retry && group)
+                return false;
+            if (retry && delay)
                 return false;
             return result && must;
         }
