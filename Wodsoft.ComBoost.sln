@@ -102,6 +102,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.SourceGene
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.SourceGenerators.Test", "test\Wodsoft.ComBoost.SourceGenerators.Test\Wodsoft.ComBoost.SourceGenerators.Test.csproj", "{9229FB76-2FF8-4075-90D6-A2C7447F4A51}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Mock.Test", "test\Wodsoft.ComBoost.Mock.Test\Wodsoft.ComBoost.Mock.Test.csproj", "{4516880B-6F25-4C83-A684-881F8B651FAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -604,6 +606,18 @@ Global
 		{9229FB76-2FF8-4075-90D6-A2C7447F4A51}.Release|ARM.Build.0 = Release|Any CPU
 		{9229FB76-2FF8-4075-90D6-A2C7447F4A51}.Release|x86.ActiveCfg = Release|Any CPU
 		{9229FB76-2FF8-4075-90D6-A2C7447F4A51}.Release|x86.Build.0 = Release|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Debug|ARM.Build.0 = Debug|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Debug|x86.Build.0 = Debug|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Release|ARM.ActiveCfg = Release|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Release|ARM.Build.0 = Release|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Release|x86.ActiveCfg = Release|Any CPU
+		{4516880B-6F25-4C83-A684-881F8B651FAE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -653,6 +667,7 @@ Global
 		{6BD0352F-4532-4D12-B445-5CF85ACB7547} = {8CD0BFB3-4317-44C0-921A-8062FA141CA8}
 		{CB1DAC67-AC07-42F1-8F22-F27E3E9D13EF} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
 		{9229FB76-2FF8-4075-90D6-A2C7447F4A51} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
+		{4516880B-6F25-4C83-A684-881F8B651FAE} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACC3A7A0-05C5-40E9-ABE8-98770CA245F0}

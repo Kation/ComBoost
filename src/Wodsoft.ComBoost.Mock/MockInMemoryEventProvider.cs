@@ -15,12 +15,14 @@ namespace Wodsoft.ComBoost.Mock
         private MockInMemoryInstance _instance;
         private MockInMemoryEventOptions _options;
         private IServiceScopeFactory _scopeFactory;
+        private readonly DomainServiceDistributedEventOptions<MockInMemoryEventProvider> _eventOptions;
         private Dictionary<Delegate, Delegate> _handlers;
         private static List<Task> _Tasks = new List<Task>();
 
-        public MockInMemoryEventProvider(IServiceScopeFactory scopeFactory, MockInMemoryEventOptions options)
+        public MockInMemoryEventProvider(IServiceScopeFactory scopeFactory, DomainServiceDistributedEventOptions<MockInMemoryEventProvider> eventOptions, MockInMemoryEventOptions options)
         {
             _scopeFactory = scopeFactory;
+            _eventOptions = eventOptions;
             _options = options;
             _instance = MockInMemoryInstance.GetInstance(options.InstanceKey);
             _handlers = new Dictionary<Delegate, Delegate>();
@@ -28,22 +30,28 @@ namespace Wodsoft.ComBoost.Mock
 
         public override bool CanHandleEvent<T>(IReadOnlyList<string> features)
         {
+            bool single = false;
+            bool once = false;
             foreach (var feature in features)
             {
                 switch (feature)
                 {
                     case DomainDistributedEventFeatures.HandleOnce:
+                        once = true;
                         break;
                     case DomainDistributedEventFeatures.MustHandle:
-                        break;
                     case DomainDistributedEventFeatures.Delay:
-                        break;
                     case DomainDistributedEventFeatures.Group:
+                        break;
+                    case DomainDistributedEventFeatures.SingleHandler:
+                        single = true;
                         break;
                     default:
                         return false;
                 }
             }
+            if (single && !once)
+                return false;
             return true;
         }
 
@@ -53,7 +61,7 @@ namespace Wodsoft.ComBoost.Mock
             {
                 string group;
                 if (features.Contains(DomainDistributedEventFeatures.Group))
-                    group = _options.GroupName;
+                    group = _eventOptions.GroupName;
                 else
                     group = string.Empty;
                 var mockHandler = new MockInMemoryEventHandler<T>(args =>
@@ -70,8 +78,6 @@ namespace Wodsoft.ComBoost.Mock
 
         public override async Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
         {
-            if (features.Contains(DomainDistributedEventFeatures.Delay) && args is IDomainDistributedDelayEvent delayEvent)
-                await Task.Delay(delayEvent.Delay);
             bool once = features.Contains(DomainDistributedEventFeatures.HandleOnce);
             var handlers = _instance.GetEventHandlers<T>(once);
             bool must = features.Contains(DomainDistributedEventFeatures.MustHandle);
@@ -79,19 +85,41 @@ namespace Wodsoft.ComBoost.Mock
                 throw new InvalidOperationException($"There is no event handler for \"{typeof(T).FullName}\".");
             if (handlers == null)
                 return;
-            var tasks = handlers.Select(t => t(args)).ToArray();
+            Task[] tasks;
+            if (features.Contains(DomainDistributedEventFeatures.SingleHandler))
+            {
+                tasks = handlers.Select(async t =>
+                {
+                    if (features.Contains(DomainDistributedEventFeatures.Delay) && args is IDomainDistributedDelayEvent delayEvent)
+                        await Task.Delay(delayEvent.Delay);
+                    await t.Semaphore.WaitAsync();
+                    try
+                    {
+                        await t.Delegates[0](args);
+                    }
+                    finally
+                    {
+                        t.Semaphore.Release();
+                    }
+                }).ToArray();
+            }
+            else
+            {
+                tasks = handlers.SelectMany(t => t.Delegates.Select(async x =>
+                {
+                    if (features.Contains(DomainDistributedEventFeatures.Delay) && args is IDomainDistributedDelayEvent delayEvent)
+                        await Task.Delay(delayEvent.Delay);
+                    await x(args);
+                })).ToArray();
+            }
             if (_options.IsAsyncEvent)
             {
-                lock (tasks)
-                    _Tasks.AddRange(tasks);
+                _Tasks.AddRange(tasks);
                 _ = Task.WhenAll(tasks).ContinueWith(task =>
                 {
-                    lock (tasks)
-                    {
-                        foreach (var taks in tasks)
-                            if (!task.IsFaulted)
-                                _Tasks.Remove(task);
-                    }
+                    foreach (var taks in tasks)
+                        if (!task.IsFaulted)
+                            _Tasks.Remove(task);
                 });
             }
             else
@@ -118,7 +146,7 @@ namespace Wodsoft.ComBoost.Mock
             {
                 string group;
                 if (features.Contains(DomainDistributedEventFeatures.Group))
-                    group = _options.GroupName;
+                    group = _eventOptions.GroupName;
                 else
                     group = string.Empty;
                 if (_handlers.TryGetValue(handler, out var mockHandler))

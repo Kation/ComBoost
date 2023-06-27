@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Mock
@@ -19,21 +20,28 @@ namespace Wodsoft.ComBoost.Mock
             return _Instances.GetOrAdd(key, (_) => new MockInMemoryInstance());
         }
 
-        private ConcurrentDictionary<Type, ConcurrentDictionary<string, List<Delegate>>> _handlers = new ConcurrentDictionary<Type, ConcurrentDictionary<string, List<Delegate>>>();
+        private ConcurrentDictionary<Type, ConcurrentDictionary<string, MockInMemoryInstanceItem>> _handlers = new ConcurrentDictionary<Type, ConcurrentDictionary<string, MockInMemoryInstanceItem>>();
 
         public void AddEventHandler<T>(MockInMemoryEventHandler<T> handler, string group) where T : DomainServiceEventArgs
         {
             _handlers.AddOrUpdate(typeof(T), type =>
             {
-                var item = new ConcurrentDictionary<string, List<Delegate>>();
-                item[group] = new List<Delegate> { handler };
+                var item = new ConcurrentDictionary<string, MockInMemoryInstanceItem>();
+                var instanceItem = new MockInMemoryInstanceItem();
+                instanceItem.Delegates.Add(handler);
+                item[group] = instanceItem;
                 return item;
             }, (type, item) =>
             {
-                item.AddOrUpdate(group, g => new List<Delegate> { handler }, (g, list) =>
+                item.AddOrUpdate(group, g =>
                 {
-                    list.Add(handler);
-                    return list;
+                    var item = new MockInMemoryInstanceItem();
+                    item.Delegates.Add(handler);
+                    return item;
+                }, (g, item) =>
+                {
+                    item.Delegates.Add(handler);
+                    return item;
                 });
                 return item;
             });
@@ -44,11 +52,11 @@ namespace Wodsoft.ComBoost.Mock
             if (_handlers.TryGetValue(typeof(T), out var item))
             {
                 if (item.TryGetValue(group, out var list))
-                    list.Remove(handler);
+                    list.Delegates.Remove(handler);
             }
         }
 
-        public IReadOnlyList<MockInMemoryEventHandler<T>>? GetEventHandlers<T>(bool once) where T : DomainServiceEventArgs
+        public IReadOnlyList<MockInMemoryInstanceHandler<T>>? GetEventHandlers<T>(bool once) where T : DomainServiceEventArgs
         {
             if (!_handlers.TryGetValue(typeof(T), out var item))
                 return null;
@@ -56,15 +64,36 @@ namespace Wodsoft.ComBoost.Mock
                 return null;
             if (item.TryGetValue(string.Empty, out var list))
             {
-                if (list.Count == 0)
+                if (list.Delegates.Count == 0)
                     return null;
                 else if (once)
-                    return new MockInMemoryEventHandler<T>[1] { (MockInMemoryEventHandler<T>)list[0] };
+                    return new MockInMemoryInstanceHandler<T>[1] { new MockInMemoryInstanceHandler<T>(new List<MockInMemoryEventHandler<T>> { (MockInMemoryEventHandler<T>)list.Delegates[0] }, list.Semaphore) };
                 else
-                    return list.ConvertAll(t => (MockInMemoryEventHandler<T>)t);
+                    return new MockInMemoryInstanceHandler<T>[1] { new MockInMemoryInstanceHandler<T>(list.Delegates.ConvertAll(t => (MockInMemoryEventHandler<T>)t).ToList(), list.Semaphore) };
             }
             else
-                return item.ToArray().Where(t => t.Value.Count > 0).Select(t => (MockInMemoryEventHandler<T>)t.Value[0]).ToArray();
+                return item.ToArray().Where(t => t.Value.Delegates.Count > 0).Select(t => new MockInMemoryInstanceHandler<T>(new List<MockInMemoryEventHandler<T>> { (MockInMemoryEventHandler<T>)t.Value.Delegates[0] }, t.Value.Semaphore)).ToArray();
         }
+
+        private class MockInMemoryInstanceItem
+        {
+            public List<Delegate> Delegates { get; } = new List<Delegate>();
+
+            public SemaphoreSlim Semaphore { get; } = new SemaphoreSlim(1);
+        }
+    }
+
+    public class MockInMemoryInstanceHandler<T>
+        where T : DomainServiceEventArgs
+    {
+        public MockInMemoryInstanceHandler(List<MockInMemoryEventHandler<T>> delegates, SemaphoreSlim semaphore)
+        {
+            Delegates = delegates;
+            Semaphore = semaphore;
+        }
+
+        public List<MockInMemoryEventHandler<T>> Delegates { get; }
+
+        public SemaphoreSlim Semaphore { get; }
     }
 }

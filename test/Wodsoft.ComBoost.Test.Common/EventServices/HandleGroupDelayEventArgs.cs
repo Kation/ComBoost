@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
+namespace Wodsoft.ComBoost.Test.EventServices
 {
     public class HandleGroupDelayEventArgs : DomainServiceEventArgs, IDomainDistributedGroupEvent, IDomainDistributedDelayEvent, IDomainDistributedMustHandleEvent
     {

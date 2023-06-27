@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Wodsoft.ComBoost.Test
 {
-    public enum InvokeType : ulong
+    public enum InvokeType : byte
     {
         None = 0,
         Test = 5

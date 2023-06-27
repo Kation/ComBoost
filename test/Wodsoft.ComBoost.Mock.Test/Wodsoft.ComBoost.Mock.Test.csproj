@@ -1,8 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -20,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Wodsoft.ComBoost.Distributed.RabbitMQ\Wodsoft.ComBoost.Distributed.RabbitMQ.csproj" />
     <ProjectReference Include="..\..\src\Wodsoft.ComBoost.Mock\Wodsoft.ComBoost.Mock.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.Test.Common\Wodsoft.ComBoost.Test.Common.csproj" />
   </ItemGroup>

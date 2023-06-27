@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test.Services
+namespace Wodsoft.ComBoost.Test.EventServices
 {
-    public class HandleMoreDelayEventArgs : DomainServiceEventArgs, IDomainDistributedMustHandleEvent, IDomainDistributedDelayEvent
+    public class HandleOnceDelayEventArgs : DomainServiceEventArgs, IDomainDistributedHandleOnceEvent, IDomainDistributedMustHandleEvent, IDomainDistributedDelayEvent
     {
         public string Text { get; set; }
+
         public int Delay { get; set; }
     }
 }
