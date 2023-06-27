@@ -33,6 +33,6 @@ namespace Wodsoft.ComBoost
         internal List<Type> GetEventPublishes() => _publishes;
 
         private string? _groupName;
-        public string GroupName { get => _groupName ?? Assembly.GetEntryAssembly().FullName; set => _groupName = value; }
+        public string GroupName { get => _groupName ?? Assembly.GetEntryAssembly().GetName().Name; set => _groupName = value; }
     }
 }
