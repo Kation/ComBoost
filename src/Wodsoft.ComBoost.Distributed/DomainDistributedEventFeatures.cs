@@ -16,6 +16,6 @@ namespace Wodsoft.ComBoost
 
         public const string Retry = "RETRY";
 
-        public const string SignelHandler = "SINGLE";
+        public const string SingleHandler = "SINGLE";
     }
 }

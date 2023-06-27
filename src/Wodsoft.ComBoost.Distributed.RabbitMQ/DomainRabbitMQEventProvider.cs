@@ -129,7 +129,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 var args = new Dictionary<string, object>();
                 if (_options.UseQuorum)
                     args["x-queue-type"] = "quorum";
-                if (features.Contains(DomainDistributedEventFeatures.SignelHandler))
+                if (features.Contains(DomainDistributedEventFeatures.SingleHandler))
                     args["x-single-active-consumer"] = true;
                 if (features.Contains(DomainDistributedEventFeatures.Group))
                 {
@@ -338,7 +338,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     var args = new Dictionary<string, object>();
                     if (_options.UseQuorum)
                         args["x-queue-type"] = "quorum";
-                    if (features.Contains(DomainDistributedEventFeatures.SignelHandler))
+                    if (features.Contains(DomainDistributedEventFeatures.SingleHandler))
                         args["x-single-active-consumer"] = true;
                     channel.QueueDeclare(name, true, false, false, args);
                 }
@@ -378,7 +378,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         result = true;
                         retry = true;
                         break;
-                    case DomainDistributedEventFeatures.SignelHandler:
+                    case DomainDistributedEventFeatures.SingleHandler:
                         result = true;
                         break;
                     default:

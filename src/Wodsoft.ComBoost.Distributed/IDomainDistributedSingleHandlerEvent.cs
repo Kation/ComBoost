@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Wodsoft.ComBoost
 {
-    [DomainDistributedEventFeature(DomainDistributedEventFeatures.SignelHandler)]
+    [DomainDistributedEventFeature(DomainDistributedEventFeatures.SingleHandler)]
     public interface IDomainDistributedSingleHandlerEvent : IDomainDistributedHandleOnceEvent
     {
     }
