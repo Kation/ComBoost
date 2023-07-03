@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" Version="2.48.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
-    <PackageReference Include="Wodsoft.Protobuf.Wrapper" Version="1.0.6" />
+    <PackageReference Include="Wodsoft.Protobuf.Wrapper" Version="1.0.7" />
   </ItemGroup>
 
   <ItemGroup>
