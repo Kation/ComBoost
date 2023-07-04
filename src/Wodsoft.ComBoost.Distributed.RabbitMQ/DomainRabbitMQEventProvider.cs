@@ -133,7 +133,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     args["x-single-active-consumer"] = true;
                 if (features.Contains(DomainDistributedEventFeatures.Group))
                 {
-                    if (_options.UseDelayedMessagePlugin)
+                    if (features.Contains(DomainDistributedEventFeatures.Delay) && _options.UseDelayedMessagePlugin)
                     {
                         var exArgs = new Dictionary<string, object>();
                         exArgs["x-delayed-type"] = "direct";
