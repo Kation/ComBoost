@@ -19,7 +19,7 @@ namespace Wodsoft.ComBoost
         IComBoostDistributedEventProviderBuilder<TProvider> IComBoostDistributedBuilder.UseEventProvider<TProvider>(params object[] parameters)
         {
             var builder = new ComBoostDistributedEventProviderBuilder<TProvider>(Services);
-            Services.TryAddEnumerable(ServiceDescriptor.Transient<IHostedService, DomainDistributedEventService<TProvider>>(sp => ActivatorUtilities.CreateInstance<DomainDistributedEventService<TProvider>>(sp, builder.Options, parameters)));
+            Services.Add(ServiceDescriptor.Transient<IHostedService, DomainDistributedEventService<TProvider>>(sp => ActivatorUtilities.CreateInstance<DomainDistributedEventService<TProvider>>(sp, builder.Options, parameters)));
             return builder;
         }
     }
