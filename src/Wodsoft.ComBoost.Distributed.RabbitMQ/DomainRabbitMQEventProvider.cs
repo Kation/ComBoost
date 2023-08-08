@@ -89,7 +89,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         throw new InvalidOperationException("A distributed event can retry means that must have \"DomainDistributedEventRetryTimesAttribute\" attribute.");
                     if (retryEvent.RetryCount > retryTimesAttribute.Times.Length)
                     {
-                        _logger.LogWarning("RabbitMQ event retry count more than limit.");
+                        _logger.LogWarning("RabbitMQ event retry count more than limit. Event: \"{typeof(T).FullName}\".");
                         return;
                     }
                     if (_options.UseDelayedMessagePlugin)
@@ -113,7 +113,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     else
                         channel.BasicPublish(name + "_EXCHANGE", "", properties, JsonSerializer.SerializeToUtf8Bytes(args));
                 }
-                _logger.LogInformation("RabbitMQ event publish successfully.");
+                _logger.LogInformation($"RabbitMQ event publish successfully. Event: \"{typeof(T).FullName}\".");
             });
         }
 
@@ -264,41 +264,44 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     {
                         logger.LogInformation("RabbitMQ starting handle event.");
                         var args = JsonSerializer.Deserialize<T>(e.Body.Span)!;
-                        DomainContext domainContext = new EmptyDomainContext(_serviceProvider.CreateScope().ServiceProvider, default(CancellationToken));
-                        DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
-                        bool isSuccess = false;
-                        try
+                        using (var scope = _serviceProvider.CreateScope())
                         {
-                            await handler(executionContext, args);
-                            isSuccess = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            if (args is IDomainDistributedRetryEvent retryEvent)
+                            DomainContext domainContext = new EmptyDomainContext(scope.ServiceProvider, default(CancellationToken));
+                            DomainDistributedExecutionContext executionContext = new DomainDistributedExecutionContext(domainContext);
+                            bool isSuccess = false;
+                            try
                             {
-                                retryEvent.RetryCount++;
-                                logger.LogError(ex, "RabbitMQ event handle error and going to retry it.");
-                                bool retrySuccess = false;
-                                try
-                                {
-                                    await SendEventAsync(args, features);
-                                    retrySuccess = true;
-                                }
-                                catch
-                                {
-                                    channel.BasicNack(e.DeliveryTag, false, true);
-                                }
-                                if (retrySuccess)
-                                    channel.BasicAck(e.DeliveryTag, false);
+                                await handler(executionContext, args);
+                                isSuccess = true;
                             }
-                            else
-                                channel.BasicNack(e.DeliveryTag, false, true);
-                            logger.LogError(ex, "RabbitMQ event handle error.");
-                        }
-                        if (isSuccess)
-                        {
-                            channel.BasicAck(e.DeliveryTag, false);
-                            logger.LogInformation("RabbitMQ event handle successfully.");
+                            catch (Exception ex)
+                            {
+                                if (args is IDomainDistributedRetryEvent retryEvent)
+                                {
+                                    retryEvent.RetryCount++;
+                                    logger.LogError(ex, "RabbitMQ event handle error and going to retry it.");
+                                    bool retrySuccess = false;
+                                    try
+                                    {
+                                        await SendEventAsync(args, features);
+                                        retrySuccess = true;
+                                    }
+                                    catch
+                                    {
+                                        channel.BasicNack(e.DeliveryTag, false, true);
+                                    }
+                                    if (retrySuccess)
+                                        channel.BasicAck(e.DeliveryTag, false);
+                                }
+                                else
+                                    channel.BasicNack(e.DeliveryTag, false, true);
+                                logger.LogError(ex, "RabbitMQ event handle error.");
+                            }
+                            if (isSuccess)
+                            {
+                                channel.BasicAck(e.DeliveryTag, false);
+                                logger.LogInformation("RabbitMQ event handle successfully.");
+                            }
                         }
                     }
                 }

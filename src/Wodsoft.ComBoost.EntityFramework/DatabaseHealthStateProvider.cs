@@ -60,6 +60,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
                 }
             }
+            scope.Dispose();
         }
 
         public async ValueTask DisposeAsync()
