@@ -40,7 +40,7 @@ namespace Wodsoft.ComBoost
         public bool IsExcluded { get; set; }
 
         /// <summary>
-        /// 是否排除。
+        /// 是否包含。
         /// </summary>
         public bool IsIncluded { get; set; }
 
