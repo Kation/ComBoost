@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             if (builderConfigure == null)
                 throw new ArgumentNullException(nameof(builderConfigure));
-            ComBoostGrpcBuilder grpcBuilder = new ComBoostGrpcBuilder(builder.Services);
+            ComBoostGrpcBuilder grpcBuilder = new ComBoostGrpcBuilder(builder.Services, builder);
             builderConfigure(grpcBuilder);
             return builder;
         }

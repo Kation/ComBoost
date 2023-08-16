@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<DomainGrpcDiscoveryService>), typeof(DomainGrpcServiceMethodProvider)));
-            return new ComBoostGrpcBuilder(builder.Services);
+            return new ComBoostGrpcBuilder(builder.Services, builder);
         }
 
         public static IComBoostGrpcBuilder AddAuthenticationPassthrough(this IComBoostGrpcBuilder builder)
