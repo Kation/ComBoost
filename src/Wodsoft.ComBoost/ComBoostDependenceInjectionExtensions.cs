@@ -34,7 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
-            var localBuilder = new ComBoostLocalBuilder(builder.Services);
+            var localBuilder = new ComBoostLocalBuilder(builder.Services, builder);
             foreach (var module in builder.Modules)
                 module.ConfigureDomainServices(localBuilder);
             localBuilderConfigure(localBuilder);

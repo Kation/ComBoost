@@ -14,5 +14,7 @@ namespace Wodsoft.ComBoost
         void AddModule<TModule>() where TModule : IDomainModule, new();
 
         event EventHandler<DomainModuleAddedEventArgs> ModuleAdded;
+
+        IDictionary<string, object> Properties { get; }
     }
 }

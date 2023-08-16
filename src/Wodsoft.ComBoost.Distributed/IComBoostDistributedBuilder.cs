@@ -9,6 +9,8 @@ namespace Wodsoft.ComBoost
     {
         IServiceCollection Services { get; }
 
+        IComBoostBuilder ComBoostBuilder { get; }
+
         IComBoostDistributedEventProviderBuilder<TProvider> UseEventProvider<TProvider>(params object[] parameters)
             where TProvider : IDomainDistributedEventProvider;
     }

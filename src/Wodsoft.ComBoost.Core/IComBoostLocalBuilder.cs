@@ -19,5 +19,7 @@ namespace Wodsoft.ComBoost
         IComBoostLocalServiceBuilder<T> AddService<T>() where T : class, IDomainService;
 
         IServiceCollection Services { get; }
+
+        IComBoostBuilder ComBoostBuilder { get; }
     }
 }

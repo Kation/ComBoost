@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost
             Modules = new ReadOnlyCollection<IDomainModule>(_modules);
         }
 
-        public event EventHandler<DomainModuleAddedEventArgs> ModuleAdded;
+        public event EventHandler<DomainModuleAddedEventArgs>? ModuleAdded;
 
         public IServiceCollection Services { get; }
 
@@ -31,5 +31,7 @@ namespace Wodsoft.ComBoost
         }
 
         public IReadOnlyList<IDomainModule> Modules { get; }
+
+        public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
     }
 }

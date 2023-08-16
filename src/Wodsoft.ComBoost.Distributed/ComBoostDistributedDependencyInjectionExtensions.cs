@@ -16,7 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             if (distributedBuilderCongifure == null)
                 throw new ArgumentNullException(nameof(distributedBuilderCongifure));
-            var distributedBuilder = new ComBoostDistributedBuilder(builder.Services);
+            var distributedBuilder = new ComBoostDistributedBuilder(builder.Services, builder);
             foreach (var module in builder.Modules)
                 if (module is IDomainDistributedModule distributedModule)
                     distributedModule.ConfigureDistributedServices(distributedBuilder);

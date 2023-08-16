@@ -8,12 +8,15 @@ namespace Wodsoft.ComBoost.Grpc.Client
 {
     public class ComBoostGrpcBuilder : IComBoostGrpcBuilder
     {
-        public ComBoostGrpcBuilder(IServiceCollection services)
+        public ComBoostGrpcBuilder(IServiceCollection services, IComBoostBuilder comBoostBuilder)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
+            ComBoostBuilder = comBoostBuilder;
         }
 
         public IServiceCollection Services { get; }
+
+        public IComBoostBuilder ComBoostBuilder { get; }
 
         public IComBoostGrpcServiceBuilder AddService(Uri address, Func<IServiceProvider, GrpcChannelOptions> optionsFactory)
         {

@@ -9,12 +9,15 @@ namespace Wodsoft.ComBoost
 {
     public class ComBoostLocalBuilder : IComBoostLocalBuilder
     {
-        public ComBoostLocalBuilder(IServiceCollection services)
+        public ComBoostLocalBuilder(IServiceCollection services, IComBoostBuilder comBoostBuilder)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
+            ComBoostBuilder = comBoostBuilder;
         }
 
         public IServiceCollection Services { get; }
+
+        public IComBoostBuilder ComBoostBuilder { get; }
 
         public event EventHandler<ComBoostLocalBuilderEventArgs>? ServiceAdded;
 

@@ -2,17 +2,21 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Wodsoft.ComBoost.AspNetCore;
 
 namespace Wodsoft.ComBoost.Grpc.AspNetCore
 {
     public class ComBoostGrpcBuilder : IComBoostGrpcBuilder
     {
-        public ComBoostGrpcBuilder(IServiceCollection services)
+        public ComBoostGrpcBuilder(IServiceCollection services, IComBoostAspNetCoreBuilder aspNetCoreBuilder)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
+            AspNetCoreBuilder = aspNetCoreBuilder;
         }
 
         public IServiceCollection Services { get; }
+
+        public IComBoostAspNetCoreBuilder AspNetCoreBuilder { get; }
 
         public IComBoostGrpcBuilder AddTemplate<T>() where T : IDomainTemplate
         {

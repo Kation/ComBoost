@@ -9,12 +9,15 @@ namespace Wodsoft.ComBoost
 {
     public class ComBoostDistributedBuilder : IComBoostDistributedBuilder
     {
-        public ComBoostDistributedBuilder(IServiceCollection services)
+        public ComBoostDistributedBuilder(IServiceCollection services, IComBoostBuilder comBoostBuilder)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
+            ComBoostBuilder = comBoostBuilder;
         }
 
         public IServiceCollection Services { get; }
+
+        public IComBoostBuilder ComBoostBuilder { get; }
 
         IComBoostDistributedEventProviderBuilder<TProvider> IComBoostDistributedBuilder.UseEventProvider<TProvider>(params object[] parameters)
         {
