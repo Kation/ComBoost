@@ -258,6 +258,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             };
             consumer.Received += async (sender, e) =>
             {
+                bool isAcked = false;
                 try
                 {
                     using (logger.BeginScope(new DomainRabbitMQLogState(typeof(T).FullName, e.Exchange, e.Redelivered, e.DeliveryTag)))
@@ -289,17 +290,25 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                                     catch
                                     {
                                         channel.BasicNack(e.DeliveryTag, false, true);
+                                        isAcked = true;
                                     }
                                     if (retrySuccess)
+                                    {
                                         channel.BasicAck(e.DeliveryTag, false);
+                                        isAcked = true;
+                                    }
                                 }
                                 else
+                                {
                                     channel.BasicNack(e.DeliveryTag, false, true);
+                                    isAcked = true;
+                                }
                                 logger.LogError(ex, "RabbitMQ event handle error.");
                             }
                             if (isSuccess)
                             {
                                 channel.BasicAck(e.DeliveryTag, false);
+                                isAcked = true;
                                 logger.LogInformation("RabbitMQ event handle successfully.");
                             }
                         }
@@ -308,7 +317,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "RabbitMQ operation error.");
-                    channel.BasicNack(e.DeliveryTag, false, true);
+                    if (!isAcked)
+                        channel.BasicNack(e.DeliveryTag, false, true);
                 }
             };
             channel.BasicConsume(queueName, false, consumer);
