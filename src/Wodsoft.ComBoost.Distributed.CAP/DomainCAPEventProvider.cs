@@ -12,14 +12,16 @@ namespace Wodsoft.ComBoost.Distributed.CAP
     {
         private ICapPublisher _publisher;
         internal Dictionary<Delegate, string> Handlers = new Dictionary<Delegate, string>();
+        private DomainCAPEventHandlerProvider _handlerProvider;
         private DomainServiceDistributedEventOptions<DomainCAPEventProvider> _eventOptions;
         private CapOptions _capOptions;
 
-        public DomainCAPEventProvider(ICapPublisher publisher, DomainServiceDistributedEventOptions<DomainCAPEventProvider> eventOptions, CapOptions capOptions)
+        public DomainCAPEventProvider(ICapPublisher publisher, DomainCAPEventHandlerProvider handlerProvider, DomainServiceDistributedEventOptions<DomainCAPEventProvider> eventOptions, IOptions<CapOptions> capOptions)
         {
             _publisher = publisher ?? throw new ArgumentNullException(nameof(publisher));
             _eventOptions = eventOptions ?? throw new ArgumentNullException(nameof(eventOptions));
-            _capOptions = capOptions ?? throw new ArgumentNullException(nameof(capOptions));
+            _capOptions = capOptions.Value;
+            _handlerProvider = handlerProvider;
         }
 
         public override void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
@@ -27,9 +29,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP
             var name = GetTypeName<T>();
             if (!string.IsNullOrEmpty(_capOptions.GroupNamePrefix))
                 name = _capOptions.GroupNamePrefix + name;
-            if (features.Contains(DomainDistributedEventFeatures.Group))
-                name += "_" + _eventOptions.GroupName;
-            Handlers.Add(handler, name);
+            _handlerProvider.Handlers.Add(handler, (name, _eventOptions.GroupName));
         }
 
         public override Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
@@ -40,7 +40,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP
 
         public override void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
         {
-            Handlers.Remove(handler);
+            _handlerProvider.Handlers.Remove(handler);
         }
 
         public override bool CanHandleEvent<T>(IReadOnlyList<string> features)
@@ -66,12 +66,12 @@ namespace Wodsoft.ComBoost.Distributed.CAP
 
         public override Task StartAsync()
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public override Task StopAsync()
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }

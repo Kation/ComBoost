@@ -8,9 +8,9 @@ namespace Wodsoft.ComBoost.Distributed.CAP
 {
     public class DomainConsumerServiceSelector : IConsumerServiceSelector
     {
-        private DomainCAPEventProvider _provider;
+        private DomainCAPEventHandlerProvider _provider;
 
-        public DomainConsumerServiceSelector(DomainCAPEventProvider provider)
+        public DomainConsumerServiceSelector(DomainCAPEventHandlerProvider provider)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
@@ -27,7 +27,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP
             return _provider.Handlers.Select(t =>
             {
                 var argType = t.Key.Method.GetParameters()[1].ParameterType;
-                var descriptor = (DomainConsumerExecutorDescriptor)Activator.CreateInstance(typeof(DomainConsumerExecutorDescriptor<>).MakeGenericType(argType), t.Key, t.Value);
+                var descriptor = (DomainConsumerExecutorDescriptor)Activator.CreateInstance(typeof(DomainConsumerExecutorDescriptor<>).MakeGenericType(argType), t.Key, t.Value.Item1, t.Value.Item2)!;
                 return descriptor;
             }).ToList();
         }

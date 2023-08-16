@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -23,14 +24,16 @@ namespace Wodsoft.ComBoost.Distributed.CAP
     {
         private DomainServiceEventHandler<T> _handler;
 
-        public DomainConsumerExecutorDescriptor(DomainServiceEventHandler<T> handler, string groupName)
+        public DomainConsumerExecutorDescriptor(DomainServiceEventHandler<T> handler, string eventName, string groupName)
         {
             _handler = handler ?? throw new ArgumentNullException(nameof(handler));
-            Attribute = new CapSubscribeAttribute(DomainDistributedEventProvider.GetTypeName(typeof(T))) { Group = groupName };
+            Attribute = new CapSubscribeAttribute(eventName) { Group = groupName };
             Parameters = new List<ParameterDescriptor>
             {
                 new ParameterDescriptor{ ParameterType = typeof(T), IsFromCap = false }
             };
+            ImplTypeInfo = handler.Target?.GetType().GetTypeInfo() ?? typeof(DomainConsumerExecutorDescriptor).GetTypeInfo();
+            MethodInfo = handler.Method;
         }
 
         public override Type ArgumentType => typeof(T);

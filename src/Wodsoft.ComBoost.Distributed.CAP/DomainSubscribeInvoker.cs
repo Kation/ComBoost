@@ -26,7 +26,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP
             if (context.ConsumerDescriptor is DomainConsumerExecutorDescriptor consumerExecutor)
             {
                 using (var scope = _serviceProvider.CreateScope())
-                    await consumerExecutor.HandleAsync(scope.ServiceProvider, context.DeliverMessage.Value, cancellationToken);
+                    await consumerExecutor.HandleAsync(scope.ServiceProvider, context.DeliverMessage.Value!, cancellationToken);
                 return new ConsumerExecutedResult(null, context.DeliverMessage.GetId(), context.DeliverMessage.GetCallbackName());
             }
             else

@@ -11,19 +11,16 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ComBoostCAPDependencyInjectionExtensions
     {
-        private static bool _Used;
-
         public static IComBoostDistributedEventProviderBuilder<DomainCAPEventProvider> UseCAP(this IComBoostDistributedBuilder builder)
         {
             if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
-            if (_Used)
+                throw new ArgumentNullException(nameof(builder));            
+            if (builder.ComBoostBuilder.Properties.ContainsKey("CAPEventProvider"))
                 throw new NotSupportedException("CAP仅支持单个使用，不支持多个实例。");
-            _Used = true;
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDomainDistributedEventProvider, DomainCAPEventProvider>(sp => sp.GetRequiredService<DomainCAPEventProvider>()));
-            builder.Services.AddSingleton<DomainCAPEventProvider>();
+            builder.ComBoostBuilder.Properties["CAPEventProvider"] = true;
             builder.Services.AddSingleton<ISubscribeInvoker, DomainSubscribeInvoker>();
             builder.Services.AddSingleton<IConsumerServiceSelector, DomainConsumerServiceSelector>();
+            builder.Services.AddSingleton<DomainCAPEventHandlerProvider>();
             return builder.UseEventProvider<DomainCAPEventProvider>();
         }
 
@@ -33,8 +30,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             if (capOptionsConfigure == null)
                 throw new ArgumentNullException(nameof(capOptionsConfigure));
+            var eventBuilder = UseCAP(builder);
             builder.Services.AddCap(capOptionsConfigure);
-            return UseCAP(builder);
+            return eventBuilder;
         }
     }
 }

@@ -98,6 +98,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                 })
                 .Build();
 
+            await serviceMock.StartAsync();
             await client1Mock.StartAsync();
             await client2Mock.StartAsync();
 
@@ -111,6 +112,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
 
             await Task.Delay(2000);
 
+            await serviceMock.StopAsync();
             await client1Mock.StopAsync();
             await client2Mock.StopAsync();
 
@@ -251,6 +253,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
                 })
                 .Build();
 
+            await serviceMock.StartAsync();
             await group1client1Mock.StartAsync();
             await group1client2Mock.StartAsync();
             await group2client1Mock.StartAsync();
@@ -266,6 +269,7 @@ namespace Wodsoft.ComBoost.Distributed.CAP.Test
 
             await Task.Delay(2000);
 
+            await serviceMock.StopAsync();
             await group1client1Mock.StopAsync();
             await group1client2Mock.StopAsync();
             await group2client1Mock.StopAsync();
