@@ -10,5 +10,7 @@ namespace Wodsoft.ComBoost.Mock
         IServiceCollection Services { get; }
 
         IComBoostMockServiceBuilder AddService<TService>() where TService : class;
+
+        IComBoostMockServiceBuilder AddAuthenticationPassthrough();
     }
 }
