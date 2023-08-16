@@ -36,7 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.TryAddScoped<IExecutionResultHandler, DefaultExecutionResultHandler>();
             builder.Services.PostConfigure<AuthenticationProviderOptions>(options => options.AddHandler<AspNetCoreAuthenticationHandler>(500));
             if (builderConfigure != null)
-                builderConfigure(new ComBoostAspNetCoreBuilder(builder.Services));
+                builderConfigure(new ComBoostAspNetCoreBuilder(builder.Services, builder));
             return builder;
         }
     }
