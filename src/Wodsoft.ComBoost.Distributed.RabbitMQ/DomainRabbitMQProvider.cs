@@ -30,11 +30,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 if (!string.IsNullOrEmpty(_options.HostName))
                     factory.HostName = _options.HostName;
                 if (!string.IsNullOrEmpty(_options.UserName))
-                    factory.HostName = _options.UserName;
+                    factory.UserName = _options.UserName;
                 if (!string.IsNullOrEmpty(_options.Password))
-                    factory.HostName = _options.Password;
+                    factory.Password = _options.Password;
                 if (!string.IsNullOrEmpty(_options.VirtualHost))
-                    factory.HostName = _options.VirtualHost;
+                    factory.VirtualHost = _options.VirtualHost;
                 if (_options.Port != 0)
                     factory.Port = _options.Port;
                 _options.FactoryConfigure?.Invoke(factory);
