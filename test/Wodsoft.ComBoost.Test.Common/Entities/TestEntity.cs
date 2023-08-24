@@ -5,7 +5,7 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Test.Entities
 {
-    public class TestEntity : EntityBase
+    public class TestEntity : EntityBase<Guid>
     {
         public int ValueInt { get; set; }
 

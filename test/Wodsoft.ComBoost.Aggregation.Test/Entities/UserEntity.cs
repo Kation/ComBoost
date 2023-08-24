@@ -8,7 +8,7 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Aggregation.Test.Entities
 {
-    public class UserEntity : EntityBase
+    public class UserEntity : EntityBase<Guid>
     {
         [Required]
         [MaxLength(20)]

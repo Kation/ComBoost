@@ -8,7 +8,7 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Aggregation.Test.Entities
 {
-    public class OrganizationEntity : EntityBase
+    public class OrganizationEntity : EntityBase<Guid>
     {
         public Guid? ParentId { get; set; }
         private OrganizationEntity _parent;

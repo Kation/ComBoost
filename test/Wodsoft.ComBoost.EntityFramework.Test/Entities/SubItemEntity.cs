@@ -6,7 +6,7 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.EntityFramework.Test.Entities
 {
-    public class SubItemEntity : EntityBase
+    public class SubItemEntity : EntityBase<Guid>
     {
         [Required]
         [MaxLength(20)]

@@ -6,7 +6,7 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Test.Entities
 {
-    public class ThenIncludeEntity : EntityBase
+    public class ThenIncludeEntity : EntityBase<Guid>
     {
         public string Text { get; set; }
     }
