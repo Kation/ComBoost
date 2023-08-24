@@ -20,7 +20,7 @@ namespace Wodsoft.ComBoost
             if (cancellationToken == null)
                 throw new ArgumentNullException(nameof(cancellationToken));
             _ServiceProvider = serviceProvider;
-            Filter = new List<IDomainServiceFilter>();
+            Filters = new List<IDomainServiceFilter>();
             EventManager = new DomainContextEventManager(serviceProvider.GetRequiredService<IDomainServiceEventManager>());
         }
 
@@ -37,7 +37,7 @@ namespace Wodsoft.ComBoost
 
         public CancellationToken ServiceAborted { get; private set; }
 
-        public IList<IDomainServiceFilter> Filter { get; private set; }
+        public IList<IDomainServiceFilter> Filters { get; private set; }
 
         public DomainServiceEventManager EventManager { get; private set; }
 

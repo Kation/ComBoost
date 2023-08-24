@@ -24,7 +24,7 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取领域服务过滤器列表。
         /// </summary>
-        IList<IDomainServiceFilter> Filter { get; }
+        IList<IDomainServiceFilter> Filters { get; }
 
         /// <summary>
         /// 领域事件管理器。

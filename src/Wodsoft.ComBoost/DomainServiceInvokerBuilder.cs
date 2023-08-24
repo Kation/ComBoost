@@ -67,7 +67,7 @@ namespace Wodsoft.ComBoost
                     using (logger.BeginScope(new DomainServiceInvokerLogState(typeof(TDomainService), _executionContext.DomainMethod)))
                         await ExecuteAsync();
                 };
-                var filters = DomainContext.Filter;
+                var filters = DomainContext.Filters;
                 for (int i = filters.Count - 1; i >= 0; i--)
                 {
                     var next = pipeline;
