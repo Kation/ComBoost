@@ -24,5 +24,10 @@ namespace Wodsoft.ComBoost.Test
         {
             return Task.CompletedTask;
         }
+
+        public async Task EventTest()
+        {
+            await RaiseEvent(new RequestEventArgs());
+        }
     }
 }

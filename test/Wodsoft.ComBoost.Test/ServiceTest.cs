@@ -32,5 +32,34 @@ namespace Wodsoft.ComBoost.Test
                 await greeter.Test(Guid.NewGuid());
             }
         }
+
+        [Fact]
+        public async Task EventTest()
+        {
+            bool raised = false;
+
+            ServiceCollection services = new ServiceCollection();
+            services.AddComBoost()
+                .AddLocalService(builder =>
+                {
+                    builder.AddService<GreeterService>()
+                        .UseTemplate<IGreeterTemplate>()
+                        .UseEventHandler<RequestEventArgs>((context, e) =>
+                        {
+                            raised = true;
+                            return Task.CompletedTask;
+                        });
+                })
+                .AddMock();
+            var serviceProvider = services.BuildServiceProvider();
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var greeter = scope.ServiceProvider.GetRequiredService<IGreeterTemplate>();
+                await greeter.EventTest();
+            }
+
+            Assert.True(raised);
+        }
     }
 }
