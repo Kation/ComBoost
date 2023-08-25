@@ -25,7 +25,8 @@ namespace Wodsoft.ComBoost.Grpc.Client
 
         public Func<IServiceProvider, GrpcChannelOptions> OptionsFactory => _optionsFactory;
 
-        IComBoostGrpcServiceBuilder IComBoostGrpcServiceBuilder.UseTemplate<T>(CallOptions callOptions)
+        public IComBoostGrpcServiceBuilder UseTemplate<T>(CallOptions callOptions = default)
+             where T : class, IDomainTemplate
         {
             Services.AddSingleton<IDomainTemplateDescriptor<T>, GrpcTemplateBuilder<T>>(sp =>
                 new GrpcTemplateBuilder<T>(GrpcChannel.ForAddress(_address, _optionsFactory(sp)), callOptions)
