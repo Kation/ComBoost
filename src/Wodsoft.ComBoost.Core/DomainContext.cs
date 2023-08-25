@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost
 {
     public abstract class DomainContext : IDomainContext
     {
-        private IServiceProvider _ServiceProvider;
+        private IServiceProvider _serviceProvider;
 
         public DomainContext(IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
@@ -19,19 +19,19 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(serviceProvider));
             if (cancellationToken == null)
                 throw new ArgumentNullException(nameof(cancellationToken));
-            _ServiceProvider = serviceProvider;
+            _serviceProvider = serviceProvider;
             Filters = new List<IDomainServiceFilter>();
             EventManager = new DomainContextEventManager(serviceProvider.GetRequiredService<IDomainServiceEventManager>());
         }
 
-        private dynamic? _DataBag;
+        private dynamic? _dataBag;
         public virtual dynamic DataBag
         {
             get
             {
-                if (_DataBag == null)
-                    _DataBag = new DomainContextDataBag();
-                return _DataBag;
+                if (_dataBag == null)
+                    _dataBag = new DomainContextDataBag();
+                return _dataBag;
             }
         }
 
@@ -41,11 +41,15 @@ namespace Wodsoft.ComBoost
 
         public DomainServiceEventManager EventManager { get; private set; }
 
+        public abstract IValueProvider ValueProvider { get; }
+
         public virtual object GetService(Type serviceType)
         {
             if (serviceType == typeof(IDomainContext) || serviceType == typeof(IServiceProvider))
                 return this;
-            return _ServiceProvider.GetService(serviceType);
+            if (serviceType == typeof(IValueProvider))
+                return ValueProvider;
+            return _serviceProvider.GetService(serviceType);
         }
     }
 }

@@ -27,8 +27,13 @@ namespace Wodsoft.ComBoost
         IList<IDomainServiceFilter> Filters { get; }
 
         /// <summary>
-        /// 领域事件管理器。
+        /// 获取领域事件管理器。
         /// </summary>
-        DomainServiceEventManager EventManager { get; }     
+        DomainServiceEventManager EventManager { get; }
+
+        /// <summary>
+        /// 获取值提供器。
+        /// </summary>
+        IValueProvider ValueProvider { get; }
     }
 }

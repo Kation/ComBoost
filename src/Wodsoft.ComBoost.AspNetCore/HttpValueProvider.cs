@@ -13,7 +13,7 @@ namespace Wodsoft.ComBoost.AspNetCore
     /// <summary>
     /// Http值提供器。
     /// </summary>
-    public class HttpValueProvider : IConfigurableValueProvider
+    public class HttpValueProvider : IValueProvider
     {
         private Dictionary<string, object?> _Values;
         private Dictionary<string, string> _Alias;

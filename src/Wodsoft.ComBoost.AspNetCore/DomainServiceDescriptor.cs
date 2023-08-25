@@ -78,7 +78,7 @@ namespace Wodsoft.ComBoost.AspNetCore
             if (!_Caches.TryGetValue(methodName, out var invoker))
                 throw new InvalidOperationException("不存在的方法名。");
             var service = context.GetRequiredService<T>();
-            await invoker(service, context, context.GetRequiredService<IValueProvider>());
+            await invoker(service, context, context.ValueProvider);
             return service.Context!;
         }
     }

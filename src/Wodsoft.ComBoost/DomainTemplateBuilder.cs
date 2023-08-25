@@ -47,7 +47,7 @@ namespace Wodsoft.ComBoost
 
             protected void SetValues(Dictionary<string, object> values)
             {
-                var valueProvider = Context.GetRequiredService<IConfigurableValueProvider>();
+                var valueProvider = Context.ValueProvider;
                 foreach (var value in values)
                     valueProvider.SetValue(value.Key, value.Value);
             }
@@ -75,6 +75,7 @@ namespace Wodsoft.ComBoost
         internal static readonly MethodInfo _GetParameterInfo = typeof(DomainTemplateBuilder<TDomainService, T>).GetMethod("GetParameterInfo");
         internal static readonly MethodInfo _GetDomainService = typeof(DomainTemplateAgent<TDomainService>).GetProperty("Service").GetGetMethod();
         internal static readonly ConstructorInfo _AgentConstructor = typeof(DomainTemplateAgent<TDomainService>).GetConstructor(new Type[] { typeof(IDomainContext), typeof(TDomainService) });
+        internal static readonly MethodInfo _GetValueProvider = typeof(IDomainContext).GetProperty(nameof(IDomainContext.ValueProvider)).GetGetMethod();
         private static Dictionary<string, FromAttribute[]> _FromAttributes;
         private static Dictionary<string, ParameterInfo[]> _ParameterInfos;
         private static TypeBuilder _AgentBuilder;
@@ -246,10 +247,7 @@ namespace Wodsoft.ComBoost
                 //var valueProvider = (IValueProvider)this.Context.GetService(typeof(IValueProvider));
                 ilGenerator.Emit(OpCodes.Ldarg_0);
                 ilGenerator.Emit(OpCodes.Call, _GetContext);
-                ilGenerator.Emit(OpCodes.Ldtoken, typeof(IValueProvider));
-                ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle", new Type[1] { typeof(RuntimeTypeHandle) }));
-                ilGenerator.Emit(OpCodes.Callvirt, _GetService);
-                ilGenerator.Emit(OpCodes.Castclass, typeof(IValueProvider));
+                ilGenerator.Emit(OpCodes.Callvirt, _GetValueProvider);
                 ilGenerator.Emit(OpCodes.Stloc, valueProviderLocal);
 
                 int count = 0;

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Wodsoft.ComBoost
 {
-    public class EmptyValueProvider : IConfigurableValueProvider
+    public class EmptyValueProvider : IValueProvider
     {
         private Dictionary<string, object?> _Values;
         private Dictionary<string, string> _Alias;

@@ -14,7 +14,7 @@ namespace Wodsoft.ComBoost.Data
             await next();
             if (context.Result is IViewModel viewModel)
             {
-                var valueProvider = context.DomainContext.GetService<IValueProvider>();
+                var valueProvider = context.DomainContext.ValueProvider;
                 int page = valueProvider.GetValue<int>("page");
                 int size = valueProvider.GetValue<int>("size");
                 viewModel.SetPage(page);

@@ -57,7 +57,7 @@ namespace Wodsoft.ComBoost
         /// <returns>返回值。</returns>
         public override object? GetValue(IDomainContext context, ParameterInfo parameter)
         {
-            IValueProvider provider = context.GetRequiredService<IValueProvider>();
+            IValueProvider provider = context.ValueProvider;
             object? value = provider.GetValue(Name ?? parameter.Name, parameter.ParameterType);
             if (value == null)
                 if (DefaultValue != null || parameter.HasDefaultValue)

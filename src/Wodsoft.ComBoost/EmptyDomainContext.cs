@@ -10,16 +10,10 @@ namespace Wodsoft.ComBoost
         public EmptyDomainContext(IServiceProvider serviceProvider, CancellationToken cancellationToken)
             : base(serviceProvider, cancellationToken)
         {
-            ValueProvider = new EmptyValueProvider();
+            _valueProvider = new EmptyValueProvider();
         }
-        
-        public EmptyValueProvider ValueProvider { get; private set; }
 
-        public override object GetService(Type serviceType)
-        {
-            if (serviceType == typeof(IValueProvider) || serviceType == typeof(IConfigurableValueProvider))
-                return ValueProvider;
-            return base.GetService(serviceType);
-        }
+        private EmptyValueProvider _valueProvider;
+        public override IValueProvider ValueProvider => _valueProvider;
     }
 }

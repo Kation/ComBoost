@@ -29,5 +29,19 @@ namespace Wodsoft.ComBoost
         /// <param name="name">名称。</param>
         /// <returns></returns>
         bool ContainsKey(string name);
+
+        /// <summary>
+        /// 设置值。
+        /// </summary>
+        /// <param name="name">名称。</param>
+        /// <param name="value">值。</param>
+        void SetValue(string name, object? value);
+
+        /// <summary>
+        /// 设置别名。
+        /// </summary>
+        /// <param name="name">名称。</param>
+        /// <param name="aliasName">别名。</param>
+        void SetAlias(string name, string aliasName);
     }
 }

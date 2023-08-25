@@ -45,7 +45,7 @@ namespace Wodsoft.ComBoost
         public override object? GetValue(IDomainContext context, ParameterInfo parameter)
         {
             var metadata = EntityDescriptor.GetMetadata(parameter.ParameterType);
-            IValueProvider provider = context.GetRequiredService<IValueProvider>();
+            IValueProvider provider = context.ValueProvider;
             if (metadata.KeyProperties.Count == 0)
                 throw new InvalidOperationException($"实体“{parameter.ParameterType.FullName}”没有主键。");
             if (metadata.KeyProperties.Count != 0)

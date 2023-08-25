@@ -14,22 +14,15 @@ namespace Wodsoft.ComBoost.Mock
 
         }
 
-        private MockValueProvider? _ValueProvider;
-        public MockValueProvider ValueProvider
+        private MockValueProvider? _valueProvider;
+        public override IValueProvider ValueProvider
         {
             get
             {
-                if (_ValueProvider == null)
-                    _ValueProvider = new MockValueProvider();
-                return _ValueProvider;
+                if (_valueProvider == null)
+                    _valueProvider = new MockValueProvider();
+                return _valueProvider;
             }
-        }
-
-        public override object GetService(Type serviceType)
-        {
-            if (serviceType == typeof(IValueProvider) || serviceType == typeof(IConfigurableValueProvider))
-                return ValueProvider;
-            return base.GetService(serviceType);
         }
     }
 }

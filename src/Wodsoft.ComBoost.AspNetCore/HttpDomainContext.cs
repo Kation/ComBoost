@@ -25,25 +25,18 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// <summary>
         /// 获取值提供器。
         /// </summary>
-        public HttpValueProvider ValueProvider { get { return GetValueProvider(); } }
+        public override IValueProvider ValueProvider { get { return GetValueProvider(); } }
 
-        private HttpValueProvider? _ValueProvider;
+        private HttpValueProvider? _valueProvider;
         /// <summary>
         /// 获取值提供器。
         /// </summary>
         /// <returns>返回Http值提供器。</returns>
         protected virtual HttpValueProvider GetValueProvider()
         {
-            if (_ValueProvider == null)
-                _ValueProvider = new HttpValueProvider(HttpContext);
-            return _ValueProvider;
-        }
-
-        public override object GetService(Type serviceType)
-        {
-            if (serviceType == typeof(IValueProvider) || serviceType == typeof(IConfigurableValueProvider))
-                return ValueProvider;
-            return base.GetService(serviceType);
+            if (_valueProvider == null)
+                _valueProvider = new HttpValueProvider(HttpContext);
+            return _valueProvider;
         }
     }
 }

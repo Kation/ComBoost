@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Wodsoft.ComBoost
 {
-    public class DomainRpcValueProvider : IConfigurableValueProvider
+    public class DomainRpcValueProvider : IValueProvider
     {
         private IDomainRpcRequest _request;
         private Dictionary<string, object?> _values = new Dictionary<string, object?>();
