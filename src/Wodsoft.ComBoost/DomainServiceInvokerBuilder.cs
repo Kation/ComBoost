@@ -72,13 +72,23 @@ namespace Wodsoft.ComBoost
                 {
                     var next = pipeline;
                     var index = i;
-                    pipeline = () => filters[index].OnExecutionAsync(_executionContext!, next);
+                    pipeline = () =>
+                    {
+                        if (_executionContext!.IsCompleted)
+                            return Task.CompletedTask;
+                        return filters[index].OnExecutionAsync(_executionContext!, next);
+                    };
                 }
                 for (int i = globalFilters.Count - 1; i >= 0; i--)
                 {
                     var next = pipeline;
                     var index = i;
-                    pipeline = () => globalFilters[index].OnExecutionAsync(_executionContext!, next);
+                    pipeline = () =>
+                    {
+                        if (_executionContext!.IsCompleted)
+                            return Task.CompletedTask;
+                        return globalFilters[index].OnExecutionAsync(_executionContext!, next);
+                    };
                 }
                 return pipeline;
             }
@@ -105,12 +115,14 @@ namespace Wodsoft.ComBoost
             }
 
             private TResult? _result;
+            private bool _executed;
 
             protected void HandleResult(Task<TResult> task)
             {
                 if (task.IsFaulted)
                     System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
                 _result = task.Result;
+                _executed = true;
                 _executionContext!.Done(_result);
             }
 
@@ -118,7 +130,9 @@ namespace Wodsoft.ComBoost
             {
                 if (task.IsFaulted)
                     System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
-                return _result;
+                if (_executed)
+                    return _result;
+                return (TResult?)_executionContext!.Result;
             }
         }
     }

@@ -61,5 +61,28 @@ namespace Wodsoft.ComBoost.Test
 
             Assert.True(raised);
         }
+
+        [Fact]
+        public async Task FilterTest()
+        {
+            ServiceCollection services = new ServiceCollection();
+            services.AddComBoost()
+                .AddLocalService(builder =>
+                {
+                    builder.AddService<GreeterService>()
+                        .UseTemplate<IGreeterTemplate>()
+                        .UseFilter<HelloInterruptFilter>("Hello");
+                })
+                .AddMock();
+            var serviceProvider = services.BuildServiceProvider();
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var greeter = scope.ServiceProvider.GetRequiredService<IGreeterTemplate>();
+                var request = new HelloRequest { Name = "Kation" };
+                var response = await greeter.Hello();
+                Assert.Equal("Interrupt", response);
+            }
+        }
     }
 }
