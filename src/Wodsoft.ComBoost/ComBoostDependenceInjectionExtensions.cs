@@ -55,6 +55,15 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
+        public static IComBoostBuilder TryAddContextProvider<TProvider>(this IComBoostBuilder builder, int order)
+            where TProvider : class, IDomainContextProvider
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.TryAddContextProvider<TProvider>(order));
+            return builder;
+        }
+
         public static IComBoostBuilder AddGlobalFilter<T>(this IComBoostBuilder builder)
             where T : class, IDomainServiceFilter, new()
         {
