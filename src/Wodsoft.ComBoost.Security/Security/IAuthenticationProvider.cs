@@ -11,6 +11,7 @@ namespace Wodsoft.ComBoost.Security
     /// <summary>
     /// 权限提供器。
     /// </summary>
+    [Obsolete]
     public interface IAuthenticationProvider
     {
         /// <summary>

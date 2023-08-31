@@ -32,7 +32,6 @@ namespace Wodsoft.ComBoost.Mock
         {
             Services.AddScoped(sp =>
             {
-                sp.GetRequiredService<IAuthenticationProvider>();
                 var lifecycle = sp.GetService<IMockServiceLifecycle>();
                 var scope = _servicesGetter().CreateScope();
                 if (_authenticationPassthrough)

@@ -26,6 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
             services.TryAddScoped<IDomainContextProvider, CompositeDomainContextProvider>();
             services.TryAddScoped<IAuthenticationProvider, AuthenticationProvider>();
+            services.AddScoped<IAuthorizationProvider, DefaultAuthorizationProvider>();
             services.PostConfigure<AuthenticationProviderOptions>(options => options.AddHandler<AnonymousAuthenticationHandler>(1000));
             return new ComBoostBuilder(services);
         }

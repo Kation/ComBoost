@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\src\Wodsoft.ComBoost.Mock\Wodsoft.ComBoost.Mock.csproj" />
     <ProjectReference Include="..\..\src\Wodsoft.ComBoost\Wodsoft.ComBoost.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.Test.Common\Wodsoft.ComBoost.Test.Common.csproj" />
+    <ProjectReference Include="..\..\src\Wodsoft.ComBoost.SourceGenerators\Wodsoft.ComBoost.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

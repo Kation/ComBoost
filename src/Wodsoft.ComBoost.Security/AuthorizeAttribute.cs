@@ -37,11 +37,11 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取权限。
         /// </summary>
-        public IAuthenticationProvider? AuthenticationProvider { get; private set; }
+        public IAuthorizationProvider? AuthorizationProvider { get; private set; }
 
         public override async Task OnExecutionAsync(IDomainExecutionContext context, DomainExecutionPipeline next)
         {
-            AuthenticationProvider = context.DomainContext.GetRequiredService<IAuthenticationProvider>();
+            AuthorizationProvider = context.DomainContext.GetRequiredService<IAuthorizationProvider>();
             await AuthorizeCore(context);
             await next();
         }
@@ -53,10 +53,16 @@ namespace Wodsoft.ComBoost
         /// <returns></returns>
         protected virtual async Task AuthorizeCore(IDomainExecutionContext context)
         {
-            var user = await AuthenticationProvider!.GetUserAsync();
-            if (Roles.Length > 0 && !Roles.Any(t => user.IsInRole(t)))
+            if (Roles.Length != 0)
             {
-                throw new DomainServiceException(new UnauthorizedAccessException("用户没有" + string.Join("，", "“" + Roles + "”") + "权限。"));
+                var exists = await AuthorizationProvider!.CheckInRoles(context, Roles);
+                if (exists.Length == 0)
+                    throw new DomainServiceException(new UnauthorizedAccessException("用户没有" + string.Join("，", "“" + Roles + "”") + "权限。"));
+            }
+            else
+            {
+                if (!context.DomainContext.User.Identity.IsAuthenticated)
+                    throw new DomainServiceException(new UnauthorizedAccessException("用户未通过身份验证。"));
             }
         }
     }

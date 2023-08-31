@@ -10,14 +10,14 @@ namespace Wodsoft.ComBoost.Grpc.Client
 {
     public class DomainGrpcClientAuthenticationPassthroughRequestHandler : IDomainRpcClientRequestHandler
     {
-        public async Task HandleAsync(IDomainRpcRequest request, IDomainContext context)
+        public Task HandleAsync(IDomainRpcRequest request, IDomainContext context)
         {
-            var authenticationProvider = context.GetRequiredService<IAuthenticationProvider>();
-            var user = await authenticationProvider.GetUserAsync();
+            var user = context.User;
             MemoryStream stream = new MemoryStream();
             BinaryWriter writer = new BinaryWriter(stream);
             user.WriteTo(writer);
             request.Headers["Authentication"] = stream.ToArray();
+            return Task.CompletedTask;
         }
     }
 }
