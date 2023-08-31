@@ -56,7 +56,8 @@ namespace Microsoft.AspNetCore.Builder
                 throw new InvalidOperationException("领域服务映射配置没有配置服务类型。");
             IDomainService domainService = (IDomainService)ActivatorUtilities.CreateInstance(httpContext.RequestServices, mapping.ServiceType);
 
-            HttpDomainContext context = new HttpDomainContext(httpContext);
+            var options = httpContext.RequestServices.GetRequiredService<IOptions<DomainAspNetCoreOptions>>();
+            HttpDomainContext context = new HttpDomainContext(httpContext, options.Value.AuthenticationHandler(httpContext));
 
             var descriptor = (DomainServiceDescriptor)httpContext.RequestServices.GetRequiredService(typeof(DomainServiceDescriptor<>).MakeGenericType(mapping.ServiceType));
             if (descriptor.ContainsMethod(method))

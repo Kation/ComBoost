@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,7 +13,7 @@ namespace Wodsoft.ComBoost.Mock
         public MockDomainContext(IServiceProvider serviceProvider, CancellationToken cancellationToken)
             : base(serviceProvider, cancellationToken)
         {
-
+            User = serviceProvider.GetRequiredService<MockAuthenticationSettings>().User;
         }
 
         private MockValueProvider? _valueProvider;
@@ -24,5 +26,7 @@ namespace Wodsoft.ComBoost.Mock
                 return _valueProvider;
             }
         }
+
+        public override ClaimsPrincipal User { get; }
     }
 }

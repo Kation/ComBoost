@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +43,8 @@ namespace Wodsoft.ComBoost
         public DomainServiceEventManager EventManager { get; private set; }
 
         public abstract IValueProvider ValueProvider { get; }
+
+        public abstract ClaimsPrincipal User { get; }
 
         public virtual object GetService(Type serviceType)
         {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,9 +13,10 @@ namespace Wodsoft.ComBoost.AspNetCore
     /// </summary>
     public class HttpDomainContext : DomainContext
     {
-        public HttpDomainContext(HttpContext httpContext) : base(httpContext.RequestServices, httpContext.RequestAborted)
+        public HttpDomainContext(HttpContext httpContext, ClaimsPrincipal user) : base(httpContext.RequestServices, httpContext.RequestAborted)
         {
             HttpContext = httpContext;
+            User = user;
         }
 
         /// <summary>
@@ -26,6 +28,8 @@ namespace Wodsoft.ComBoost.AspNetCore
         /// 获取值提供器。
         /// </summary>
         public override IValueProvider ValueProvider { get { return GetValueProvider(); } }
+
+        public override ClaimsPrincipal User { get; }
 
         private HttpValueProvider? _valueProvider;
         /// <summary>

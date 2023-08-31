@@ -1,16 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Security.Claims;
 using System.Text;
 
-namespace Wodsoft.ComBoost.Grpc.AspNetCore
+namespace Wodsoft.ComBoost.AspNetCore
 {
-    public class DomainGrpcServiceOptions
+    public class DomainAspNetCoreOptions
     {
-        private Func<HttpContext, IDomainRpcRequest, ClaimsPrincipal> _authenticationHandler = (context, request) => context.User;
-        public Func<HttpContext, IDomainRpcRequest, ClaimsPrincipal> AuthenticationHandler
+        private Func<HttpContext, ClaimsPrincipal> _authenticationHandler = context => context.User ;
+        public Func<HttpContext, ClaimsPrincipal> AuthenticationHandler
         {
             get => _authenticationHandler; set
             {

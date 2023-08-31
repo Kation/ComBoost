@@ -2,8 +2,10 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using Wodsoft.ComBoost;
 using Wodsoft.ComBoost.AspNetCore;
@@ -23,7 +25,17 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IComBoostGrpcBuilder AddAuthenticationPassthrough(this IComBoostGrpcBuilder builder)
         {
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDomainRpcServerRequestHandler, DomainGrpcServerAuthenticationPassthroughRequestHandler>());
+            builder.Services.PostConfigure<DomainGrpcServiceOptions>(options => options.AuthenticationHandler = (context, request) =>
+            {
+                if (request.Headers.TryGetValue("Authentication", out var data))
+                {
+                    MemoryStream stream = new MemoryStream(data);
+                    BinaryReader reader = new BinaryReader(stream);
+                    ClaimsPrincipal principal = new ClaimsPrincipal(reader);
+                    return principal;
+                }
+                return context.User;
+            });
             return builder;
         }
 

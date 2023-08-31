@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,5 +36,10 @@ namespace Wodsoft.ComBoost
         /// 获取值提供器。
         /// </summary>
         IValueProvider ValueProvider { get; }
+
+        /// <summary>
+        /// 获取用户主体声明。
+        /// </summary>
+        ClaimsPrincipal User { get; }
     }
 }

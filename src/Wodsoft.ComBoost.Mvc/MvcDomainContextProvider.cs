@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,9 +11,11 @@ namespace Wodsoft.ComBoost.Mvc
 {
     public class MvcDomainContextProvider : HttpDomainContextProvider
     {
-        public MvcDomainContextProvider(IActionContextAccessor actionContextAccessor) : base(actionContextAccessor?.ActionContext?.HttpContext)
+        private readonly DomainAspNetCoreOptions _options;
+        public MvcDomainContextProvider(IActionContextAccessor actionContextAccessor, IOptions<DomainAspNetCoreOptions> options) : base(actionContextAccessor?.ActionContext?.HttpContext)
         {
             ActionContext = actionContextAccessor?.ActionContext;
+            _options = options.Value;
         }
 
         protected MvcDomainContextProvider(ActionContext actionContext) : base(actionContext?.HttpContext)
@@ -28,7 +31,7 @@ namespace Wodsoft.ComBoost.Mvc
         {
             if (ActionContext == null)
                 throw new NotSupportedException("There is no action context currently.");
-            return new MvcDomainContext(ActionContext);
+            return new MvcDomainContext(ActionContext, _options.AuthenticationHandler(HttpContext));
         }
     }
 }
