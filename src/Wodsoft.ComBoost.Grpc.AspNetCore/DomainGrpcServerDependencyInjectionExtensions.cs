@@ -1,4 +1,5 @@
 ﻿using Grpc.AspNetCore.Server.Model;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
@@ -23,9 +24,15 @@ namespace Microsoft.Extensions.DependencyInjection
             return new ComBoostGrpcBuilder(builder.Services, builder);
         }
 
+        public static IComBoostGrpcBuilder UseAuthentication(this IComBoostGrpcBuilder builder, Func<HttpContext, IDomainRpcRequest, ClaimsPrincipal> handler)
+        {
+            builder.Services.PostConfigure<DomainGrpcServiceOptions>(options => options.AuthenticationHandler = handler);
+            return builder;
+        }
+
         public static IComBoostGrpcBuilder AddAuthenticationPassthrough(this IComBoostGrpcBuilder builder)
         {
-            builder.Services.PostConfigure<DomainGrpcServiceOptions>(options => options.AuthenticationHandler = (context, request) =>
+            return UseAuthentication(builder, (context, request) =>
             {
                 if (request.Headers.TryGetValue("Authentication", out var data))
                 {
@@ -36,7 +43,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 }
                 return context.User;
             });
-            return builder;
         }
 
         private readonly static MethodInfo _AddTemplateMethod = typeof(IComBoostGrpcBuilder).GetMethod("AddTemplate")!;
