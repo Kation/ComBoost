@@ -31,6 +31,13 @@ namespace Microsoft.Extensions.DependencyInjection
             return new ComBoostBuilder(services);
         }
 
+        public static IComBoostBuilder AddAuthorizationProvider<T>(this IComBoostBuilder builder)
+            where T : class, IAuthorizationProvider
+        {
+            builder.Services.AddScoped<IAuthorizationProvider, T>();
+            return builder;
+        }
+
         public static IComBoostBuilder AddLocalService(this IComBoostBuilder builder, Action<IComBoostLocalBuilder> localBuilderConfigure)
         {
             if (builder == null)
