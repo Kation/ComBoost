@@ -33,6 +33,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         public async Task Add(TCreateDTO item)
         {
             var entity = _mapper.Map<TCreateDTO, TEntity>(item);
+            entity.OnCreating();
             _options.OnAddMapped?.Invoke(entity, item);
             _context.Add(entity);
             await _context.Database.SaveAsync();
@@ -46,6 +47,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             var entities = source.Select(t =>
             {
                 var entity = _mapper.Map<TCreateDTO, TEntity>(t);
+                entity.OnCreating();
                 _options.OnAddMapped?.Invoke(entity, t);
                 return entity;
             }).ToArray();
