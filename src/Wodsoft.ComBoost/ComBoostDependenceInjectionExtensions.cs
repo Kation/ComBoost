@@ -109,5 +109,10 @@ namespace Microsoft.Extensions.DependencyInjection
             }
             return builder;
         }
+
+        public static IServiceCollection AddInMemorySemaphoreProvider(this IServiceCollection services)
+        {
+            return services.AddSingleton<ISemaphoreProvider, InMemorySemaphoreProvider>();
+        }
     }
 }
