@@ -183,6 +183,70 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ.Test
         }
 
         [Fact]
+        public async Task HandleMoreWithOneClientTest()
+        {
+            var serviceMock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddLocalService(builder =>
+                        {
+                            builder.AddService<EventTestService>().UseTemplate<IEventTestService>();
+                        })
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventPublisher<HandleMoreEventArgs>();
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            string text = "Hello";
+
+            var client1Mock = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddComBoost()
+                        .AddDistributed(builder =>
+                        {
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleMoreEventArgs>((context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    _handleMoreCount++;
+                                    return Task.CompletedTask;
+                                });
+                            builder.UseRabbitMQ("amqp://guest:guest@127.0.0.1")
+                                .AddDistributedEventHandler<HandleMoreEventArgs>((context, e) =>
+                                {
+                                    Assert.Equal(text, e.Text);
+                                    _handleMoreCount++;
+                                    return Task.CompletedTask;
+                                });
+                        })
+                        .AddMock();
+                })
+                .Build();
+
+            await serviceMock.StartAsync();
+            await client1Mock.StartAsync();
+
+            await serviceMock.RunAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IEventTestService>();
+                await service.FireHandleMore(text);
+            });
+
+            await Task.Delay(2000);
+
+            await client1Mock.StopAsync();
+            await serviceMock.StopAsync();
+
+            Assert.Equal(2, _handleMoreCount);
+        }
+
+        [Fact]
         public async Task HandleOnceDelayTest()
         {
             var serviceMock = Host.CreateDefaultBuilder()
