@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Wodsoft.ComBoost.AspNetCore\Wodsoft.ComBoost.AspNetCore.csproj" />
     <ProjectReference Include="..\Wodsoft.ComBoost.Test.Common\Wodsoft.ComBoost.Test.Common.csproj" />
+    <ProjectReference Include="..\..\src\Wodsoft.ComBoost.SourceGenerators.AspNetCore\Wodsoft.ComBoost.SourceGenerators.AspNetCore.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

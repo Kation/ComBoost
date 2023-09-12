@@ -106,6 +106,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Mock.Test"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.StackExchangeRedis", "src\Wodsoft.ComBoost.StackExchangeRedis\Wodsoft.ComBoost.StackExchangeRedis.csproj", "{C4969CEC-9804-41B0-A63C-EF327D1DCB81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.SourceGenerators.AspNetCore", "src\Wodsoft.ComBoost.SourceGenerators.AspNetCore\Wodsoft.ComBoost.SourceGenerators.AspNetCore.csproj", "{F7047059-72E2-40B3-81B3-1EEB63360CCA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -632,6 +634,18 @@ Global
 		{C4969CEC-9804-41B0-A63C-EF327D1DCB81}.Release|ARM.Build.0 = Release|Any CPU
 		{C4969CEC-9804-41B0-A63C-EF327D1DCB81}.Release|x86.ActiveCfg = Release|Any CPU
 		{C4969CEC-9804-41B0-A63C-EF327D1DCB81}.Release|x86.Build.0 = Release|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Debug|ARM.Build.0 = Debug|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Debug|x86.Build.0 = Debug|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Release|ARM.ActiveCfg = Release|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Release|ARM.Build.0 = Release|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Release|x86.ActiveCfg = Release|Any CPU
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -683,6 +697,7 @@ Global
 		{9229FB76-2FF8-4075-90D6-A2C7447F4A51} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
 		{4516880B-6F25-4C83-A684-881F8B651FAE} = {29BF66BA-1E0D-4550-BAA5-8917E558A6D1}
 		{C4969CEC-9804-41B0-A63C-EF327D1DCB81} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
+		{F7047059-72E2-40B3-81B3-1EEB63360CCA} = {42E2F6CA-200F-471D-B92A-4D0961AB35E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACC3A7A0-05C5-40E9-ABE8-98770CA245F0}

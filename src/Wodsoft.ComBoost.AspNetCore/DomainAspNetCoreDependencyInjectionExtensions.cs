@@ -2,6 +2,9 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Reflection;
 using System.Text;
 using Wodsoft.ComBoost;
 using Wodsoft.ComBoost.AspNetCore;
@@ -11,21 +14,18 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DomainAspNetCoreDependencyInjectionExtensions
     {
-        public static void AddDomainServiceMapping<T>(this IComBoostAspNetCoreBuilder builder, string? name = null)
-            where T : class, IDomainService
+        public static IComBoostAspNetCoreBuilder AddDomainEndpoint(this IComBoostAspNetCoreBuilder builder)
         {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
-            if (name == null)
-            {
-                name = DomainService.GetServiceName(typeof(T));
-            }
-            builder.Services.Configure<DomainServiceMapping>(name.ToLower(), options =>
-            {
-                options.ServiceType = typeof(T);
-            });
-            builder.Services.AddSingleton<DomainServiceDescriptor<T>>();
-            builder.Services.AddTransient<T>();
+            var types = Assembly.GetCallingAssembly().GetTypes().Where(t => !t.IsValueType && !t.IsAbstract && t.GetCustomAttribute<DomainEndpointAttribute>() != null).ToList();
+            builder.Services.PostConfigure<DomainEndpointOptions>(options => options.Types.AddRange(types));
+            return builder;
+        }
+
+        public static IComBoostAspNetCoreBuilder AddDomainEndpoint(this IComBoostAspNetCoreBuilder builder, Assembly assembly)
+        {
+            var types = assembly.GetTypes().Where(t => !t.IsValueType && !t.IsAbstract && t.GetCustomAttribute<DomainEndpointAttribute>() != null).ToList();
+            builder.Services.PostConfigure<DomainEndpointOptions>(options => options.Types.AddRange(types));
+            return builder;
         }
 
         public static IComBoostBuilder AddAspNetCore(this IComBoostBuilder builder, Action<IComBoostAspNetCoreBuilder>? builderConfigure = null)

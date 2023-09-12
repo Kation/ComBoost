@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Wodsoft.ComBoost.AspNetCore.Test.Services;
 using Wodsoft.ComBoost.Test;
 
 namespace Wodsoft.ComBoost.AspNetCore.Test
@@ -15,11 +16,11 @@ namespace Wodsoft.ComBoost.AspNetCore.Test
             services.AddComBoost()
                 .AddLocalService(builder =>
                 {
-                    //builder.AddService<GreeterService>().UseTemplate<IGreeterTemplate>();
+                    builder.AddService<TestDomainService>();
                 })
                 .AddAspNetCore(builder =>
                 {
-                    builder.AddDomainServiceMapping<GreeterService>();
+                    builder.AddDomainEndpoint();
                 });
         }
 
@@ -29,7 +30,7 @@ namespace Wodsoft.ComBoost.AspNetCore.Test
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDomainService();
+                endpoints.MapDomainEndpoint();
             });
         }
     }

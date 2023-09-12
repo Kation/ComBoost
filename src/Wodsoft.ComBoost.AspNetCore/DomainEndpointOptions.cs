@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
-    public class DomainServiceMapping
+    public class DomainEndpointOptions
     {
-        public Type? ServiceType { get; set; }
+        public List<Type> Types { get; } = new List<Type>();
     }
 }
