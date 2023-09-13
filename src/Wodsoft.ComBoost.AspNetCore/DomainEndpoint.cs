@@ -1,4 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
+#if !NETCOREAPP2_1
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+#endif
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,6 +20,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
@@ -20,6 +29,14 @@ namespace Wodsoft.ComBoost.AspNetCore
         public abstract Task HandleRequest(HttpContext httpContext);
 
         public abstract string EndpointTemplate { get; }
+
+        public abstract bool HasEndpoint { get; }
+
+        public abstract Type TemplateType { get; }
+
+#if !NETCOREAPP2_1
+        public abstract IEnumerable<ApiDescription> GetApiDescriptions();
+#endif
     }
 
     public abstract class DomainEndpoint<T> : DomainEndpoint
@@ -178,5 +195,93 @@ namespace Wodsoft.ComBoost.AspNetCore
             httpContext.Response.StatusCode = 500;
             return Task.CompletedTask;
         }
+
+#if !NETCOREAPP2_1
+
+        protected virtual IEnumerable<ApiRequestFormat> GetSupportedRequestFormat(MethodInfo method)
+        {
+            if (method.Name.StartsWith("Get"))
+                return Array.Empty<ApiRequestFormat>();
+            return new ApiRequestFormat[] { new ApiRequestFormat { MediaType = "application/json" } };
+        }
+
+        protected virtual ModelMetadata GetModelMetadata(Type type)
+        {
+            return new DomainEndpointModelMetadata(ModelMetadataIdentity.ForType(type));
+        }
+
+        protected virtual IEnumerable<ApiResponseType> GetSupportedResponse(MethodInfo method)
+        {
+            if (method.ReturnType == typeof(Task))
+            {
+                return new ApiResponseType[]
+                {
+                    new ApiResponseType
+                    {
+                        StatusCode = 200
+                    }
+                };
+            }
+            else
+            {
+                return new ApiResponseType[]
+                {
+                    new ApiResponseType
+                    {
+                        ApiResponseFormats = { new ApiResponseFormat { MediaType = "application/json"} },
+                        ModelMetadata = GetModelMetadata( method.ReturnType.GetGenericArguments()[0]),
+                        StatusCode = 200
+                    }
+                };
+            }
+        }
+
+        public override IEnumerable<ApiDescription> GetApiDescriptions()
+        {
+            foreach (var method in typeof(T).GetMethods())
+            {
+                var apiDescription = new ApiDescription();
+                if (method.Name.StartsWith("Get"))
+                    apiDescription.HttpMethod = "GET";
+                else if (method.Name.StartsWith("Update") || method.Name.StartsWith("Edit"))
+                    apiDescription.HttpMethod = "PUT";
+                else if (method.Name.StartsWith("Delete") || method.Name.StartsWith("Remove"))
+                    apiDescription.HttpMethod = "DELETE";
+                else
+                    apiDescription.HttpMethod = "POST";
+#pragma warning disable CS8619
+                apiDescription.ActionDescriptor = new ActionDescriptor
+                {
+                    RouteValues = new Dictionary<string, string>
+                    {
+                        // Swagger uses this to group endpoints together.
+                        // Group methods together using the service name.
+                        ["controller"] = GetTemplateName()
+                    },
+                    EndpointMetadata = Array.Empty<object>()
+                };
+#pragma warning restore CS8619
+                apiDescription.RelativePath = EndpointTemplate.TrimStart('/').Replace("{method}", method.Name);
+                if (apiDescription.HttpMethod != "GET")
+                    foreach (var format in GetSupportedRequestFormat(method))
+                        apiDescription.SupportedRequestFormats.Add(format);
+                foreach (var responseType in GetSupportedResponse(method))
+                    apiDescription.SupportedResponseTypes.Add(responseType);
+                //apiDescription.GroupName = explorerSettings.GroupName;
+
+                foreach (var parameter in method.GetParameters())
+                {
+                    apiDescription.ParameterDescriptions.Add(new ApiParameterDescription
+                    {
+                        Name = parameter.Name!,
+                        ModelMetadata = GetModelMetadata(parameter.ParameterType),
+                        Source = apiDescription.HttpMethod == "GET" ? BindingSource.Query : BindingSource.Body,
+                        DefaultValue = parameter.DefaultValue
+                    });
+                }
+                yield return apiDescription;
+            }
+        }
+#endif
     }
 }

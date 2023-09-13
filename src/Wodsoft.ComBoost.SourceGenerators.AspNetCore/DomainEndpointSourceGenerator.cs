@@ -51,107 +51,122 @@ namespace Wodsoft.ComBoost
                     builder.AppendLine("{");
                     builder.AppendLine($"    public partial class {name}");
                     builder.AppendLine("    {");
-                    builder.AppendLine($"        protected override async Task HandleRequest(HttpContext httpContext, {GetTypeFullText((INamedTypeSymbol)templateType)} domainTemplate, string method)");
-                    builder.AppendLine("        {");
-                    builder.AppendLine("            switch (method.ToLower())");
-                    builder.AppendLine("            {");
-                    bool fail = false;
-                    foreach (var member in templateType.GetMembers().OfType<IMethodSymbol>())
+                    if (templateType.GetMembers().OfType<IMethodSymbol>().Any())
                     {
-                        builder.AppendLine($"                case \"{member.Name.ToLower()}\":");
-                        builder.AppendLine("                {");
-                        string httpMethod;
-                        if (member.Name.StartsWith("Get"))
-                            httpMethod = "GET";
-                        else if (member.Name.StartsWith("Post") || member.Name.StartsWith("Insert") || member.Name.StartsWith("Create"))
-                            httpMethod = "POST";
-                        else if (member.Name.StartsWith("Update") || member.Name.StartsWith("Edit"))
-                            httpMethod = "PUT";
-                        else if (member.Name.StartsWith("Delete") || member.Name.StartsWith("Remove"))
-                            httpMethod = "DELETE";
-                        else
-                            httpMethod = "POST";
-                        if (httpMethod != "GET" && member.Parameters.Length != 1)
+                        builder.AppendLine($"        protected override async Task HandleRequest(HttpContext httpContext, {GetTypeFullText((INamedTypeSymbol)templateType)} domainTemplate, string method)");
+                        builder.AppendLine("        {");
+                        builder.AppendLine("            switch (method.ToLower())");
+                        builder.AppendLine("            {");
+                        bool fail = false;
+                        foreach (var member in templateType.GetMembers().OfType<IMethodSymbol>())
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor("CBANC003", "Domain template contains not support methods.", "Domain template contains methods which is non HTTP GET and have more than one parameters.", "Wodsoft.ComBoost.AspNetCore", DiagnosticSeverity.Error, true)
-                                , classSyntax.GetLocation()));
-                            fail = true;
-                            break;
-                        }
-                        foreach (var parameter in member.Parameters)
-                        {
-                            builder.AppendLine($"                    if (httpContext.Request.Method != \"{httpMethod}\")");
-                            builder.AppendLine("                    {");
-                            builder.AppendLine("                        httpContext.Response.StatusCode = 405;");
-                            builder.AppendLine("                        break;");
-                            builder.AppendLine("                    }");
-                            var parameterType = (INamedTypeSymbol)parameter.Type;
-                            if (httpMethod == "GET")
+                            builder.AppendLine($"                case \"{member.Name.ToLower()}\":");
+                            builder.AppendLine("                {");
+                            string httpMethod;
+                            if (member.Name.StartsWith("Get"))
+                                httpMethod = "GET";
+                            else if (member.Name.StartsWith("Post") || member.Name.StartsWith("Insert") || member.Name.StartsWith("Create"))
+                                httpMethod = "POST";
+                            else if (member.Name.StartsWith("Update") || member.Name.StartsWith("Edit"))
+                                httpMethod = "PUT";
+                            else if (member.Name.StartsWith("Delete") || member.Name.StartsWith("Remove"))
+                                httpMethod = "DELETE";
+                            else
+                                httpMethod = "POST";
+                            if (httpMethod != "GET" && member.Parameters.Length != 1)
                             {
-                                builder.Append($"                    var {parameter.Name} = ");
-                                if (parameterType.IsGenericType && parameterType.ContainingNamespace.ToString() == "System.Collections.Generic" && parameterType.Name == "List")
+                                context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor("CBANC003", "Domain template contains not support methods.", "Domain template contains methods which is non HTTP GET and have more than one parameters.", "Wodsoft.ComBoost.AspNetCore", DiagnosticSeverity.Error, true)
+                                    , classSyntax.GetLocation()));
+                                fail = true;
+                                break;
+                            }
+                            foreach (var parameter in member.Parameters)
+                            {
+                                builder.AppendLine($"                    if (httpContext.Request.Method != \"{httpMethod}\")");
+                                builder.AppendLine("                    {");
+                                builder.AppendLine("                        httpContext.Response.StatusCode = 405;");
+                                builder.AppendLine("                        break;");
+                                builder.AppendLine("                    }");
+                                var parameterType = (INamedTypeSymbol)parameter.Type;
+                                if (httpMethod == "GET")
                                 {
-                                    builder.AppendLine($"GetQueryListValue<{GetTypeFullText((INamedTypeSymbol)parameterType.TypeArguments[0])}>(httpContext, \"{parameter.Name}\");");
-                                }
-                                else if (parameterType.TypeKind == TypeKind.Array)
-                                {
-                                    builder.AppendLine($"GetQueryArrayValue<{GetTypeFullText(parameterType)}>(httpContext, \"{parameter.Name}\");");
+                                    builder.Append($"                    var {parameter.Name} = ");
+                                    if (parameterType.IsGenericType && parameterType.ContainingNamespace.ToString() == "System.Collections.Generic" && parameterType.Name == "List")
+                                    {
+                                        builder.AppendLine($"GetQueryListValue<{GetTypeFullText((INamedTypeSymbol)parameterType.TypeArguments[0])}>(httpContext, \"{parameter.Name}\");");
+                                    }
+                                    else if (parameterType.TypeKind == TypeKind.Array)
+                                    {
+                                        builder.AppendLine($"GetQueryArrayValue<{GetTypeFullText(parameterType)}>(httpContext, \"{parameter.Name}\");");
+                                    }
+                                    else
+                                    {
+                                        if (parameterType.ContainingNamespace.ToString() == "System" && parameterType.Name == "Nullable")
+                                            builder.AppendLine($"GetQueryNullableValue<{GetTypeFullText((INamedTypeSymbol)parameterType.TypeArguments[0])}>(httpContext, \"{parameter.Name}\");");
+                                        else
+                                            builder.AppendLine($"GetQueryValue<{GetTypeFullText(parameterType)}>(httpContext, \"{parameter.Name}\");");
+                                    }
                                 }
                                 else
                                 {
-                                    if (parameterType.ContainingNamespace.ToString() == "System" && parameterType.Name == "Nullable")
-                                        builder.AppendLine($"GetQueryNullableValue<{GetTypeFullText((INamedTypeSymbol)parameterType.TypeArguments[0])}>(httpContext, \"{parameter.Name}\");");
-                                    else
-                                        builder.AppendLine($"GetQueryValue<{GetTypeFullText(parameterType)}>(httpContext, \"{parameter.Name}\");");
+                                    builder.AppendLine($"                    var {parameter.Name}Value = await GetBodyValueAsync<{GetTypeFullText(parameterType)}>(httpContext);");
+                                    builder.AppendLine($"                    if (!{parameter.Name}Value.Item1)");
+                                    builder.AppendLine("                        break;");
+                                    builder.AppendLine($"                    var {parameter.Name} = {parameter.Name}Value.Item2;");
                                 }
+                            }
+                            var returnType = (INamedTypeSymbol)member.ReturnType;
+                            builder.AppendLine("                    bool success = false;");
+                            if (returnType.IsGenericType)
+                            {
+                                builder.AppendLine($"                    {GetTypeFullText((INamedTypeSymbol)returnType.TypeArguments[0])} result = default;");
+                                builder.AppendLine("                    try");
+                                builder.AppendLine("                    {");
+                                builder.AppendLine($"                        result = await domainTemplate.{member.Name}({string.Join(", ", member.Parameters.Select(t => t.Name))});");
+                                builder.AppendLine("                        success = true;");
+                                builder.AppendLine("                    }");
+                                builder.AppendLine("                    catch (Exception ex)");
+                                builder.AppendLine("                    {");
+                                builder.AppendLine($"                        await OnDomainException(httpContext, \"{member.Name}\", ex);");
+                                builder.AppendLine("                    }");
+                                builder.AppendLine("                    if (success)");
+                                builder.AppendLine($"                        await OnDomainExecuted(httpContext, \"{member.Name}\", result);");
                             }
                             else
                             {
-                                builder.AppendLine($"                    var {parameter.Name}Value = await GetBodyValueAsync<{GetTypeFullText(parameterType)}>(httpContext);");
-                                builder.AppendLine($"                    if (!{parameter.Name}Value.Item1)");
-                                builder.AppendLine("                        break;");
-                                builder.AppendLine($"                    var {parameter.Name} = {parameter.Name}Value.Item2;");
+                                builder.AppendLine("                    try");
+                                builder.AppendLine("                    {");
+                                builder.AppendLine($"                        await domainTemplate.{member.Name}({string.Join(", ", member.Parameters.Select(t => t.Name))});");
+                                builder.AppendLine("                    }");
+                                builder.AppendLine("                    catch (Exception ex)");
+                                builder.AppendLine("                    {");
+                                builder.AppendLine($"                        await OnDomainException(httpContext, \"{member.Name}\", ex);");
+                                builder.AppendLine("                    }");
+                                builder.AppendLine("                    if (success)");
+                                builder.AppendLine($"                        await OnDomainExecuted(httpContext, \"{member.Name}\");");
                             }
+                            builder.AppendLine("                    break;");
+                            builder.AppendLine("                }");
                         }
-                        var returnType = (INamedTypeSymbol)member.ReturnType;
-                        builder.AppendLine("                    bool success = false;");
-                        if (returnType.IsGenericType)
-                        {
-                            builder.AppendLine($"                    {GetTypeFullText((INamedTypeSymbol)returnType.TypeArguments[0])} result = default;");
-                            builder.AppendLine("                    try");
-                            builder.AppendLine("                    {");
-                            builder.AppendLine($"                        result = await domainTemplate.{member.Name}({string.Join(", ", member.Parameters.Select(t => t.Name))});");
-                            builder.AppendLine("                        success = true;");
-                            builder.AppendLine("                    }");
-                            builder.AppendLine("                    catch (Exception ex)");
-                            builder.AppendLine("                    {");
-                            builder.AppendLine($"                        await OnDomainException(httpContext, \"{member.Name}\", ex);");
-                            builder.AppendLine("                    }");
-                            builder.AppendLine("                    if (success)");
-                            builder.AppendLine($"                        await OnDomainExecuted(httpContext, \"{member.Name}\", result);");
-                        }
-                        else
-                        {
-                            builder.AppendLine("                    try");
-                            builder.AppendLine("                    {");
-                            builder.AppendLine($"                        await domainTemplate.{member.Name}({string.Join(", ", member.Parameters.Select(t => t.Name))});");
-                            builder.AppendLine("                    }");
-                            builder.AppendLine("                    catch (Exception ex)");
-                            builder.AppendLine("                    {");
-                            builder.AppendLine($"                        await OnDomainException(httpContext, \"{member.Name}\", ex);");
-                            builder.AppendLine("                    }");
-                            builder.AppendLine("                    if (success)");
-                            builder.AppendLine($"                        await OnDomainExecuted(httpContext, \"{member.Name}\");");
-                        }
-                        builder.AppendLine("                    break;");
-                        builder.AppendLine("                }");
+                        if (fail)
+                            continue;
+                        builder.AppendLine("                default:");
+                        builder.AppendLine("                    return;");
+                        builder.AppendLine("            }");
+                        builder.AppendLine("        }");
+                        builder.AppendLine("");
+                        builder.AppendLine("        public override bool HasEndpoint => true;");
                     }
-                    if (fail)
-                        continue;
-                    builder.AppendLine("                default:");
-                    builder.AppendLine("                    return;");
-                    builder.AppendLine("            }");
-                    builder.AppendLine("        }");
+                    else
+                    {
+                        builder.AppendLine($"        protected override Task HandleRequest(HttpContext httpContext, {GetTypeFullText((INamedTypeSymbol)templateType)} domainTemplate, string method)");
+                        builder.AppendLine("        {");
+                        builder.AppendLine("            return Task.CompletedTask;");
+                        builder.AppendLine("        }");
+                        builder.AppendLine("");
+                        builder.AppendLine("        public override bool HasEndpoint => false;");
+                    }
+                    builder.AppendLine($"        public override Type TemplateType => typeof({GetTypeFullText((INamedTypeSymbol)templateType)});");
                     builder.AppendLine("    }");
                     builder.Append("}");
                     var filename = $"{ns}.{name}.g.cs";

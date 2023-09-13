@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +36,6 @@ namespace Microsoft.AspNetCore.Builder
     public static class DomainAspNetCoreEndpointExtensions
     {
 #if !NETCOREAPP2_1
-
         public static void MapHealthCheck(this IEndpointRouteBuilder endpoint, string path)
         {
             if (endpoint == null)
@@ -51,9 +51,15 @@ namespace Microsoft.AspNetCore.Builder
             foreach (var type in types.Distinct())
             {
                 var domainEndpoint = (DomainEndpoint)ActivatorUtilities.CreateInstance(endpoint.ServiceProvider, type);
-                endpoint.Map(domainEndpoint.EndpointTemplate, domainEndpoint.HandleRequest);
+                if (domainEndpoint.HasEndpoint)
+                {
+                    var apiDescriptorOptions = (DomainEndpointApiDescriptorOptions)endpoint.ServiceProvider.GetRequiredService(typeof(DomainEndpointApiDescriptorOptions<>).MakeGenericType(type));
+                    apiDescriptorOptions.Descriptions.AddRange(domainEndpoint.GetApiDescriptions());
+                    endpoint.Map(domainEndpoint.EndpointTemplate, domainEndpoint.HandleRequest);
+                }
             }
         }
+
 #endif
         public static void UseDomainEndpoint(this IApplicationBuilder app)
         {
@@ -63,11 +69,18 @@ namespace Microsoft.AspNetCore.Builder
             foreach (var type in types.Distinct())
             {
                 var domainEndpoint = (DomainEndpoint)ActivatorUtilities.CreateInstance(app.ApplicationServices, type);
-                var handler = new RouteHandler(domainEndpoint.HandleRequest);
-                var routeBuilder = new RouteBuilder(app, handler);
-                routeBuilder.MapRoute("Domain Template Endpoint", domainEndpoint.EndpointTemplate);
-                var router = routeBuilder.Build();
-                app.UseRouter(router);
+                if (domainEndpoint.HasEndpoint)
+                {
+#if !NETCOREAPP2_1
+                    var apiDescriptorOptions = (DomainEndpointApiDescriptorOptions)app.ApplicationServices.GetRequiredService(typeof(DomainEndpointApiDescriptorOptions<>).MakeGenericType(type));
+                    apiDescriptorOptions.Descriptions.AddRange(domainEndpoint.GetApiDescriptions());
+#endif
+                    var handler = new RouteHandler(domainEndpoint.HandleRequest);
+                    var routeBuilder = new RouteBuilder(app, handler);
+                    routeBuilder.MapRoute("Domain Template Endpoint", domainEndpoint.EndpointTemplate);
+                    var router = routeBuilder.Build();
+                    app.UseRouter(router);
+                }
             }
         }
 
