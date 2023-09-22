@@ -14,20 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Wodsoft.ComBoost.SourceGenerators\Wodsoft.ComBoost.SourceGenerators.csproj" PrivateAssets="All"/>
+    <None Include="..\Wodsoft.ComBoost.SourceGenerators\bin\$(Configuration)\netstandard2.0\Wodsoft.ComBoost.SourceGenerators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
-  
-  <PropertyGroup>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-  </PropertyGroup>
-
-  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
-    <ItemGroup>
-      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->WithMetadataValue('PrivateAssets', 'All'))"/>
-    </ItemGroup>
-    <Message Text="Batch for .nupkg: ReferenceCopyLocalPaths = @(_ReferenceCopyLocalPaths), ReferenceCopyLocalPaths.DestinationSubDirectory = %(_ReferenceCopyLocalPaths.DestinationSubDirectory) Filename = %(_ReferenceCopyLocalPaths.Filename) Extension = %(_ReferenceCopyLocalPaths.Extension)" Importance="High" Condition="'@(_ReferenceCopyLocalPaths)' != ''" />
-    <ItemGroup>
-      <BuildOutputInPackage Include="@(_ReferenceCopyLocalPaths)" TargetPath="/analyzers/dotnet/cs/%(_ReferenceCopyLocalPaths.Filename)%(_ReferenceCopyLocalPaths.Extension)"/>
-    </ItemGroup>
-  </Target>
 </Project>

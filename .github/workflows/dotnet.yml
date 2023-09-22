@@ -1,4 +1,4 @@
-name: .NET
+﻿name: .NET
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
       run: |
         dotnet pack -c Release src/Wodsoft.ComBoost/Wodsoft.ComBoost.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.AspNetCore/Wodsoft.ComBoost.AspNetCore.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
-        dotnet pack -c Release src/Wodsoft.ComBoost.Core/Wodsoft.ComBoost.Core.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs
+        dotnet pack -c Release src/Wodsoft.ComBoost.Core/Wodsoft.ComBoost.Core.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Data/Wodsoft.ComBoost.Data.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Data.Core/Wodsoft.ComBoost.Data.Core.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
         dotnet pack -c Release src/Wodsoft.ComBoost.Data.Distributed/Wodsoft.ComBoost.Data.Distributed.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
