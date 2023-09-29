@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -121,6 +122,36 @@ namespace Wodsoft.ComBoost
             else if (nameSyntax is PredefinedTypeSyntax predefinedSyntax)
             {
 
+            }
+            else if (nameSyntax is GenericNameSyntax genericNameSyntax)
+            {
+                foreach (UsingDirectiveSyntax item in ((Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax)genericNameSyntax.SyntaxTree.GetRoot()).Usings)
+                {
+                    if (!item.StaticKeyword.IsKind(SyntaxKind.None))
+                        continue;
+                    if (item.Alias != null)
+                        continue;
+                    if (item.Name.ToString() + "." + genericNameSyntax.Identifier.Text == fullname)
+                        return true;
+                }
+                var nsList = new List<string>();
+                var parentNS = nameSyntax.FirstAncestorOrSelf<BaseNamespaceDeclarationSyntax>();
+                while (parentNS != null)
+                {
+                    var nsSplit = parentNS.Name.ToString().Split('.');
+                    nsList.InsertRange(0, nsSplit);
+                    parentNS = parentNS.FirstAncestorOrSelf<BaseNamespaceDeclarationSyntax>(t => t != parentNS);
+                }
+                var splits = fullname.Split('.');
+                if (nsList.Count >= splits.Length - 1)
+                {
+                    int i = 0;
+                    for (i = 0; i < splits.Length - 1; i++)
+                        if (nsList[i] != splits[i])
+                            break;
+                    if (i == splits.Length - 1 && splits[splits.Length - 1] == genericNameSyntax.Identifier.Text)
+                        return true;
+                }
             }
             return false;
         }
