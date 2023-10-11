@@ -84,25 +84,45 @@ namespace Wodsoft.ComBoost
                                         isGetMethod = true;
                                     builder.AppendLine($"        [{GetTypeFullText(attr.AttributeClass)}]");
                                 }
-                                if (!isGetMethod && member.Parameters.Length != 1)
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor("CBANC003", "Domain template contains not support methods.", "Domain template contains methods which is non HTTP GET and have more than one parameters.", "Wodsoft.ComBoost.AspNetCore", DiagnosticSeverity.Error, true)
-                                        , classSyntax.GetLocation()));
-                                    fail = true;
-                                    break;
-                                }
+                                bool hasFromBody = false;
                                 builder.Append($"        public {GetTypeFullText((INamedTypeSymbol)member.ReturnType)} {member.Name}([FromServices] {GetTypeFullText(templateType)} service");
                                 foreach (var parameter in member.Parameters)
                                 {
-                                    var parameterType = (INamedTypeSymbol)parameter.Type;
-                                    if (isGetMethod)
+                                    var attrs = parameter.GetAttributes().ToList();
+                                    var fromAttributes = attrs.Where(t => t.AttributeClass.AllInterfaces.Any(x => x.ContainingNamespace.ToString() == "Microsoft.AspNetCore.Mvc.ModelBinding" && x.Name == "IBindingSourceMetadata")).ToList();
+                                    foreach (var item in fromAttributes)
+                                        attrs.Remove(item);
+                                    builder.Append(", [");
+                                    if (fromAttributes.Count == 0)
                                     {
-                                        builder.Append(", [FromQuery] ");
+                                        if (isGetMethod)
+                                        {
+                                            builder.Append("FromQuery");
+                                        }
+                                        else
+                                        {
+                                            if (hasFromBody)
+                                            {
+                                                context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor("CBANC003", "Domain template contains not support methods.", "Domain template contains methods which is non HTTP GET and have more than one parameters.", "Wodsoft.ComBoost.AspNetCore", DiagnosticSeverity.Error, true)
+                                                    , classSyntax.GetLocation()));
+                                                fail = true;
+                                                break;
+                                            }
+                                            builder.Append("FromBody");
+                                            hasFromBody = true;
+                                        }
                                     }
                                     else
                                     {
-                                        builder.Append(", [FromBody] ");
+                                        builder.Append(string.Join(", ", fromAttributes.Select(t => GetTypeFullText(t.AttributeClass))));
                                     }
+                                    if (attrs.Count != 0)
+                                    {
+                                        foreach (var item in attrs)
+                                            builder.Append($", {GetTypeFullText(item.AttributeClass)}");
+                                    }
+                                    builder.Append("] ");
+                                    var parameterType = (INamedTypeSymbol)parameter.Type;
                                     builder.Append($"{GetTypeFullText(parameterType)} {parameter.Name}");
                                 }
                                 builder.AppendLine(")");

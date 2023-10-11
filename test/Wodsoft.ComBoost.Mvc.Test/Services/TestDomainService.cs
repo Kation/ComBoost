@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +43,7 @@ namespace Wodsoft.ComBoost.Mvc.Test.Services
 
         Task CreateString(TestObject value);
 
-        Task EditString(TestObject value);
+        Task EditString(TestObject value, [FromQuery, Required] int id);
 
         Task RemoveString(TestObject value);
 
