@@ -12,8 +12,6 @@ namespace Wodsoft.ComBoost.Mvc.Test
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
-                .AddComBoostMvc();
             services.AddComBoost()
                 .AddLocalService(builder =>
                 {
