@@ -13,7 +13,7 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public abstract class EntityApiController<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO, TListResult, TCreateResult, TEditResult, TRemoveResult> : ControllerBase
+    public abstract class EntityApiController<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : ControllerBase
         where TEntity : class, IEntity
         where TListDTO : class
         where TCreateDTO : class
@@ -22,7 +22,8 @@ namespace Wodsoft.ComBoost.Mvc
     {
         #region List
 
-        public virtual async Task<TListResult> List()
+        [HttpGet]
+        public virtual async Task<IActionResult> List()
         {
             var model = await GetListModel();
             return await HandleListModelAsync(model);
@@ -54,13 +55,17 @@ namespace Wodsoft.ComBoost.Mvc
             return Task.CompletedTask;
         }
 
-        protected abstract Task<TListResult> HandleListModelAsync(IViewModel<TListDTO> viewModel);
+        protected virtual Task<IActionResult> HandleListModelAsync(IViewModel<TListDTO> viewModel)
+        {
+            return Task.FromResult<IActionResult>(Ok(viewModel));
+        }
 
         #endregion
 
         #region Create
 
-        public virtual async Task<TCreateResult> Create(TCreateDTO dto)
+        [HttpPost]
+        public virtual async Task<IActionResult> Create([FromBody] TCreateDTO dto)
         {
             var model = await CreateEntity(dto);
             return await HandleCreateModelAsync(model, dto);
@@ -77,16 +82,38 @@ namespace Wodsoft.ComBoost.Mvc
             return HttpContext.RequestServices.GetRequiredService<IEntityDomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
         }
 
-        protected abstract Task<TCreateResult> HandleCreateModelAsync(IUpdateModel<TListDTO> model, TCreateDTO createDto);
+        protected virtual Task<IActionResult> HandleCreateModelAsync(IUpdateModel<TListDTO> model, TCreateDTO dto)
+        {
+            return Task.FromResult<IActionResult>(Ok(model));
+        }
+
+        [HttpPost]
+        public virtual async Task<IActionResult> CreateRange([FromBody] TCreateDTO[] dtos)
+        {
+            var model = await CreateEntities(dtos);
+            return await HandleCreateRangeModelAsync(model, dtos);
+        }
+
+        protected virtual Task<IUpdateRangeModel<TListDTO>> CreateEntities(TCreateDTO[] dtos)
+        {
+            var domain = GetCreateDomainTemplate();
+            return domain.CreateRange(dtos);
+        }
+
+        protected virtual Task<IActionResult> HandleCreateRangeModelAsync(IUpdateRangeModel<TListDTO> model, TCreateDTO[] dtos)
+        {
+            return Task.FromResult<IActionResult>(Ok(model));
+        }
 
         #endregion
 
         #region Edit
 
-        public virtual async Task<TEditResult> Edit(TEditDTO dto)
+        [HttpPut]
+        public virtual async Task<IActionResult> Edit([FromBody] TEditDTO dto)
         {
             var model = await EditEntity(dto);
-            return await OnEditModelCreated(model, dto);
+            return await HandleEditModelAsync(model, dto);
         }
 
         protected virtual Task<IUpdateModel<TListDTO>> EditEntity(TEditDTO dto)
@@ -100,16 +127,38 @@ namespace Wodsoft.ComBoost.Mvc
             return HttpContext.RequestServices.GetRequiredService<IEntityDomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
         }
 
-        protected abstract Task<TEditResult> OnEditModelCreated(IUpdateModel<TListDTO> model, TEditDTO editDto);
+        protected virtual Task<IActionResult> HandleEditModelAsync(IUpdateModel<TListDTO> model, TEditDTO dto)
+        {
+            return Task.FromResult<IActionResult>(Ok(model));
+        }
+
+        [HttpPut]
+        public virtual async Task<IActionResult> EditRange([FromBody] TEditDTO[] dtos)
+        {
+            var model = await EditEntities(dtos);
+            return await HandleEditRangeModelAsync(model, dtos);
+        }
+
+        protected virtual Task<IUpdateRangeModel<TListDTO>> EditEntities(TEditDTO[] dtos)
+        {
+            var domain = GetEditDomainTemplate();
+            return domain.EditRange(dtos);
+        }
+
+        protected virtual Task<IActionResult> HandleEditRangeModelAsync(IUpdateRangeModel<TListDTO> model, TEditDTO[] dtos)
+        {
+            return Task.FromResult<IActionResult>(Ok(model));
+        }
 
         #endregion
 
         #region Remove
 
-        public virtual async Task<TRemoveResult> Remove(TRemoveDTO dto)
+        [HttpDelete]
+        public virtual async Task<IActionResult> Remove([FromBody] TRemoveDTO dto)
         {
             await RemoveEntity(dto);
-            return await OnRemoved(dto);
+            return await HandleRemoveModelAsync(dto);
         }
 
         protected virtual Task RemoveEntity(TRemoveDTO dto)
@@ -123,15 +172,29 @@ namespace Wodsoft.ComBoost.Mvc
             return HttpContext.RequestServices.GetRequiredService<IEntityDomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
         }
 
-        protected abstract Task<TRemoveResult> OnRemoved(TRemoveDTO dto);
+        protected virtual Task<IActionResult> HandleRemoveModelAsync(TRemoveDTO dto)
+        {
+            return Task.FromResult<IActionResult>(Ok());
+        }
+
+        [HttpDelete]
+        public virtual async Task<IActionResult> RemoveRange([FromBody] TRemoveDTO[] dtos)
+        {
+            await RemoveEntities(dtos);
+            return await HandleRemoveRangeModelAsync(dtos);
+        }
+
+        protected virtual Task RemoveEntities(TRemoveDTO[] dtos)
+        {
+            var domain = GetRemoveDomainTemplate();
+            return domain.RemoveRange(dtos);
+        }
+
+        protected virtual Task<IActionResult> HandleRemoveRangeModelAsync(TRemoveDTO[] dtos)
+        {
+            return Task.FromResult<IActionResult>(Ok());
+        }
 
         #endregion
-    }
-
-    public abstract class CurdController<TEntity, TDTO, TListResult, TCreateResult, TEditResult, TRemoveResult> : EntityApiController<TEntity, TDTO, TDTO, TDTO, TDTO, TListResult, TCreateResult, TEditResult, TRemoveResult>
-        where TEntity : class, IEntity
-        where TDTO : class
-    {
-
     }
 }
