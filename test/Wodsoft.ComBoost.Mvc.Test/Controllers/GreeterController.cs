@@ -7,8 +7,8 @@ using Wodsoft.ComBoost.Test;
 
 namespace Wodsoft.ComBoost.Mvc.Test.Controllers
 {
-    public abstract class GreeterController : DomainController<GreeterService>
-    {
+    //public abstract class GreeterController : DomainController<GreeterService>
+    //{
 
-    }
+    //}
 }

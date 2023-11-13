@@ -25,15 +25,6 @@ namespace Microsoft.Extensions.DependencyInjection
             options.ModelBinderProviders.Add(new SelectedFileBinderProvider());
         }
 
-        public static void AddComBoostMvc(this IMvcBuilder builder)
-        {
-            var assembly = Assembly.GetCallingAssembly();
-            builder.ConfigureApplicationPartManager(manager =>
-            {
-                manager.ApplicationParts.Add(new DomainApplicationPart(assembly));
-            });
-        }
-
         public static IComBoostBuilder AddMvc(this IComBoostBuilder builder)
         {
             builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.TryAddContextProvider<MvcDomainContextProvider>(200));
