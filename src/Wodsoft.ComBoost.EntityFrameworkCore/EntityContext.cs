@@ -167,5 +167,16 @@ namespace Wodsoft.ComBoost.Data.Entity
             }
 #pragma warning restore CS8619 // 值中的引用类型的为 Null 性与目标类型不匹配。
         }
+
+        public void Detach(T item)
+        {
+            Database.InnerContext.Entry(item).State = EntityState.Detached;
+        }
+
+        public void DetachRange(IEnumerable<T> items)
+        {
+            foreach (var item in items)
+                Database.InnerContext.Entry(item).State = EntityState.Detached;
+        }
     }
 }

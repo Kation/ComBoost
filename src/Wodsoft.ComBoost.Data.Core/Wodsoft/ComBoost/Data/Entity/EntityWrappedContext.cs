@@ -95,5 +95,15 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             throw new NotSupportedException();
         }
+
+        public void Detach(T item)
+        {
+            InnerContext.Detach((M)item);
+        }
+
+        public void DetachRange(IEnumerable<T> items)
+        {
+            InnerContext.DetachRange(items.Cast<M>());
+        }
     }
 }

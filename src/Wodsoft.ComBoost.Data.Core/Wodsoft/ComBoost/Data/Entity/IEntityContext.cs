@@ -49,5 +49,15 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         /// <param name="items">要删除的实体。</param>
         void RemoveRange(IEnumerable<T> items);
+        /// <summary>
+        /// 从上下文分离实体。
+        /// </summary>
+        /// <param name="item">要分离的实体。</param>
+        void Detach(T item);
+        /// <summary>
+        /// 从上下文分离实体。
+        /// </summary>
+        /// <param name="items">要分离的实体。</param>
+        void DetachRange(IEnumerable<T> items);
     }
 }

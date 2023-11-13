@@ -209,5 +209,16 @@ namespace Wodsoft.ComBoost.Data.Entity
                 entry.State = EntityState.Detached;
             Metadata.GetProperty(reference.Name)!.SetValue(item, propertyValue);
         }
+
+        public void Detach(T item)
+        {
+            Database.InnerContext.Entry(item).State = EntityState.Detached;
+        }
+
+        public void DetachRange(IEnumerable<T> items)
+        {
+            foreach (var item in items)
+                Database.InnerContext.Entry(item).State = EntityState.Detached;
+        }
     }
 }
