@@ -41,21 +41,21 @@ namespace Wodsoft.ComBoost.Data
             queryable = entityQueryEventArgs.Queryable;
             bool isOrdered = entityQueryEventArgs.IsOrdered;
             OnListQuery(ref queryable, ref isOrdered);
-            var dtoQueryable = queryable.ProjectTo<TListDTO>(mapper.ConfigurationProvider);
-            OnListQuery(ref dtoQueryable, ref isOrdered);
             if (!isOrdered)
             {
-                var sortProperty = EntityDescriptor.GetMetadata<TListDTO>().SortProperty;
+                var sortProperty = EntityDescriptor.GetMetadata<TEntity>().SortProperty;
                 if (sortProperty != null)
                 {
-                    var parameter = Expression.Parameter(typeof(TListDTO));
-                    dynamic express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(TListDTO), sortProperty.ClrType), Expression.Property(parameter, sortProperty.ClrName), parameter);
-                    if (EntityDescriptor.GetMetadata<TListDTO>().IsSortDescending)
-                        dtoQueryable = Queryable.OrderByDescending(dtoQueryable, express);
+                    var parameter = Expression.Parameter(typeof(TEntity));
+                    dynamic express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(TEntity), sortProperty.ClrType), Expression.Property(parameter, sortProperty.ClrName), parameter);
+                    if (EntityDescriptor.GetMetadata<TEntity>().IsSortDescending)
+                        queryable = Queryable.OrderByDescending(queryable, express);
                     else
-                        dtoQueryable = Queryable.OrderBy(dtoQueryable, express);
+                        queryable = Queryable.OrderBy(queryable, express);
                 }
             }
+            var dtoQueryable = queryable.ProjectTo<TListDTO>(mapper.ConfigurationProvider);
+            //OnListQuery(ref dtoQueryable, ref isOrdered);
             ViewModel<TListDTO> model = new ViewModel<TListDTO>(dtoQueryable);
             await RaiseEvent(new EntityQueryModelCreatedEventArgs<TListDTO>(model));
             return model;
@@ -66,10 +66,10 @@ namespace Wodsoft.ComBoost.Data
 
         }
 
-        protected virtual void OnListQuery(ref IQueryable<TListDTO> queryable, ref bool isOrdered)
-        {
+        //protected virtual void OnListQuery(ref IQueryable<TListDTO> queryable, ref bool isOrdered)
+        //{
 
-        }
+        //}
 
         #endregion
 
@@ -92,10 +92,19 @@ namespace Wodsoft.ComBoost.Data
             mapper.Map(dto, entity);
             await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
             entityContext.Add(entity);
-            await RaiseEvent(new EntityPreCreateEventArgs<TEntity>(entity));
-            await entityContext.Database.SaveAsync();
-            await RaiseEvent(new EntityCreatedEventArgs<TEntity>(entity));
-            model.IsSuccess = true;
+            var preCreateEventArgs = new EntityPreCreateEventArgs<TEntity>(entity);
+            await RaiseEvent(preCreateEventArgs);
+            if (preCreateEventArgs.IsCanceled)
+            {
+                model.IsSuccess = true;
+                entityContext.Detach(entity);
+            }
+            else
+            {
+                await entityContext.Database.SaveAsync();
+                await RaiseEvent(new EntityCreatedEventArgs<TEntity>(entity));
+                model.IsSuccess = true;
+            }
             model.Item = mapper.Map<TListDTO>(entity);
             return model;
         }
@@ -114,13 +123,22 @@ namespace Wodsoft.ComBoost.Data
                     mapper.Map(dto, entity);
                     await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
                     entityContext.Add(entity);
-                    await RaiseEvent(new EntityPreCreateEventArgs<TEntity>(entity));
-                    var listDto = mapper.Map<TListDTO>(entity);
-                    entities.Add(listDto, entity);
-                    model.AddItem(listDto);
+                    var preCreateEventArgs = new EntityPreCreateEventArgs<TEntity>(entity);
+                    await RaiseEvent(preCreateEventArgs);
+                    if (preCreateEventArgs.IsCanceled)
+                    {
+                        entityContext.Detach(entity);
+                    }
+                    else
+                    {
+                        var listDto = mapper.Map<TListDTO>(entity);
+                        entities.Add(listDto, entity);
+                        model.AddItem(listDto);
+                    }
                 }
                 else
                 {
+                    model.IsSuccess = false;
                     model.AddItem(null, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
                 }
             }

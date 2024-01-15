@@ -12,5 +12,7 @@ namespace Wodsoft.ComBoost.Data
         }
 
         public T Entity { get; }
+
+        public bool IsCanceled { get; set; }
     }
 }

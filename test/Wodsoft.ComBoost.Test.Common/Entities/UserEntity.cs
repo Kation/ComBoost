@@ -8,6 +8,7 @@ namespace Wodsoft.ComBoost.Test.Entities
 {
     public class UserEntity: UserBase
     {
+        [Key]
         [Required]
         [MaxLength(16)]
         public string UserName { get; set; }
