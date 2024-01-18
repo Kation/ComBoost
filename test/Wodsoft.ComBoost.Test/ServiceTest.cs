@@ -34,6 +34,25 @@ namespace Wodsoft.ComBoost.Test
         }
 
         [Fact]
+        public async Task NotRequiredValueTest()
+        {
+            ServiceCollection services = new ServiceCollection();
+            services.AddComBoost()
+                .AddLocalService(builder =>
+                {
+                    builder.AddService<GreeterService>().UseTemplate<IGreeterTemplate>();
+                })
+                .AddMock();
+            var serviceProvider = services.BuildServiceProvider();
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var greeter = scope.ServiceProvider.GetRequiredService<IGreeterTemplate>();
+                await greeter.Test();
+            }
+        }
+
+        [Fact]
         public async Task EventTest()
         {
             bool raised = false;

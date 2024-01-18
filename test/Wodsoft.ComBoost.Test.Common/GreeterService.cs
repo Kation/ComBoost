@@ -20,7 +20,7 @@ namespace Wodsoft.ComBoost.Test
             return Task.FromResult("Hi.");
         }
 
-        public Task Test(Guid id)
+        public Task Test([FromValue(false)] Guid id)
         {
             return Task.CompletedTask;
         }
