@@ -187,7 +187,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 if (!_options.UseDelayedMessagePlugin)
                 {
                     var args = new Dictionary<string, object>();
-                    if (_options.UseQuorum)
+                    if (_options.UseQuorum && _options.UseTtlQuorum)
                         args["x-queue-type"] = "quorum";
                     args["x-dead-letter-exchange"] = name + "_EXCHANGE";
                     channel.QueueDeclare(name + "_DELAY", true, false, false, args);
@@ -218,7 +218,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         if (i > 0 && time == retryTimesAttribute.Times[i - 1])
                             continue;
                         var args = new Dictionary<string, object>();
-                        if (_options.UseQuorum)
+                        if (_options.UseQuorum && _options.UseTtlQuorum)
                             args["x-queue-type"] = "quorum";
                         args["x-message-ttl"] = time;
                         if (features.Contains(DomainDistributedEventFeatures.Group))

@@ -25,6 +25,8 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
 
         public bool UseQuorum { get; set; } = true;
 
+        public bool UseTtlQuorum { get; set; } = true;
+
         public bool UseDelayedMessagePlugin { get; set; }
 
         public Action<IConnectionFactory>? FactoryConfigure { get; set; }
