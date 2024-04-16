@@ -15,7 +15,7 @@ namespace Wodsoft.ComBoost
         {
             if (syntaxNode.Language == "C#" && syntaxNode is ClassDeclarationSyntax classDeclarationSyntax && classDeclarationSyntax.Modifiers.Any(t => t.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.PartialKeyword)))
             {
-                if (classDeclarationSyntax.BaseList.Types.Any(t => SyntaxHelper.IsSameFullName(t.Type, "Wodsoft.ComBoost.Mvc.IDomainAction", false)))
+                if (classDeclarationSyntax.BaseList != null && classDeclarationSyntax.BaseList.Types.Any(t => SyntaxHelper.IsSameFullName(t.Type, "Wodsoft.ComBoost.Mvc.IDomainAction", false)))
                 {
                     ClassDeclarations.Add(classDeclarationSyntax);
                 }
