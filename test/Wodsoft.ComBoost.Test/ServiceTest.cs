@@ -18,7 +18,7 @@ namespace Wodsoft.ComBoost.Test
                 })
                 .AddMock();
             var serviceProvider = services.BuildServiceProvider();
-
+                        
             using (var scope = serviceProvider.CreateScope())
             {
                 var greeter = scope.ServiceProvider.GetRequiredService<IGreeterTemplate>();
@@ -101,6 +101,26 @@ namespace Wodsoft.ComBoost.Test
                 var request = new HelloRequest { Name = "Kation" };
                 var response = await greeter.Hello();
                 Assert.Equal("Interrupt", response);
+            }
+        }
+
+        [Fact]
+        public async Task SkipFilterTest()
+        {
+            ServiceCollection services = new ServiceCollection();
+            services.AddComBoost()
+                .AddLocalService(builder =>
+                {
+                    builder.AddService<GreeterService>().UseTemplate<IGreeterTemplate>();
+                })
+                .AddMock();
+            var serviceProvider = services.BuildServiceProvider();
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var greeter = scope.ServiceProvider.GetRequiredService<IGreeterTemplate>();
+                var response = await greeter.NoExecute();
+                Assert.False(response);
             }
         }
     }

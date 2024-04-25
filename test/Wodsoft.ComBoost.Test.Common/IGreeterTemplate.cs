@@ -19,5 +19,7 @@ namespace Wodsoft.ComBoost.Test
         Task Test(Guid id);
 
         Task EventTest();
+
+        Task<bool> NoExecute();
     }
 }

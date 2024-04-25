@@ -112,6 +112,7 @@ namespace Wodsoft.ComBoost
         {
             protected DomainServiceInvoker(TDomainService domainService, IDomainContext domainContext) : base(domainService, domainContext)
             {
+
             }
 
             private TResult? _result;
@@ -132,6 +133,8 @@ namespace Wodsoft.ComBoost
                     System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
                 if (_executed)
                     return _result;
+                if (_executionContext!.Result == null && typeof(TResult).IsValueType)
+                    return default;
                 return (TResult?)_executionContext!.Result;
             }
         }

@@ -20,6 +20,12 @@ namespace Wodsoft.ComBoost.Test
             return Task.FromResult("Hi.");
         }
 
+        [SkipFilter]
+        public Task<bool> NoExecute()
+        {
+            return Task.FromResult(true);
+        }
+
         public Task Test([FromValue(false)] Guid id)
         {
             return Task.CompletedTask;
