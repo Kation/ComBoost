@@ -13,5 +13,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
         IComBoostGrpcServiceBuilder AddService(Uri address, Func<IServiceProvider, GrpcChannelOptions> optionsFactory);
 
         IComBoostBuilder ComBoostBuilder { get; }
+
+        IComBoostGrpcBuilder UseCallOptionsHandler(IDomainGrpcCallOptionsHandler handler);
     }
 }
