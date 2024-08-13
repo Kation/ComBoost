@@ -2,7 +2,7 @@
 
 on:
   push:
-    branches: [ next ]
+    branches: [ master ]
 jobs:
   build:
     runs-on: windows-latest
