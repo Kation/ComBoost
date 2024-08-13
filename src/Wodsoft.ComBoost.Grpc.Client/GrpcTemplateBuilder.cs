@@ -138,6 +138,24 @@ namespace Wodsoft.ComBoost.Grpc.Client
             var staticConstructor = typeBuilder.DefineConstructor(MethodAttributes.Static, CallingConventions.Standard, null);
             var staticILGenerator = staticConstructor.GetILGenerator();
 
+            //Service end point provider
+            IDomainGrpcEndPointProvider? serviceEndPointProvider;
+            string? serviceName;
+            DomainGrpcServiceAttribute? serviceAttr = type.GetCustomAttribute<DomainGrpcServiceAttribute>();
+            if (serviceAttr == null)
+            {
+                serviceName = null;
+                serviceEndPointProvider = null;
+            }
+            else
+            {
+                serviceName = serviceAttr.ServiceName;
+                if (serviceAttr.EndPointProvider == null)
+                    serviceEndPointProvider = null;
+                else
+                    serviceEndPointProvider = (IDomainGrpcEndPointProvider)Activator.CreateInstance(serviceAttr.EndPointProvider)!;
+            }
+
             Dictionary<string, int> methodOverrideCount = new Dictionary<string, int>();
             //Implement methods in interface
             foreach (var method in type.GetMethods())
@@ -171,10 +189,33 @@ namespace Wodsoft.ComBoost.Grpc.Client
                     requestType = typeof(DomainGrpcRequest<>).MakeGenericType(argumentType);
                 }
 
+                //Method end point provider
+                string? methodServiceName, methodName;
+                DomainGrpcMethodAttribute? methodAttr = method.GetCustomAttribute<DomainGrpcMethodAttribute>();
+                if (methodAttr == null)
+                {
+                    methodServiceName = null;
+                    methodName = null;
+                    if (serviceEndPointProvider != null)
+                        serviceEndPointProvider.GetEndPoint(method, out methodServiceName, out methodName);
+                }
+                else
+                {
+                    if (methodAttr.EndPointProvider == null)
+                    {
+                        methodServiceName = methodAttr.ServiceName;
+                        methodName = methodAttr.MethodName;
+                    }
+                    else
+                    {
+                        var methodEndPointProvider = (IDomainGrpcEndPointProvider)Activator.CreateInstance(methodAttr.EndPointProvider);
+                        methodEndPointProvider.GetEndPoint(method, out methodServiceName, out methodName);
+                    }
+                }
                 //Create static Method<,> field and set value
                 var methodField = typeBuilder.DefineField("_Method_" + method.Name + "_" + methodIndex, typeof(Method<,>).MakeGenericType(requestType, responseType), FieldAttributes.Private | FieldAttributes.Static);
-                staticILGenerator.Emit(OpCodes.Ldstr, DomainService.GetServiceName(type));
-                staticILGenerator.Emit(OpCodes.Ldstr, method.Name + "_" + methodIndex);
+                staticILGenerator.Emit(OpCodes.Ldstr, methodServiceName ?? serviceName ?? DomainService.GetServiceName(type));
+                staticILGenerator.Emit(OpCodes.Ldstr, methodName ?? (method.Name + "_" + methodIndex));
                 staticILGenerator.Emit(OpCodes.Call, typeof(DomainGrpcMethod<,>).MakeGenericType(requestType, responseType).GetMethod("CreateMethod"));
                 staticILGenerator.Emit(OpCodes.Stsfld, methodField);
 

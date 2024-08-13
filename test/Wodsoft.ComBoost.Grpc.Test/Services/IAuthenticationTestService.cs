@@ -8,6 +8,7 @@ namespace Wodsoft.ComBoost.Grpc.Test.Services
 {
     public interface IAuthenticationTestService : IDomainTemplate
     {
+        [DomainGrpcMethod("Authentication", "GetRoles")]
         Task<string[]> GetRoles();
     }
 }
