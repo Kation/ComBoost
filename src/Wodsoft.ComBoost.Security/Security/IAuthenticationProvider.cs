@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost.Security
     /// <summary>
     /// 权限提供器。
     /// </summary>
-    [Obsolete]
+    [Obsolete("Please use IDomainContext.User instead of IAuthenticationProvider.")]
     public interface IAuthenticationProvider
     {
         /// <summary>

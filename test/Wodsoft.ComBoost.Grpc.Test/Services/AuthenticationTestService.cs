@@ -11,10 +11,10 @@ namespace Wodsoft.ComBoost.Grpc.Test.Services
     [DomainTemplateImplementer(typeof(IAuthenticationTestService))]
     public class AuthenticationTestService : DomainService
     {
-        public async Task<string[]> GetRoles([FromService] IAuthenticationProvider authenticationProvider)
+        public Task<string[]> GetRoles()
         {
-            var user = await authenticationProvider.GetUserAsync();
-            return user.FindAll(ClaimTypes.Role).Select(t=>t.Value).ToArray();
+            var user = Context.DomainContext.User;
+            return Task.FromResult(user.FindAll(ClaimTypes.Role).Select(t => t.Value).ToArray());
         }
     }
 }
