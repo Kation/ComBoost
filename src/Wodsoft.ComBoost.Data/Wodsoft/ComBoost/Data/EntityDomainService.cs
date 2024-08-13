@@ -9,298 +9,280 @@ using Wodsoft.ComBoost.Data.Entity.Metadata;
 using Wodsoft.ComBoost.Security;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
+using Wodsoft.ComBoost.Data.Linq;
+using AutoMapper.QueryableExtensions;
+using System.Linq.Expressions;
 
 namespace Wodsoft.ComBoost.Data
 {
-    /// <summary>
-    /// 实体领域服务。
-    /// </summary>
-    /// <typeparam name="T">实体类型。</typeparam>
-    public class EntityDomainService<T> : DomainService
-        where T : class, IEntity, new()
+
+    //public class EntityDomainService<TKey, TEntity, TEntityDTO> : EntityDomainService<TKey, TEntity, TEntityDTO, TEntityDTO, TEntityDTO>
+    //    where TEntity : class, IEntity<TKey>
+    //    where TEntityDTO : class
+    //{
+    //}
+
+    public class EntityDomainService<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : DomainService
+        where TEntity : class, IEntity
+        where TListDTO : class
+        where TCreateDTO : class
+        where TEditDTO : class
+        where TRemoveDTO : class
     {
-        /// <summary>
-        /// 获取实体元数据。
-        /// </summary>
-        public IEntityMetadata Metadata { get; private set; }
+        #region List
 
-        /// <summary>
-        /// 实例化实体领域服务。
-        /// </summary>
-        public EntityDomainService()
+        [EntityViewModelFilter]
+        public virtual async Task<IViewModel<TListDTO>> List([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper)
         {
-            Metadata = EntityDescriptor.GetMetadata<T>();
-        }
-
-        [OptionRequired(typeof(EntityPagerOption))]
-        public virtual async Task<IEntityViewModel<T>> List([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
-        {
-            var auth = authenticationProvider.GetAuthentication();
-            if (authorizeOption == null)
-                authorizeOption = EntityDomainAuthorizeOption.View;
-            authorizeOption.Validate(Metadata, auth);
-            var context = database.GetContext<T>();
-            var queryable = context.Query();
-            foreach (var propertyMetadata in Metadata.Properties.Where(t => t.CustomType == "Entity"))
+            var queryable = entityContext.Query().AsNoTracking();
+            var entityQueryEventArgs = new EntityQueryEventArgs<TEntity>(queryable);
+            await RaiseEvent(entityQueryEventArgs);
+            queryable = entityQueryEventArgs.Queryable;
+            bool isOrdered = entityQueryEventArgs.IsOrdered;
+            OnListQuery(ref queryable, ref isOrdered);
+            if (!isOrdered)
             {
-                queryable = context.Include(queryable, propertyMetadata.ClrName);
+                var sortProperty = EntityDescriptor.GetMetadata<TEntity>().SortProperty;
+                if (sortProperty != null)
+                {
+                    var parameter = Expression.Parameter(typeof(TEntity));
+                    dynamic express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(TEntity), sortProperty.ClrType), Expression.Property(parameter, sortProperty.ClrName), parameter);
+                    if (EntityDescriptor.GetMetadata<TEntity>().IsSortDescending)
+                        queryable = Queryable.OrderByDescending(queryable, express);
+                    else
+                        queryable = Queryable.OrderBy(queryable, express);
+                }
             }
-            var e = new EntityQueryEventArgs<T>(queryable);
-            await RaiseAsyncEvent(EntityQueryEvent, e);
-            queryable = e.Queryable;
-            if (!e.IsOrdered)
-                queryable = context.Order(queryable);
-            EntityViewModel<T> model = new EntityViewModel<T>(queryable);
-            model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
-            if (pagerOption != null)
-            {
-                model.CurrentSize = pagerOption.CurrentSize;
-                model.CurrentPage = pagerOption.CurrentPage;
-                model.PageSizeOption = pagerOption.PageSizeOption;
-            }
-            await model.UpdateTotalPageAsync();
-            await model.UpdateItemsAsync();
+            var dtoQueryable = queryable.ProjectTo<TListDTO>(mapper.ConfigurationProvider);
+            //OnListQuery(ref dtoQueryable, ref isOrdered);
+            ViewModel<TListDTO> model = new ViewModel<TListDTO>(dtoQueryable);
+            await RaiseEvent(new EntityQueryModelCreatedEventArgs<TListDTO>(model));
             return model;
         }
 
-        public static readonly DomainServiceEventRoute EntityQueryEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityQueryEventArgs<T>>("EntityQuery", typeof(EntityDomainService<T>));
-        public event DomainServiceAsyncEventHandler<EntityQueryEventArgs<T>> EntityQuery { add { AddAsyncEventHandler(EntityQueryEvent, value); } remove { RemoveAsyncEventHandler(EntityQueryEvent, value); } }
-
-        [OptionRequired(typeof(EntityPagerOption))]
-        public virtual async Task<IViewModel<TViewModel>> ListViewModel<TViewModel>([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption, [FromOptions(true)]EntityQuerySelectOption<T, TViewModel> selectOption)
-            where TViewModel : class
+        protected virtual void OnListQuery(ref IQueryable<TEntity> queryable, ref bool isOrdered)
         {
-            var auth = authenticationProvider.GetAuthentication();
-            if (authorizeOption == null)
-                authorizeOption = EntityDomainAuthorizeOption.View;
-            authorizeOption.Validate(Metadata, auth);
-            var context = database.GetContext<T>();
-            var queryable = context.Query();
-            var e = new EntityQueryEventArgs<T>(queryable);
-            await RaiseAsyncEvent(EntityQueryEvent, e);
-            queryable = e.Queryable;
-            var convertQueryable = selectOption.Select(queryable);
-            ViewModel<TViewModel> model = new ViewModel<TViewModel>(convertQueryable); 
-            EntityPagerOption pagerOption = Context.DomainContext.Options.GetOption<EntityPagerOption>();
-            if (pagerOption != null)
+
+        }
+
+        //protected virtual void OnListQuery(ref IQueryable<TListDTO> queryable, ref bool isOrdered)
+        //{
+
+        //}
+
+        #endregion
+
+        #region Create
+
+        public virtual async Task<IUpdateModel<TListDTO>> Create([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TCreateDTO dto)
+        {
+            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
+            UpdateModel<TListDTO> model = new UpdateModel<TListDTO>();
+            List<ValidationResult> results = new List<ValidationResult>();
+            if (!Validator.TryValidateObject(dto, validationContext, results, true))
             {
-                model.CurrentSize = pagerOption.CurrentSize;
-                model.CurrentPage = pagerOption.CurrentPage;
-                model.PageSizeOption = pagerOption.PageSizeOption;
+                model.IsSuccess = false;
+                foreach (var result in results)
+                    if (result.ErrorMessage != null)
+                        model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
+                return model;
             }
-            await model.UpdateTotalPageAsync();
-            await model.UpdateItemsAsync();
-            return model;
-        }
-
-        public virtual async Task<IEntityEditModel<T>> Create([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
-        {
-            var auth = authenticationProvider.GetAuthentication();
-            if (authorizeOption == null)
-                authorizeOption = EntityDomainAuthorizeOption.Create;
-            authorizeOption.Validate(Metadata, auth);
-            var context = database.GetContext<T>();
-            var item = context.Create();
-            item.OnCreating();
-            EntityEditModel<T> model = new EntityEditModel<T>(item);
-            model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
-            await RaiseAsyncEvent(EntityCreateModelCreatedEvent, arg);
-            model = arg.Model;
-            return model;
-        }
-
-        public static readonly DomainServiceEventRoute EntityCreateModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>("EntityCreateModelCreated", typeof(EntityDomainService<T>));
-        public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityCreateModelCreated { add { AddAsyncEventHandler(EntityCreateModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityCreateModelCreatedEvent, value); } }
-
-        public virtual async Task<IEntityEditModel<T>> Edit([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
-        {
-            object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
-            var auth = authenticationProvider.GetAuthentication();
-            if (authorizeOption == null)
-                authorizeOption = EntityDomainAuthorizeOption.Edit;
-            authorizeOption.Validate(Metadata, auth);
-            var context = database.GetContext<T>();
-            var queryable = context.Query();
-            foreach (var propertyMetadata in Metadata.Properties.Where(t => t.CustomType == "Entity"))
+            var entity = entityContext.Create();
+            mapper.Map(dto, entity);
+            await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
+            entityContext.Add(entity);
+            var preCreateEventArgs = new EntityPreCreateEventArgs<TEntity>(entity);
+            await RaiseEvent(preCreateEventArgs);
+            if (preCreateEventArgs.IsCanceled)
             {
-                queryable = context.Include(queryable, propertyMetadata.ClrName);
-            }
-            T entity = await context.GetAsync(queryable, index);
-            if (entity == null)
-                throw new DomainServiceException(new EntityNotFoundException(typeof(T), index));
-            entity.OnEditing();
-            var model = new EntityEditModel<T>(entity);
-            model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            EntityModelCreatedEventArgs<T> arg = new EntityModelCreatedEventArgs<T>(model);
-            await RaiseAsyncEvent(EntityEditModelCreatedEvent, arg);
-            model = arg.Model;
-            return model;
-        }
-
-        public static readonly DomainServiceEventRoute EntityEditModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>("EntityEditModelCreated", typeof(EntityDomainService<T>));
-        public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityEditModelCreated { add { AddAsyncEventHandler(EntityEditModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityEditModelCreatedEvent, value); } }
-
-        public virtual async Task<IEntityUpdateModel<T>> Update([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService] IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
-        {
-            object index = valueProvider.GetValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
-            var context = database.GetContext<T>();
-            bool isNew = index == null || (Metadata.KeyProperty.ClrType.GetTypeInfo().IsValueType ? index.Equals(Activator.CreateInstance(Metadata.KeyProperty.ClrType)) : false);
-            var auth = authenticationProvider.GetAuthentication();
-            if (authorizeOption == null)
-                if (isNew)
-                    authorizeOption = EntityDomainAuthorizeOption.Create;
-                else
-                    authorizeOption = EntityDomainAuthorizeOption.Edit;
-            authorizeOption.Validate(Metadata, auth);
-            T entity;
-            if (isNew)
-            {
-                entity = context.Create();
-                entity.OnCreating();
+                model.IsSuccess = true;
+                entityContext.Detach(entity);
             }
             else
             {
-                entity = await context.GetAsync(index);
+                await entityContext.Database.SaveAsync();
+                await RaiseEvent(new EntityCreatedEventArgs<TEntity>(entity));
+                model.IsSuccess = true;
+            }
+            model.Item = mapper.Map<TListDTO>(entity);
+            return model;
+        }
+
+        public virtual async Task<IUpdateRangeModel<TListDTO>> CreateRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TCreateDTO[] dtos)
+        {
+            UpdateRangeModel<TListDTO> model = new UpdateRangeModel<TListDTO>();
+            Dictionary<TListDTO, TEntity> entities = new Dictionary<TListDTO, TEntity>();
+            foreach (var dto in dtos)
+            {
+                var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
+                List<ValidationResult> results = new List<ValidationResult>();
+                if (Validator.TryValidateObject(dto, validationContext, results, true))
+                {
+                    var entity = entityContext.Create();
+                    mapper.Map(dto, entity);
+                    await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
+                    entityContext.Add(entity);
+                    var preCreateEventArgs = new EntityPreCreateEventArgs<TEntity>(entity);
+                    await RaiseEvent(preCreateEventArgs);
+                    if (preCreateEventArgs.IsCanceled)
+                    {
+                        entityContext.Detach(entity);
+                    }
+                    else
+                    {
+                        var listDto = mapper.Map<TListDTO>(entity);
+                        entities.Add(listDto, entity);
+                        model.AddItem(listDto);
+                    }
+                }
+                else
+                {
+                    model.IsSuccess = false;
+                    model.AddItem(null, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
+                }
+            }
+            if (!model.IsSuccess)
+                return model;
+            await entityContext.Database.SaveAsync();
+            foreach (var entity in entities)
+            {
+                await RaiseEvent(new EntityCreatedEventArgs<TEntity>(entity.Value));
+                mapper.Map(entity.Value, entity.Key);
+            }
+            return model;
+        }
+
+        #endregion
+
+        #region Edit
+
+        public virtual async Task<IUpdateModel<TListDTO>> Edit([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TEditDTO dto)
+        {
+            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
+            UpdateModel<TListDTO> model = new UpdateModel<TListDTO>();
+            List<ValidationResult> results = new List<ValidationResult>();
+            if (!Validator.TryValidateObject(dto, validationContext, results, true))
+            {
+                model.IsSuccess = false;
+                foreach (var result in results)
+                    if (result.ErrorMessage != null)
+                        model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
+                return model;
+            }
+            var mappedEntity = mapper.Map<TEntity>(dto);
+            var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
+            var keys = new object[keyProperties.Count];
+            for (int i = 0; i < keyProperties.Count; i++)
+                keys[i] = keyProperties[i].GetValue(mappedEntity);
+            var entity = await entityContext.GetAsync(keys);
+            if (entity == null)
+                throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+            if (!entity.IsEditAllowed)
+                throw new DomainServiceException(new InvalidOperationException("Entity does not allowed to edit."));
+            await RaiseEvent(new EntityPreMapEventArgs<TEntity, TEditDTO>(entity, dto));
+            mapper.Map(dto, entity);
+            await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
+            entityContext.Update(entity);
+            await RaiseEvent(new EntityPreEditEventArgs<TEntity>(entity));
+            await entityContext.Database.SaveAsync();
+            await RaiseEvent(new EntityEditedEventArgs<TEntity>(entity));
+            model.IsSuccess = true;
+            model.Item = mapper.Map<TListDTO>(entity);
+            return model;
+        }
+
+        public virtual async Task<IUpdateRangeModel<TListDTO>> EditRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TEditDTO[] dtos)
+        {
+            UpdateRangeModel<TListDTO> model = new UpdateRangeModel<TListDTO>();
+            Dictionary<TListDTO, TEntity> entities = new Dictionary<TListDTO, TEntity>();
+            foreach (var dto in dtos)
+            {
+                var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto, Context!.DomainContext, null);
+                List<ValidationResult> results = new List<ValidationResult>();
+                if (Validator.TryValidateObject(dto, validationContext, results, true))
+                {
+                    var mappedEntity = mapper.Map<TEntity>(dto);
+                    var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
+                    var keys = new object[keyProperties.Count];
+                    for (int i = 0; i < keyProperties.Count; i++)
+                        keys[i] = keyProperties[i].GetValue(mappedEntity);
+                    var entity = await entityContext.GetAsync(keys);
+                    if (entity == null)
+                        throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+                    if (!entity.IsEditAllowed)
+                        throw new DomainServiceException(new InvalidOperationException("Entity does not allowed to edit."));
+                    await RaiseEvent(new EntityPreMapEventArgs<TEntity, TEditDTO>(entity, dto));
+                    mapper.Map(dto, entity);
+                    await RaiseEvent(new EntityMappedEventArgs<TEntity, TEditDTO>(entity, dto));
+                    entityContext.Update(entity);
+                    await RaiseEvent(new EntityPreEditEventArgs<TEntity>(entity));
+                    var listDto = mapper.Map<TListDTO>(entity);
+                    entities.Add(listDto, entity);
+                    model.AddItem(listDto);
+                }
+                else
+                {
+                    model.AddItem(null, results.Where(t => t.ErrorMessage != null).Select(t => new KeyValuePair<string, string>(t.MemberNames.FirstOrDefault() ?? string.Empty, t.ErrorMessage!)).ToList());
+                }
+            }
+            if (!model.IsSuccess)
+                return model;
+            await entityContext.Database.SaveAsync();
+            foreach (var entity in entities)
+            {
+                await RaiseEvent(new EntityEditedEventArgs<TEntity>(entity.Value));
+                mapper.Map(entity.Value, entity.Key);
+            }
+            return model;
+        }
+
+        #endregion
+
+        #region Remove
+
+        public virtual async Task Remove([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TRemoveDTO dto)
+        {
+            var mappedEntity = mapper.Map<TEntity>(dto);
+            var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
+            var keys = new object[keyProperties.Count];
+            for (int i = 0; i < keyProperties.Count; i++)
+                keys[i] = keyProperties[i].GetValue(mappedEntity);
+            var entity = await entityContext.GetAsync(keys);
+            if (entity == null)
+                throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+            if (!entity.IsRemoveAllowed)
+                throw new DomainServiceException(new InvalidOperationException("Entity does not allowed to remove."));
+            await RaiseEvent(new EntityPreRemoveEventArgs<TEntity>(entity));
+            entityContext.Remove(entity);
+            await entityContext.Database.SaveAsync();
+            await RaiseEvent(new EntityRemovedEventArgs<TEntity>(entity));
+        }
+
+        public virtual async Task RemoveRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TRemoveDTO[] dtos)
+        {
+            List<TEntity> entities = new List<TEntity>();
+            foreach (var dto in dtos)
+            {
+                var mappedEntity = mapper.Map<TEntity>(dto);
+                var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
+                var keys = new object[keyProperties.Count];
+                for (int i = 0; i < keyProperties.Count; i++)
+                    keys[i] = keyProperties[i].GetValue(mappedEntity);
+                var entity = await entityContext.GetAsync(keys);
                 if (entity == null)
-                    throw new DomainServiceException(new EntityNotFoundException(typeof(T), index));
+                    throw new DomainServiceException(new ResourceNotFoundException("Entity does not exists."));
+                if (!entity.IsRemoveAllowed)
+                    throw new DomainServiceException(new InvalidOperationException("Entity does not allowed to remove."));
+                await RaiseEvent(new EntityPreRemoveEventArgs<TEntity>(entity));
+                entityContext.Remove(entity);
+                entities.Add(entity);
             }
-            var result = await UpdateCore(valueProvider, auth, entity, authorizeOption.GetProperties(Metadata, auth).ToArray());
-            if (result.IsSuccess)
-            {
-                if (isNew)
-                    context.Add(entity);
-                else
-                    context.Update(entity);
-                await database.SaveAsync();
-            }
-            return result;
+            await entityContext.Database.SaveAsync();
+            foreach (var entity in entities)
+                await RaiseEvent(new EntityRemovedEventArgs<TEntity>(entity));
         }
 
-        protected virtual async Task<EntityUpdateModel<T>> UpdateCore(IValueProvider valueProvider, IAuthentication authentication, T entity, IPropertyMetadata[] properties)
-        {
-            var model = new EntityUpdateModel<T>();
-            {
-                var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
-                await RaiseAsyncEvent(EntityPreUpdateEvent, arg);
-                properties = arg.Properties;
-            }
-            foreach (var property in properties)
-            {
-                try
-                {
-                    await UpdateProperty(valueProvider, entity, property);
-                }
-                catch (ValidationException ex)
-                {
-                    model.ErrorMessage.Add(property, ex.Message);
-                }
-            }
-            if (model.ErrorMessage.Count == 0)
-            {
-                var arg = new EntityUpdateEventArgs<T>(entity, valueProvider, properties);
-                await RaiseAsyncEvent(EntityUpdatedEvent, arg);
-            }
-            model.IsSuccess = model.ErrorMessage.Count == 0;
-            model.Result = entity;
-            return model;
-        }
-
-        public static readonly DomainServiceEventRoute EntityPreUpdateEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityUpdateEventArgs<T>>("EntityPreUpdate", typeof(EntityDomainService<T>));
-        public static readonly DomainServiceEventRoute EntityUpdatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityUpdateEventArgs<T>>("EntityUpdated", typeof(EntityDomainService<T>));
-        public event DomainServiceAsyncEventHandler<EntityUpdateEventArgs<T>> EntityPreUpdate { add { AddAsyncEventHandler(EntityPreUpdateEvent, value); } remove { RemoveAsyncEventHandler(EntityPreUpdateEvent, value); } }
-        public event DomainServiceAsyncEventHandler<EntityUpdateEventArgs<T>> EntityUpdated { add { AddAsyncEventHandler(EntityUpdatedEvent, value); } remove { RemoveAsyncEventHandler(EntityUpdatedEvent, value); } }
-
-        protected virtual async Task UpdateProperty(IValueProvider valueProvider, T entity, IPropertyMetadata property)
-        {
-            bool handled = false;
-            bool hasValue = valueProvider.ContainsKey(property.ClrName);
-            object value;
-            if (hasValue)
-            {
-                if (property.IsFileUpload)
-                {
-                    value = valueProvider.GetValue<ISelectedFile>(property.ClrName);
-                }
-                else if (property.Type == CustomDataType.Password)
-                {
-                    value = valueProvider.GetValue<string>(property.ClrName);
-                }
-                else
-                {
-                    value = valueProvider.GetValue(property.ClrName, property.ClrType);
-                }
-                var arg = new EntityPropertyUpdateEventArgs<T>(entity, valueProvider, property, value);
-                await RaiseAsyncEvent(EntityPropertyUpdateEvent, arg);
-                handled = arg.IsHandled;
-            }
-            else
-                value = property.GetValue(entity);
-            if (!handled)
-            {
-                if (value != null && !property.ClrType.IsAssignableFrom(value.GetType()))
-                    throw new NotImplementedException("未处理的属性“" + property.Name + "”。");
-                ValidationContext validationContext = new ValidationContext(entity, Context.DomainContext, null);
-                validationContext.MemberName = property.ClrName;
-                validationContext.DisplayName = property.Name;
-                var error = property.GetAttributes<ValidationAttribute>().Select(t => t.GetValidationResult(value, validationContext)).Where(t => t != ValidationResult.Success).ToArray();
-                if (error.Length > 0)
-                    throw new ValidationException(string.Join("，", error.Select(t => t.ErrorMessage)));
-                if (hasValue)
-                    property.SetValue(entity, value);
-            }
-        }
-
-        public static readonly DomainServiceEventRoute EntityPropertyUpdateEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityPropertyUpdateEventArgs<T>>("EntityPropertyUpdate", typeof(EntityDomainService<T>));
-        public event DomainServiceAsyncEventHandler<EntityPropertyUpdateEventArgs<T>> EntityPropertyUpdate { add { AddAsyncEventHandler(EntityPropertyUpdateEvent, value); } remove { RemoveAsyncEventHandler(EntityPropertyUpdateEvent, value); } }
-
-        public virtual async Task Remove([FromService] IDatabaseContext database, [FromService]IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
-        {
-            object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
-            var auth = authenticationProvider.GetAuthentication();
-            if (authorizeOption == null)
-                authorizeOption = EntityDomainAuthorizeOption.Remove;
-            authorizeOption.Validate(Metadata, auth);
-            var context = database.GetContext<T>();
-            T entity = await context.GetAsync(index);
-            if (entity == null)
-                throw new DomainServiceException(new EntityNotFoundException(typeof(T), index));
-            var e = new EntityRemoveEventArgs<T>(entity);
-            await RaiseAsyncEvent(EntityRemoveEvent, e);
-            if (e.IsCanceled)
-                return;
-            context.Remove(entity);
-            await database.SaveAsync();
-        }
-
-        public static readonly DomainServiceEventRoute EntityRemoveEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityRemoveEventArgs<T>>("EntityRemove", typeof(EntityDomainService<T>));
-        public event DomainServiceAsyncEventHandler<EntityRemoveEventArgs<T>> EntityRemove { add { AddAsyncEventHandler(EntityRemoveEvent, value); } remove { RemoveAsyncEventHandler(EntityRemoveEvent, value); } }
-
-        public virtual async Task<IEntityEditModel<T>> Detail([FromService] IDatabaseContext database, [FromService] IAuthenticationProvider authenticationProvider, [FromService]IValueProvider valueProvider, [FromOptions]EntityDomainAuthorizeOption authorizeOption)
-        {
-            object index = valueProvider.GetRequiredValue(Metadata.KeyProperty.ClrName, Metadata.KeyProperty.ClrType);
-            var auth = authenticationProvider.GetAuthentication();
-            if (authorizeOption == null)
-                authorizeOption = EntityDomainAuthorizeOption.Detail;
-            authorizeOption.Validate(Metadata, auth);
-            var context = database.GetContext<T>();
-            var queryable = context.Query();
-            foreach (var propertyMetadata in Metadata.Properties.Where(t => t.CustomType == "Entity"))
-            {
-                queryable = context.Include(queryable, propertyMetadata.ClrName);
-            }
-            T entity = await context.GetAsync(queryable, index);
-            if (entity == null)
-                throw new DomainServiceException(new EntityNotFoundException(typeof(T), index));
-            var model = new EntityEditModel<T>(entity);
-            model.Properties = authorizeOption.GetProperties(Metadata, auth);
-            var e = new EntityModelCreatedEventArgs<T>(model);
-            await RaiseAsyncEvent(EntityDetailModelCreatedEvent, e);
-            return model;
-        }
-
-        public static readonly DomainServiceEventRoute EntityDetailModelCreatedEvent = DomainServiceEventRoute.RegisterAsyncEvent<EntityModelCreatedEventArgs<T>>("EntityDetailModelCreated", typeof(EntityDomainService<T>));
-        public event DomainServiceAsyncEventHandler<EntityModelCreatedEventArgs<T>> EntityDetailModelCreated { add { AddAsyncEventHandler(EntityDetailModelCreatedEvent, value); } remove { RemoveAsyncEventHandler(EntityDetailModelCreatedEvent, value); } }
+        #endregion
     }
 }

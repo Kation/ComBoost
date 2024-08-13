@@ -7,6 +7,9 @@ using Microsoft.Extensions.Primitives;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
+    /// <summary>
+    /// Http表单值选择器。
+    /// </summary>
     public class HttpFormValueSelector : HttpStringValuesSelector
     {
         public HttpFormValueSelector(HttpContext httpContext) : base(httpContext)

@@ -21,7 +21,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <param name="customType">Custom type if exists.</param>
         /// <param name="isFileUpload">Is property used to upload.</param>
         /// <returns>Custom data type.</returns>
-        public static CustomDataType GetCustomDataType(this PropertyInfo propertyInfo, out string customType, out bool isFileUpload)
+        public static CustomDataType GetCustomDataType(this PropertyInfo propertyInfo, out string? customType, out bool isFileUpload)
         {
             CustomDataType type = CustomDataType.Default;
             customType = null;
@@ -42,10 +42,10 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 //    type = CustomDataType.Other;
                 //    customType = "ValueFilter";
                 //}
-                if (propertyType.GetTypeInfo().IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    propertyType = propertyType.GetGenericArguments()[0];
-                else if (propertyType == typeof(DateTime))
-                    type = CustomDataType.Date;
+                if (Nullable.GetUnderlyingType(propertyType) != null)
+                    propertyType = Nullable.GetUnderlyingType(propertyType);
+                if (propertyType == typeof(DateTime) || propertyType == typeof(DateTimeOffset))
+                    type = CustomDataType.DateTime;
                 else if (propertyType == typeof(TimeSpan))
                     type = CustomDataType.Time;
                 else if (propertyType == typeof(bool))
@@ -104,14 +104,14 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <param name="propertyInfo">Property info.</param>
         /// <returns>The set delegate made of labmda expression.</returns>
-        public static Action<object, object> GetSetMethodDelegate(this PropertyInfo propertyInfo)
+        public static Action<object, object?> GetSetMethodDelegate(this PropertyInfo propertyInfo)
         {
             var objParameter = Expression.Parameter(typeof(object));
             var valueParameter = Expression.Parameter(typeof(object));
             var objConverterParameter = Expression.Convert(objParameter, propertyInfo.DeclaringType);
             var valueConverterParameter = Expression.Convert(valueParameter, propertyInfo.PropertyType);
             var expression = Expression.Call(objConverterParameter, propertyInfo.GetSetMethod(), valueConverterParameter);
-            var lambda = Expression.Lambda<Action<object, object>>(expression, objParameter, valueParameter).Compile();
+            var lambda = Expression.Lambda<Action<object, object?>>(expression, objParameter, valueParameter).Compile();
             return lambda;
         }
     }

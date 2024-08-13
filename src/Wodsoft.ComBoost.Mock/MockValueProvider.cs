@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost.Mock
 
         public bool IgnoreCase { get; set; }
 
-        private MockValueKeyCollection _Keys;
+        private MockValueKeyCollection? _Keys;
         public override IValueKeyCollection Keys
         {
             get
@@ -28,7 +28,7 @@ namespace Wodsoft.ComBoost.Mock
             }
         }
 
-        protected override object GetValue(string name)
+        protected override object? GetValue(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -37,7 +37,7 @@ namespace Wodsoft.ComBoost.Mock
             return base.GetValue(name);
         }
 
-        public override void SetValue(string name, object value)
+        public override void SetValue(string name, object? value)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));

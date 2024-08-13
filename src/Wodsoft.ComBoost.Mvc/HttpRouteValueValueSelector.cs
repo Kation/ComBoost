@@ -18,7 +18,7 @@ namespace Wodsoft.ComBoost.Mvc
             return HttpContext.GetRouteData().Values.Keys.ToArray();
         }
 
-        protected override object GetValueCore(string key)
+        protected override object? GetValueCore(string key)
         {
             return HttpContext.GetRouteValue(key);
         }

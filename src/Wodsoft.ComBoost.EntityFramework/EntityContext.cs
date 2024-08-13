@@ -76,9 +76,9 @@ namespace Wodsoft.ComBoost.Data.Entity
         public IQueryable<T> Query()
         {
             if (Database.TrackEntity)
-                return DbSet;
+                return new WrappedAsyncQueryable<T>(DbSet);
             else
-                return DbSet.AsNoTracking();
+                return new WrappedAsyncQueryable<T>(DbSet.AsNoTracking());
         }
 
         public void Remove(T item)
@@ -144,15 +144,6 @@ namespace Wodsoft.ComBoost.Data.Entity
             return query.Include(expression);
         }
 
-        public Task<T> GetAsync(object key)
-        {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-            if (key.GetType() != Metadata.KeyType)
-                key = TypeDescriptor.GetConverter(Metadata.KeyType).ConvertFrom(key);
-            return DbSet.FindAsync(key);
-        }
-
         public Task ReloadAsync(T item)
         {
             return Database.InnerContext.Entry(item).ReloadAsync();
@@ -161,6 +152,73 @@ namespace Wodsoft.ComBoost.Data.Entity
         public IQueryable<T> ExecuteQuery(string sql, params object[] parameters)
         {
             return DbSet.SqlQuery(sql, parameters).AsNoTracking().AsQueryable();
+        }
+
+        public Task<T> GetAsync(params object[] keys)
+        {
+            if (Database.TrackEntity)
+                return DbSet.FindAsync(keys);
+            else
+            {
+                ParameterExpression parameter = Expression.Parameter(typeof(T));
+                Expression? expression = null;
+                if (Metadata.KeyProperties.Count != keys.Length)
+                    throw new InvalidOperationException("Length of keys is difference to entity.");
+                for (int i = 0; i < Metadata.KeyProperties.Count; i++)
+                {
+                    var equal = Expression.Equal(Expression.Property(parameter, Metadata.KeyProperties[i].ClrName), Expression.Constant(keys[i]));
+                    if (expression == null)
+                        expression = equal;
+                    else
+                        expression = Expression.AndAlso(expression, equal);
+                }
+                var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
+                return DbSet.AsNoTracking().Where(lambda).FirstOrDefaultAsync();
+            }
+        }
+
+        public IQueryable<TChildren> QueryChildren<TChildren>(T item, Expression<Func<T, ICollection<TChildren>>> childrenSelector) where TChildren : class
+        {
+            var entry = Database.InnerContext.Entry<T>(item);
+            var state = entry.State;
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Unchanged;
+            var query = entry.Collection(childrenSelector).Query();
+            if (Database.TrackEntity)
+                query = new WrappedAsyncQueryable<TChildren>(query);
+            else
+                query = new WrappedAsyncQueryable<TChildren>(query.AsNoTracking());
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Detached;
+            return query;
+        }
+
+        public async Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty?>> propertySelector) where TProperty : class
+        {
+            var entry = Database.InnerContext.Entry<T>(item);
+            var state = entry.State;
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Unchanged;
+            var reference = entry.Reference(propertySelector);
+            TProperty? propertyValue;
+            if (Database.TrackEntity)
+                propertyValue = await reference.Query().FirstOrDefaultAsync();
+            else
+                propertyValue = await reference.Query().AsNoTracking().FirstOrDefaultAsync();
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Detached;
+            Metadata.GetProperty(reference.Name)!.SetValue(item, propertyValue);
+        }
+
+        public void Detach(T item)
+        {
+            Database.InnerContext.Entry(item).State = EntityState.Detached;
+        }
+
+        public void DetachRange(IEnumerable<T> items)
+        {
+            foreach (var item in items)
+                Database.InnerContext.Entry(item).State = EntityState.Detached;
         }
     }
 }

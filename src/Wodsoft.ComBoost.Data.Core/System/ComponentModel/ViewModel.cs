@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
+using Wodsoft.ComBoost.Data.Linq;
 
 namespace System.ComponentModel
 {
@@ -11,14 +12,14 @@ namespace System.ComponentModel
     /// 视图模型。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ViewModel<T> : NotifyBase, IViewModel<T>
+    public class ViewModel<T> : IViewModel<T>
         where T : class
     {
         /// <summary>
         /// 实例化视图模型。
         /// </summary>
         /// <param name="queryable">查询体。</param>
-        public ViewModel(IQueryable<T> queryable) : this(queryable, 1, Pagination.DefaultPageSize) { }
+        public ViewModel(IQueryable<T> queryable) : this(queryable, 1, 0) { }
 
         /// <summary>
         /// 实例化视图模型。
@@ -30,18 +31,17 @@ namespace System.ComponentModel
         {
             if (page < 1)
                 throw new ArgumentException("不能小于1。", "page");
-            if (size < 1)
-                throw new ArgumentException("不能小于1。", "size");
-            ViewButtons = new IViewButton[0];
-            ItemButtons = new IItemButton[0];
+            if (size < 0)
+                throw new ArgumentException("不能小于0。", "size");
             CurrentSize = size;
             PageSizeOption = Pagination.DefaultPageSizeOption;
-            Queryable = queryable ?? throw new ArgumentNullException("queryable");
+            _Queryable = queryable ?? throw new ArgumentNullException("queryable");
+            CurrentPage = page;
         }
 
         private IQueryable<T> _Queryable;
         /// <inheritdoc />
-        public IQueryable<T> Queryable
+        protected IQueryable<T> Queryable
         {
             get
             {
@@ -55,49 +55,39 @@ namespace System.ComponentModel
         }
 
         /// <inheritdoc />
-        public int[] PageSizeOption { get { return (int[])GetValue(); } set { SetValue(value); } }
+        public int[] PageSizeOption { get; set; }
 
         /// <inheritdoc />
-        public int TotalPage { get { return (int)GetValue(); } set { SetValue(value); } }
+        public int TotalPage { get; set; }
 
         /// <inheritdoc />
-        public int CurrentSize { get { return (int)GetValue(); } set { SetValue(value); } }
+        public int CurrentSize { get; set; }
 
         /// <inheritdoc />
-        public int CurrentPage { get { return (int)GetValue(); } set { SetValue(value); } }
+        public int CurrentPage { get; set; }
+
+        IReadOnlyList<object>? IViewModel.Items { get { return Items; } }
 
         /// <inheritdoc />
-        public IViewButton[] ViewButtons { get; set; }
+        public IReadOnlyList<T>? Items { get; set; }
 
         /// <inheritdoc />
-        public IItemButton[] ItemButtons { get; set; }
-
-        object[] IViewModel.Items { get { return Items; } }
-
-        /// <inheritdoc />
-        public T[] Items { get { return (T[])GetValue(); } set { SetValue(value); } }
-
-        /// <inheritdoc />
-        public int TotalCount { get { return (int)GetValue(); } set { SetValue(value); } }
+        public int TotalCount { get; set; }
 
         /// <inheritdoc />
         public void SetPage(int page)
         {
             if (page < 1)
                 throw new ArgumentException("页数不能小于1。", "page");
-            if (page > TotalPage)
-                page = TotalPage;
             CurrentPage = page;
         }
 
         /// <inheritdoc />
         public void SetSize(int size)
         {
-            if (size < 1)
-                throw new ArgumentException("每页显示数量不能小于1。", "size");
+            if (size < 0)
+                throw new ArgumentException("每页显示数量不能小于0。", "size");
             CurrentSize = size;
-            if (CurrentPage != 1)
-                SetPage(1);
         }
 
         /// <inheritdoc />
@@ -108,12 +98,17 @@ namespace System.ComponentModel
             TotalPage = (int)Math.Ceiling(total / (double)CurrentSize);
             if (TotalPage == 0)
                 TotalPage = 1;
+            if (CurrentPage > TotalPage)
+                CurrentPage = TotalPage;
         }
 
         /// <inheritdoc />
         public async Task UpdateItemsAsync()
         {
-            Items = await Linq.Queryable.Skip<T>(Queryable, (int)((CurrentPage - 1) * CurrentSize)).Take(CurrentSize).ToArrayAsync();
+            if (CurrentSize > 0)
+                Items = await Queryable.Skip((CurrentPage - 1) * CurrentSize).Take(CurrentSize).ToArrayAsync();
+            else
+                Items = await Queryable.ToArrayAsync();
         }
     }
 }

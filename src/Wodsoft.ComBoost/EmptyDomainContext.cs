@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
 using System.Threading;
 
@@ -10,16 +11,13 @@ namespace Wodsoft.ComBoost
         public EmptyDomainContext(IServiceProvider serviceProvider, CancellationToken cancellationToken)
             : base(serviceProvider, cancellationToken)
         {
-            ValueProvider = new EmptyValueProvider();
+            _valueProvider = new EmptyValueProvider();
+            User = new ClaimsPrincipal(new ClaimsIdentity("Anonymous"));
         }
-        
-        public EmptyValueProvider ValueProvider { get; private set; }
 
-        public override object GetService(Type serviceType)
-        {
-            if (serviceType == typeof(IValueProvider))
-                return ValueProvider;
-            return base.GetService(serviceType);
-        }
+        private EmptyValueProvider _valueProvider;
+        public override IValueProvider ValueProvider => _valueProvider;
+
+        public override ClaimsPrincipal User { get; }
     }
 }

@@ -14,22 +14,22 @@ namespace System.ComponentModel
         /// <summary>
         /// Get the name of the button.
         /// </summary>
-        string Name { get; }
+        string? Name { get; }
 
         /// <summary>
         /// Get the tooltip of the button.
         /// </summary>
-        object Tooltip { get; }
+        object? Tooltip { get; }
 
         /// <summary>
         /// Get the icon of the button.
         /// </summary>
-        object Icon { get; }
+        object? Icon { get; }
 
         /// <summary>
         /// Get the target of the button.
         /// </summary>
-        object Target { get; }
+        object? Target { get; }
 
         /// <summary>
         /// Set the target of button.

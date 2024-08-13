@@ -9,12 +9,12 @@ namespace Wodsoft.ComBoost.Mock
 {
     public class MockStorage : IStorage
     {
-        private IFileProvider _FileProvider;
+        private IFileProvider? _FileProvider;
         private Dictionary<string, MemoryStream> _MemoryStore;
         private Dictionary<string, DateTime> _MemoryDateStore;
         private List<string> _Removed;
 
-        public MockStorage(IFileProvider fileProvider)
+        public MockStorage(IFileProvider? fileProvider)
         {
             _FileProvider = fileProvider;
             _MemoryDateStore = new Dictionary<string, DateTime>();
@@ -46,7 +46,7 @@ namespace Wodsoft.ComBoost.Mock
             return Task.FromResult(false);
         }
 
-        public async Task<Stream> GetAsync(string path)
+        public async Task<Stream?> GetAsync(string path)
         {
             if (!_Removed.Contains(path))
             {
@@ -68,7 +68,7 @@ namespace Wodsoft.ComBoost.Mock
             return null;
         }
 
-        public async Task<IStorageFile> GetFileAsync(string path)
+        public async Task<IStorageFile?> GetFileAsync(string path)
         {
             if (!_Removed.Contains(path))
             {

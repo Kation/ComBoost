@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "配置文件 1": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\..\\test\\Wodsoft.ComBoost.AspNetCore.Test\\Wodsoft.ComBoost.AspNetCore.Test.csproj"
+    }
+  }
+}

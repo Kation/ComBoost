@@ -1,7 +1,0 @@
-﻿@model IPagination
-<div class="btn-group" role="group">
-    @foreach (var size in Model.PageSizeOption)
-    {
-        <button type="submit" name="size" value="@size" class="btn btn-default @(size == Model.CurrentSize ? "active" : "")">@size</button>
-    }
-</div>

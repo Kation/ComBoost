@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Wodsoft.ComBoost.AspNetCore
 {
+    /// <summary>
+    /// Http文件值选择器。
+    /// </summary>
     public class HttpFormFileValueSelector : HttpValueSelector
     {
         public HttpFormFileValueSelector(HttpContext httpContext) : base(httpContext)

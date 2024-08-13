@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,16 +25,21 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取领域服务过滤器列表。
         /// </summary>
-        IList<IDomainServiceFilter> Filter { get; }
+        IList<IDomainServiceFilter> Filters { get; }
 
         /// <summary>
-        /// 获取领域服务选项。
+        /// 获取领域事件管理器。
         /// </summary>
-        IDomainServiceOptions Options { get; }
+        DomainServiceEventManager EventManager { get; }
 
         /// <summary>
-        /// 领域事件管理器。
+        /// 获取值提供器。
         /// </summary>
-        DomainServiceEventManager EventManager { get; }     
+        IValueProvider ValueProvider { get; }
+
+        /// <summary>
+        /// 获取用户主体声明。
+        /// </summary>
+        ClaimsPrincipal User { get; }
     }
 }

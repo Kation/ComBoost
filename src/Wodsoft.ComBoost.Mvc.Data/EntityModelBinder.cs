@@ -15,32 +15,32 @@ namespace Wodsoft.ComBoost.Mvc
     {
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
+            var modelMetadataProvider = bindingContext.HttpContext.RequestServices.GetRequiredService<IModelMetadataProvider>();
+            var modelBinderFactory = bindingContext.HttpContext.RequestServices.GetRequiredService<IModelBinderFactory>();
             var metadata = EntityDescriptor.GetMetadata(bindingContext.ModelType);
-            object key = bindingContext.ValueProvider.GetValue(bindingContext.ModelName).ToString();
-            if (metadata.KeyType != typeof(string))
+            var keys = new object[metadata.KeyProperties.Count];
+            for(int i = 0; i < keys.Length; i++)
             {
-                var converter = TypeDescriptor.GetConverter(metadata.KeyType);
-                key = converter.ConvertFromString((string)key);
-            }
-            if (metadata.KeyType.GetTypeInfo().IsValueType)
-            {
-                if (key.Equals(Activator.CreateInstance(metadata.KeyType)))
+                var property = metadata.KeyProperties[i];
+                var bindingInfo = new BindingInfo() { BinderModelName = property.ClrName, BindingSource = BindingSource.ModelBinding };
+                var modelMetadata = modelMetadataProvider.GetMetadataForType(metadata.KeyProperties[i].ClrType);
+                var propertyBindingContext = DefaultModelBindingContext.CreateBindingContext(bindingContext.ActionContext, bindingContext.ValueProvider, modelMetadata, bindingInfo, property.ClrName);
+                ModelBinderFactoryContext binderContext = new ModelBinderFactoryContext();
+                binderContext.BindingInfo = new BindingInfo() { BinderModelName = property.ClrName, BindingSource = BindingSource.ModelBinding };
+                binderContext.CacheToken = property.ClrName + "_" + property.ClrType.Name;
+                binderContext.Metadata = modelMetadataProvider.GetMetadataForType(property.ClrType);
+                var binder = modelBinderFactory.CreateBinder(binderContext);
+                await binder.BindModelAsync(propertyBindingContext);
+                if (propertyBindingContext.Result.Model == null)
                 {
-                    bindingContext.Result = ModelBindingResult.Success(null);
+                    bindingContext.Result = ModelBindingResult.Failed();
                     return;
                 }
-            }
-            else
-            {
-                if (key == null)
-                {
-                    bindingContext.Result = ModelBindingResult.Success(null);
-                    return;
-                }
+                keys[i] = propertyBindingContext.Result.Model;
             }
             var databaseContext = bindingContext.HttpContext.RequestServices.GetRequiredService<IDatabaseContext>();
             var entityContext = databaseContext.GetDynamicContext(metadata.Type);
-            var entity = await entityContext.GetAsync(key);
+            var entity = await entityContext.GetAsync(keys);
             if (entity != null)
                 bindingContext.Result = ModelBindingResult.Success(entity);
             else

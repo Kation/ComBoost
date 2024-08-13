@@ -8,326 +8,195 @@ using Wodsoft.ComBoost.Security;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Newtonsoft.Json;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.ExceptionServices;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Wodsoft.ComBoost.Mvc
 {
-    public class EntityController<T> : EntityController, IHaveEntityMetadata
-        where T : class, IEntity, new()
+    public class EntityController<TEntity, TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> : Controller
+        where TEntity : class, IEntity
+        where TListDTO : class
+        where TCreateDTO : class
+        where TEditDTO : class
+        where TRemoveDTO : class
     {
-        private EntityDomainService<T> _EntityService;
-        protected EntityDomainService<T> EntityService
-        {
-            get
-            {
-                if (_EntityService == null)
-                    _EntityService = GetEntityDomainService();
-                return _EntityService;
-            }
-        }
-
-        private IEntityMetadata _Metadata;
-        public IEntityMetadata Metadata
-        {
-            get
-            {
-                if (_Metadata == null)
-                    _Metadata = EntityDescriptor.GetMetadata<T>();
-                return _Metadata;
-            }
-        }
+        #region List
 
         [HttpGet]
-        [EntityAuthorize]
         public virtual async Task<IActionResult> Index()
         {
-            var context = CreateIndexContext();
-            try
-            {
-                var model = await EntityService.ExecuteList(context);
-                foreach (var button in model.ViewButtons)
-                    button.SetTarget(HttpContext.RequestServices);
-                if (IsJsonRequest())
-                {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
-                }
-                return View(model);
-            }
-            catch (DomainServiceException ex)
-            {
-                if (ex.InnerException is UnauthorizedAccessException)
-                    return StatusCode(401, ex.InnerException.Message);
-                else
-                {
-                    ExceptionDispatchInfo.Capture(ex).Throw();
-                    throw;
-                }
-            }
+            var model = await CreateListModel();
+            return OnListModelCreated(model);
         }
 
-        protected virtual ControllerDomainContext CreateIndexContext()
+        protected virtual async Task<IViewModel<TListDTO>> CreateListModel()
         {
-            return CreateDomainContext();
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            domain.Context.EventManager.AddEventHandler<EntityQueryEventArgs<TEntity>>((context, e) =>
+            {
+                bool isOrdered = e.IsOrdered;
+                var queryable = e.Queryable;
+                OnListQuery(ref queryable, ref isOrdered);
+                e.Queryable = queryable;
+                return Task.CompletedTask;
+            });
+            var model = await domain.List();
+            return model;
         }
+
+        protected virtual void OnListQuery(ref IQueryable<TEntity> queryable, ref bool isOrdered) { }
+
+        protected virtual IActionResult OnListModelCreated(IViewModel<TListDTO> model)
+        {
+            return View(model);
+        }
+
+        #endregion
+
+        #region Create
 
         [HttpGet]
-        [EntityAuthorize]
         public virtual async Task<IActionResult> Create()
         {
-            var context = CreateCreateContext();
-            try
-            {
-                var model = await EntityService.ExecuteCreate(context);
-                if (IsJsonRequest())
-                {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Create, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityEditModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
-                }
-                return View("Edit", model);
-            }
-            catch (DomainServiceException ex)
-            {
-                if (ex.InnerException is UnauthorizedAccessException)
-                    return StatusCode(401, ex.InnerException.Message);
-                else
-                {
-                    ExceptionDispatchInfo.Capture(ex).Throw();
-                    throw;
-                }
-            }
+            var model = await CreateCreateModel();
+            return OnCreateModelCreated(model);
         }
 
-        protected virtual ControllerDomainContext CreateCreateContext()
+        protected virtual Task<IEditModel<TCreateDTO>> CreateCreateModel()
         {
-            return CreateDomainContext();
+            var entityContext = HttpContext.RequestServices.GetRequiredService<IEntityContext<TEntity>>();
+            var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
+            var entity = entityContext.Create();
+            var dto = mapper.Map<TCreateDTO>(entity);
+            IEditModel<TCreateDTO> model = new EditModel<TCreateDTO>(dto);
+            return Task.FromResult(model);
         }
+
+        protected virtual IActionResult OnCreateModelCreated(IEditModel<TCreateDTO> model)
+        {
+            return View(model);
+        }
+
+        [HttpPost]
+        public virtual async Task<IActionResult> Create(TCreateDTO dto)
+        {
+            var model = await CreateEntity(dto);
+            return OnCreateModelCreated(model, dto);
+        }
+
+        protected virtual Task<IUpdateModel<TListDTO>> CreateEntity(TCreateDTO dto)
+        {
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            return domain.Create(dto);
+        }
+
+        protected virtual IActionResult OnCreateModelCreated(IUpdateModel<TListDTO> model, TCreateDTO createDto)
+        {
+            if (model.IsSuccess)
+                return RedirectToAction("Index");
+            else
+                return View(new EditModel<TCreateDTO>(createDto));
+        }
+
+        #endregion
+
+        #region Edit
 
         [HttpGet]
-        [EntityAuthorize]
         public virtual async Task<IActionResult> Edit()
         {
-            var context = CreateEditContext();
-            try
-            {
-                var model = await EntityService.ExecuteEdit(context);
-                if (IsJsonRequest())
-                {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Edit, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityEditModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
-                }
-                return View(model);
-            }
-            catch (DomainServiceException ex)
-            {
-                if (ex.InnerException is UnauthorizedAccessException)
-                    return StatusCode(401, ex.InnerException.Message);
-                else if (ex.InnerException is EntityNotFoundException)
-                    return StatusCode(404, ex.InnerException.Message);
-                else
-                {
-                    ExceptionDispatchInfo.Capture(ex).Throw();
-                    throw;
-                }
-            }
+            var model = await CreateEditModel();
+            return OnEditModelCreated(model);
         }
 
-        protected virtual ControllerDomainContext CreateEditContext()
+        protected virtual async Task<IEditModel<TEditDTO>?> CreateEditModel()
         {
-            return CreateDomainContext();
+            var entityContext = HttpContext.RequestServices.GetRequiredService<IEntityContext<TEntity>>();
+            var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
+            var keys = await GetKeysFromQuery();
+            if (keys.Any(t => t == null))
+                return null;
+            var entity = await entityContext.GetAsync(keys);
+            var dto = mapper.Map<TEditDTO>(entity);
+            IEditModel<TEditDTO> model = new EditModel<TEditDTO>(dto);
+            return model;
         }
 
-        [HttpGet]
-        [EntityAuthorize]
-        public virtual async Task<IActionResult> Detail()
+        protected virtual async Task<object?[]> GetKeysFromQuery()
         {
-            var context = CreateDetailContext();
-            try
+            var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
+            var keys = new object?[keyProperties.Count];
+            var valueProvider = await CompositeValueProvider.CreateAsync(ControllerContext);
+            for (int i = 0; i < keyProperties.Count; i++)
             {
-                var model = await EntityService.ExecuteDetail(context);
-                if (IsJsonRequest())
+                var property = keyProperties[i];
+                ModelBinderFactoryContext context = new ModelBinderFactoryContext();
+                context.BindingInfo = new BindingInfo() { BinderModelName = property.ClrName, BindingSource = BindingSource.ModelBinding };
+                context.CacheToken = property.ClrName + "_" + property.ClrType.Name;
+                context.Metadata = MetadataProvider.GetMetadataForType(property.ClrType);
+                var binder = ModelBinderFactory.CreateBinder(context);
+                var bindingContext = DefaultModelBindingContext.CreateBindingContext(ControllerContext, valueProvider, context.Metadata, context.BindingInfo, property.ClrName);
+                try
                 {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.Detail, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityEditModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
+                    await binder.BindModelAsync(bindingContext);
+                    if (bindingContext.Result.IsModelSet)
+                        keys[i] = bindingContext.Result.Model;
                 }
-                return View(model);
-            }
-            catch (DomainServiceException ex)
-            {
-                if (ex.InnerException is UnauthorizedAccessException)
-                    return StatusCode(401, ex.InnerException.Message);
-                else if (ex.InnerException is EntityNotFoundException)
-                    return StatusCode(404, ex.InnerException.Message);
-                else
+                catch
                 {
-                    ExceptionDispatchInfo.Capture(ex).Throw();
-                    throw;
+
                 }
             }
+            return keys;
         }
 
-        protected virtual ControllerDomainContext CreateDetailContext()
+        protected virtual IActionResult OnEditModelCreated(IEditModel<TEditDTO>? model)
         {
-            return CreateDomainContext();
+            if (model == null)
+                return NotFound();
+            return View(model);
         }
 
         [HttpPost]
-        [EntityAuthorize]
-        public virtual async Task<IActionResult> Remove()
+        public virtual async Task<IActionResult> Edit(TEditDTO dto)
         {
-            var context = CreateRemoveContext();
-            try
-            {
-                await EntityService.ExecuteRemove(context);
-                return StatusCode(200);
-            }
-            catch (DomainServiceException ex)
-            {
-                if (ex.InnerException is UnauthorizedAccessException)
-                    return StatusCode(401, ex.InnerException.Message);
-                else if (ex.InnerException is EntityNotFoundException)
-                    return StatusCode(404, ex.InnerException.Message);
-                else
-                {
-                    ExceptionDispatchInfo.Capture(ex).Throw();
-                    throw;
-                }
-            }
+            var model = await EditEntity(dto);
+            return OnEditModelCreated(model, dto);
         }
 
-        protected virtual ControllerDomainContext CreateRemoveContext()
+        protected virtual Task<IUpdateModel<TListDTO>> EditEntity(TEditDTO dto)
         {
-            return CreateDomainContext();
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            return domain.Edit(dto);
         }
+
+        protected virtual IActionResult OnEditModelCreated(IUpdateModel<TListDTO> model, TEditDTO editDto)
+        {
+            if (model.IsSuccess)
+                return RedirectToAction("Index");
+            else
+                return View(new EditModel<TEditDTO>(editDto));
+        }
+
+        #endregion
+
+        #region Remove
 
         [HttpPost]
-        [EntityAuthorize]
-        public virtual async Task<IActionResult> Update()
+        public virtual async Task<IActionResult> Remove(TRemoveDTO dto)
         {
-            var context = CreateUpdateContext();
-            try
-            {
-                var result = await EntityService.ExecuteUpdate(context);
-                if (result.IsSuccess)
-                    return StatusCode(204);
-                Response.StatusCode = 400;
-                return Json(result.ErrorMessage.Select(t =>
-                    new
-                    {
-                        Property = t.Key.ClrName,
-                        Name = t.Key.Name,
-                        ErrorMessage = t.Value
-                    }));
-            }
-            catch (DomainServiceException ex)
-            {
-                if (ex.InnerException is UnauthorizedAccessException)
-                    return StatusCode(401, ex.InnerException.Message);
-                else if (ex.InnerException is EntityNotFoundException)
-                    return StatusCode(404, ex.InnerException.Message);
-                else if (ex.InnerException is ArgumentException || ex.InnerException is ArgumentNullException || ex.InnerException is ArgumentOutOfRangeException)
-                    return StatusCode(400, ex.InnerException.Message);
-                else
-                {
-                    ExceptionDispatchInfo.Capture(ex).Throw();
-                    throw;
-                }
-            }
+            await RemoveEntity(dto);
+            return NoContent();
         }
 
-        protected virtual ControllerDomainContext CreateUpdateContext()
+        protected virtual Task RemoveEntity(TRemoveDTO dto)
         {
-            return CreateDomainContext();
+            var domain = HttpContext.RequestServices.GetRequiredService<IEntityDomainTemplate<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO>>();
+            return domain.Remove(dto);
         }
 
-        [HttpGet]
-        [EntityAuthorize]
-        public virtual async Task<IActionResult> Selector()
-        {
-            var context = CreateSelectorContext();
-            try
-            {
-                var model = await EntityService.ExecuteList(context);
-                if (IsJsonRequest())
-                {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
-                }
-                return View(model);
-            }
-            catch (DomainServiceException ex)
-            {
-                if (ex.InnerException is UnauthorizedAccessException)
-                    return StatusCode(401, ex.InnerException.Message);
-                else
-                {
-                    ExceptionDispatchInfo.Capture(ex).Throw();
-                    throw;
-                }
-            }
-        }
-
-        protected virtual ControllerDomainContext CreateSelectorContext()
-        {
-            return CreateDomainContext();
-        }
-
-        [HttpGet]
-        [EntityAuthorize]
-        public virtual async Task<IActionResult> MultipleSelector()
-        {
-            var context = CreateMultipleSelectorContext();
-            try
-            {
-                var model = await EntityService.ExecuteList(context);
-                if (IsJsonRequest())
-                {
-                    EntityJsonConverter entityConverter = new Mvc.EntityJsonConverter(EntityDomainAuthorizeOption.View, HttpContext.RequestServices.GetRequiredService<IAuthenticationProvider>().GetAuthentication());
-                    return Content(JsonConvert.SerializeObject(model, entityConverter, EntityMetadataJsonConverter.Converter, PropertyMetadataJsonConverter.Converter, EntityViewModelJsonConverter.Converter), "application/json", System.Text.Encoding.UTF8);
-                }
-                return View(model);
-            }
-            catch (DomainServiceException ex)
-            {
-                if (ex.InnerException is UnauthorizedAccessException)
-                    return StatusCode(401, ex.InnerException.Message);
-                else
-                {
-                    ExceptionDispatchInfo.Capture(ex).Throw();
-                    throw;
-                }
-            }
-        }
-
-        protected virtual ControllerDomainContext CreateMultipleSelectorContext()
-        {
-            return CreateDomainContext();
-        }
-
-        protected virtual EntityDomainService<T> GetEntityDomainService()
-        {
-            return DomainProvider.GetService<EntityDomainService<T>>();
-        }
-
-        protected virtual bool IsJsonRequest()
-        {
-            var accept = Request.Headers["accept"].ToString();
-            var json = accept.IndexOf("application/json");
-            if (json == -1)
-                return false;
-            var html = accept.IndexOf("text/html");
-            if (html == -1)
-                return true;
-            return json < html;
-        }
-
-        protected override ControllerDomainContext CreateDomainContext()
-        {
-            var context = base.CreateDomainContext();
-            context.ValueProvider.SetAlias("id", "index");
-            return context;
-        }
+        #endregion
     }
 }

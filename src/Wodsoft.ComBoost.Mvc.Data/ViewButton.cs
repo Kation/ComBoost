@@ -12,26 +12,26 @@ namespace Wodsoft.ComBoost.Mvc
         /// <summary>
         /// Get or set the name of button.
         /// </summary>
-        public virtual string Name { get; set; }
+        public virtual string? Name { get; set; }
 
         /// <summary>
         /// Get or set the icon url.
         /// </summary>
-        public virtual string Icon { get; set; }
+        public virtual string? Icon { get; set; }
 
         /// <summary>
         /// Get or set the tooltip.
         /// </summary>
-        public virtual string Tooltip { get; set; }
+        public virtual string? Tooltip { get; set; }
 
-        object IViewButton.Icon { get { return Icon; } }
+        object? IViewButton.Icon { get { return Icon; } }
 
-        object IViewButton.Tooltip { get { return Tooltip; } }
+        object? IViewButton.Tooltip { get { return Tooltip; } }
         
         /// <summary>
         /// Get or set the target of the button.
         /// </summary>
-        public virtual object Target { get; set; }
+        public virtual object? Target { get; set; }
 
         public void SetTarget(IServiceProvider provider)
         {

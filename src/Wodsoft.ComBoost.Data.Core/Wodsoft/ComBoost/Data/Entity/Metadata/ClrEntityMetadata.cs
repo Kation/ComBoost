@@ -24,11 +24,71 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             if (type == null)
                 throw new ArgumentNullException("type");
-            
-            PropertyInfo[] properties = type.GetProperties().ToArray();
-            SetProperties(properties.Select(t => new ClrPropertyMetadata(t)).OrderBy(t => t.Order).ToArray());
+            _properties = type.GetProperties().Select(t => new ClrPropertyMetadata(t)).OrderBy(t => t.Order).ToDictionary(t => t.ClrName, t => t);
+            Properties = new ReadOnlyCollection<IPropertyMetadata>(_properties.Values.ToArray());
 
-            SetMetadata();
+            DisplayNameAttribute display = type.GetCustomAttribute<DisplayNameAttribute>();
+            if (display != null)
+                Name = display.DisplayName;
+            else
+                Name = Type.Name;
+
+            ParentAttribute parent = Type.GetTypeInfo().GetCustomAttribute<ParentAttribute>();
+            if (parent != null)
+                ParentProperty = GetProperty(parent.PropertyName) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not contains parent property \"{parent.PropertyName}\".");
+
+            var multipleKeyAttribute = type.GetCustomAttribute<MultipleKeyAttribute>();
+            if (multipleKeyAttribute == null || multipleKeyAttribute.Keys.Length == 0)
+            {
+                var keys = Properties.Where(t => t.IsKey).ToArray();
+                if (keys.Length == 0)
+                {
+                    var key = GetProperty("Id") ?? GetProperty("ID") ?? GetProperty("Index") ?? GetProperty(Type.Name + "Id") ?? GetProperty(Type.Name + "ID");
+                    if (key != null)
+                        KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(new IPropertyMetadata[] { key });
+                    else
+                        throw new NotSupportedException($"Type \"{Type.FullName}\" does not contains key property.");
+                }
+                else
+                {
+                    KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(keys);
+                }
+            }
+            else
+            {
+                KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(multipleKeyAttribute.Keys.Select(t => GetProperty(t) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not exist key property \"{t}\".")).ToArray());
+            }
+
+            DisplayColumnAttribute displayColumn = Type.GetTypeInfo().GetCustomAttribute<DisplayColumnAttribute>();
+            if (displayColumn != null)
+            {
+                DisplayProperty = GetProperty(displayColumn.DisplayColumn);
+                if (displayColumn.SortColumn != null)
+                    SortProperty = GetProperty(displayColumn.SortColumn) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not contains sort property \"{displayColumn.SortColumn}\".");
+                IsSortDescending = displayColumn.SortDescending;
+            }
+
+            if (SortProperty == null)
+                SortProperty = KeyProperties[0];
+        }
+
+        private Dictionary<string, ClrPropertyMetadata> _properties;
+        public override IReadOnlyList<IPropertyMetadata> KeyProperties { get; }
+
+        public override string Name { get; }
+
+        public override IPropertyMetadata SortProperty { get; }
+
+        public override IReadOnlyList<IPropertyMetadata> Properties { get; }
+
+        public override IPropertyMetadata? ParentProperty { get; }
+
+        public override IPropertyMetadata? GetProperty(string name)
+        {
+            ClrPropertyMetadata value;
+            if (_properties.TryGetValue(name, out value))
+                return value;
+            return null;
         }
     }
 }

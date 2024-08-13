@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data.Entity
@@ -27,7 +28,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public WrappedQueryableProvider<T, M> Provider { get; private set; }
 
-        System.Linq.IQueryProvider IQueryable.Provider { get { return Provider; } }
+        IQueryProvider IQueryable.Provider { get { return Provider; } }
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -36,7 +37,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new WrappedEnumerator<T, M>(Provider.InnerQueryProvider.CreateQuery<M>(Expression).GetEnumerator());
+            return GetEnumerator();
         }
     }
 

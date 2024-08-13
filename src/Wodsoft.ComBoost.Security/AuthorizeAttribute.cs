@@ -17,48 +17,33 @@ namespace Wodsoft.ComBoost
         /// </summary>
         public AuthorizeAttribute()
         {
-            Roles = new object[0];
-            AllowAnonymous = false;
+            Roles = Array.Empty<string>();
         }
 
         /// <summary>
         /// 指定角色。
         /// </summary>
-        /// <param name="mode">判断模式。</param>
         /// <param name="roles">角色。</param>
-        public AuthorizeAttribute(AuthenticationRequiredMode mode, params object[] roles)
+        public AuthorizeAttribute(params string[] roles)
         {
-            Mode = mode;
             Roles = roles;
-            AllowAnonymous = false;
         }
-
-        /// <summary>
-        /// 获取或设置权限判断模式。
-        /// </summary>
-        public AuthenticationRequiredMode Mode { get; set; }
-
-        /// <summary>
-        /// 获取或设置允许匿名访问。
-        /// </summary>
-        public bool AllowAnonymous { get; set; }
 
         /// <summary>
         /// 获取或设置需要的角色。
         /// </summary>
-        public object[] Roles { get; set; }
+        public string[] Roles { get; set; }
 
         /// <summary>
         /// 获取权限。
         /// </summary>
-        public IAuthentication Authentication { get; private set; }
+        public IAuthorizationProvider? AuthorizationProvider { get; private set; }
 
-        /// <inheritdoc/>
-        public override Task OnExecutingAsync(IDomainExecutionContext context)
+        public override async Task OnExecutionAsync(IDomainExecutionContext context, DomainExecutionPipeline next)
         {
-            var provider = context.DomainContext.GetService<IAuthenticationProvider>();
-            Authentication = provider.GetAuthentication();
-            return AuthorizeCore(context);
+            AuthorizationProvider = context.DomainContext.GetRequiredService<IAuthorizationProvider>();
+            await AuthorizeCore(context);
+            await next();
         }
 
         /// <summary>
@@ -66,35 +51,19 @@ namespace Wodsoft.ComBoost
         /// </summary>
         /// <param name="context">领域执行上下文。</param>
         /// <returns></returns>
-        protected virtual Task AuthorizeCore(IDomainExecutionContext context)
+        protected virtual async Task AuthorizeCore(IDomainExecutionContext context)
         {
-            if (!AllowAnonymous && !Authentication.Identity.IsAuthenticated)
-                throw new DomainServiceException(new UnauthorizedAccessException("用户未登录。"));
-            if (Roles.Length > 0)
-                if (Mode == AuthenticationRequiredMode.All)
-                {
-                    foreach (var role in Roles)
-                        if (!Authentication.IsInRole(role))
-                            throw new DomainServiceException(new UnauthorizedAccessException("用户没有“" + role + "”的权限。"));
-                }
-                else
-                {
-                    foreach (var role in Roles)
-                        if (Authentication.IsInRole(role))
-                            return Task.FromResult(0);
+            if (Roles.Length != 0)
+            {
+                var exists = await AuthorizationProvider!.CheckInRoles(context, Roles);
+                if (exists.Length == 0)
                     throw new DomainServiceException(new UnauthorizedAccessException("用户没有" + string.Join("，", "“" + Roles + "”") + "权限。"));
-                }
-            return Task.FromResult(0);
-        }
-
-        /// <summary>
-        /// 判断是否拥有权限。
-        /// </summary>
-        /// <param name="role">权限。</param>
-        /// <returns></returns>
-        protected virtual bool IsInRole(object role)
-        {
-            return Authentication.IsInRole(role);
+            }
+            else
+            {
+                if (!context.DomainContext.User.Identity.IsAuthenticated)
+                    throw new DomainServiceException(new UnauthorizedAccessException("用户未通过身份验证。"));
+            }
         }
     }
 }

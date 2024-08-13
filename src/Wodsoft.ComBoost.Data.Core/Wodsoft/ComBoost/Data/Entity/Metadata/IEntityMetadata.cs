@@ -19,14 +19,9 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         Type Type { get; }
 
         /// <summary>
-        /// 获取主键类型。
-        /// </summary>
-        Type KeyType { get; }
-
-        /// <summary>
         /// 获取主键属性。
         /// </summary>
-        IPropertyMetadata KeyProperty { get; }
+        IReadOnlyList<IPropertyMetadata> KeyProperties { get; }
 
         /// <summary>
         /// 获取实体名称。
@@ -34,19 +29,19 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         string Name { get; }
 
         /// <summary>
-        /// 获取显示属性。
+        /// 获取默认显示属性。
         /// </summary>
-        IPropertyMetadata DisplayProperty { get; }
+        IPropertyMetadata? DisplayProperty { get; }
 
         /// <summary>
-        /// 获取排序属性。
+        /// 获取默认排序属性。
         /// </summary>
         IPropertyMetadata SortProperty { get; }
 
         /// <summary>
-        /// 获取父级属性。
+        /// 获取默认父级属性。
         /// </summary>
-        IPropertyMetadata ParentProperty { get; }
+        IPropertyMetadata? ParentProperty { get; }
 
         /// <summary>
         /// 获取是否倒序排序。
@@ -56,69 +51,64 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// 获取所有属性。
         /// </summary>
-        IEnumerable<IPropertyMetadata> Properties { get; }
+        IReadOnlyList<IPropertyMetadata> Properties { get; }
 
-        /// <summary>
-        /// 获取列表属性。
-        /// </summary>
-        IEnumerable<IPropertyMetadata> ViewProperties { get; }
+        ///// <summary>
+        ///// 获取列表属性。
+        ///// </summary>
+        //IReadOnlyList<IPropertyMetadata> ViewProperties { get; }
 
-        /// <summary>
-        /// 获取创建属性。
-        /// </summary>
-        IEnumerable<IPropertyMetadata> CreateProperties { get; }
+        ///// <summary>
+        ///// 获取创建属性。
+        ///// </summary>
+        //IReadOnlyList<IPropertyMetadata> CreateProperties { get; }
 
-        /// <summary>
-        /// 获取编辑属性。
-        /// </summary>
-        IEnumerable<IPropertyMetadata> EditProperties { get; }
+        ///// <summary>
+        ///// 获取编辑属性。
+        ///// </summary>
+        //IReadOnlyList<IPropertyMetadata> EditProperties { get; }
 
-        /// <summary>
-        /// 获取搜索属性。
-        /// </summary>
-        IEnumerable<IPropertyMetadata> SearchProperties { get; }
+        ///// <summary>
+        ///// 获取搜索属性。
+        ///// </summary>
+        //IReadOnlyList<IPropertyMetadata> SearchProperties { get; }
 
-        /// <summary>
-        /// 获取详情属性。
-        /// </summary>
-        IEnumerable<IPropertyMetadata> DetailProperties { get; }
+        ///// <summary>
+        ///// 获取详情属性。
+        ///// </summary>
+        //IReadOnlyList<IPropertyMetadata> DetailProperties { get; }
 
-        /// <summary>
-        /// 获取是否允许匿名访问。
-        /// </summary>
-        bool AllowAnonymous { get; }
+        ///// <summary>
+        ///// 获取是否允许匿名访问。
+        ///// </summary>
+        //bool AllowAnonymous { get; }
 
-        /// <summary>
-        /// 获取列表角色。
-        /// </summary>
-        IEnumerable<object> ViewRoles { get; }
+        ///// <summary>
+        ///// 获取列表角色。
+        ///// </summary>
+        //IEnumerable<object> ViewRoles { get; }
 
-        /// <summary>
-        /// 获取新增角色。
-        /// </summary>
-        IEnumerable<object> AddRoles { get; }
+        ///// <summary>
+        ///// 获取新增角色。
+        ///// </summary>
+        //IEnumerable<object> AddRoles { get; }
 
-        /// <summary>
-        /// 获取编辑角色。
-        /// </summary>
-        IEnumerable<object> EditRoles { get; }
+        ///// <summary>
+        ///// 获取编辑角色。
+        ///// </summary>
+        //IEnumerable<object> EditRoles { get; }
 
-        /// <summary>
-        /// 获取删除角色。
-        /// </summary>
-        IEnumerable<object> RemoveRoles { get; }
-
-        /// <summary>
-        /// 获取权限判断模式。
-        /// </summary>
-        AuthenticationRequiredMode AuthenticationRequiredMode { get; }
+        ///// <summary>
+        ///// 获取删除角色。
+        ///// </summary>
+        //IEnumerable<object> RemoveRoles { get; }
 
         /// <summary>
         /// 获取属性。
         /// </summary>
         /// <param name="name">属性名。</param>
         /// <returns>返回元数据。如果不存在则返回空。</returns>
-        IPropertyMetadata GetProperty(string name);
+        IPropertyMetadata? GetProperty(string name);
 
         /// <summary>
         /// 获取数据字典。

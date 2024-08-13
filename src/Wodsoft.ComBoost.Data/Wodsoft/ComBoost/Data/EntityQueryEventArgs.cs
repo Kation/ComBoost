@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data
 {
-    public class EntityQueryEventArgs<T> : EventArgs
+    public class EntityQueryEventArgs<T> : DomainServiceEventArgs
     {
         public EntityQueryEventArgs(IQueryable<T> queryable)
         {

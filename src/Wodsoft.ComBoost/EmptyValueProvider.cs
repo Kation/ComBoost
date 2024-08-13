@@ -8,18 +8,18 @@ using System.Text;
 
 namespace Wodsoft.ComBoost
 {
-    public class EmptyValueProvider : IConfigurableValueProvider
+    public class EmptyValueProvider : IValueProvider
     {
-        private Dictionary<string, object> _Values;
+        private Dictionary<string, object?> _Values;
         private Dictionary<string, string> _Alias;
 
         public EmptyValueProvider()
         {
-            _Values = new Dictionary<string, object>();
+            _Values = new Dictionary<string, object?>();
             _Alias = new Dictionary<string, string>();
         }
 
-        public virtual void SetValue(string name, object value)
+        public virtual void SetValue(string name, object? value)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -35,7 +35,7 @@ namespace Wodsoft.ComBoost
             _Keys = null;
         }
 
-        private ValueKeyCollection _Keys;
+        private ValueKeyCollection? _Keys;
         public virtual IValueKeyCollection Keys
         {
             get
@@ -49,7 +49,7 @@ namespace Wodsoft.ComBoost
             }
         }
 
-        protected virtual object GetValue(string name)
+        protected virtual object? GetValue(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -58,14 +58,14 @@ namespace Wodsoft.ComBoost
             return null;
         }
 
-        public virtual object GetValue(string name, Type valueType)
+        public virtual object? GetValue(string name, Type valueType)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
             if (valueType == null)
                 throw new ArgumentNullException(nameof(valueType));
             
-            object value = GetValue(name);
+            object? value = GetValue(name);
             if (value == null)
             {
                 if (!_Alias.TryGetValue(name, out string aliasName))
@@ -75,10 +75,18 @@ namespace Wodsoft.ComBoost
             }
             if (value == null)
                 return null;
-            if (!valueType.IsAssignableFrom(value.GetType()))
+            var currentType = value.GetType();
+            if (!valueType.IsAssignableFrom(currentType))
             {
                 var converter = TypeDescriptor.GetConverter(valueType);
-                value = converter.ConvertFrom(value);
+                if (converter.CanConvertFrom(currentType))
+                    value = converter.ConvertFrom(value);
+                else
+                {
+                    var currentConverter = TypeDescriptor.GetConverter(currentType);
+                    var currentStringValue = currentConverter.ConvertToString(value);
+                    value = converter.ConvertFromString(currentStringValue);
+                }
             }
             return value;
         }

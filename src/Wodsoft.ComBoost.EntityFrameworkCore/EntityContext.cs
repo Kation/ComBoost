@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Extensions;
-using System.Reflection;
-using System.ComponentModel;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.Transactions;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
@@ -40,7 +40,7 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             foreach (var reference in Database.InnerContext.Entry(item).References)
             {
-                if (reference.CurrentValue != null && reference.TargetEntry.State == EntityState.Detached)
+                if (reference.CurrentValue != null && reference.TargetEntry!.State == EntityState.Detached)
                     reference.TargetEntry.State = EntityState.Unchanged;
             }
         }
@@ -72,9 +72,48 @@ namespace Wodsoft.ComBoost.Data.Entity
         public IQueryable<T> Query()
         {
             if (Database.TrackEntity)
-                return DbSet;
+                return new WrappedAsyncQueryable<T>(DbSet);
             else
-                return DbSet.AsNoTracking();
+                return new WrappedAsyncQueryable<T>(DbSet.AsNoTracking());
+        }
+
+        public IQueryable<TChildren> QueryChildren<TChildren>(T item, Expression<Func<T, ICollection<TChildren>>> childrenSelector)
+            where TChildren : class
+        {
+#pragma warning disable EF1001 // Internal EF Core API usage.
+            var entry = new EntityEntry<T>(((IDbContextDependencies)Database.InnerContext).StateManager.GetOrCreateEntry(item));
+#pragma warning restore EF1001 // Internal EF Core API usage.
+            var state = entry.State;
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Unchanged;
+            var query = (IQueryable<TChildren>)entry.Collection(((MemberExpression)childrenSelector.Body).Member.Name).Query();
+            if (Database.TrackEntity)
+                query = new WrappedAsyncQueryable<TChildren>(query);
+            else
+                query = new WrappedAsyncQueryable<TChildren>(query.AsNoTracking());
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Detached;
+            return query;
+        }
+
+        public async Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty?>> propertySelector)
+            where TProperty : class
+        {
+#pragma warning disable EF1001 // Internal EF Core API usage.
+            var entry = new EntityEntry<T>(((IDbContextDependencies)Database.InnerContext).StateManager.GetOrCreateEntry(item));
+#pragma warning restore EF1001 // Internal EF Core API usage.
+            var state = entry.State;
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Unchanged;
+            var reference = entry.Reference(propertySelector);
+            TProperty? propertyValue;
+            if (Database.TrackEntity)
+                propertyValue = await reference.Query().FirstOrDefaultAsync();
+            else
+                propertyValue = await reference.Query().AsNoTracking().FirstOrDefaultAsync();
+            if (state == EntityState.Detached)
+                entry.State = EntityState.Detached;
+            Metadata.GetProperty(reference.Metadata.Name)!.SetValue(item, propertyValue);
         }
 
         public void Remove(T item)
@@ -85,16 +124,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         public void RemoveRange(IEnumerable<T> items)
         {
             DbSet.RemoveRange(items);
-        }
-
-        public Task<T[]> ToArrayAsync(IQueryable<T> query)
-        {
-            return query.ToArrayAsync();
-        }
-
-        public Task<List<T>> ToListAsync(IQueryable<T> query)
-        {
-            return query.ToListAsync();
         }
 
         public void Update(T item)
@@ -114,53 +143,40 @@ namespace Wodsoft.ComBoost.Data.Entity
             DbSet.UpdateRange(items);
         }
 
-        public Task<T> SingleOrDefaultAsync(IQueryable<T> query)
+        public Task<T> GetAsync(params object[] keys)
         {
-            return query.SingleOrDefaultAsync();
+#pragma warning disable CS8619 // 值中的引用类型的为 Null 性与目标类型不匹配。
+            if (Database.TrackEntity)
+                return DbSet.FindAsync(keys).AsTask();
+            else
+            {
+                ParameterExpression parameter = Expression.Parameter(typeof(T));
+                Expression? expression = null;
+                if (Metadata.KeyProperties.Count != keys.Length)
+                    throw new InvalidOperationException("Length of keys is difference to entity.");
+                for (int i = 0; i < Metadata.KeyProperties.Count; i++)
+                {
+                    var equal = Expression.Equal(Expression.Property(parameter, Metadata.KeyProperties[i].ClrName), Expression.Constant(keys[i]));
+                    if (expression == null)
+                        expression = equal;
+                    else
+                        expression = Expression.AndAlso(expression, equal);
+                }
+                var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
+                return DbSet.AsNoTracking().Where(lambda).FirstOrDefaultAsync();
+            }
+#pragma warning restore CS8619 // 值中的引用类型的为 Null 性与目标类型不匹配。
         }
 
-        public Task<T> SingleAsync(IQueryable<T> query)
+        public void Detach(T item)
         {
-            return query.SingleAsync();
+            Database.InnerContext.Entry(item).State = EntityState.Detached;
         }
 
-        public Task<T> FirstOrDefaultAsync(IQueryable<T> query)
+        public void DetachRange(IEnumerable<T> items)
         {
-            return query.FirstOrDefaultAsync();
-        }
-
-        public Task<T> FirstAsync(IQueryable<T> query)
-        {
-            return query.FirstAsync();
-        }
-
-        public Task<int> CountAsync(IQueryable<T> query)
-        {
-            return query.CountAsync();
-        }
-
-        public IQueryable<T> Include<TProperty>(IQueryable<T> query, Expression<Func<T, TProperty>> expression)
-        {
-            return query.Include(expression);
-        }
-
-        public Task<T> GetAsync(object key)
-        {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-            if (key.GetType() != Metadata.KeyType)
-                key = TypeDescriptor.GetConverter(Metadata.KeyType).ConvertFrom(key);
-            return DbSet.FindAsync(key);
-        }
-
-        public Task ReloadAsync(T item)
-        {
-            return Database.InnerContext.Entry(item).ReloadAsync();
-        }
-
-        public IQueryable<T> ExecuteQuery(string sql, params object[] parameters)
-        {
-            return DbSet.FromSql(sql, parameters).AsNoTracking();
+            foreach (var item in items)
+                Database.InnerContext.Entry(item).State = EntityState.Detached;
         }
     }
 }

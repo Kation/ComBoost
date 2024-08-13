@@ -35,7 +35,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             if (indexes.Length > 1)
                 throw new NotSupportedException();
-            string key = indexes[0] as string;
+            string? key = indexes[0] as string;
             if (string.IsNullOrEmpty(key))
                 throw new NotSupportedException();
             _Values.TryGetValue(key, out result);
@@ -46,7 +46,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             if (indexes.Length > 1)
                 throw new NotSupportedException();
-            string key = indexes[0] as string;
+            string? key = indexes[0] as string;
             if (string.IsNullOrEmpty(key))
                 throw new NotSupportedException();
             _Values.AddOrUpdate(key, value, (k, v) =>

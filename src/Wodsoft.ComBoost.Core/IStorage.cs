@@ -24,14 +24,14 @@ namespace Wodsoft.ComBoost
         /// </summary>
         /// <param name="path">文件路径。</param>
         /// <returns>返回文件流。</returns>
-        Task<Stream> GetAsync(string path);
+        Task<Stream?> GetAsync(string path);
 
         /// <summary>
         /// 获取文件。
         /// </summary>
         /// <param name="path">文件路径。</param>
         /// <returns>返回文件。</returns>
-        Task<IStorageFile> GetFileAsync(string path);
+        Task<IStorageFile?> GetFileAsync(string path);
 
         /// <summary>
         /// 删除文件。

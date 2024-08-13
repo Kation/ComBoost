@@ -27,22 +27,53 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 _GetValue = propertyInfo.GetGetMethodDelegate();
             if (CanSet)
                 _SetValue = propertyInfo.GetSetMethodDelegate();
-            SetMetadata();
 
-            HideAttribute hide = propertyInfo.GetCustomAttribute<HideAttribute>();
-            if (hide == null)
-                if (!propertyInfo.PropertyType.GetTypeInfo().IsValueType && propertyInfo.PropertyType.GetTypeInfo().IsGenericType)
-                    IsHiddenOnView = true;
 
-            string customType;
+            var display = GetAttribute<DisplayAttribute>();
+            if (display != null)
+            {
+                if (display.Name == null)
+                    Name = ClrName;
+                else
+                    Name = display.Name;
+                ShortName = display.ShortName == null ? Name : display.ShortName;
+                Description = display.Description;
+                Order = display.GetOrder() ?? 0;
+            }
+            else
+            {
+                var description = GetAttribute<DescriptionAttribute>();
+                if (description != null)
+                {
+                    Name = description.Description;
+                    ShortName = Name;
+                }
+                else
+                {
+                    Name = ClrName;
+                    ShortName = Name;
+                }
+            }
+
+
+            //HideAttribute hide = propertyInfo.GetCustomAttribute<HideAttribute>();
+            //if (hide == null)
+            //    if (!propertyInfo.PropertyType.GetTypeInfo().IsValueType && propertyInfo.PropertyType.GetTypeInfo().IsGenericType)
+            //        IsHiddenOnView = true;
+
+            string? customType;
             bool isFileUpload;
             Type = propertyInfo.GetCustomDataType(out customType, out isFileUpload);
             CustomType = customType;
-            IsFileUpload = isFileUpload;
-            Converter = TypeDescriptor.GetConverter(ClrType);
+            var typeConverterAttribute = propertyInfo.GetCustomAttribute<TypeConverterAttribute>();
+            if (typeConverterAttribute == null)
+                Converter = TypeDescriptor.GetConverter(ClrType);
+            else
+                Converter = (TypeConverter)Activator.CreateInstance(System.Type.GetType(typeConverterAttribute.ConverterTypeName));
 
-            SearchableAttribute searchable = propertyInfo.GetCustomAttribute<SearchableAttribute>();
-            Searchable = searchable != null;
+            IsKey = GetAttribute<KeyAttribute>() != null;
+            IsRequired = GetAttribute<RequiredAttribute>() != null || (ClrType.GetTypeInfo().IsValueType && !ClrType.GetTypeInfo().IsGenericType);
+            IsDistinct = GetAttribute<DistinctAttribute>() != null;
         }
 
 
@@ -50,6 +81,30 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// Get the property info.
         /// </summary>
         public PropertyInfo Property { get; private set; }
+
+        public override string Name { get; }
+
+        public override string ShortName { get; }
+
+        public override string? Description { get; }
+
+        public override TypeConverter Converter { get; }
+
+        public override bool IsDistinct { get; }
+
+        public override bool IsExpended { get; }
+
+        public override CustomDataType Type { get; }
+
+        public override string? CustomType { get; }
+
+        public override bool IsRequired { get; }
+
+        public override bool IsKey { get; }
+
+        public override bool CanGet { get; }
+
+        public override bool CanSet { get; }
 
         /// <summary>
         /// Get property display name.
@@ -80,7 +135,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             return Property.GetCustomAttributes<T>(true).ToArray();
         }
 
-        private Func<object, object> _GetValue;
+        private Func<object, object>? _GetValue;
         /// <summary>
         /// Get property value from an entity.
         /// </summary>
@@ -90,20 +145,20 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             if (!CanGet)
                 throw new NotSupportedException("Property doen't support get method.");
-            return _GetValue(entity);
+            return _GetValue!(entity);
         }
 
-        private Action<object, object> _SetValue;
+        private Action<object, object?>? _SetValue;
         /// <summary>
         /// Set property value to an entity.
         /// </summary>
         /// <param name="entity">Entity.</param>
         /// <param name="value">Value.</param>
-        public override void SetValue(object entity, object value)
+        public override void SetValue(object entity, object? value)
         {
             if (!CanSet)
                 throw new NotSupportedException("Property doen't support set method.");
-            _SetValue(entity, value);
+            _SetValue!(entity, value);
         }
 
         /// <summary>

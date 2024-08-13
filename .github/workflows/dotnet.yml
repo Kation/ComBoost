@@ -1,0 +1,62 @@
+﻿name: .NET
+
+on:
+  push:
+    branches: [ next ]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET 6
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Setup .NET 5
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Setup .NET Core 3.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Setup .NET Core 2.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.1.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore -c Release -nowarn:CS1591
+    - name: Pack
+      run: |
+        dotnet pack -c Release src/Wodsoft.ComBoost/Wodsoft.ComBoost.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.AspNetCore/Wodsoft.ComBoost.AspNetCore.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Core/Wodsoft.ComBoost.Core.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Data/Wodsoft.ComBoost.Data.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Data.Core/Wodsoft.ComBoost.Data.Core.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Data.Distributed/Wodsoft.ComBoost.Data.Distributed.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Distributed/Wodsoft.ComBoost.Distributed.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Distributed.CAP/Wodsoft.ComBoost.Distributed.CAP.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Distributed.RabbitMQ/Wodsoft.ComBoost.Distributed.RabbitMQ.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.EntityFramework/Wodsoft.ComBoost.EntityFramework.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.EntityFrameworkCore/Wodsoft.ComBoost.EntityFrameworkCore.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Mock/Wodsoft.ComBoost.Mock.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Mvc/Wodsoft.ComBoost.Mvc.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Mvc.Data/Wodsoft.ComBoost.Mvc.Data.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Security/Wodsoft.ComBoost.Security.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Grpc/Wodsoft.ComBoost.Grpc.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Grpc.AspNetCore/Wodsoft.ComBoost.Grpc.AspNetCore.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Grpc.Client/Wodsoft.ComBoost.Grpc.Client.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation/Wodsoft.ComBoost.Aggregation.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Caching/Wodsoft.ComBoost.Aggregation.Caching.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Caching.Data/Wodsoft.ComBoost.Aggregation.Caching.Data.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Core/Wodsoft.ComBoost.Aggregation.Core.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Data/Wodsoft.ComBoost.Aggregation.Data.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Json/Wodsoft.ComBoost.Aggregation.Json.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Mvc/Wodsoft.ComBoost.Aggregation.Mvc.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.NewtonsoftJson/Wodsoft.ComBoost.Aggregation.NewtonsoftJson.csproj --version-suffix "alpha.${{github.run_id}}" -o nupkgs --no-build
+    - name: Publish package
+      run: |
+        cd nupkgs
+        dotnet nuget push "*.symbols.nupkg" -k ${{secrets.MYGET_TOKEN}} -s https://www.myget.org/F/comboost/api/v2/package

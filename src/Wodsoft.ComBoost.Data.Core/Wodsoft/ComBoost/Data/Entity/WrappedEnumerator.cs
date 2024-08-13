@@ -19,9 +19,10 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public IEnumerator<M> InnerEnumerator { get; private set; }
 
-        public T Current { get { return InnerEnumerator.Current; } }
+        public T Current => InnerEnumerator.Current;
 
-        object IEnumerator.Current { get { return InnerEnumerator.Current; } }
+        object IEnumerator.Current => Current;
+
         public void Dispose()
         {
             InnerEnumerator.Dispose();

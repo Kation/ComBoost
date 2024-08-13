@@ -31,12 +31,12 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 获取值。
         /// </summary>
-        /// <param name="executionContext">领域执行上下文。</param>
+        /// <param name="context">领域执行上下文。</param>
         /// <param name="parameter">参数信息。</param>
         /// <returns>返回值。</returns>
-        public override object GetValue(IDomainExecutionContext executionContext, ParameterInfo parameter)
+        public override object? GetValue(IDomainContext context, ParameterInfo parameter)
         {
-            var service = executionContext.DomainContext.GetService(parameter.ParameterType);
+            var service = context.GetService(parameter.ParameterType);
             if (service == null)
                 if (parameter.HasDefaultValue)
                     service = parameter.DefaultValue;

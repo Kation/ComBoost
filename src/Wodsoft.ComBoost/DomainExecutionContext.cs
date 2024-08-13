@@ -23,8 +23,23 @@ namespace Wodsoft.ComBoost
             _ParameterValues = GetParameters();
         }
 
+        public DomainExecutionContext(IDomainService domainService, IDomainContext domainContext, MethodInfo method, object[] parameters)
+        {
+            if (domainService == null)
+                throw new ArgumentNullException(nameof(domainService));
+            if (domainContext == null)
+                throw new ArgumentNullException(nameof(domainContext));
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
+            _DomainService = domainService;
+            _Context = domainContext;
+            _Method = method;
+            _Parameters = _Method.GetParameters();
+            _ParameterValues = parameters;
+        }
+
         private IDomainService _DomainService;
-        public IDomainService DomainService
+        public IDomainService? DomainService
         {
             get
             {
@@ -36,13 +51,13 @@ namespace Wodsoft.ComBoost
         public IDomainContext DomainContext { get { return _Context; } }
 
         private MethodInfo _Method;
-        public MethodInfo DomainMethod { get { return _Method; } }
+        public MethodInfo? DomainMethod { get { return _Method; } }
 
-        private object[] _ParameterValues;
-        public object[] ParameterValues { get { return _ParameterValues; } }
+        private object?[] _ParameterValues;
+        public object?[] ParameterValues { get { return _ParameterValues; } }
 
         private ParameterInfo[] _Parameters;
-        public object GetParameterValue(ParameterInfo parameter)
+        public object? GetParameterValue(ParameterInfo parameter)
         {
             int index = Array.IndexOf(_Parameters, parameter);
             if (index == -1)
@@ -50,14 +65,14 @@ namespace Wodsoft.ComBoost
             return _ParameterValues[index];
         }
 
-        private object[] GetParameters()
+        private object?[] GetParameters()
         {
             return _Parameters.Select(t =>
             {
                 var from = t.GetCustomAttribute<FromAttribute>();
                 if (from == null)
                     throw new NotSupportedException(string.Format("不能解析的参数，{0}的{1}。", _Method.DeclaringType.FullName, t.Name));
-                var value = from.GetValue(this, t);
+                var value = from.GetValue(DomainContext, t);
                 if (value == null && t.HasDefaultValue)
                     value = t.DefaultValue;
                 return value;
@@ -69,13 +84,13 @@ namespace Wodsoft.ComBoost
             IsCompleted = true;
         }
 
-        public void Done(object result)
+        public void Done(object? result)
         {
             Result = result;
             IsCompleted = true;
         }
 
-        public object Result { get; internal set; }
+        public object? Result { get; set; }
 
         public bool IsAborted { get { return DomainContext.ServiceAborted.IsCancellationRequested; } }
 

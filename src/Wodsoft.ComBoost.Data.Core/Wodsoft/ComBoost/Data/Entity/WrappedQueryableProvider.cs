@@ -3,30 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
-    public class WrappedQueryableProvider<T, M> : System.Linq.IQueryProvider
+    public class WrappedQueryableProvider<T, M> : IQueryProvider
         where T : IEntity
         where M : IEntity, T
     {
-        public WrappedQueryableProvider(System.Linq.IQueryProvider queryProvider)
+        public WrappedQueryableProvider(IQueryProvider queryProvider)
         {
             if (queryProvider == null)
                 throw new ArgumentNullException(nameof(queryProvider));
             InnerQueryProvider = queryProvider;
         }
 
-        public System.Linq.IQueryProvider InnerQueryProvider { get; private set; }
-
-        public IQueryable CreateQuery(Expression expression)
-        {
-            if (typeof(IOrderedQueryable).IsAssignableFrom(expression.Type))
-                return new WrappedOrderedQueryable<T, M>(this, expression);
-            else
-                return new WrappedQueryable<T, M>(this, expression);
-        }
+        public IQueryProvider InnerQueryProvider { get; private set; }
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
@@ -36,6 +29,14 @@ namespace Wodsoft.ComBoost.Data.Entity
                 return (IQueryable<TElement>)new WrappedOrderedQueryable<T, M>(this, expression);
             else
                 return (IQueryable<TElement>)new WrappedQueryable<T, M>(this, expression);
+        }
+
+        public IQueryable CreateQuery(Expression expression)
+        {
+            if (typeof(IOrderedQueryable).IsAssignableFrom(expression.Type))
+                return new WrappedOrderedQueryable<T, M>(this, expression);
+            else
+                return new WrappedQueryable<T, M>(this, expression);
         }
 
         public object Execute(Expression expression)

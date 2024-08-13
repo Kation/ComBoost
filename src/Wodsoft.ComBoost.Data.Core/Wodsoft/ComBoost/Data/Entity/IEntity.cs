@@ -11,16 +11,6 @@ namespace Wodsoft.ComBoost.Data.Entity
     public interface IEntity
     {
         /// <summary>
-        /// 获取或设置主键。
-        /// </summary>
-        object Index { get; set; }
-
-        /// <summary>
-        /// 获取或设置创建时间。
-        /// </summary>
-        DateTime CreateDate { get; set; }
-
-        /// <summary>
         /// 创建时。
         /// 通常于创建实体实例时调用。
         /// </summary>
@@ -54,14 +44,10 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         bool IsEditAllowed { get; }
 
-        ///// <summary>
-        ///// 获取或设置相关的实体查询上下文。
-        ///// </summary>
-        //IEntityQueryContext<IEntity> EntityContext { get; set; }
-
         /// <summary>
         /// 获取是否是新创建的实体。
         /// </summary>
+        [Obsolete("No used anymore.")]
         bool IsNewCreated { get; }
     }
 }

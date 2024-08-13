@@ -14,13 +14,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
     /// </summary>
     public class EntityDescriptor : IEntityDescriptor
     {
-        private static IEntityDescriptor _Descriptor;
-        private static Dictionary<Type, IEntityDescriptor> _TargetedDescriptor;
+        internal static IEntityDescriptor _Descriptor;
 
         static EntityDescriptor()
         {
             _Descriptor = new EntityDescriptor();
-            _TargetedDescriptor = new Dictionary<Type, IEntityDescriptor>();
         }
 
         /// <summary>
@@ -43,11 +41,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             if (descriptor == null)
                 throw new ArgumentNullException(nameof(descriptor));
-            Type type = typeof(T);
-            if (_TargetedDescriptor.ContainsKey(type))
-                _TargetedDescriptor[type] = descriptor;
-            else
-                _TargetedDescriptor.Add(type, descriptor);
+            EntityDescriptor<T>.Descriptor = descriptor;
         }
 
         /// <summary>
@@ -59,13 +53,8 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
-            if (_TargetedDescriptor.Count > 0)
-            {
-                var targeted = _TargetedDescriptor.Keys.FirstOrDefault(t => t.IsAssignableFrom(type));
-                if (targeted != null)
-                    return _TargetedDescriptor[targeted].GetMetadata(type);
-            }
-            return _Descriptor.GetMetadata(type);
+            IEntityDescriptor descriptor = (IEntityDescriptor)typeof(EntityDescriptor<>).MakeGenericType(type).GetProperty("Descriptor", BindingFlags.Static | BindingFlags.Public).GetValue(null);
+            return descriptor.GetMetadata(type);
         }
 
         /// <summary>
@@ -75,38 +64,27 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <returns>返回实体元数据。如果出现错误则返回空。</returns>
         public static IEntityMetadata GetMetadata<TEntity>()
         {
-            return GetMetadata(typeof(TEntity));
+            return EntityDescriptor<TEntity>.Descriptor.GetMetadata<TEntity>();
         }
 
-        private ConcurrentDictionary<Type, IEntityMetadata> _Metadata;
+        private ConcurrentDictionary<Type, IEntityMetadata> _metadata;
 
         /// <summary>
         /// 实例化实体解释器。
         /// </summary>
         public EntityDescriptor()
         {
-            _Metadata = new ConcurrentDictionary<Type, IEntityMetadata>();
+            _metadata = new ConcurrentDictionary<Type, IEntityMetadata>();
         }
 
         IEntityMetadata IEntityDescriptor.GetMetadata(Type type)
         {
-            while (type.GetTypeInfo().Assembly.IsDynamic)
-                type = type.GetTypeInfo().BaseType;
-            if (!typeof(IEntity).IsAssignableFrom(type))
-                throw new NotSupportedException("该类型没有继承IEntity接口。");
-            IEntityMetadata metadata = _Metadata.GetOrAdd(type, s =>
-            {
-                var metadataField = type.GetField("Metadata", BindingFlags.Static | BindingFlags.Public);
-                IEntityMetadata m;
-                if (metadataField != null)
-                    m = (IEntityMetadata)metadataField.GetValue(null);
-                else
-                    m = new ClrEntityMetadata(type);
-                foreach (var interfaceType in type.GetInterfaces().Where(t => t != typeof(IEntity) && t.GetTypeInfo().GetCustomAttribute<EntityInterfaceAttribute>() != null && typeof(IEntity).IsAssignableFrom(t)))
-                    _Metadata.TryAdd(interfaceType, m);
-                return m;
-            });
-            return metadata;
+            return (IEntityMetadata)typeof(EntityDescriptor<>).MakeGenericType(type).GetProperty("Metadata").GetValue(null);
+        }
+
+        IEntityMetadata IEntityDescriptor.GetMetadata<T>()
+        {
+            return EntityDescriptor<T>.Metadata;
         }
 
         /// <summary>
@@ -123,6 +101,50 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 return true;
             }))
                 GetMetadata(type);
+        }
+    }
+
+    internal class EntityDescriptor<T>
+    {
+        private static IEntityDescriptor? _Descriptor;
+        public static IEntityDescriptor Descriptor
+        {
+            get
+            {
+                return _Descriptor ?? EntityDescriptor._Descriptor;
+            }
+            internal set
+            {
+                _Descriptor = value;
+            }
+        }
+
+        private static IEntityMetadata? _Metadata;
+        public static IEntityMetadata Metadata
+        {
+            get
+            {
+                if (_Metadata == null)
+                {
+                    var type = typeof(T);
+                    while (type.Assembly.IsDynamic)
+                        type = type.BaseType;
+                    var metadataField = type.GetField("Metadata", BindingFlags.Static | BindingFlags.Public);
+                    if (metadataField != null)
+                        _Metadata = (IEntityMetadata)metadataField.GetValue(null);
+                    else
+                        _Metadata = new ClrEntityMetadata(type);
+                    foreach (var interfaceType in type.GetInterfaces().Where(t => t != typeof(IEntity) && t.GetTypeInfo().GetCustomAttribute<EntityInterfaceAttribute>() != null && typeof(IEntity).IsAssignableFrom(t)))
+                    {
+                        typeof(EntityDescriptor<T>).MakeGenericType(interfaceType).GetProperty(nameof(Metadata), BindingFlags.Public | BindingFlags.Static).SetValue(null, _Metadata);
+                    }
+                }
+                return _Metadata;
+            }
+            internal set
+            {
+                _Metadata = value;
+            }
         }
     }
 }

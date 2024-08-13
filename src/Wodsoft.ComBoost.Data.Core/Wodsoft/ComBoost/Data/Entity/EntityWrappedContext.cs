@@ -5,12 +5,13 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity.Metadata;
+using Wodsoft.ComBoost.Data.Linq;
 
 namespace Wodsoft.ComBoost.Data.Entity
 {
     public class EntityWrappedContext<T, M> : IEntityContext<T>
-        where M : IEntity, T
-        where T : IEntity
+        where M : class, IEntity, T
+        where T : class, IEntity
     {
         public EntityWrappedContext(IEntityContext<M> context)
         {
@@ -34,25 +35,10 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             InnerContext.AddRange(items.Cast<M>());
         }
-
-        public Task<int> CountAsync(IQueryable<T> query)
-        {
-            return InnerContext.CountAsync(query.Unwrap<T, M>());
-        }
-        
+                
         public T Create()
         {
             return InnerContext.Create();
-        }
-
-        public async Task<T> FirstAsync(IQueryable<T> query)
-        {
-            return await InnerContext.FirstAsync(query.Unwrap<T, M>());
-        }
-
-        public async Task<T> FirstOrDefaultAsync(IQueryable<T> query)
-        {
-            return await InnerContext.FirstOrDefaultAsync(query.Unwrap<T, M>());
         }
 
         public IQueryable<T> Query()
@@ -68,26 +54,6 @@ namespace Wodsoft.ComBoost.Data.Entity
         public void RemoveRange(IEnumerable<T> items)
         {
             InnerContext.RemoveRange(items.Cast<M>());
-        }
-
-        public async Task<T> SingleAsync(IQueryable<T> query)
-        {
-            return await InnerContext.SingleAsync(query.Unwrap<T, M>());
-        }
-
-        public async Task<T> SingleOrDefaultAsync(IQueryable<T> query)
-        {
-            return await InnerContext.SingleOrDefaultAsync(query.Unwrap<T, M>());
-        }
-
-        public async Task<T[]> ToArrayAsync(IQueryable<T> query)
-        {
-            return (await InnerContext.ToArrayAsync(query.Unwrap<T, M>())).Cast<T>().ToArray();
-        }
-
-        public async Task<List<T>> ToListAsync(IQueryable<T> query)
-        {
-            return (await InnerContext.ToListAsync(query.Unwrap<T, M>())).Cast<T>().ToList();
         }
 
         public void Update(T item)
@@ -110,19 +76,34 @@ namespace Wodsoft.ComBoost.Data.Entity
             return queryable.Wrap<T, M>();
         }
 
-        public async Task<T> GetAsync(object key)
+        public Task<T> GetAsync(params object[] keys)
         {
-            return (M)await InnerContext.GetAsync(key);
+            return InnerContext.GetAsync(keys).ContinueWith(task =>
+            {
+                if (task.Exception!=null)
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
+                return (T)task.Result;
+            });
         }
 
-        public Task ReloadAsync(T item)
-        {
-            return InnerContext.ReloadAsync((M)item);
-        }
-
-        public IQueryable<T> ExecuteQuery(string sql, params object[] parameters)
+        public IQueryable<TChildren> QueryChildren<TChildren>(T item, Expression<Func<T, ICollection<TChildren>>> childrenSelector) where TChildren : class
         {
             throw new NotSupportedException();
+        }
+
+        public Task LoadPropertyAsync<TProperty>(T item, Expression<Func<T, TProperty?>> propertySelector) where TProperty : class
+        {
+            throw new NotSupportedException();
+        }
+
+        public void Detach(T item)
+        {
+            InnerContext.Detach((M)item);
+        }
+
+        public void DetachRange(IEnumerable<T> items)
+        {
+            InnerContext.DetachRange(items.Cast<M>());
         }
     }
 }

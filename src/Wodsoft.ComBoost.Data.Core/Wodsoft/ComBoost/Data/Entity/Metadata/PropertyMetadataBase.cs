@@ -34,7 +34,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// Get the property display name.
         /// </summary>
-        public string Name { get; protected set; }
+        public abstract string Name { get; }
 
         /// <summary>
         /// Get the property runtime name.
@@ -44,22 +44,22 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// Get the short name of property.
         /// </summary>
-        public string ShortName { get; protected set; }
+        public abstract string ShortName { get; }
 
         /// <summary>
         /// Get the description of property.
         /// </summary>
-        public string Description { get; protected set; }
+        public abstract string? Description { get; }
 
         /// <summary>
         /// Get the property is distinct.
         /// </summary>
-        public bool IsDistinct { get; protected set; }
+        public abstract bool IsDistinct { get; }
 
         /// <summary>
         /// Get the property is expended.
         /// </summary>
-        public bool IsExpended { get; protected set; }
+        public abstract bool IsExpended { get; }
 
         /// <summary>
         /// Get the runtime type of property.
@@ -69,101 +69,96 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// <summary>
         /// Get the type of property.
         /// </summary>
-        public CustomDataType Type { get; protected set; }
+        public abstract CustomDataType Type { get; }
 
         /// <summary>
         /// Get the custom data type of property.
         /// </summary>
-        public string CustomType { get; protected set; }
+        public abstract string? CustomType { get; }
 
         /// <summary>
         /// 获取或设置类型转换器。
         /// </summary>
-        public TypeConverter Converter { get; protected set; }
+        public abstract TypeConverter Converter { get; }
 
-        /// <summary>
-        /// Get the property is base on upload file.
-        /// </summary>
-        public bool IsFileUpload { get; protected set; }
+        ///// <summary>
+        ///// Get the property is base on upload file.
+        ///// </summary>
+        //public bool IsFileUpload { get; protected set; }
 
         /// <summary>
         /// Get is the property must has data.
         /// </summary>
-        public bool IsRequired { get; protected set; }
+        public abstract bool IsRequired { get; }
 
-        public bool IsKey { get; private set; }
+        public abstract bool IsKey { get; }
 
-        /// <summary>
-        /// Get is the property hidden while creating.
-        /// </summary>
-        public bool IsHiddenOnCreate { get; protected set; }
+        ///// <summary>
+        ///// Get is the property hidden while creating.
+        ///// </summary>
+        //public bool IsHiddenOnCreate { get; protected set; }
 
-        /// <summary>
-        /// Get is the property hidden while edit.
-        /// </summary>
-        public bool IsHiddenOnEdit { get; protected set; }
+        ///// <summary>
+        ///// Get is the property hidden while edit.
+        ///// </summary>
+        //public bool IsHiddenOnEdit { get; protected set; }
 
-        /// <summary>
-        /// Get is the property hidden in viewlist.
-        /// </summary>
-        public bool IsHiddenOnView { get; protected set; }
+        ///// <summary>
+        ///// Get is the property hidden in viewlist.
+        ///// </summary>
+        //public bool IsHiddenOnView { get; protected set; }
 
-        /// <summary>
-        /// Get is the property hidden in detail.
-        /// </summary>
-        public bool IsHiddenOnDetail { get; protected set; }
+        ///// <summary>
+        ///// Get is the property hidden in detail.
+        ///// </summary>
+        //public bool IsHiddenOnDetail { get; protected set; }
 
         /// <summary>
         /// Get the order of property.
         /// </summary>
         public int Order { get; protected set; }
 
-        /// <summary>
-        /// Get is the property search able.
-        /// </summary>
-        public bool Searchable { get; protected set; }
+        ///// <summary>
+        ///// Get is the property search able.
+        ///// </summary>
+        //public bool Searchable { get; protected set; }
 
-        /// <summary>
-        /// Get is property allow anonymous operate.
-        /// </summary>
-        public bool AllowAnonymous { get; protected set; }
+        ///// <summary>
+        ///// Get is property allow anonymous operate.
+        ///// </summary>
+        //public bool AllowAnonymous { get; protected set; }
 
-        /// <summary>
-        /// Get the roles to view property.
-        /// </summary>
-        public IEnumerable<object> ViewRoles { get; protected set; }
+        ///// <summary>
+        ///// Get the roles to view property.
+        ///// </summary>
+        //public IEnumerable<object> ViewRoles { get; protected set; }
 
-        /// <summary>
-        /// Get the roles to edit property.
-        /// </summary>
-        public IEnumerable<object> AddRoles { get; protected set; }
+        ///// <summary>
+        ///// Get the roles to edit property.
+        ///// </summary>
+        //public IEnumerable<object> AddRoles { get; protected set; }
 
-        /// <summary>
-        /// Get the roles to edit property.
-        /// </summary>
-        public IEnumerable<object> EditRoles { get; protected set; }
-
-        /// <summary>
-        /// Get the authentication required mode.
-        /// </summary>
-        public AuthenticationRequiredMode AuthenticationRequiredMode { get; protected set; }
+        ///// <summary>
+        ///// Get the roles to edit property.
+        ///// </summary>
+        //public IEnumerable<object> EditRoles { get; protected set; }
 
         /// <summary>
         /// Get is the property can get value.
         /// </summary>
-        public bool CanGet { get; protected set; }
+        public abstract bool CanGet { get; }
 
         /// <summary>
         /// Get is the property can set value.
         /// </summary>
-        public bool CanSet { get; protected set; }
+        public abstract bool CanSet { get; }
 
         /// <summary>
         /// Get attribute from metadata.
         /// </summary>
         /// <typeparam name="T">Attribute type.</typeparam>
         /// <returns></returns>
-        public abstract T GetAttribute<T>() where T : Attribute;
+        public abstract T? GetAttribute<T>() where T : Attribute;
 
         /// <summary>
         /// Get attributes from metadata.
@@ -184,108 +179,12 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <param name="entity">Entity.</param>
         /// <param name="value">Value.</param>
-        public abstract void SetValue(object entity, object value);
+        public abstract void SetValue(object entity, object? value);
 
         /// <summary>
         /// Try get PropertyInfo from metadata.
         /// </summary>
         /// <returns>Return value if there can be a PropertyInfo.</returns>
-        public abstract PropertyInfo TryGetPropertyInfo();
-
-        /// <summary>
-        /// Set the metadata of display.
-        /// </summary>
-        /// <param name="display">Display attribute.</param>
-        protected virtual void SetDisplay(DisplayAttribute display)
-        {
-            if (display == null)
-                throw new ArgumentNullException("display");
-            if (display.Name == null)
-                Name = ClrName;
-            else
-                Name = display.Name;
-            ShortName = display.ShortName == null ? Name : display.ShortName;
-            Description = display.Description;
-            Order = display.GetOrder().HasValue ? display.Order : 0;
-        }
-
-        /// <summary>
-        /// Set the metadata of hide.
-        /// </summary>
-        /// <param name="hide"></param>
-        protected virtual void SetHide(HideAttribute hide)
-        {
-            if (hide == null)
-                throw new ArgumentNullException("hide");
-            IsHiddenOnCreate = hide.IsHiddenOnCreate;
-            IsHiddenOnDetail = hide.IsHiddenOnDetail;
-            IsHiddenOnEdit = hide.IsHiddenOnEdit;
-            IsHiddenOnView = hide.IsHiddenOnView;
-        }
-
-        /// <summary>
-        /// Set the metadata of authentication.
-        /// </summary>
-        /// <param name="authentication"></param>
-        protected virtual void SetAuthentication(PropertyAuthenticationAttribute authentication)
-        {
-            if (authentication == null)
-                throw new ArgumentNullException("authentication");
-            AllowAnonymous = authentication.AllowAnonymous;
-            AddRoles = new ReadOnlyCollection<object>(authentication.AddRolesRequired);
-            EditRoles = new ReadOnlyCollection<object>(authentication.EditRolesRequired);
-            ViewRoles = new ReadOnlyCollection<object>(authentication.ViewRolesRequired);
-            AuthenticationRequiredMode = authentication.Mode;
-        }
-
-        /// <summary>
-        /// Set the metadata of data type.
-        /// </summary>
-        /// <param name="dataType"></param>
-        protected virtual void SetDataType(CustomDataTypeAttribute dataType)
-        {
-            if (dataType == null)
-                throw new ArgumentNullException("dataType");
-            Type = dataType.Type;
-            CustomType = dataType.Custom;
-            IsFileUpload = dataType.IsFileUpload;
-        }
-
-        /// <summary>
-        /// Set the metadata automatic.
-        /// </summary>
-        protected virtual void SetMetadata()
-        {
-            var display = GetAttribute<DisplayAttribute>();
-            if (display != null)
-                SetDisplay(display);
-            else
-                Name = ClrName;
-
-            var hide = GetAttribute<HideAttribute>();
-            if (hide != null)
-                SetHide(hide);
-
-            var authentication = GetAttribute<PropertyAuthenticationAttribute>();
-            if (authentication != null)
-                SetAuthentication(authentication);
-            else
-            {
-                ViewRoles = new string[0];
-                AddRoles = new string[0];
-                EditRoles = new string[0];
-                AllowAnonymous = true;
-            }
-
-            var dataType = GetAttribute<CustomDataTypeAttribute>();
-            if (dataType != null)
-                SetDataType(dataType);
-
-            IsKey = GetAttribute<KeyAttribute>() != null;
-            IsRequired = GetAttribute<RequiredAttribute>() != null || (ClrType.GetTypeInfo().IsValueType && !ClrType.GetTypeInfo().IsGenericType);
-            Searchable = GetAttribute<SearchableAttribute>() != null;
-            IsDistinct = GetAttribute<DistinctAttribute>() != null;
-            //IsExpended = GetAttribute<ExpendEntityAttribute>() != null || ClrType.GetCustomAttribute<ExpendEntityAttribute>() != null;
-        }
+        public abstract PropertyInfo? TryGetPropertyInfo();
     }
 }

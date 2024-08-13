@@ -1,23 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>ComBoost用于EntityFramework实现的实体模块。</Description>
-    <AssemblyTitle>Wodsoft.ComBoost.EntityFramework</AssemblyTitle>
-    <TargetFramework>net46</TargetFramework>
-    <AssemblyName>Wodsoft.ComBoost.EntityFramework</AssemblyName>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <TargetFrameworks>net461;netstandard2.1</TargetFrameworks>
     <RootNamespace>Wodsoft.ComBoost.Data.Entity</RootNamespace>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <Import Project="../../common.props" />
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
+    <NoWarn>$(NoWarn);nullable</NoWarn>
+  </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Wodsoft.ComBoost.Data.Core\Wodsoft.ComBoost.Data.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.1.3" />
-    <PackageReference Include="System.Interactive.Async" Version="3.1.1" />
+    <PackageReference Include="EntityFramework" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net461'">
+    <PackageReference Include="System.Interactive.Async" Version="5.0.0" />
   </ItemGroup>
 
 </Project>
