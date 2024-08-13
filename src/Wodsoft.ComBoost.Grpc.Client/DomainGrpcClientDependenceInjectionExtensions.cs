@@ -30,6 +30,12 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
+        public static IComBoostGrpcBuilder UseCallOptionsHandler<T>(this IComBoostGrpcBuilder builder)
+            where T : IDomainGrpcCallOptionsHandler, new()
+        {
+            return builder.UseCallOptionsHandler(new T());
+        }
+
         public static IComBoostGrpcServiceBuilder AddService(this IComBoostGrpcBuilder builder, Uri address)
         {
             return builder.AddService(address, sp => new GrpcChannelOptions());
@@ -38,6 +44,12 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IComBoostGrpcServiceBuilder AddService(this IComBoostGrpcBuilder builder, Uri address, GrpcChannelOptions options)
         {
             return builder.AddService(address, sp => options);
+        }
+
+        public static IComBoostGrpcServiceBuilder UseCallOptionsHandler<T>(this IComBoostGrpcServiceBuilder builder)
+            where T : IDomainGrpcCallOptionsHandler, new()
+        {
+            return builder.UseCallOptionsHandler(new T());
         }
 
         private readonly static MethodInfo _UseTemplateMethod = typeof(IComBoostGrpcServiceBuilder).GetMethod("UseTemplate");
