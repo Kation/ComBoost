@@ -12,6 +12,7 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
             AspNetCoreBuilder = aspNetCoreBuilder;
+            services.AddSingleton<IDomainGrpcMethodBuilder, DomainGrpcMethodProtobufBuilder>();
         }
 
         public IServiceCollection Services { get; }
@@ -21,6 +22,12 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
         public IComBoostGrpcBuilder AddTemplate<T>() where T : IDomainTemplate
         {
             Services.PostConfigure<DomainGrpcTemplateOptions>(options => options.AddTemplate<T>());
+            return this;
+        }
+
+        public IComBoostGrpcBuilder UseMethodBuilder<T>() where T : class, IDomainGrpcMethodBuilder
+        {
+            Services.AddSingleton<IDomainGrpcMethodBuilder, T>();
             return this;
         }
     }

@@ -108,10 +108,14 @@ namespace Wodsoft.ComBoost.Grpc.Client
     public class GrpcTemplateBuilder<T> : GrpcTemplateBuilder, IDomainTemplateDescriptor<T>
         where T : class, IDomainTemplate
     {
-        private static Type _TemplateType;
+        private static Type? _TemplateType;
+        private static IDomainGrpcMethodBuilder? _MethodBuilder;
 
-        static GrpcTemplateBuilder()
+        public static IDomainGrpcMethodBuilder MethodBuilder => _MethodBuilder ?? throw new InvalidOperationException("Template not build yet.");
+
+        internal static void Build(IDomainGrpcMethodBuilder grpcMethodBuilder)
         {
+            _MethodBuilder = grpcMethodBuilder;
             var type = typeof(T);
             if (!type.IsInterface)
                 throw new NotSupportedException("Not support non interface type as a template.");
@@ -214,9 +218,10 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 }
                 //Create static Method<,> field and set value
                 var methodField = typeBuilder.DefineField("_Method_" + method.Name + "_" + methodIndex, typeof(Method<,>).MakeGenericType(requestType, responseType), FieldAttributes.Private | FieldAttributes.Static);
+                staticILGenerator.Emit(OpCodes.Call, typeof(GrpcTemplateBuilder<T>).GetProperty("MethodBuilder", BindingFlags.Public | BindingFlags.Static).GetMethod);
                 staticILGenerator.Emit(OpCodes.Ldstr, methodServiceName ?? serviceName ?? DomainService.GetServiceName(type));
                 staticILGenerator.Emit(OpCodes.Ldstr, methodName ?? (method.Name + "_" + methodIndex));
-                staticILGenerator.Emit(OpCodes.Call, typeof(DomainGrpcMethod<,>).MakeGenericType(requestType, responseType).GetMethod("CreateMethod"));
+                staticILGenerator.Emit(OpCodes.Callvirt, typeof(IDomainGrpcMethodBuilder).GetMethod("CreateMethod").MakeGenericMethod(requestType, responseType));
                 staticILGenerator.Emit(OpCodes.Stsfld, methodField);
 
                 //Create method for class
@@ -279,7 +284,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
 
         public T GetTemplate(IDomainContext context)
         {
-            var template = (T)Activator.CreateInstance(_TemplateType, _channel, _callOptions);
+            var template = (T)Activator.CreateInstance(_TemplateType!, _channel, _callOptions);
             template.Context = context;
             return template;
         }

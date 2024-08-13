@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Wodsoft.ComBoost;
+using Wodsoft.ComBoost.Grpc;
 using Wodsoft.ComBoost.Grpc.Client;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -36,6 +37,12 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder.UseCallOptionsHandler(new T());
         }
 
+        public static IComBoostGrpcBuilder UseMethodBuilder<T>(this IComBoostGrpcBuilder builder)
+            where T : IDomainGrpcMethodBuilder, new()
+        {
+            return builder.UseMethodBuilder(new T());
+        }
+
         public static IComBoostGrpcServiceBuilder AddService(this IComBoostGrpcBuilder builder, Uri address)
         {
             return builder.AddService(address, sp => new GrpcChannelOptions());
@@ -50,6 +57,12 @@ namespace Microsoft.Extensions.DependencyInjection
             where T : IDomainGrpcCallOptionsHandler, new()
         {
             return builder.UseCallOptionsHandler(new T());
+        }
+
+        public static IComBoostGrpcServiceBuilder UseMethodBuilder<T>(this IComBoostGrpcServiceBuilder builder)
+            where T : IDomainGrpcMethodBuilder, new()
+        {
+            return builder.UseMethodBuilder(new T());
         }
 
         private readonly static MethodInfo _UseTemplateMethod = typeof(IComBoostGrpcServiceBuilder).GetMethod("UseTemplate");

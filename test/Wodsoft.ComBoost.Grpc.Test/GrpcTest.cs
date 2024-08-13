@@ -65,7 +65,7 @@ namespace Wodsoft.ComBoost.Grpc.Test
                         HttpClient = client
                     }).UseTemplate<IGreeterTemplate>();
                 })
-                .AddMock(builder=>
+                .AddMock(builder =>
                 {
 
                 });
@@ -296,6 +296,84 @@ namespace Wodsoft.ComBoost.Grpc.Test
             }
         }
 
+        [Fact]
+        public async Task Greeter_JsonMethodBuilder_Test()
+        {
+            using var host = await new HostBuilder()
+                .ConfigureWebHost(webBuilder =>
+                {
+                    webBuilder
+                        .UseEnvironment(Environments.Development)
+                        .ConfigureAppConfiguration((context, configBuilder) =>
+                        {
+                            configBuilder.AddJsonFile("appsettings.json", true);
+                            configBuilder.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", true);
+                        })
+                        .ConfigureLogging(builder => builder.AddDebug())
+                        .UseTestServer()
+                        .ConfigureServices(services =>
+                        {
+                            services.AddGrpc();
+
+                            services.AddComBoost()
+                                .AddLocalService(builder =>
+                                {
+                                    builder.AddService<GreeterService>().UseTemplate<IGreeterTemplate>();
+                                })
+                                .AddAspNetCore(builder =>
+                                {
+                                    builder.AddGrpcServices()
+                                        .UseMethodBuilder<JsonMethodBuilder>()
+                                        .AddTemplate<IGreeterTemplate>()
+                                        .AddAuthenticationPassthrough();
+                                });
+                        })
+                        .Configure(app =>
+                        {
+                            app.UseRouting();
+
+                            app.UseEndpoints(endpoints =>
+                            {
+                                endpoints.MapDomainGrpcService();
+                            });
+                        });
+                })
+                .StartAsync();
+            var client = host.GetTestClient();
+
+            //Wodsoft.ComBoost.Grpc.AspNetCore.DomainGrpcService.GetAssembly();
+            //var generator = new Lokad.ILPack.AssemblyGenerator();
+            //// for ad-hoc serialization
+            //var bytes = generator.GenerateAssemblyBytes(Wodsoft.ComBoost.Grpc.AspNetCore.DomainGrpcService.GetAssembly());
+            //System.IO.File.WriteAllBytes("dynamic.dll", bytes);
+
+            ServiceCollection services = new ServiceCollection();
+            services.AddComBoost()
+                .AddGrpcService(builder =>
+                {
+                    builder.AddAuthenticationPassthrough();
+                    builder.UseMethodBuilder<JsonMethodBuilder>();
+                    builder.AddService(host.GetTestServer().BaseAddress, new GrpcChannelOptions
+                    {
+                        HttpClient = client
+                    }).UseTemplate<IGreeterTemplate>();
+                })
+                .AddMock(builder =>
+                {
+
+                });
+
+            var serviceProvider = services.BuildServiceProvider();
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var greeter = scope.ServiceProvider.GetRequiredService<IGreeterTemplate>();
+                var request = new HelloRequest { Name = "Kation" };
+                var response = await greeter.SayHi(request);
+                Assert.Equal($"Hi {request.Name}.", response.Answer);
+                Assert.Equal("Hi.", await greeter.Hello());
+                Assert.Equal("Hi.", await greeter.Hello("I'm Kation."));
+            }
+        }
 
         private class ResponseVersionHandler : DelegatingHandler
         {

@@ -15,5 +15,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
         IComBoostBuilder ComBoostBuilder { get; }
 
         IComBoostGrpcBuilder UseCallOptionsHandler(IDomainGrpcCallOptionsHandler handler);
+
+        IComBoostGrpcBuilder UseMethodBuilder(IDomainGrpcMethodBuilder methodBuilder);
     }
 }

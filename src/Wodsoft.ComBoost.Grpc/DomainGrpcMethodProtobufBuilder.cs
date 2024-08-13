@@ -9,20 +9,17 @@ using Wodsoft.Protobuf;
 
 namespace Wodsoft.ComBoost.Grpc
 {
-    public class DomainGrpcMethod<TRequest, TResponse>
-        where TRequest : class, IMessage, new()
-        where TResponse : class, IMessage, new()
+    public class DomainGrpcMethodProtobufBuilder : IDomainGrpcMethodBuilder
     {
-        public static Method<TRequest, TResponse> CreateMethod(string serviceName, string methodName)
+        public Method<TRequest, TResponse> CreateMethod<TRequest, TResponse>(string serviceName, string methodName)
         {
             return new Method<TRequest, TResponse>(MethodType.Unary, serviceName, methodName, new Marshaller<TRequest>((request) =>
             {
                 try
                 {
+
                     MemoryStream stream = new MemoryStream();
-                    var output = new CodedOutputStream(stream, true);
-                    output.WriteRawMessage(request);
-                    output.Flush();
+                    Message.Serialize(stream, request);
                     return stream.ToArray();
                 }
                 catch (Exception ex)
@@ -34,8 +31,7 @@ namespace Wodsoft.ComBoost.Grpc
                 try
                 {
                     var input = new CodedInputStream(data);
-                    var value = new TRequest();
-                    input.ReadRawMessage(value);
+                    var value = Message.Deserialize<TRequest>(input);
                     return value;
                 }
                 catch (Exception ex)
@@ -47,9 +43,7 @@ namespace Wodsoft.ComBoost.Grpc
                 try
                 {
                     MemoryStream stream = new MemoryStream();
-                    var output = new CodedOutputStream(stream, true);
-                    output.WriteRawMessage(response);
-                    output.Flush();
+                    Message.Serialize(stream, response);
                     return stream.ToArray();
                 }
                 catch (Exception ex)
@@ -61,8 +55,7 @@ namespace Wodsoft.ComBoost.Grpc
                 try
                 {
                     var input = new CodedInputStream(data);
-                    var value = new TResponse();
-                    input.ReadRawMessage(value);
+                    var value = Message.Deserialize<TResponse>(input);
                     return value;
                 }
                 catch (Exception ex)

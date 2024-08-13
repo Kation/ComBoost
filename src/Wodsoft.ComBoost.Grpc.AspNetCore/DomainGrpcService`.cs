@@ -87,10 +87,15 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
             return response;
         }
 
-        internal static readonly Type ServiceType;
+        internal static Type? ServiceType;
+        private static IDomainGrpcMethodBuilder? _MethodBuilder;
 
-        static DomainGrpcService()
+        public static IDomainGrpcMethodBuilder MethodBuilder => _MethodBuilder ?? throw new InvalidOperationException("Service not build yet.");
+
+        internal static void Build(IDomainGrpcMethodBuilder grpcMethodBuilder)
         {
+            _MethodBuilder = grpcMethodBuilder;
+
             var templateType = typeof(T);
             TypeBuilder typeBuilder = DomainGrpcService.CreateType(templateType.Name.Trim('I'), typeof(DomainGrpcService<T>));
 
@@ -225,9 +230,10 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
                 }
                 //Create static Method<,> field and set value
                 var methodField = typeBuilder.DefineField("_Method_" + method.Name + "_" + methodIndex, typeof(Method<,>).MakeGenericType(requestType, responseType), FieldAttributes.Private | FieldAttributes.Static);
+                staticILGenerator.Emit(OpCodes.Call, typeof(DomainGrpcService<T>).GetProperty("MethodBuilder", BindingFlags.Public | BindingFlags.Static)!.GetMethod!);
                 staticILGenerator.Emit(OpCodes.Ldstr, methodServiceName ?? serviceName ?? DomainService.GetServiceName(typeof(T)));
                 staticILGenerator.Emit(OpCodes.Ldstr, methodName ?? (method.Name + "_" + methodIndex));
-                staticILGenerator.Emit(OpCodes.Call, typeof(DomainGrpcMethod<,>).MakeGenericType(requestType, responseType).GetMethod("CreateMethod")!);
+                staticILGenerator.Emit(OpCodes.Callvirt, typeof(IDomainGrpcMethodBuilder).GetMethod("CreateMethod")!.MakeGenericMethod(requestType, responseType));
                 staticILGenerator.Emit(OpCodes.Stsfld, methodField);
             }
 

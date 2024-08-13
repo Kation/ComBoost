@@ -13,10 +13,12 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
 {
     public class DomainGrpcServiceMethodProvider : IServiceMethodProvider<DomainGrpcDiscoveryService>
     {
-        private DomainGrpcTemplateOptions _options;
+        private readonly DomainGrpcTemplateOptions _options;
+        private readonly IDomainGrpcMethodBuilder _methodBuilder;
 
-        public DomainGrpcServiceMethodProvider(IOptions<DomainGrpcTemplateOptions> options)
+        public DomainGrpcServiceMethodProvider(IDomainGrpcMethodBuilder methodBuilder, IOptions<DomainGrpcTemplateOptions> options)
         {
+            _methodBuilder = methodBuilder;
             _options = options.Value;
         }
 
@@ -25,12 +27,13 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
         private static ConstructorInfo _GrpcContextConstructorInfo = typeof(DomainGrpcContext).GetConstructors()[0];
         private static MethodInfo _GetServiceMethodInfo = typeof(ServiceProviderServiceExtensions).GetMethod("GetRequiredService", 1, BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IServiceProvider) }, null)!;
 
-
         public void OnServiceMethodDiscovery(ServiceMethodProviderContext<DomainGrpcDiscoveryService> context)
         {
             var contextType = context.GetType();
             foreach (var type in _options.Types)
             {
+                var builderType = typeof(DomainGrpcService<>).MakeGenericType(type);
+                builderType.GetMethod("Build", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, new object[] { _methodBuilder });
                 var serviceType = (Type)typeof(DomainGrpcService<>).MakeGenericType(type).GetField("ServiceType", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
                 foreach (var method in serviceType.GetTypeInfo().DeclaredMethods)
                 {
