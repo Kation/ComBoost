@@ -27,7 +27,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore -c Release -nowarn:CS1591 -p:Version=4.0.0.{{github.run_number}}
+      run: dotnet build --no-restore -c Release -nowarn:CS1591
     - name: Pack
       run: |
         dotnet pack -c Release src/Wodsoft.ComBoost/Wodsoft.ComBoost.csproj -p:Version=4.0.0.{{github.run_number}} --version-suffix "alpha" -o nupkgs --no-build
