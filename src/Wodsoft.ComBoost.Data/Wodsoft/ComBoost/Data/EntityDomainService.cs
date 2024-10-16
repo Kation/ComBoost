@@ -89,6 +89,7 @@ namespace Wodsoft.ComBoost.Data
                 return model;
             }
             var entity = entityContext.Create();
+            await RaiseEvent(new EntityPreMapEventArgs<TEntity, TCreateDTO>(entity, dto));
             mapper.Map(dto, entity);
             await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
             entityContext.Add(entity);
@@ -120,6 +121,7 @@ namespace Wodsoft.ComBoost.Data
                 if (Validator.TryValidateObject(dto, validationContext, results, true))
                 {
                     var entity = entityContext.Create();
+                    await RaiseEvent(new EntityPreMapEventArgs<TEntity, TCreateDTO>(entity, dto));
                     mapper.Map(dto, entity);
                     await RaiseEvent(new EntityMappedEventArgs<TEntity, TCreateDTO>(entity, dto));
                     entityContext.Add(entity);
