@@ -43,9 +43,15 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 //    customType = "ValueFilter";
                 //}
                 if (Nullable.GetUnderlyingType(propertyType) != null)
-                    propertyType = Nullable.GetUnderlyingType(propertyType);
+                    propertyType = Nullable.GetUnderlyingType(propertyType)!;
                 if (propertyType == typeof(DateTime) || propertyType == typeof(DateTimeOffset))
                     type = CustomDataType.DateTime;
+#if NET6_0_OR_GREATER
+                else if (propertyType == typeof(DateOnly))
+                    type = CustomDataType.Date;
+                else if (propertyType == typeof(TimeOnly))
+                    type = CustomDataType.Time;
+#endif
                 else if (propertyType == typeof(TimeSpan))
                     type = CustomDataType.Time;
                 else if (propertyType == typeof(bool))
@@ -92,7 +98,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         public static Func<object, object> GetGetMethodDelegate(this PropertyInfo propertyInfo)
         {
             var parameterExpression = Expression.Parameter(typeof(object));
-            var convertExpression = Expression.Convert(parameterExpression, propertyInfo.DeclaringType);
+            var convertExpression = Expression.Convert(parameterExpression, propertyInfo.DeclaringType!);
             var propertyExpression = Expression.Property(convertExpression, propertyInfo);
             convertExpression = Expression.Convert(propertyExpression, typeof(object));
             var lambda = Expression.Lambda<Func<object, object>>(convertExpression, parameterExpression).Compile();
@@ -108,9 +114,9 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             var objParameter = Expression.Parameter(typeof(object));
             var valueParameter = Expression.Parameter(typeof(object));
-            var objConverterParameter = Expression.Convert(objParameter, propertyInfo.DeclaringType);
+            var objConverterParameter = Expression.Convert(objParameter, propertyInfo.DeclaringType!);
             var valueConverterParameter = Expression.Convert(valueParameter, propertyInfo.PropertyType);
-            var expression = Expression.Call(objConverterParameter, propertyInfo.GetSetMethod(), valueConverterParameter);
+            var expression = Expression.Call(objConverterParameter, propertyInfo.GetSetMethod()!, valueConverterParameter);
             var lambda = Expression.Lambda<Action<object, object?>>(expression, objParameter, valueParameter).Compile();
             return lambda;
         }
