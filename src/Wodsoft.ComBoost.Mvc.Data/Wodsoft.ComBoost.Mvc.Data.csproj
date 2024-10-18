@@ -1,32 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <Description>ComBoost用于AspNetCore Mvc的实体模块。</Description>
-    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
-    <LangVersion>10.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <RootNamespace>Wodsoft.ComBoost.Mvc</RootNamespace>
-  </PropertyGroup>
-  <Import Project="../../common.props" />
+	<PropertyGroup>
+		<Description>ComBoost用于AspNetCore Mvc的实体模块。</Description>
+		<TargetFrameworks>$(AspnetTargetFrameworks)</TargetFrameworks>
+		<LangVersion>10.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<RootNamespace>Wodsoft.ComBoost.Mvc</RootNamespace>
+	</PropertyGroup>
+	<Import Project="../../common.props" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.csproj" />
-    <ProjectReference Include="..\Wodsoft.ComBoost.Mvc\Wodsoft.ComBoost.Mvc.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)'== 'netcoreapp2.1'">
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.0" />
-  </ItemGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)'== 'netcoreapp3.1'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Wodsoft.ComBoost.Data\Wodsoft.ComBoost.Data.csproj" />
+		<ProjectReference Include="..\Wodsoft.ComBoost.Mvc\Wodsoft.ComBoost.Mvc.csproj" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'== 'net5.0'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'== 'netcoreapp2.1'">
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.0" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'== 'net6.0'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'!= 'netcoreapp2.1'">
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 
 </Project>

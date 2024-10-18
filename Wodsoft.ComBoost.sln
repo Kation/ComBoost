@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D2D0E3C7-C38F-4A99-AA22-03D925C266D5}"
 	ProjectSection(SolutionItems) = preProject
 		common.props = common.props
+		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -106,7 +107,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.Mock.Test"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.StackExchangeRedis", "src\Wodsoft.ComBoost.StackExchangeRedis\Wodsoft.ComBoost.StackExchangeRedis.csproj", "{C4969CEC-9804-41B0-A63C-EF327D1DCB81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.ComBoost.SourceGenerators.AspNetCore", "src\Wodsoft.ComBoost.SourceGenerators.AspNetCore\Wodsoft.ComBoost.SourceGenerators.AspNetCore.csproj", "{F7047059-72E2-40B3-81B3-1EEB63360CCA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wodsoft.ComBoost.SourceGenerators.AspNetCore", "src\Wodsoft.ComBoost.SourceGenerators.AspNetCore\Wodsoft.ComBoost.SourceGenerators.AspNetCore.csproj", "{F7047059-72E2-40B3-81B3-1EEB63360CCA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

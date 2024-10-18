@@ -2,15 +2,16 @@
 
   <PropertyGroup>
     <Description>ComBoost RabbitMQ支持。</Description>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>$(BaseTargetFrameworks)</TargetFrameworks>
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
+    <UserSecretsId>0a390d6f-f221-43c0-87e9-db94a0e38f82</UserSecretsId>
   </PropertyGroup>
   <Import Project="../../common.props" />
 
   <ItemGroup>
-    <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <ItemGroup>
