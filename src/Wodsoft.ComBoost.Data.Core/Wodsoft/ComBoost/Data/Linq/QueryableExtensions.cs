@@ -1582,7 +1582,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         private static readonly MethodInfo _AsTrackingMethodInfo
             = typeof(QueryableExtensions)
-                .GetTypeInfo().GetDeclaredMethod(nameof(AsTracking));
+                .GetTypeInfo().GetDeclaredMethod(nameof(AsTracking))!;
         public static IQueryable<TSource> AsTracking<TSource>(this IQueryable<TSource> source)
         {
             return source.Provider.CreateQuery<TSource>(
@@ -1594,7 +1594,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         private static readonly MethodInfo _AsNoTrackingMethodInfo
             = typeof(QueryableExtensions)
-                .GetTypeInfo().GetDeclaredMethod(nameof(AsTracking));
+                .GetTypeInfo().GetDeclaredMethod(nameof(AsNoTracking))!;
         public static IQueryable<TSource> AsNoTracking<TSource>(this IQueryable<TSource> source)
         {
             return source.Provider.CreateQuery<TSource>(
