@@ -54,7 +54,9 @@ namespace Wodsoft.ComBoost.Data
                         queryable = Queryable.OrderBy(queryable, express);
                 }
             }
-            var dtoQueryable = queryable.ProjectTo<TListDTO>(mapper.ConfigurationProvider);
+            var configEventArgs = new EntityMapperConfigEventArgs(mapper);
+            await RaiseEvent(configEventArgs);
+            var dtoQueryable = queryable.ProjectTo<TListDTO>(configEventArgs.Mapper.ConfigurationProvider);
             //OnListQuery(ref dtoQueryable, ref isOrdered);
             ViewModel<TListDTO> model = new ViewModel<TListDTO>(dtoQueryable);
             await RaiseEvent(new EntityQueryModelCreatedEventArgs<TListDTO>(model));
@@ -88,6 +90,9 @@ namespace Wodsoft.ComBoost.Data
                         model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
                 return model;
             }
+            var configEventArgs = new EntityMapperConfigEventArgs(mapper);
+            await RaiseEvent(configEventArgs);
+            mapper = configEventArgs.Mapper;
             var entity = entityContext.Create();
             await RaiseEvent(new EntityPreMapEventArgs<TEntity, TCreateDTO>(entity, dto));
             mapper.Map(dto, entity);
@@ -112,6 +117,9 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task<IUpdateRangeModel<TListDTO>> CreateRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TCreateDTO[] dtos)
         {
+            var configEventArgs = new EntityMapperConfigEventArgs(mapper);
+            await RaiseEvent(configEventArgs);
+            mapper = configEventArgs.Mapper;
             UpdateRangeModel<TListDTO> model = new UpdateRangeModel<TListDTO>();
             Dictionary<TListDTO, TEntity> entities = new Dictionary<TListDTO, TEntity>();
             foreach (var dto in dtos)
@@ -172,6 +180,9 @@ namespace Wodsoft.ComBoost.Data
                         model.ErrorMessage.Add(new KeyValuePair<string, string>(result.MemberNames.FirstOrDefault() ?? string.Empty, result.ErrorMessage));
                 return model;
             }
+            var configEventArgs = new EntityMapperConfigEventArgs(mapper);
+            await RaiseEvent(configEventArgs);
+            mapper = configEventArgs.Mapper;
             var mappedEntity = mapper.Map<TEntity>(dto);
             var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
             var keys = new object[keyProperties.Count];
@@ -196,6 +207,9 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task<IUpdateRangeModel<TListDTO>> EditRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TEditDTO[] dtos)
         {
+            var configEventArgs = new EntityMapperConfigEventArgs(mapper);
+            await RaiseEvent(configEventArgs);
+            mapper = configEventArgs.Mapper;
             UpdateRangeModel<TListDTO> model = new UpdateRangeModel<TListDTO>();
             Dictionary<TListDTO, TEntity> entities = new Dictionary<TListDTO, TEntity>();
             foreach (var dto in dtos)
@@ -245,6 +259,9 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task Remove([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TRemoveDTO dto)
         {
+            var configEventArgs = new EntityMapperConfigEventArgs(mapper);
+            await RaiseEvent(configEventArgs);
+            mapper = configEventArgs.Mapper;
             var mappedEntity = mapper.Map<TEntity>(dto);
             var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
             var keys = new object[keyProperties.Count];
@@ -263,6 +280,9 @@ namespace Wodsoft.ComBoost.Data
 
         public virtual async Task RemoveRange([FromService] IEntityContext<TEntity> entityContext, [FromService] IMapper mapper, [FromValue] TRemoveDTO[] dtos)
         {
+            var configEventArgs = new EntityMapperConfigEventArgs(mapper);
+            await RaiseEvent(configEventArgs);
+            mapper = configEventArgs.Mapper;
             List<TEntity> entities = new List<TEntity>();
             foreach (var dto in dtos)
             {
