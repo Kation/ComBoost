@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>ComBoost Grpc基础。</Description>
     <TargetFrameworks>$(BaseTargetFrameworks)</TargetFrameworks>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <Import Project="../../common.props" />

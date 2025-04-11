@@ -30,11 +30,11 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
         private DomainGrpcTrace? _trace;
         private Stopwatch? _watch;
 
-        protected void HandleRequest(DomainGrpcRequest request, ServerCallContext context)
+        protected async Task HandleRequest(DomainGrpcRequest request, ServerCallContext context)
         {
             var handlers = Template.Context.GetServices<IDomainRpcServerRequestHandler>();
             foreach (var handler in handlers)
-                handler.Handle(request, (DomainGrpcContext)Template.Context);
+                await handler.HandleAsync(request, (DomainGrpcContext)Template.Context);
             if (_options.IsTraceEnabled)
             {
                 _trace = new DomainGrpcTrace();
@@ -44,7 +44,7 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
             }
         }
 
-        protected DomainGrpcResponse<TResult> HandleResponse<TResult>(Task<TResult> task)
+        protected async Task<DomainGrpcResponse<TResult>> HandleResponse<TResult>(Task<TResult> task)
         {
             var response = new DomainGrpcResponse<TResult>();
             if (_options.IsTraceEnabled)
@@ -64,11 +64,11 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
             }
             var handlers = Template.Context.GetServices<IDomainRpcServerResponseHandler>();
             foreach (var handler in handlers)
-                handler.Handle(response);
+                await handler.HandleAsync(response);
             return response;
         }
 
-        protected DomainGrpcResponse HandleResponse(Task task)
+        protected async Task<DomainGrpcResponse> HandleResponse(Task task)
         {
             var response = new DomainGrpcResponse();
             if (_options.IsTraceEnabled)
@@ -83,12 +83,17 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
                 response.Exception = new DomainGrpcException(task.Exception);
             var handlers = Template.Context.GetServices<IDomainRpcServerResponseHandler>();
             foreach (var handler in handlers)
-                handler.Handle(response);
+                await handler.HandleAsync(response);
             return response;
         }
 
         internal static Type? ServiceType;
         private static IDomainGrpcMethodBuilder? _MethodBuilder;
+        private static MethodInfo _UnwrapMethod = typeof(TaskExtensions).GetMethod("Unwrap", BindingFlags.Public | BindingFlags.Static, null, [typeof(Task<Task>)], null)!;
+        private static MethodInfo _UnwrapGenericMethod = typeof(TaskExtensions).GetMethod("Unwrap", 1, BindingFlags.Public | BindingFlags.Static, null, [typeof(Task<>).MakeGenericType(typeof(Task<>).MakeGenericType(Type.MakeGenericMethodParameter(0)))], null)!;
+        private static MethodInfo _ExceptionProperty = typeof(Task).GetProperty("Exception")!.GetGetMethod()!;
+        private static MethodInfo _FromExceptionMethod = typeof(Task).GetMethod("FromException", 0, BindingFlags.Public | BindingFlags.Static, null, [typeof(Exception)], null)!;
+        private static MethodInfo _FromExceptionGenericMethod = typeof(Task).GetMethod("FromException", 1, BindingFlags.Public | BindingFlags.Static, null, [typeof(Exception)], null)!;
 
         public static IDomainGrpcMethodBuilder MethodBuilder => _MethodBuilder ?? throw new InvalidOperationException("Service not build yet.");
 
@@ -162,7 +167,7 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
                     requestType = typeof(DomainGrpcRequest<>).MakeGenericType(argumentType);
                 }
                 //Define method "Response Method(Request, ServerCallContext)"
-                var methodBuilder = typeBuilder.DefineMethod(method.Name + "_" + methodIndex, MethodAttributes.Public | MethodAttributes.Virtual);
+                var methodBuilder = typeBuilder.DefineMethod(method.Name + "_" + methodIndex, MethodAttributes.Public);
                 methodBuilder.SetParameters(requestType, typeof(ServerCallContext));
                 methodBuilder.SetReturnType(typeof(Task<>).MakeGenericType(responseType));
 
@@ -173,36 +178,74 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
                 methodILGenerator.Emit(OpCodes.Ldarg_2);
                 methodILGenerator.Emit(OpCodes.Call, typeof(DomainGrpcService<T>).GetMethod(nameof(HandleRequest), BindingFlags.NonPublic | BindingFlags.Instance)!);
 
-
+                var invokeMethodBuilder = typeBuilder.DefineMethod(method.Name + "_" + methodIndex + "_Invoker", MethodAttributes.Private);
+                if (parameters.Length == 0)
+                    invokeMethodBuilder.SetParameters(typeof(Task));
+                else
+                    invokeMethodBuilder.SetParameters(typeof(Task), typeof(object));
+                invokeMethodBuilder.SetReturnType(method.ReturnType);
+                var invokeILGenerator = invokeMethodBuilder.GetILGenerator();
+                var invokeLabel = invokeILGenerator.DefineLabel();
+                //if (task.Exception != null) return Task.FromException(task.Exception);
                 //_template.{method}(args...)
-                methodILGenerator.Emit(OpCodes.Ldarg_0);
-                methodILGenerator.Emit(OpCodes.Ldfld, typeof(DomainGrpcService<T>).GetField(nameof(Template), BindingFlags.NonPublic | BindingFlags.Instance)!);
-                //methodILGenerator.Emit(OpCodes.Ldarg_1);
-                //methodILGenerator.Emit(OpCodes.Call())
+                invokeILGenerator.Emit(OpCodes.Ldarg_1);
+                invokeILGenerator.Emit(OpCodes.Call, _ExceptionProperty);
+                invokeILGenerator.Emit(OpCodes.Brfalse_S, invokeLabel);
+                invokeILGenerator.Emit(OpCodes.Ldarg_1);
+                invokeILGenerator.Emit(OpCodes.Call, _ExceptionProperty);
+                if (method.ReturnType == typeof(Task))
+                    invokeILGenerator.Emit(OpCodes.Call, _FromExceptionMethod);
+                else
+                    invokeILGenerator.Emit(OpCodes.Call, _FromExceptionGenericMethod.MakeGenericMethod(method.ReturnType.GetGenericArguments()[0]));
+                invokeILGenerator.Emit(OpCodes.Ret);
+                invokeILGenerator.MarkLabel(invokeLabel);
+                invokeILGenerator.Emit(OpCodes.Ldarg_0);
+                invokeILGenerator.Emit(OpCodes.Ldfld, typeof(DomainGrpcService<T>).GetField(nameof(Template), BindingFlags.NonPublic | BindingFlags.Instance)!);
                 for (int i = 0; i < parameters.Length; i++)
                 {
-                    methodILGenerator.Emit(OpCodes.Ldarg_1);
-                    methodILGenerator.Emit(OpCodes.Call, requestType.GetProperty("Argument")!.GetMethod!);
-                    methodILGenerator.Emit(OpCodes.Call, argumentType!.GetProperty("Argument" + (i + 1))!.GetMethod!);
+                    invokeILGenerator.Emit(OpCodes.Ldarg_2);
+                    invokeILGenerator.Emit(OpCodes.Call, argumentType!.GetProperty("Argument" + (i + 1))!.GetMethod!);
                 }
-                methodILGenerator.Emit(OpCodes.Callvirt, method);
+                invokeILGenerator.Emit(OpCodes.Callvirt, method);
+                invokeILGenerator.Emit(OpCodes.Ret);
 
-                //.ContinueWith(HandleResponse)
-                if (method.ReturnType == typeof(Task))
+                //.ContinueWith(Invoker, Arguments).Unwrap()
+                methodILGenerator.Emit(OpCodes.Ldarg_0);
+                methodILGenerator.Emit(OpCodes.Ldftn, invokeMethodBuilder);
+                if (parameters.Length == 0)
                 {
-                    methodILGenerator.Emit(OpCodes.Ldarg_0);
-                    methodILGenerator.Emit(OpCodes.Ldftn, typeof(DomainGrpcService<T>).GetMethod(nameof(HandleResponse), BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(Task) }, null)!);
-                    methodILGenerator.Emit(OpCodes.Newobj, typeof(Func<Task, DomainGrpcResponse>).GetConstructors()[0]);
-                    methodILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", 1, BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(Func<,>).MakeGenericType(method.ReturnType, Type.MakeGenericMethodParameter(0)) }, null)!.MakeGenericMethod(typeof(DomainGrpcResponse)));
+                    methodILGenerator.Emit(OpCodes.Newobj, typeof(Func<,>).MakeGenericType([typeof(Task), method.ReturnType]).GetConstructors()[0]);
+                    methodILGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod("ContinueWith", 1, BindingFlags.Public | BindingFlags.Instance, null,
+                        new Type[] { typeof(Func<,>).MakeGenericType(typeof(Task), Type.MakeGenericMethodParameter(0)) }, null)!.MakeGenericMethod(method.ReturnType));
                 }
                 else
                 {
+                    methodILGenerator.Emit(OpCodes.Newobj, typeof(Func<,,>).MakeGenericType([typeof(Task), typeof(object), method.ReturnType]).GetConstructors()[0]);
+                    methodILGenerator.Emit(OpCodes.Ldarg_1);
+                    methodILGenerator.Emit(OpCodes.Call, requestType.GetProperty("Argument")!.GetMethod!);
+                    methodILGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod("ContinueWith", 1, BindingFlags.Public | BindingFlags.Instance, null,
+                        new Type[] { typeof(Func<,,>).MakeGenericType(typeof(Task), typeof(object), Type.MakeGenericMethodParameter(0)), typeof(object) }, null)!.MakeGenericMethod(method.ReturnType));
+                }
+
+                //.ContinueWith(HandleResponse).Unwrap()
+                if (method.ReturnType == typeof(Task))
+                {
+                    methodILGenerator.Emit(OpCodes.Call, _UnwrapMethod);
+                    methodILGenerator.Emit(OpCodes.Ldarg_0);
+                    methodILGenerator.Emit(OpCodes.Ldftn, typeof(DomainGrpcService<T>).GetMethod(nameof(HandleResponse), BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(Task) }, null)!);
+                    methodILGenerator.Emit(OpCodes.Newobj, typeof(Func<Task, DomainGrpcResponse>).GetConstructors()[0]);
+                    methodILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", 1, BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(Func<,>).MakeGenericType(method.ReturnType, Type.MakeGenericMethodParameter(0)) }, null)!.MakeGenericMethod(typeof(Task<DomainGrpcResponse>)));
+                }
+                else
+                {
+                    methodILGenerator.Emit(OpCodes.Call, _UnwrapGenericMethod.MakeGenericMethod(method.ReturnType.GetGenericArguments()[0]));
                     methodILGenerator.Emit(OpCodes.Ldarg_0);
                     var handleMethod = typeof(DomainGrpcService<T>).GetMethod(nameof(HandleResponse), 1, BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(Task<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) }, null)!.MakeGenericMethod(method.ReturnType.GetGenericArguments());
                     methodILGenerator.Emit(OpCodes.Ldftn, handleMethod);
                     methodILGenerator.Emit(OpCodes.Newobj, typeof(Func<,>).MakeGenericType(method.ReturnType, handleMethod.ReturnType).GetConstructors()[0]);
                     methodILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", 1, BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(Func<,>).MakeGenericType(method.ReturnType, Type.MakeGenericMethodParameter(0)) }, null)!.MakeGenericMethod(handleMethod.ReturnType));
                 }
+                methodILGenerator.Emit(OpCodes.Call, _UnwrapGenericMethod.MakeGenericMethod(responseType));
                 methodILGenerator.Emit(OpCodes.Ret);
 
                 //Method end point provider
