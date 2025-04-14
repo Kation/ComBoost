@@ -233,7 +233,7 @@ namespace Wodsoft.ComBoost.Grpc.AspNetCore
                     methodILGenerator.Emit(OpCodes.Call, _UnwrapMethod);
                     methodILGenerator.Emit(OpCodes.Ldarg_0);
                     methodILGenerator.Emit(OpCodes.Ldftn, typeof(DomainGrpcService<T>).GetMethod(nameof(HandleResponse), BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(Task) }, null)!);
-                    methodILGenerator.Emit(OpCodes.Newobj, typeof(Func<Task, DomainGrpcResponse>).GetConstructors()[0]);
+                    methodILGenerator.Emit(OpCodes.Newobj, typeof(Func<Task, Task<DomainGrpcResponse>>).GetConstructors()[0]);
                     methodILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", 1, BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(Func<,>).MakeGenericType(method.ReturnType, Type.MakeGenericMethodParameter(0)) }, null)!.MakeGenericMethod(typeof(Task<DomainGrpcResponse>)));
                 }
                 else

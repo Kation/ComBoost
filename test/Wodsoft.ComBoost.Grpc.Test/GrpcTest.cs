@@ -224,7 +224,7 @@ namespace Wodsoft.ComBoost.Grpc.Test
         }
 
         [Fact]
-        public async Task GenericService_Test()
+        public async Task GenericService_NoRequest()
         {
             using var host = await new HostBuilder()
                 .ConfigureWebHost(webBuilder =>
@@ -291,8 +291,80 @@ namespace Wodsoft.ComBoost.Grpc.Test
             using (var scope = serviceProvider.CreateScope())
             {
                 var service = scope.ServiceProvider.GetRequiredService<IGenericTestService<string>>();
-                var response = await service.Test();
+                var response = await service.NoRequest();
                 Assert.Equal("123", response);
+            }
+        }
+
+        [Fact]
+        public async Task GenericService_NoResponse()
+        {
+            using var host = await new HostBuilder()
+                .ConfigureWebHost(webBuilder =>
+                {
+                    webBuilder
+                        .UseEnvironment(Environments.Development)
+                        .ConfigureAppConfiguration((context, configBuilder) =>
+                        {
+                            configBuilder.AddJsonFile("appsettings.json", true);
+                            configBuilder.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", true);
+                        })
+                        .ConfigureLogging(builder => builder.AddDebug())
+                        .UseTestServer()
+                        .ConfigureServices(services =>
+                        {
+                            services.AddGrpc();
+                            services.AddComBoost()
+                                .AddLocalService(builder =>
+                                {
+                                    builder.AddService<GenericTestService<string>>().UseTemplate<IGenericTestService<string>>();
+                                })
+                                .AddAspNetCore(builder =>
+                                {
+                                    builder.AddGrpcServices()
+                                        .AddTemplate<IGenericTestService<string>>()
+                                        .AddAuthenticationPassthrough();
+                                });
+                        })
+                        .Configure(app =>
+                        {
+                            app.UseRouting();
+
+                            app.UseEndpoints(endpoints =>
+                            {
+                                endpoints.MapDomainGrpcService();
+                            });
+                        });
+                })
+                .StartAsync();
+            var client = host.GetTestClient();
+
+            //Wodsoft.ComBoost.Grpc.AspNetCore.DomainGrpcService.GetAssembly();
+            //var generator = new Lokad.ILPack.AssemblyGenerator();
+            //// for ad-hoc serialization
+            //var bytes = generator.GenerateAssemblyBytes(Wodsoft.ComBoost.Grpc.AspNetCore.DomainGrpcService.GetAssembly());
+            //System.IO.File.WriteAllBytes("dynamic.dll", bytes);
+
+            ServiceCollection services = new ServiceCollection();
+            services.AddComBoost()
+                .AddGrpcService(builder =>
+                {
+                    builder.AddAuthenticationPassthrough();
+                    builder.AddService(host.GetTestServer().BaseAddress, new GrpcChannelOptions
+                    {
+                        HttpClient = client
+                    }).UseTemplate<IGenericTestService<string>>();
+                })
+                .AddMock(builder =>
+                {
+
+                });
+
+            var serviceProvider = services.BuildServiceProvider();
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IGenericTestService<string>>();
+                await service.NoResponse("Hi");
             }
         }
 

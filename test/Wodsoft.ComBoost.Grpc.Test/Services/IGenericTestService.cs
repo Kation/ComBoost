@@ -8,6 +8,8 @@ namespace Wodsoft.ComBoost.Grpc.Test.Services
 {
     public interface IGenericTestService<T> : IDomainTemplate
     {
-        Task<string> Test();
+        Task<string> NoRequest();
+
+        Task NoResponse(string value);
     }
 }
