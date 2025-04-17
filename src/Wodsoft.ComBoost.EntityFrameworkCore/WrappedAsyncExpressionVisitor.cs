@@ -171,6 +171,8 @@ namespace Wodsoft.ComBoost.Data.Entity
                         case "UpdateAsync":
 #if NET6_0
                             return typeof(RelationalQueryableExtensions).GetMethod("Execute" + method.Name)!.MakeGenericMethod(method.GetGenericArguments());
+#elif NET9_0
+                            return typeof(EntityFrameworkQueryableExtensions).GetMethod("Execute" + method.Name)!.MakeGenericMethod(method.GetGenericArguments());
 #else
                             throw new NotSupportedException("Not support below .NET 6.");
 #endif
