@@ -92,6 +92,8 @@ namespace Microsoft.Extensions.DependencyInjection
                     continue;
                 if (type.IsValueType)
                     continue;
+                if (type.IsGenericTypeDefinition)
+                    continue;
                 if (type.GetConstructor(Array.Empty<Type>()) == null)
                     continue;
                 foreach (var item in type.GetInterfaces())
@@ -115,6 +117,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 if (type.IsInterface)
                     continue;
                 if (type.IsValueType)
+                    continue;
+                if (type.IsGenericTypeDefinition)
                     continue;
                 if (type.GetInterfaces().Any(t => t == typeof(IDomainService)))
                     _AddServiceMethod.MakeGenericMethod(type).Invoke(builder, null);
