@@ -86,24 +86,36 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             foreach (var type in assembly.GetTypes())
             {
+                if (type.IsAbstract)
+                    continue;
+                if (type.IsInterface)
+                    continue;
+                if (type.IsValueType)
+                    continue;
                 if (type.GetConstructor(Array.Empty<Type>()) == null)
                     continue;
                 foreach (var item in type.GetInterfaces())
                 {
                     if (item.IsGenericType && item.GetGenericTypeDefinition() == typeof(IDomainServiceEventHandler<>))
                     {
-                        typeof(IComBoostLocalBuilder).GetMethod(nameof(IComBoostLocalBuilder.AddEventHandler)).MakeGenericMethod(item, item.GetGenericArguments()[0]).Invoke(builder, Array.Empty<object>());
+                        typeof(IComBoostLocalBuilder).GetMethod(nameof(IComBoostLocalBuilder.AddEventHandler))!.MakeGenericMethod(item, item.GetGenericArguments()[0]).Invoke(builder, Array.Empty<object>());
                     }
                 }
             }
             return builder;
         }
 
-        private static readonly MethodInfo _AddServiceMethod = typeof(IComBoostLocalBuilder).GetMethod("AddService", BindingFlags.Public | BindingFlags.Instance);
+        private static readonly MethodInfo _AddServiceMethod = typeof(IComBoostLocalBuilder).GetMethod("AddService", BindingFlags.Public | BindingFlags.Instance)!;
         public static IComBoostLocalBuilder AddServiceFromAssembly(this IComBoostLocalBuilder builder, Assembly assembly)
         {
             foreach (var type in assembly.GetTypes())
             {
+                if (type.IsAbstract)
+                    continue;
+                if (type.IsInterface)
+                    continue;
+                if (type.IsValueType)
+                    continue;
                 if (type.GetInterfaces().Any(t => t == typeof(IDomainService)))
                     _AddServiceMethod.MakeGenericMethod(type).Invoke(builder, null);
             }
