@@ -123,5 +123,36 @@ namespace Wodsoft.ComBoost.Test
                 Assert.False(response);
             }
         }
+
+        [Fact]
+        public async Task LifetimeTest()
+        {
+            ServiceCollection services = new ServiceCollection();
+            services.AddScoped<LifetimeCounter>();
+            services.AddComBoost()
+                .AddLocalService(builder =>
+                {
+                    builder.AddService<LifetimeService>();
+                })
+                .AddMock();
+            var serviceProvider = services.BuildServiceProvider();
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<ILifetimeService>();
+                var count = await service.Increase();
+                Assert.Equal(1, count);
+                count = await service.Increase();
+                Assert.Equal(2, count);
+                count = await service.TransientIncrease();
+                Assert.Equal(1, count);
+                service.OverrideLifetimeStrategy = DomainLifetimeStrategy.Scope;
+                count = await service.TransientIncrease();
+                Assert.Equal(3, count);
+                service.OverrideLifetimeStrategy = DomainLifetimeStrategy.Transient;
+                count = await service.Increase();
+                Assert.Equal(1, count);
+            }
+        }
     }
 }

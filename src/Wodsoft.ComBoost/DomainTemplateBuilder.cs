@@ -14,18 +14,21 @@ namespace Wodsoft.ComBoost
 {
     public class DomainTemplateBuilder
     {
-        internal static readonly ConstructorInfo _DictionaryConstructor = typeof(Dictionary<string, object>).GetConstructor(new Type[0]);
-        internal static readonly MethodInfo _DictionaryAdd = typeof(Dictionary<string, object>).GetMethod("Add", new Type[] { typeof(string), typeof(object) });
-        internal static readonly MethodInfo _ExecuteAsync = typeof(IDomainService).GetMethod("ExecuteAsync");
-        internal static readonly MethodInfo _ExecuteWithValueAsync = typeof(IDomainService).GetMethod("ExecuteWithValueAsync");
-        internal static readonly MethodInfo _SetValues = typeof(DomainTemplateAgent).GetMethod("SetValues", BindingFlags.NonPublic | BindingFlags.Instance);
-        internal static readonly MethodInfo _GetFromValue = typeof(FromAttribute).GetMethod("GetValue");
-        internal static readonly MethodInfo _GetContext = typeof(DomainTemplateAgent).GetProperty("Context").GetGetMethod();
-        internal static readonly MethodInfo _GetMethodMethod = typeof(MethodBase).GetMethod("GetMethodFromHandle", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(RuntimeMethodHandle) }, null);
-        internal static readonly MethodInfo _GetService = typeof(IServiceProvider).GetMethod("GetService");
-        internal static readonly MethodInfo _GetValue = typeof(IValueProvider).GetMethod("GetValue");
-        internal static readonly MethodInfo _Initialize = typeof(IDomainService).GetMethod("Initialize");
-        internal static readonly ConstructorInfo _ExecutionContextConstructor = typeof(DomainExecutionContext).GetConstructor(new Type[] { typeof(IDomainService), typeof(IDomainContext), typeof(MethodInfo), typeof(object[]) });
+        internal static readonly ConstructorInfo _DictionaryConstructor = typeof(Dictionary<string, object>).GetConstructor(new Type[0])!;
+        internal static readonly MethodInfo _DictionaryAdd = typeof(Dictionary<string, object>).GetMethod("Add", new Type[] { typeof(string), typeof(object) })!;
+        internal static readonly MethodInfo _ExecuteAsync = typeof(IDomainService).GetMethod("ExecuteAsync")!;
+        internal static readonly MethodInfo _ExecuteWithValueAsync = typeof(IDomainService).GetMethod("ExecuteWithValueAsync")!;
+        internal static readonly MethodInfo _SetValues = typeof(DomainTemplateAgent).GetMethod("SetValues", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        internal static readonly MethodInfo _GetFromValue = typeof(FromAttribute).GetMethod(nameof(FromAttribute.GetValue))!;
+        internal static readonly MethodInfo _GetContext = typeof(DomainTemplateAgent).GetProperty(nameof(DomainTemplateAgent.Context))!.GetGetMethod()!;
+        internal static readonly MethodInfo _GetMethodMethod = typeof(MethodBase).GetMethod(nameof(MethodBase.GetMethodFromHandle), BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(RuntimeMethodHandle) }, null)!;
+        internal static readonly MethodInfo _GetService = typeof(IServiceProvider).GetMethod(nameof(IServiceProvider.GetService))!;
+        internal static readonly MethodInfo _GetValue = typeof(IValueProvider).GetMethod(nameof(IValueProvider.GetValue))!;
+        internal static readonly MethodInfo _Initialize = typeof(IDomainService).GetMethod(nameof(IDomainService.Initialize))!;
+        internal static readonly ConstructorInfo _ExecutionContextConstructor = typeof(DomainExecutionContext).GetConstructor(new Type[] { typeof(IDomainService), typeof(IDomainContext), typeof(MethodInfo), typeof(object[]) })!;
+        internal static readonly MethodInfo _GetLifetimeStrategy = typeof(DomainTemplateAgent).GetMethod("GetLifetimeStrategy", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        internal static readonly ConstructorInfo _TransientDomainContextConstructor = typeof(TransientDomainContext).GetConstructor(new Type[] { typeof(IDomainContext) })!;
+        internal static readonly MethodInfo _GetTypeFromHandleMethod = typeof(Type).GetMethod("GetTypeFromHandle", new Type[1] { typeof(RuntimeTypeHandle) })!;
 
         public static ModuleBuilder Module { get; }
 
@@ -45,23 +48,21 @@ namespace Wodsoft.ComBoost
             private IDomainContext _context;
             public IDomainContext Context { get => _context; set => _context = value ?? throw new ArgumentNullException(nameof(value)); }
 
+            public DomainLifetimeStrategy? OverrideLifetimeStrategy { get; set; }
+
             protected void SetValues(Dictionary<string, object> values)
             {
                 var valueProvider = Context.ValueProvider;
                 foreach (var value in values)
                     valueProvider.SetValue(value.Key, value.Value);
             }
-        }
 
-        public abstract class DomainTemplateAgent<TService> : DomainTemplateAgent
-            where TService : class, IDomainService
-        {
-            public DomainTemplateAgent(IDomainContext context, TService service) : base(context)
+            protected DomainLifetimeStrategy GetLifetimeStrategy(DomainLifetimeStrategy strategy)
             {
-                Service = service;
+                if (OverrideLifetimeStrategy.HasValue)
+                    return OverrideLifetimeStrategy.Value;
+                return strategy;
             }
-
-            public TService Service { get; }
         }
     }
 
@@ -71,11 +72,11 @@ namespace Wodsoft.ComBoost
     {
         private static Type _TemplateType;
 
-        internal static readonly MethodInfo _GetAttribute = typeof(DomainTemplateBuilder<TDomainService, T>).GetMethod(nameof(GetAttribute), BindingFlags.Public | BindingFlags.Static);
-        internal static readonly MethodInfo _GetParameterInfo = typeof(DomainTemplateBuilder<TDomainService, T>).GetMethod("GetParameterInfo");
-        internal static readonly MethodInfo _GetDomainService = typeof(DomainTemplateAgent<TDomainService>).GetProperty("Service").GetGetMethod();
-        internal static readonly ConstructorInfo _AgentConstructor = typeof(DomainTemplateAgent<TDomainService>).GetConstructor(new Type[] { typeof(IDomainContext), typeof(TDomainService) });
-        internal static readonly MethodInfo _GetValueProvider = typeof(IDomainContext).GetProperty(nameof(IDomainContext.ValueProvider)).GetGetMethod();
+        internal static readonly MethodInfo _GetAttribute = typeof(DomainTemplateBuilder<TDomainService, T>).GetMethod(nameof(GetAttribute), BindingFlags.Public | BindingFlags.Static)!;
+        internal static readonly MethodInfo _GetParameterInfo = typeof(DomainTemplateBuilder<TDomainService, T>).GetMethod(nameof(DomainTemplateBuilder<TDomainService, T>.GetParameterInfo))!;
+        //internal static readonly MethodInfo _GetDomainService = typeof(DomainTemplateAgent<TDomainService>).GetProperty(nameof(DomainTemplateAgent<TDomainService>.Service))!.GetGetMethod()!;
+        internal static readonly ConstructorInfo _AgentConstructor = typeof(DomainTemplateAgent).GetConstructor(new Type[] { typeof(IDomainContext) })!;
+        internal static readonly MethodInfo _GetValueProvider = typeof(IDomainContext).GetProperty(nameof(IDomainContext.ValueProvider))!.GetGetMethod()!;
         private static Dictionary<string, FromAttribute[]> _FromAttributes;
         private static Dictionary<string, ParameterInfo[]> _ParameterInfos;
         private static TypeBuilder _AgentBuilder;
@@ -108,16 +109,15 @@ namespace Wodsoft.ComBoost
                 throw new NotSupportedException("Interface template could not contains properties.");
             if (type.GetEvents().Length != 0)
                 throw new NotSupportedException("Interface template could not contains events.");
-            _AgentBuilder = Module.DefineType("Proxy_" + typeof(T).Name + "_" + typeof(T).GetHashCode(), TypeAttributes.Public | TypeAttributes.Class, typeof(DomainTemplateAgent<TDomainService>), new Type[] { type, typeof(IDomainTemplate) });
+            _AgentBuilder = Module.DefineType("Proxy_" + typeof(T).Name + "_" + typeof(T).GetHashCode(), TypeAttributes.Public | TypeAttributes.Class, typeof(DomainTemplateAgent), new Type[] { type, typeof(IDomainTemplate) });
 
             //Create constructor ctor(IDomainContext, IDomainService)
             {
                 var constructor = _AgentBuilder.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, CallingConventions.Standard,
-                    new Type[] { typeof(IDomainContext), typeof(TDomainService) });
+                    new Type[] { typeof(IDomainContext) });
                 var ilGenerator = constructor.GetILGenerator();
                 ilGenerator.Emit(OpCodes.Ldarg_0);
                 ilGenerator.Emit(OpCodes.Ldarg_1);
-                ilGenerator.Emit(OpCodes.Ldarg_2);
                 ilGenerator.Emit(OpCodes.Call, _AgentConstructor);
                 ilGenerator.Emit(OpCodes.Ret);
             }
@@ -135,6 +135,9 @@ namespace Wodsoft.ComBoost
                     interfaces.Enqueue(i);
             }
 
+            var serviceStrategyAttribute = serviceType.GetCustomAttribute<DomainLifetimeStrategyAttribute>();
+            DomainLifetimeStrategy serviceStrategy = serviceStrategyAttribute?.Strategy ?? DomainLifetimeStrategy.Scope;
+
             //Implement methods in interface
             foreach (var method in methods)
             {
@@ -143,9 +146,12 @@ namespace Wodsoft.ComBoost
                 if (serviceMethod == null)
                     throw new NotSupportedException($"Domain service \"{serviceType.FullName}\" does not implement method \"{method}\".");
                 if (serviceMethod.ReturnType != method.ReturnType)
-                    throw new NotSupportedException($"Return type of {method.DeclaringType.FullName}.{method.Name}({string.Join(",", method.GetParameters().Select(t => t.ParameterType.Name))}) does not equal {serviceMethod.DeclaringType.FullName}.{serviceMethod.Name}({string.Join(",", serviceMethod.GetParameters().Select(t => t.ParameterType.Name))})");
+                    throw new NotSupportedException($"Return type of {method.DeclaringType!.FullName}.{method.Name}({string.Join(",", method.GetParameters().Select(t => t.ParameterType.Name))}) does not equal {serviceMethod.DeclaringType!.FullName}.{serviceMethod.Name}({string.Join(",", serviceMethod.GetParameters().Select(t => t.ParameterType.Name))})");
                 if (!typeof(Task).IsAssignableFrom(serviceMethod.ReturnType))
-                    throw new NotSupportedException($"Return type of {method.DeclaringType.FullName}.{method.Name} must be a Task.");
+                    throw new NotSupportedException($"Return type of {method.DeclaringType!.FullName}.{method.Name} must be a Task.");
+
+                var methodStrategyAttribute = serviceMethod.GetCustomAttribute<DomainLifetimeStrategyAttribute>();
+                DomainLifetimeStrategy methodStrategy = methodStrategyAttribute?.Strategy ?? serviceStrategy;
 
                 var parameters = method.GetParameters();
                 //Create method for class
@@ -242,11 +248,26 @@ namespace Wodsoft.ComBoost
                 ilGenerator.Emit(OpCodes.Ldloc, values);
                 ilGenerator.Emit(OpCodes.Call, _SetValues);
 
-                var valueProviderLocal = ilGenerator.DeclareLocal(typeof(IValueProvider));
-
-                //var valueProvider = (IValueProvider)this.Context.GetService(typeof(IValueProvider));
+                //IDomainContext domainContext = GetLifetimeStrategy(?) == DomainLifetimeStrategy.Scope ? new TransientDomainContext(Context) : Context;
+                var domainContextLocal = ilGenerator.DeclareLocal(typeof(IDomainContext));
+                var scopeLabel = ilGenerator.DefineLabel();
                 ilGenerator.Emit(OpCodes.Ldarg_0);
                 ilGenerator.Emit(OpCodes.Call, _GetContext);
+                ilGenerator.Emit(OpCodes.Ldarg_0);
+                if (methodStrategy == DomainLifetimeStrategy.Scope)
+                    ilGenerator.Emit(OpCodes.Ldc_I4_0);
+                else
+                    ilGenerator.Emit(OpCodes.Ldc_I4_1);
+                ilGenerator.Emit(OpCodes.Call, _GetLifetimeStrategy);
+                ilGenerator.Emit(OpCodes.Brfalse_S, scopeLabel);
+                ilGenerator.Emit(OpCodes.Newobj, _TransientDomainContextConstructor);
+                ilGenerator.MarkLabel(scopeLabel);
+                ilGenerator.Emit(OpCodes.Stloc, domainContextLocal);
+
+                var valueProviderLocal = ilGenerator.DeclareLocal(typeof(IValueProvider));
+
+                //var valueProvider = (IValueProvider)domainContext.GetService(typeof(IValueProvider));
+                ilGenerator.Emit(OpCodes.Ldloc, domainContextLocal);
                 ilGenerator.Emit(OpCodes.Callvirt, _GetValueProvider);
                 ilGenerator.Emit(OpCodes.Stloc, valueProviderLocal);
 
@@ -268,7 +289,7 @@ namespace Wodsoft.ComBoost
                             ilGenerator.Emit(OpCodes.Ldloc, valueProviderLocal);
                             ilGenerator.Emit(OpCodes.Ldstr, serviceParameter.Name);
                             ilGenerator.Emit(OpCodes.Ldtoken, serviceParameter.ParameterType);
-                            ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle", new Type[1] { typeof(RuntimeTypeHandle) }));
+                            ilGenerator.Emit(OpCodes.Call, _GetTypeFromHandleMethod);
                             ilGenerator.Emit(OpCodes.Callvirt, _GetValue);
                             if (serviceParameter.ParameterType.IsValueType)
                                 ilGenerator.Emit(OpCodes.Unbox_Any, serviceParameter.ParameterType);
@@ -283,8 +304,7 @@ namespace Wodsoft.ComBoost
                             ilGenerator.Emit(OpCodes.Ldc_I4, count);
                             ilGenerator.Emit(OpCodes.Call, _GetAttribute);
 
-                            ilGenerator.Emit(OpCodes.Ldarg_0);
-                            ilGenerator.Emit(OpCodes.Call, _GetContext);
+                            ilGenerator.Emit(OpCodes.Ldloc, domainContextLocal);
 
                             ilGenerator.Emit(OpCodes.Ldstr, serviceMethod.Name);
                             ilGenerator.Emit(OpCodes.Ldc_I4, count);
@@ -309,11 +329,12 @@ namespace Wodsoft.ComBoost
                     count++;
                 }
 
-                //new Invoker(DomainService, DomainContext).InvokeAsync(...)
-                ilGenerator.Emit(OpCodes.Ldarg_0);
-                ilGenerator.Emit(OpCodes.Call, _GetDomainService);
-                ilGenerator.Emit(OpCodes.Ldarg_0);
-                ilGenerator.Emit(OpCodes.Call, _GetContext);
+                //new Invoker(domainContext.GetService<TDomainService>(), domainContext).InvokeAsync(...)
+                ilGenerator.Emit(OpCodes.Ldloc, domainContextLocal);
+                ilGenerator.Emit(OpCodes.Ldtoken, serviceType);
+                ilGenerator.Emit(OpCodes.Call, _GetTypeFromHandleMethod);
+                ilGenerator.Emit(OpCodes.Callvirt, _GetService);
+                ilGenerator.Emit(OpCodes.Ldloc, domainContextLocal);
                 var invoker = DomainServiceInvokerBuilder<TDomainService>.GetInvokerReference(serviceMethod);
                 ilGenerator.Emit(OpCodes.Newobj, invoker.Constructor);
                 for (int i = 0; i < count; i++)
@@ -330,8 +351,7 @@ namespace Wodsoft.ComBoost
 
         public T GetTemplate(IDomainContext context)
         {
-            var service = context.GetRequiredService<TDomainService>();
-            return (T)Activator.CreateInstance(_TemplateType, context, service);
+            return (T)Activator.CreateInstance(_TemplateType, context)!;
         }
     }
 }

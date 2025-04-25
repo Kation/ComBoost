@@ -7,5 +7,7 @@ namespace Wodsoft.ComBoost
     public interface IDomainTemplate
     {
         IDomainContext Context { get; set; }
+
+        DomainLifetimeStrategy? OverrideLifetimeStrategy { get; set; }
     }
 }

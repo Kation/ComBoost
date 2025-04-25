@@ -44,6 +44,8 @@ namespace Wodsoft.ComBoost.Grpc.Client
 
             public GrpcChannel Channel { get; }
 
+            public DomainLifetimeStrategy? OverrideLifetimeStrategy { get => null; set => throw new NotSupportedException("Grpc client doesn't support override lifetime strategy."); }
+
             protected async Task InvokeAsync(Method<DomainGrpcRequest, DomainGrpcResponse> method)
             {
                 DomainGrpcRequest request = new DomainGrpcRequest();
