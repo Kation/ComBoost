@@ -9,7 +9,19 @@ namespace Wodsoft.ComBoost
 {
     public abstract class DomainDistributedEventProvider : IDomainDistributedEventProvider
     {
+#if NETSTANDARD2_0
         public abstract Task SendEventAsync<T>(T args, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+
+        public abstract Task RegisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+
+        public abstract Task UnregisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+#else
+        public abstract ValueTask SendEventAsync<T>(T args, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+
+        public abstract ValueTask RegisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+
+        public abstract ValueTask UnregisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+#endif
 
         protected virtual string GetTypeName<T>()
         {
@@ -26,10 +38,6 @@ namespace Wodsoft.ComBoost
             }
             return name;
         }
-
-        public abstract void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
-
-        public abstract void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
 
         public abstract bool CanHandleEvent<T>(IReadOnlyList<string> features) where T : DomainServiceEventArgs;
 

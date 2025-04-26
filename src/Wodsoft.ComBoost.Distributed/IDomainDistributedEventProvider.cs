@@ -13,10 +13,19 @@ namespace Wodsoft.ComBoost
 
         bool CanHandleEvent<T>(IReadOnlyList<string> features) where T : DomainServiceEventArgs;
 
+#if NETSTANDARD2_0
         Task SendEventAsync<T>(T args, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
 
-        void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+        Task RegisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
 
-        void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+        Task UnregisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+#else
+        ValueTask SendEventAsync<T>(T args, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+
+        ValueTask RegisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+
+        ValueTask UnregisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features) where T : DomainServiceEventArgs;
+#endif
+
     }
 }

@@ -55,11 +55,15 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             _logger.LogWarning("RabbitMQ connection blocked. " + e.Reason);
         }
 
-        public override Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
+#if NETSTANDARD2_0
+        public override async Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
+#else
+        public override async ValueTask SendEventAsync<T>(T args, IReadOnlyList<string> features)
+#endif
         {
             if (_connection == null)
                 throw new InvalidOperationException("未开启RabbitMQ服务。");
-            return Task.Run(() =>
+            await Task.Run(() =>
             {
                 var name = _options.Prefix + GetTypeName<T>();
                 var channel = GetPublisherChannel<T>(features);
@@ -89,7 +93,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                         throw new InvalidOperationException("A distributed event can retry means that must have \"DomainDistributedEventRetryTimesAttribute\" attribute.");
                     if (retryEvent.RetryCount > retryTimesAttribute.Times.Length)
                     {
-                        _logger.LogWarning("RabbitMQ event retry count more than limit. Event: \"{typeof(T).FullName}\".");
+                        _logger.LogWarning($"RabbitMQ event retry count more than limit. Event: \"{typeof(T).FullName}\".");
                         return;
                     }
                     if (_options.UseDelayedMessagePlugin)
@@ -117,7 +121,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             });
         }
 
-        public override void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#if NETSTANDARD2_0
+        public override Task RegisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#else
+        public override ValueTask RegisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#endif
         {
             if (_connection == null)
                 throw new InvalidOperationException("未开启RabbitMQ服务。");
@@ -323,9 +331,18 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             };
             channel.BasicConsume(queueName, false, consumer);
             _consumers.Add(name, consumer);
+#if NETSTANDARD2_0
+            return Task.CompletedTask;
+#else
+            return default;
+#endif
         }
 
-        public override void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#if NETSTANDARD2_0
+        public override Task UnregisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#else
+        public override ValueTask UnregisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#endif
         {
             if (_connection == null)
                 throw new InvalidOperationException("未开启RabbitMQ服务。");
@@ -338,6 +355,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 consumer.Model.Dispose();
                 _consumers.Remove(name);
             }
+#if NETSTANDARD2_0
+            return Task.CompletedTask;
+#else
+            return default;
+#endif
         }
 
         protected virtual IModel GetPublisherChannel<T>(IReadOnlyList<string> features)

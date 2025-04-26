@@ -14,15 +14,15 @@ namespace Wodsoft.ComBoost
     public abstract class DomainDistributedEventService
     {
         private static ConcurrentDictionary<Type, IReadOnlyList<string>> _FeatureCaches = new ConcurrentDictionary<Type, IReadOnlyList<string>>();
-        protected static MethodInfo CanHandleEventMethod = typeof(IDomainDistributedEventProvider).GetMethod(nameof(IDomainDistributedEventProvider.CanHandleEvent));
-        protected static MethodInfo AddEventHandlerMethod = typeof(IDomainServiceEventManager).GetMethod(nameof(IDomainServiceEventManager.AddEventHandler));
-        protected static MethodInfo RemoveEventHandlerMethod = typeof(IDomainServiceEventManager).GetMethod(nameof(IDomainServiceEventManager.RemoveEventHandler));
+        protected static MethodInfo CanHandleEventMethod = typeof(IDomainDistributedEventProvider).GetMethod(nameof(IDomainDistributedEventProvider.CanHandleEvent))!;
+        protected static MethodInfo AddEventHandlerMethod = typeof(IDomainServiceEventManager).GetMethod(nameof(IDomainServiceEventManager.AddEventHandler))!;
+        protected static MethodInfo RemoveEventHandlerMethod = typeof(IDomainServiceEventManager).GetMethod(nameof(IDomainServiceEventManager.RemoveEventHandler))!;
 
         protected static IReadOnlyList<string> GetFeatures(Type eventType)
         {
             return _FeatureCaches.GetOrAdd(eventType, type =>
             {
-                return (IReadOnlyList<string>)typeof(DomainDistributedEventFeatureCache<>).MakeGenericType(type).GetProperty("Features").GetValue(null);
+                return (IReadOnlyList<string>)typeof(DomainDistributedEventFeatureCache<>).MakeGenericType(type).GetProperty("Features")!.GetValue(null)!;
             });
         }
 
@@ -54,7 +54,7 @@ namespace Wodsoft.ComBoost
             _parameters = parameters;
         }
 
-        static MethodInfo _EventHanderMethod = typeof(DomainDistributedEventService<TProvider>).GetMethod("PublisherEventHandler", BindingFlags.Instance | BindingFlags.NonPublic);
+        static MethodInfo _EventHanderMethod = typeof(DomainDistributedEventService<TProvider>).GetMethod("PublisherEventHandler", BindingFlags.Instance | BindingFlags.NonPublic)!;
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
@@ -63,12 +63,16 @@ namespace Wodsoft.ComBoost
             _scope = _serviceScopeFactory.CreateScope();
             _provider = ActivatorUtilities.CreateInstance<TProvider>(_scope.ServiceProvider, _parameters);
             await _provider.StartAsync();
-            var registerMethod = typeof(IDomainDistributedEventProvider).GetMethod(nameof(IDomainDistributedEventProvider.RegisterEventHandler));
+            var registerMethod = typeof(IDomainDistributedEventProvider).GetMethod(nameof(IDomainDistributedEventProvider.RegisterEventHandlerAsync))!;
             foreach (var item in _options.GetEventHandlers())
             {
                 var features = GetFeatures(item.Key);
-                if ((bool)CanHandleEventMethod.MakeGenericMethod(item.Key).Invoke(_provider, new object[] { features }))
-                    registerMethod.MakeGenericMethod(item.Key).Invoke(_provider, new object[] { item.Value, features });
+                if ((bool)CanHandleEventMethod.MakeGenericMethod(item.Key).Invoke(_provider, new object[] { features })!)
+#if NETSTANDARD2_0
+                    await (Task)registerMethod.MakeGenericMethod(item.Key).Invoke(_provider, new object[] { item.Value, features });
+#else
+                    await (ValueTask)registerMethod.MakeGenericMethod(item.Key).Invoke(_provider, new object[] { item.Value, features })!;
+#endif
                 else
                     throw new NotSupportedException($"“{typeof(TProvider)}”不支持“{string.Join(",", features)}”类型的分布式事件“{item.Key.FullName}”。");
             }
@@ -76,7 +80,7 @@ namespace Wodsoft.ComBoost
             foreach (var item in _options.GetEventPublishes())
             {
                 var features = GetFeatures(item);
-                if ((bool)CanHandleEventMethod.MakeGenericMethod(item).Invoke(_provider, new object[] { features }))
+                if ((bool)CanHandleEventMethod.MakeGenericMethod(item).Invoke(_provider, new object[] { features })!)
                 {
                     var d = Delegate.CreateDelegate(typeof(DomainServiceEventHandler<>).MakeGenericType(item), this, _EventHanderMethod.MakeGenericMethod(item));
                     _delegateCache[item] = d;
@@ -91,11 +95,15 @@ namespace Wodsoft.ComBoost
         {
             if (_scope == null)
                 throw new InvalidOperationException("服务未启动。");
-            var unregisterMethod = typeof(IDomainDistributedEventProvider).GetMethod(nameof(IDomainDistributedEventProvider.UnregisterEventHandler));
+            var unregisterMethod = typeof(IDomainDistributedEventProvider).GetMethod(nameof(IDomainDistributedEventProvider.UnregisterEventHandlerAsync))!;
             foreach (var item in _options.GetEventHandlers())
             {
                 var features = GetFeatures(item.Key);
-                unregisterMethod.MakeGenericMethod(item.Key).Invoke(_provider, new object[] { item.Value, features });
+#if NETSTANDARD2_0
+                await (Task)unregisterMethod.MakeGenericMethod(item.Key).Invoke(_provider, new object[] { item.Value, features });
+#else
+                await (ValueTask)unregisterMethod.MakeGenericMethod(item.Key).Invoke(_provider, new object[] { item.Value, features })!;
+#endif
             }
             var eventManager = _scope.ServiceProvider.GetRequiredService<IDomainServiceEventManager>();
             foreach (var item in _delegateCache)
@@ -107,12 +115,12 @@ namespace Wodsoft.ComBoost
             _scope.Dispose();
         }
 
-        private Task PublisherEventHandler<T>(IDomainExecutionContext context, T args)
+        private async Task PublisherEventHandler<T>(IDomainExecutionContext context, T args)
             where T : DomainServiceEventArgs
         {
             if (_provider == null)
-                return Task.CompletedTask;
-            return _provider.SendEventAsync(args, GetFeatures<T>());
+                return;
+            await _provider.SendEventAsync(args, GetFeatures<T>());
         }
     }
 }

@@ -23,24 +23,26 @@ namespace Wodsoft.ComBoost.Distributed.CAP
             _capOptions = capOptions.Value;
             _handlerProvider = handlerProvider;
         }
-
-        public override void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+                
+        public override ValueTask RegisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
         {
             var name = GetTypeName<T>();
             if (!string.IsNullOrEmpty(_capOptions.GroupNamePrefix))
                 name = _capOptions.GroupNamePrefix + name;
             _handlerProvider.Handlers.Add(handler, (name, _eventOptions.GroupName));
+            return ValueTask.CompletedTask;
         }
 
-        public override Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
+        public override async ValueTask SendEventAsync<T>(T args, IReadOnlyList<string> features)
         {
             var name = GetTypeName<T>();
-            return _publisher.PublishAsync<T>(name, args);
+            await _publisher.PublishAsync<T>(name, args);
         }
 
-        public override void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+        public override ValueTask UnregisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
         {
             _handlerProvider.Handlers.Remove(handler);
+            return ValueTask.CompletedTask;
         }
 
         public override bool CanHandleEvent<T>(IReadOnlyList<string> features)

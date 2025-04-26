@@ -55,7 +55,11 @@ namespace Wodsoft.ComBoost.Mock
             return true;
         }
 
-        public override void RegisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#if NETSTANDARD2_0
+        public override Task RegisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#else
+        public override ValueTask RegisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#endif
         {
             lock (this)
             {
@@ -74,9 +78,18 @@ namespace Wodsoft.ComBoost.Mock
                 _handlers.Add(handler, mockHandler);
                 _instance.AddEventHandler(mockHandler, group);
             }
+#if NETSTANDARD2_0
+            return Task.CompletedTask;
+#else
+            return default;
+#endif
         }
 
+#if NETSTANDARD2_0
         public override async Task SendEventAsync<T>(T args, IReadOnlyList<string> features)
+#else
+        public override async ValueTask SendEventAsync<T>(T args, IReadOnlyList<string> features)
+#endif
         {
             bool once = features.Contains(DomainDistributedEventFeatures.HandleOnce);
             var handlers = _instance.GetEventHandlers<T>(once);
@@ -140,7 +153,11 @@ namespace Wodsoft.ComBoost.Mock
             return Task.WhenAll(tasks);
         }
 
-        public override void UnregisterEventHandler<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#if NETSTANDARD2_0
+        public override Task UnregisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#else
+        public override ValueTask UnregisterEventHandlerAsync<T>(DomainServiceEventHandler<T> handler, IReadOnlyList<string> features)
+#endif
         {
             lock (this)
             {
@@ -152,6 +169,11 @@ namespace Wodsoft.ComBoost.Mock
                 if (_handlers.TryGetValue(handler, out var mockHandler))
                     _instance.RemoveEventHandler((MockInMemoryEventHandler<T>)mockHandler, group);
             }
+#if NETSTANDARD2_0
+            return Task.CompletedTask;
+#else
+            return default;
+#endif
         }
 
         public override Task StartAsync()
