@@ -37,6 +37,10 @@ namespace Wodsoft.ComBoost
 
         public object? GetService(Type serviceType)
         {
+            if (serviceType == typeof(IDomainContext) || serviceType == typeof(IServiceProvider))
+                return this;
+            if (serviceType == typeof(IValueProvider))
+                return _innerContext.ValueProvider;
             return _scope.ServiceProvider.GetService(serviceType);
         }
     }
