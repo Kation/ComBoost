@@ -61,7 +61,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                         }
                     case "UpdateAsync":
                         {
-#if NET6_0
+#if NET6_0_OR_GREATER
                             var method = MapMethod(node.Method);
                             var updateCaller = (LambdaExpression)((ConstantExpression)node.Arguments[1]).Value!;
                             var callType = typeof(SetPropertyCalls<>).MakeGenericType(updateCaller.ReturnType.GetGenericArguments());

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;net9.0</TargetFrameworks>
     <RootNamespace>Wodsoft.ComBoost.Test</RootNamespace>
   </PropertyGroup>
 
@@ -23,6 +23,11 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0" />
   </ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)'=='net9.0'">
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+	</ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Wodsoft.ComBoost.Data.Core\Wodsoft.ComBoost.Data.Core.csproj" />
