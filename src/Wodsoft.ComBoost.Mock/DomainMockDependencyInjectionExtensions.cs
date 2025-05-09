@@ -17,7 +17,8 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IComBoostBuilder AddMock(this IComBoostBuilder builder, Action<IComBoostMockBuilder>? builderConfigure = null)
         {
             builder.Services.AddInMemorySemaphoreProvider();
-            builder.Services.AddScoped<IDomainContextProvider, MockDomainContextProvider>();
+            builder.Services.AddSingleton<IDomainContextAccessor, DomainContextAccessor>();
+            builder.Services.PostConfigure<CompositeDomainContextProviderOptions>(options => options.TryAddContextProvider<MockDomainContextProvider>(0));
             builder.Services.AddScoped<MockAuthenticationSettings>();
             builder.Services.PostConfigure<AuthenticationProviderOptions>(options =>
             {

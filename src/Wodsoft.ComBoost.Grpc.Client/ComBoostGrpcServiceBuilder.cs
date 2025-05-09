@@ -53,9 +53,9 @@ namespace Wodsoft.ComBoost.Grpc.Client
             });
             Services.AddTransient<T>(sp =>
             {
-                var contextProvider = sp.GetRequiredService<IDomainContextProvider>();
+                var contextAccessor = sp.GetRequiredService<IDomainContextAccessor>();
                 var templateDescriptor = sp.GetRequiredService<IDomainTemplateDescriptor<T>>();
-                var context = contextProvider.GetContext();
+                var context = contextAccessor.Context;
                 return templateDescriptor.GetTemplate(context);
             });
             return this;

@@ -154,5 +154,25 @@ namespace Wodsoft.ComBoost.Test
                 Assert.Equal(1, count);
             }
         }
+
+        [Fact]
+        public async Task DomainContextAccessorTest()
+        {
+            ServiceCollection services = new ServiceCollection();
+            services.AddScoped<LifetimeCounter>();
+            services.AddComBoost()
+                .AddLocalService(builder =>
+                {
+                    builder.AddService<LifetimeService>();
+                })
+                .AddMock();
+            var serviceProvider = services.BuildServiceProvider();
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<ILifetimeService>();
+                await service.DomainContextAccessor();
+            }
+        }
     }
 }

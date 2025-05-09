@@ -24,6 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 var manager = new DomainServiceEventManager(options.Value);
                 return manager;
             });
+            services.AddSingleton<IDomainContextAccessor, DomainContextAccessor>();
             services.TryAddScoped<IDomainContextProvider, CompositeDomainContextProvider>();
             services.TryAddScoped<IAuthenticationProvider, AuthenticationProvider>();
             services.AddScoped<IAuthorizationProvider, DefaultAuthorizationProvider>();

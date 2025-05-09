@@ -29,6 +29,7 @@ namespace Wodsoft.ComBoost
         internal static readonly MethodInfo _GetLifetimeStrategy = typeof(DomainTemplateAgent).GetMethod("GetLifetimeStrategy", BindingFlags.NonPublic | BindingFlags.Instance)!;
         internal static readonly ConstructorInfo _TransientDomainContextConstructor = typeof(TransientDomainContext).GetConstructor(new Type[] { typeof(IDomainContext) })!;
         internal static readonly MethodInfo _GetTypeFromHandleMethod = typeof(Type).GetMethod("GetTypeFromHandle", new Type[1] { typeof(RuntimeTypeHandle) })!;
+        internal static readonly MethodInfo _SetContext = typeof(IDomainContextAccessor).GetProperty("Context")!.GetSetMethod()!;
 
         public static ModuleBuilder Module { get; }
 
@@ -77,11 +78,11 @@ namespace Wodsoft.ComBoost
         //internal static readonly MethodInfo _GetDomainService = typeof(DomainTemplateAgent<TDomainService>).GetProperty(nameof(DomainTemplateAgent<TDomainService>.Service))!.GetGetMethod()!;
         internal static readonly ConstructorInfo _AgentConstructor = typeof(DomainTemplateAgent).GetConstructor(new Type[] { typeof(IDomainContext) })!;
         internal static readonly MethodInfo _GetValueProvider = typeof(IDomainContext).GetProperty(nameof(IDomainContext.ValueProvider))!.GetGetMethod()!;
-        private static Dictionary<string, FromAttribute[]> _FromAttributes;
+        private static Dictionary<string, FromAttribute?[]> _FromAttributes;
         private static Dictionary<string, ParameterInfo[]> _ParameterInfos;
         private static TypeBuilder _AgentBuilder;
 
-        public static FromAttribute GetAttribute(string method, int parameterIndex)
+        public static FromAttribute? GetAttribute(string method, int parameterIndex)
         {
             var values = _FromAttributes[method];
             return values[parameterIndex];
@@ -98,7 +99,7 @@ namespace Wodsoft.ComBoost
             var serviceType = typeof(TDomainService);
             var type = typeof(T);
             _FromAttributes = serviceType.GetMethods().ToDictionary(x => x.Name,
-                    x => x.GetParameters().Select(y => (FromAttribute)y.GetCustomAttributes().FirstOrDefault(z => z is FromAttribute)).ToArray());
+                    x => x.GetParameters().Select(y => (FromAttribute?)y.GetCustomAttributes().FirstOrDefault(z => z is FromAttribute)).ToArray());
             _ParameterInfos = serviceType.GetMethods().ToDictionary(x => x.Name, x => x.GetParameters());
 
             if (!type.IsInterface)
@@ -176,13 +177,15 @@ namespace Wodsoft.ComBoost
                 //Set each parameter value into values. values.Add(parameter name, parameter value)
                 for (int i = 0; i < parameters.Length; i++)
                 {
+                    if (parameters[i].Name == null)
+                        continue;
                     ilGenerator.Emit(OpCodes.Ldloc, values);
-                    ilGenerator.Emit(OpCodes.Ldstr, parameters[i].Name);
+                    ilGenerator.Emit(OpCodes.Ldstr, parameters[i].Name!);
                     ilGenerator.Emit(OpCodes.Ldarg_S, (byte)(i + 1));
                     if (parameters[i].ParameterType.IsValueType)
                         ilGenerator.Emit(OpCodes.Box, parameters[i].ParameterType);
                     ilGenerator.Emit(OpCodes.Call, _DictionaryAdd);
-                    parameterNames.Add(parameters[i].Name);
+                    parameterNames.Add(parameters[i].Name!);
                 }
 
                 var valueAttributes = method.GetCustomAttributes<DomainValueAttribute>();
@@ -262,11 +265,19 @@ namespace Wodsoft.ComBoost
                 ilGenerator.Emit(OpCodes.Brfalse_S, scopeLabel);
                 ilGenerator.Emit(OpCodes.Newobj, _TransientDomainContextConstructor);
                 ilGenerator.MarkLabel(scopeLabel);
+                ilGenerator.Emit(OpCodes.Dup);
                 ilGenerator.Emit(OpCodes.Stloc, domainContextLocal);
+
+                //domainContext.GetService<IDomainContextAccessor>().Context = domainContext;
+                ilGenerator.Emit(OpCodes.Ldtoken, typeof(IDomainContextAccessor));
+                ilGenerator.Emit(OpCodes.Call, _GetTypeFromHandleMethod);
+                ilGenerator.Emit(OpCodes.Callvirt, _GetService);
+                ilGenerator.Emit(OpCodes.Ldloc, domainContextLocal);
+                ilGenerator.Emit(OpCodes.Callvirt, _SetContext);
 
                 var valueProviderLocal = ilGenerator.DeclareLocal(typeof(IValueProvider));
 
-                //var valueProvider = (IValueProvider)domainContext.GetService(typeof(IValueProvider));
+                //var valueProvider = domainContext.ValueProvider;
                 ilGenerator.Emit(OpCodes.Ldloc, domainContextLocal);
                 ilGenerator.Emit(OpCodes.Callvirt, _GetValueProvider);
                 ilGenerator.Emit(OpCodes.Stloc, valueProviderLocal);

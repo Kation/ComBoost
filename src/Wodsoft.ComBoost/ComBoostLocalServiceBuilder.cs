@@ -11,8 +11,7 @@ namespace Wodsoft.ComBoost
     public class ComBoostLocalServiceBuilder<TService> : IComBoostLocalServiceBuilder<TService>
         where TService : class, IDomainService
     {
-        private static MethodInfo _GetRequiredServiceMethodInfo = typeof(ServiceProviderServiceExtensions).GetMethod("GetRequiredService", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IServiceProvider) }, null);
-        private static MethodInfo _GetContextMethodInfo = typeof(IDomainContextProvider).GetMethod("GetContext");
+        private static MethodInfo _UseTemplateMethod = typeof(ComBoostLocalServiceBuilder<TService>).GetMethod("UseTemplate")!;
 
         public ComBoostLocalServiceBuilder(IServiceCollection services, IComBoostLocalBuilder builder)
         {
@@ -22,16 +21,7 @@ namespace Wodsoft.ComBoost
             var type = typeof(TService);
             var descriptors = type.GetCustomAttributes<DomainTemplateImplementerAttribute>();
             foreach (var descriptor in descriptors)
-            {
-                var descriptorType = typeof(IDomainTemplateDescriptor<>).MakeGenericType(descriptor.TemplateType);
-                services.AddSingleton(descriptorType,
-                    typeof(DomainTemplateBuilder<,>).MakeGenericType(typeof(TService), descriptor.TemplateType));
-                var spParameter = Expression.Parameter(typeof(IServiceProvider));
-                var createMethod = (Func<IServiceProvider, object>)Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(IServiceProvider), descriptor.TemplateType),
-                    Expression.Call(Expression.Call(_GetRequiredServiceMethodInfo.MakeGenericMethod(descriptorType), spParameter), descriptorType.GetMethod("GetTemplate"), Expression.Call(Expression.Call(_GetRequiredServiceMethodInfo.MakeGenericMethod(typeof(IDomainContextProvider)), spParameter), _GetContextMethodInfo)),
-                    spParameter).Compile();
-                Services.AddTransient(descriptor.TemplateType, createMethod);
-            }
+                _UseTemplateMethod.MakeGenericMethod(descriptor.TemplateType).Invoke(this, null);
             services.AddTransient<TService>();
         }
 
@@ -80,9 +70,9 @@ namespace Wodsoft.ComBoost
             Services.AddSingleton<IDomainTemplateDescriptor<T>, DomainTemplateBuilder<TService, T>>();
             Services.AddTransient<T>(sp =>
             {
-                var contextProvider = sp.GetRequiredService<IDomainContextProvider>();
+                var contextAccessor = sp.GetRequiredService<IDomainContextAccessor>();
                 var templateDescriptor = sp.GetRequiredService<IDomainTemplateDescriptor<T>>();
-                var context = contextProvider.GetContext();
+                var context = contextAccessor.Context;
                 return templateDescriptor.GetTemplate(context);
             });
             return this;
