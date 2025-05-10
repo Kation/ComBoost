@@ -241,7 +241,11 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                     }
                 }
             }
-            channel.BasicQos(0, _options.PrefetchCount, false);
+            var concurrentAttribute = typeof(T).GetCustomAttribute<DomainDistributedEventConcurrentAttribute>();
+            if (concurrentAttribute == null)
+                channel.BasicQos(0, _options.PrefetchCount, false);
+            else
+                channel.BasicQos(0, (ushort)concurrentAttribute.Count, false);
             var consumer = new AsyncEventingBasicConsumer(channel);
             var logger = _serviceProvider.GetRequiredService<ILogger<DomainServiceEventHandler<T>>>();
             consumer.ConsumerCancelled += (sender, e) =>
