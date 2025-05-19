@@ -56,6 +56,8 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 var contextAccessor = sp.GetRequiredService<IDomainContextAccessor>();
                 var templateDescriptor = sp.GetRequiredService<IDomainTemplateDescriptor<T>>();
                 var context = contextAccessor.Context;
+                if (context == null)
+                    context = sp.GetRequiredService<IDomainContextProvider>().GetContext();
                 return templateDescriptor.GetTemplate(context);
             });
             return this;

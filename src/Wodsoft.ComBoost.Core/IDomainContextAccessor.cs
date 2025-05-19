@@ -6,6 +6,6 @@ namespace Wodsoft.ComBoost
 {
     public interface IDomainContextAccessor
     {
-        IDomainContext Context { get; set; }
+        IDomainContext? Context { get; set; }
     }
 }
