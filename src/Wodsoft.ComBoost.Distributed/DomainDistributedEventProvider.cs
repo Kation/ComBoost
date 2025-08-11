@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,6 +32,9 @@ namespace Wodsoft.ComBoost
         private static ConcurrentDictionary<Type, string> _TypeNames = new ConcurrentDictionary<Type, string>();
         public static string GetTypeName(Type type)
         {
+            var nameAttribute = type.GetCustomAttribute<DomainDistributedEventNameAttribute>();
+            if (nameAttribute != null)
+                return nameAttribute.Name;
             var name = type.Namespace + "." + type.Name;
             if (type.IsGenericType)
             {
