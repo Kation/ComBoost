@@ -1,4 +1,4 @@
-name: .NET
+name: Publish Package to MyGet
 
 on:
   push:
