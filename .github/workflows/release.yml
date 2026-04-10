@@ -1,0 +1,64 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Publish Package
+
+on:
+  release:
+    types: [ "published" ]
+
+jobs:
+  build:
+    permissions:
+      id-token: write
+    runs-on: windows-latest
+    environment: release
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -c Release --no-restore
+    - name: Pack
+      run: |
+        dotnet pack -c Release src/Wodsoft.ComBoost/Wodsoft.ComBoost.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.AspNetCore/Wodsoft.ComBoost.AspNetCore.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Core/Wodsoft.ComBoost.Core.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Data/Wodsoft.ComBoost.Data.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Data.Core/Wodsoft.ComBoost.Data.Core.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Data.Distributed/Wodsoft.ComBoost.Data.Distributed.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Distributed/Wodsoft.ComBoost.Distributed.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Distributed.CAP/Wodsoft.ComBoost.Distributed.CAP.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Distributed.RabbitMQ/Wodsoft.ComBoost.Distributed.RabbitMQ.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.EntityFramework/Wodsoft.ComBoost.EntityFramework.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.EntityFrameworkCore/Wodsoft.ComBoost.EntityFrameworkCore.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Mock/Wodsoft.ComBoost.Mock.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Mvc/Wodsoft.ComBoost.Mvc.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Mvc.Data/Wodsoft.ComBoost.Mvc.Data.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Security/Wodsoft.ComBoost.Security.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Grpc/Wodsoft.ComBoost.Grpc.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Grpc.AspNetCore/Wodsoft.ComBoost.Grpc.AspNetCore.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Grpc.Client/Wodsoft.ComBoost.Grpc.Client.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation/Wodsoft.ComBoost.Aggregation.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Caching/Wodsoft.ComBoost.Aggregation.Caching.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Caching.Data/Wodsoft.ComBoost.Aggregation.Caching.Data.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Core/Wodsoft.ComBoost.Aggregation.Core.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Data/Wodsoft.ComBoost.Aggregation.Data.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Json/Wodsoft.ComBoost.Aggregation.Json.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.Mvc/Wodsoft.ComBoost.Aggregation.Mvc.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.Aggregation.NewtonsoftJson/Wodsoft.ComBoost.Aggregation.NewtonsoftJson.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+        dotnet pack -c Release src/Wodsoft.ComBoost.StackExchangeRedis/Wodsoft.ComBoost.StackExchangeRedis.csproj -p:Version=${{github.ref_name}} -o nupkgs --no-build
+    - name: NuGet login (OIDC → temp API key)
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: ${{ secrets.NUGET_USER }}
+    - name: Publish
+      run: |
+        cd nupkgs
+        dotnet nuget push "*.symbols.nupkg" -k ${{steps.login.outputs.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+
