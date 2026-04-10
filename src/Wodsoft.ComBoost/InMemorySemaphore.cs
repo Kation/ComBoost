@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -28,13 +28,13 @@ namespace Wodsoft.ComBoost
             _entered = true;
         }
 
-        public async Task<bool> EnterAsync(int timeout)
+        public async Task<bool> EnterAsync(int timeout, CancellationToken cancellationToken = default)
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(InMemorySemaphore));
             if (_entered)
                 throw new InvalidOperationException("Already entered.");
-            if (await _semaphore.WaitAsync(timeout))
+            if (await _semaphore.WaitAsync(timeout, cancellationToken))
             {
                 _entered = true;
                 return true;

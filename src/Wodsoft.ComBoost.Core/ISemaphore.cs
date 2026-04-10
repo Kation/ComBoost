@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,6 +14,7 @@ namespace Wodsoft.ComBoost
         /// <summary>
         /// 异步进入信号。
         /// </summary>
+        /// <param name="cancellationToken">取消令牌。</param>
         /// <returns>返回异步任务。</returns>
         Task EnterAsync(CancellationToken cancellationToken = default);
 
@@ -27,8 +28,9 @@ namespace Wodsoft.ComBoost
         /// 异步进入信号。
         /// </summary>
         /// <param name="timeout">超时时间。</param>
+        /// <param name="cancellationToken">取消令牌。</param>
         /// <returns>返回异步任务。</returns>
-        Task<bool> EnterAsync(int timeout);
+        Task<bool> EnterAsync(int timeout, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// 异步退出信号。
