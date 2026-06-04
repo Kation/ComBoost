@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
@@ -16,5 +17,11 @@ namespace Wodsoft.ComBoost
         /// <param name="name">信号名称。</param>
         /// <returns>返回信号量。</returns>
         ISemaphore GetSemaphore(string name);
+
+#if NETSTANDARD2_0
+        Task<IDisposable> EnterScopeAsync(string name, CancellationToken cancellationToken = default);
+#else
+        Task<IAsyncDisposable> EnterScopeAsync(string name, CancellationToken cancellationToken = default);
+#endif
     }
 }

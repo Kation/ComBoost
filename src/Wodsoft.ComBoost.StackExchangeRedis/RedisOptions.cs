@@ -9,5 +9,7 @@ namespace Wodsoft.ComBoost.StackExchangeRedis
         public string Configuration { get; set; }
 
         public string Prefix { get; set; }
+
+        public int LockTimeout { get; set; } = 10000;
     }
 }
