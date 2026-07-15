@@ -74,7 +74,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// Get is the property must has data.
         /// </summary>
         bool IsRequired { get; }
-        
+
         bool IsKey { get; }
 
         ///// <summary>
@@ -149,14 +149,14 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <typeparam name="T">Attribute type.</typeparam>
         /// <returns></returns>
-        T[] GetAttributes<T>() where T : Attribute;
+        IEnumerable<T> GetAttributes<T>() where T : Attribute;
 
         /// <summary>
         /// Get property value from an entity.
         /// </summary>
         /// <param name="entity">Entity.</param>
         /// <returns></returns>
-        object GetValue(object entity);
+        object? GetValue(object entity);
 
         /// <summary>
         /// Set property value to an entity.

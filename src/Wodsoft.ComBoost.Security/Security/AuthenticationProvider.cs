@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost.Security
 {
-#pragma warning disable CS0612 // 类型或成员已过时
+#pragma warning disable CS0618
     public class AuthenticationProvider : IAuthenticationProvider
-#pragma warning restore CS0612 // 类型或成员已过时
+#pragma warning restore CS0618
     {
         private readonly IReadOnlyList<Type> _handlers;
         private readonly IServiceProvider _serviceProvider;

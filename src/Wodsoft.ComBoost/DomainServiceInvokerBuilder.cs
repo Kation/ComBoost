@@ -15,9 +15,11 @@ namespace Wodsoft.ComBoost
 {
     public class DomainServiceInvokerBuilder
     {
-        protected internal static readonly MethodInfo _GetMethodMethod = typeof(MethodBase).GetMethod("GetMethodFromHandle", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(RuntimeMethodHandle), typeof(RuntimeTypeHandle) }, null);
-        protected internal static readonly ConstructorInfo _ExecutionContextConstructor = typeof(DomainExecutionContext).GetConstructor(new Type[] { typeof(IDomainService), typeof(IDomainContext), typeof(MethodInfo), typeof(object[]) });
-        protected internal static readonly MethodInfo _Initialize = typeof(IDomainService).GetMethod("Initialize");
+        protected internal static readonly MethodInfo _GetMethodMethod = typeof(MethodBase).GetMethod("GetMethodFromHandle", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(RuntimeMethodHandle), typeof(RuntimeTypeHandle) }, null)!;
+        protected internal static readonly ConstructorInfo _ExecutionContextConstructor = typeof(DomainExecutionContext).GetConstructor(new Type[] { typeof(IDomainService), typeof(IDomainContext), typeof(MethodInfo), typeof(object[]) })!;
+        protected internal static readonly MethodInfo _Initialize = typeof(IDomainService).GetMethod("Initialize")!;
+        protected internal static readonly MethodInfo _DomainServiceGet = typeof(DomainServiceInvoker<IDomainService>).GetProperty(nameof(DomainServiceInvoker<IDomainService>.DomainService))!.GetGetMethod()!;
+        protected internal static readonly MethodInfo _DomainContextGet = typeof(DomainServiceInvoker<IDomainService>).GetProperty(nameof(DomainServiceInvoker<IDomainService>.DomainContext))!.GetGetMethod()!;
 
         public abstract class DomainServiceInvoker<TDomainService>
             where TDomainService : class, IDomainService
@@ -64,7 +66,7 @@ namespace Wodsoft.ComBoost
                 DomainExecutionPipeline pipeline = async () =>
                 {
                     var logger = DomainContext.GetRequiredService<ILogger<TDomainService>>();
-                    using (logger.BeginScope(new DomainServiceInvokerLogState(typeof(TDomainService), _executionContext.DomainMethod)))
+                    using (logger.BeginScope(new DomainServiceInvokerLogState(typeof(TDomainService), _executionContext!.DomainMethod)))
                         await ExecuteAsync();
                 };
                 var filters = DomainContext.Filters;
@@ -96,7 +98,7 @@ namespace Wodsoft.ComBoost
             protected void HandleResult(Task task)
             {
                 if (task.IsFaulted)
-                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception!).Throw();
                 _executionContext!.Done();
             }
 
@@ -121,7 +123,7 @@ namespace Wodsoft.ComBoost
             protected void HandleResult(Task<TResult> task)
             {
                 if (task.IsFaulted)
-                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception!).Throw();
                 _result = task.Result;
                 _executed = true;
                 _executionContext!.Done(_result);
@@ -130,7 +132,7 @@ namespace Wodsoft.ComBoost
             protected TResult? ReturnResult(Task task)
             {
                 if (task.IsFaulted)
-                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception!).Throw();
                 if (_executed)
                     return _result;
                 if (_executionContext!.Result == null && typeof(TResult).IsValueType)
@@ -170,15 +172,15 @@ namespace Wodsoft.ComBoost
             constructorILGenerator.Emit(OpCodes.Ldarg_0);
             constructorILGenerator.Emit(OpCodes.Ldarg_1);
             constructorILGenerator.Emit(OpCodes.Ldarg_2);
-            constructorILGenerator.Emit(OpCodes.Call, baseType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0]);
+            constructorILGenerator.Emit(OpCodes.Call, baseType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0]!);
             constructorILGenerator.Emit(OpCodes.Ret);
 
             var executeMethod = type.DefineMethod("ExecuteAsync", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final, typeof(Task), null);
             var executeILGenerator = executeMethod.GetILGenerator();
             //Service.{method}()
             executeILGenerator.Emit(OpCodes.Ldarg_0);
-            executeILGenerator.Emit(OpCodes.Call, baseType.GetProperty("DomainService").GetGetMethod());
-            type.DefineMethodOverride(executeMethod, baseType.GetMethod("ExecuteAsync", BindingFlags.NonPublic | BindingFlags.Instance));
+            executeILGenerator.Emit(OpCodes.Call, baseType.GetProperty("DomainService")!.GetGetMethod()!);
+            type.DefineMethodOverride(executeMethod, baseType.GetMethod("ExecuteAsync", BindingFlags.NonPublic | BindingFlags.Instance)!);
 
             var invokeMethod = type.DefineMethod("InvokeAsync", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot, method.ReturnType, method.GetParameters().Select(t => t.ParameterType).ToArray());
             var invokeILGenerator = invokeMethod.GetILGenerator();
@@ -200,16 +202,16 @@ namespace Wodsoft.ComBoost
 
             //Call IDomainService.Initialize
             invokeILGenerator.Emit(OpCodes.Ldarg_0);
-            invokeILGenerator.Emit(OpCodes.Call, typeof(DomainServiceInvoker<TDomainService>).GetProperty("DomainService").GetGetMethod());
+            invokeILGenerator.Emit(OpCodes.Call, _DomainServiceGet);
             //Create DomainExecutionContext
             //DomainService
             invokeILGenerator.Emit(OpCodes.Dup);
             //DomainContext
             invokeILGenerator.Emit(OpCodes.Ldarg_0);
-            invokeILGenerator.Emit(OpCodes.Call, typeof(DomainServiceInvoker<TDomainService>).GetProperty("DomainContext").GetGetMethod());
+            invokeILGenerator.Emit(OpCodes.Call, _DomainContextGet);
             //MethodInfo
             invokeILGenerator.Emit(OpCodes.Ldtoken, method);
-            invokeILGenerator.Emit(OpCodes.Ldtoken, method.DeclaringType);
+            invokeILGenerator.Emit(OpCodes.Ldtoken, method.DeclaringType!);
             invokeILGenerator.Emit(OpCodes.Call, _GetMethodMethod);
 
             invokeILGenerator.Emit(OpCodes.Ldc_I4, count);
@@ -227,32 +229,31 @@ namespace Wodsoft.ComBoost
             invokeILGenerator.Emit(OpCodes.Callvirt, _Initialize);
 
             invokeILGenerator.Emit(OpCodes.Ldarg_0);
-            invokeILGenerator.Emit(OpCodes.Call, baseType.GetMethod("RunPipeline", BindingFlags.NonPublic | BindingFlags.Instance));
+            invokeILGenerator.Emit(OpCodes.Call, baseType.GetMethod("RunPipeline", BindingFlags.NonPublic | BindingFlags.Instance)!);
 
             executeILGenerator.Emit(OpCodes.Callvirt, method);
             if (method.ReturnType != typeof(Task))
             {
                 invokeILGenerator.Emit(OpCodes.Ldarg_0);
-                invokeILGenerator.Emit(OpCodes.Ldftn, baseType.GetMethod("ReturnResult", BindingFlags.NonPublic | BindingFlags.Instance));
-                invokeILGenerator.Emit(OpCodes.Newobj, typeof(Func<,>).MakeGenericType(typeof(Task), method.ReturnType.GenericTypeArguments[0]).GetConstructors()[0]);
-                invokeILGenerator.Emit(OpCodes.Call, typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(t => t.Name == "ContinueWith" && t.IsGenericMethodDefinition && t.GetParameters().Length == 1).First().MakeGenericMethod(method.ReturnType.GenericTypeArguments[0]));
+                invokeILGenerator.Emit(OpCodes.Ldftn, baseType.GetMethod("ReturnResult", BindingFlags.NonPublic | BindingFlags.Instance)!);
+                invokeILGenerator.Emit(OpCodes.Newobj, typeof(Func<,>).MakeGenericType(typeof(Task), method.ReturnType.GenericTypeArguments[0]).GetConstructors()[0]!);
+                invokeILGenerator.Emit(OpCodes.Call, typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(t => t.Name == "ContinueWith" && t.IsGenericMethodDefinition && t.GetParameters().Length == 1).First().MakeGenericMethod(method.ReturnType.GenericTypeArguments[0])!);
             }
             executeILGenerator.Emit(OpCodes.Ldarg_0);
-            executeILGenerator.Emit(OpCodes.Ldftn, baseType.GetMethod("HandleResult", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { method.ReturnType }, null));
-            executeILGenerator.Emit(OpCodes.Newobj, typeof(Action<>).MakeGenericType(method.ReturnType).GetConstructors()[0]);
-            executeILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", new Type[] { typeof(Action<>).MakeGenericType(method.ReturnType) }));
+            executeILGenerator.Emit(OpCodes.Ldftn, baseType.GetMethod("HandleResult", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { method.ReturnType }, null)!);
+            executeILGenerator.Emit(OpCodes.Newobj, typeof(Action<>).MakeGenericType(method.ReturnType).GetConstructors()[0]!);
+            executeILGenerator.Emit(OpCodes.Call, method.ReturnType.GetMethod("ContinueWith", new Type[] { typeof(Action<>).MakeGenericType(method.ReturnType) })!);
 
             executeILGenerator.Emit(OpCodes.Ret);
             invokeILGenerator.Emit(OpCodes.Ret);
 
-            var invoker = new DomainServiceInvokerReference(type.CreateTypeInfo().AsType());
+            var invoker = new DomainServiceInvokerReference(type.CreateTypeInfo()!.AsType());
             return invoker;
         }
 
         public static DomainServiceInvokerReference GetInvokerReference(MethodInfo method)
         {
-            _References.TryGetValue(method, out var invoker);
-            return invoker;
+            return _References[method];
         }
     }
 
@@ -261,8 +262,8 @@ namespace Wodsoft.ComBoost
         internal DomainServiceInvokerReference(Type type)
         {
             Type = type;
-            InvokeMethod = type.GetMethod("InvokeAsync");
-            Constructor = type.GetConstructors()[0];
+            InvokeMethod = type.GetMethod("InvokeAsync")!;
+            Constructor = type.GetConstructors()[0]!;
         }
 
         public Type Type { get; }

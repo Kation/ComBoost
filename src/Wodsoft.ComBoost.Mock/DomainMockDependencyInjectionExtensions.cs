@@ -79,7 +79,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder.UseEventProvider<MockInMemoryEventProvider>(options);
         }
 
-        private readonly static MethodInfo _AddServiceMethod = typeof(IComBoostMockServiceBuilder).GetMethod("AddService");
+        private readonly static MethodInfo _AddServiceMethod = typeof(IComBoostMockServiceBuilder).GetMethod("AddService")!;
         public static IComBoostMockServiceBuilder AddServiceInAssembly(this IComBoostMockServiceBuilder builder, string serviceName, Assembly assembly)
         {
             if (builder == null)

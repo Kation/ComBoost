@@ -50,22 +50,22 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             return _connection;
         }
 
-        private void connection_RecoverySucceeded(object sender, EventArgs e)
+        private void connection_RecoverySucceeded(object? sender, EventArgs e)
         {
             State = HealthState.Healthy;
         }
 
-        private void connection_ConnectionShutdown(object sender, ShutdownEventArgs e)
+        private void connection_ConnectionShutdown(object? sender, ShutdownEventArgs e)
         {
             State = _options.IsCriticalHealthState ? HealthState.Critical : HealthState.Warning;
         }
 
-        private void connection_ConnectionUnblocked(object sender, EventArgs e)
+        private void connection_ConnectionUnblocked(object? sender, EventArgs e)
         {
             State = HealthState.Healthy;
         }
 
-        private void connection_ConnectionBlocked(object sender, global::RabbitMQ.Client.Events.ConnectionBlockedEventArgs e)
+        private void connection_ConnectionBlocked(object? sender, global::RabbitMQ.Client.Events.ConnectionBlockedEventArgs e)
         {
             State = _options.IsCriticalHealthState ? HealthState.Critical : HealthState.Warning;
         }

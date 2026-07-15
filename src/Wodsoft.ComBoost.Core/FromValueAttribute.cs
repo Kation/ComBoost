@@ -58,14 +58,14 @@ namespace Wodsoft.ComBoost
         public override object? GetValue(IDomainContext context, ParameterInfo parameter)
         {
             IValueProvider provider = context.ValueProvider;
-            object? value = provider.GetValue(Name ?? parameter.Name, parameter.ParameterType);
+            object? value = provider.GetValue(Name ?? parameter.Name!, parameter.ParameterType);
             if (value == null)
                 if (DefaultValue != null || parameter.HasDefaultValue)
                     value = DefaultValue ?? parameter.DefaultValue;
                 else
                 {
                     if (IsRequired)
-                        throw new DomainServiceException(new ArgumentNullException(parameter.Name, "获取" + (Name ?? parameter.Name) + "的值为空。"));
+                        throw new DomainServiceException(new ArgumentException($"获取{Name ?? parameter.Name!}的值为空。"));
                     else if (parameter.ParameterType.IsValueType)
                         value = Activator.CreateInstance(parameter.ParameterType);
                 }

@@ -27,13 +27,13 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             _properties = type.GetProperties().Select(t => new ClrPropertyMetadata(t)).OrderBy(t => t.Order).ToDictionary(t => t.ClrName, t => t);
             Properties = new ReadOnlyCollection<IPropertyMetadata>(_properties.Values.ToArray());
 
-            DisplayNameAttribute display = type.GetCustomAttribute<DisplayNameAttribute>();
+            DisplayNameAttribute? display = type.GetCustomAttribute<DisplayNameAttribute>();
             if (display != null)
                 Name = display.DisplayName;
             else
                 Name = Type.Name;
 
-            ParentAttribute parent = Type.GetTypeInfo().GetCustomAttribute<ParentAttribute>();
+            ParentAttribute? parent = Type.GetTypeInfo().GetCustomAttribute<ParentAttribute>();
             if (parent != null)
                 ParentProperty = GetProperty(parent.PropertyName) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not contains parent property \"{parent.PropertyName}\".");
 
@@ -59,7 +59,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 KeyProperties = new ReadOnlyCollection<IPropertyMetadata>(multipleKeyAttribute.Keys.Select(t => GetProperty(t) ?? throw new InvalidOperationException($"Type \"{Type.FullName}\" does not exist key property \"{t}\".")).ToArray());
             }
 
-            DisplayColumnAttribute displayColumn = Type.GetTypeInfo().GetCustomAttribute<DisplayColumnAttribute>();
+            DisplayColumnAttribute? displayColumn = Type.GetTypeInfo().GetCustomAttribute<DisplayColumnAttribute>();
             if (displayColumn != null)
             {
                 DisplayProperty = GetProperty(displayColumn.DisplayColumn);
@@ -85,8 +85,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
 
         public override IPropertyMetadata? GetProperty(string name)
         {
-            ClrPropertyMetadata value;
-            if (_properties.TryGetValue(name, out value))
+            if (_properties.TryGetValue(name, out ClrPropertyMetadata? value))
                 return value;
             return null;
         }

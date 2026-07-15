@@ -11,7 +11,7 @@ namespace Wodsoft.ComBoost.Mvc
 {
     public class MvcDomainContextProvider : HttpDomainContextProvider
     {
-        private readonly DomainAspNetCoreOptions _options;
+        private readonly DomainAspNetCoreOptions? _options;
         public MvcDomainContextProvider(IActionContextAccessor actionContextAccessor, IOptions<DomainAspNetCoreOptions> options) : base(actionContextAccessor?.ActionContext?.HttpContext)
         {
             ActionContext = actionContextAccessor?.ActionContext;
@@ -31,7 +31,13 @@ namespace Wodsoft.ComBoost.Mvc
         {
             if (ActionContext == null)
                 throw new NotSupportedException("There is no action context currently.");
-            return new MvcDomainContext(ActionContext, _options.AuthenticationHandler(HttpContext));
+            var httpContext = ActionContext.HttpContext;
+            if (httpContext == null)
+                throw new NotSupportedException("There is no http context currently.");
+            if (_options == null)
+                return new MvcDomainContext(ActionContext, httpContext.User);
+            else
+                return new MvcDomainContext(ActionContext, _options.AuthenticationHandler(httpContext));
         }
     }
 }

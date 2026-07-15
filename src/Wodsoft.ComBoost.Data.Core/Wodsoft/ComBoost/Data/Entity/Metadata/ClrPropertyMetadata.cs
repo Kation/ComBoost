@@ -69,7 +69,11 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             if (typeConverterAttribute == null)
                 Converter = TypeDescriptor.GetConverter(ClrType);
             else
-                Converter = (TypeConverter)Activator.CreateInstance(System.Type.GetType(typeConverterAttribute.ConverterTypeName));
+            {
+                var converterType = System.Type.GetType(typeConverterAttribute.ConverterTypeName)
+                    ?? throw new InvalidOperationException($"Cannot resolve type converter \"{typeConverterAttribute.ConverterTypeName}\" for property \"{propertyInfo.Name}\".");
+                Converter = (TypeConverter)Activator.CreateInstance(converterType)!;
+            }
 
             IsKey = GetAttribute<KeyAttribute>() != null;
             IsRequired = GetAttribute<RequiredAttribute>() != null || (ClrType.GetTypeInfo().IsValueType && !ClrType.GetTypeInfo().IsGenericType);
@@ -120,7 +124,8 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <typeparam name="T">Attribute type.</typeparam>
         /// <returns></returns>
-        public override T GetAttribute<T>()
+        public override T? GetAttribute<T>()
+            where T : class
         {
             return Property.GetCustomAttribute<T>(true);
         }
@@ -130,9 +135,9 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <typeparam name="T">Attribute type.</typeparam>
         /// <returns></returns>
-        public override T[] GetAttributes<T>()
+        public override IEnumerable<T> GetAttributes<T>()
         {
-            return Property.GetCustomAttributes<T>(true).ToArray();
+            return Property.GetCustomAttributes<T>(true);
         }
 
         private Func<object, object>? _GetValue;

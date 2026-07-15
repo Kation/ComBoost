@@ -21,7 +21,7 @@ namespace Wodsoft.ComBoost
         public override IValueProvider ValueProvider => _valueProvider;
 
         private Dictionary<Type, object> _services;
-        public override object GetService(Type serviceType)
+        public override object? GetService(Type serviceType)
         {
             if (_services.TryGetValue(serviceType, out var service))
                 return service;

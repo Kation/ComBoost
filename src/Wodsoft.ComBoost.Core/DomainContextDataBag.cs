@@ -8,20 +8,20 @@ namespace Wodsoft.ComBoost
 {
     public class DomainContextDataBag : System.Dynamic.DynamicObject
     {
-        private Dictionary<string, object> _Data;
+        private Dictionary<string, object?> _Data;
 
         public DomainContextDataBag()
         {
-            _Data = new Dictionary<string, object>();
+            _Data = new Dictionary<string, object?>();
         }
 
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        public override bool TryGetMember(GetMemberBinder binder, out object? result)
         {
             _Data.TryGetValue(binder.Name, out result);
             return true;
         }
 
-        public override bool TrySetMember(SetMemberBinder binder, object value)
+        public override bool TrySetMember(SetMemberBinder binder, object? value)
         {
             if (_Data.ContainsKey(binder.Name))
                 _Data[binder.Name] = value;
@@ -30,7 +30,7 @@ namespace Wodsoft.ComBoost
             return true;
         }
 
-        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
+        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object? result)
         {
             if (indexes.Length > 1)
                 throw new NotSupportedException();
@@ -41,7 +41,7 @@ namespace Wodsoft.ComBoost
             return true;
         }
 
-        public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object value)
+        public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object? value)
         {
             if (indexes.Length > 1)
                 throw new NotSupportedException();

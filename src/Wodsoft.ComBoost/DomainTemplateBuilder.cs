@@ -298,7 +298,7 @@ namespace Wodsoft.ComBoost
                         {
                             //When there is no FromAtrribute, get value from IValueProvider
                             ilGenerator.Emit(OpCodes.Ldloc, valueProviderLocal);
-                            ilGenerator.Emit(OpCodes.Ldstr, serviceParameter.Name);
+                            ilGenerator.Emit(OpCodes.Ldstr, serviceParameter.Name!);
                             ilGenerator.Emit(OpCodes.Ldtoken, serviceParameter.ParameterType);
                             ilGenerator.Emit(OpCodes.Call, _GetTypeFromHandleMethod);
                             ilGenerator.Emit(OpCodes.Callvirt, _GetValue);
@@ -332,7 +332,7 @@ namespace Wodsoft.ComBoost
                     else
                     {
                         if (methodParameter.ParameterType != serviceParameter.ParameterType)
-                            throw new NotSupportedException($"Type of parameter \"{methodParameter.Name}\" of {methodParameter.Member.DeclaringType.FullName}.{methodParameter.Member.Name}({string.Join(",", ((MethodInfo)methodParameter.Member).GetParameters().Select(t => t.ParameterType.Name))}) does not equal to {serviceParameter.Member.DeclaringType.FullName}.{serviceParameter.Member.Name}({string.Join(",", ((MethodInfo)serviceParameter.Member).GetParameters().Select(t => t.ParameterType.Name))})");
+                            throw new NotSupportedException($"Type of parameter \"{methodParameter.Name}\" of {methodParameter.Member.DeclaringType!.FullName}.{methodParameter.Member.Name}({string.Join(",", ((MethodInfo)methodParameter.Member).GetParameters().Select(t => t.ParameterType.Name))}) does not equal to {serviceParameter.Member.DeclaringType!.FullName}.{serviceParameter.Member.Name}({string.Join(",", ((MethodInfo)serviceParameter.Member).GetParameters().Select(t => t.ParameterType.Name))})");
                         var methodParameterIndex = Array.IndexOf(parameters, methodParameter);
                         ilGenerator.Emit(OpCodes.Ldarg_S, (byte)(methodParameterIndex + 1));
                         ilGenerator.Emit(OpCodes.Stloc, locals[count]);
@@ -357,7 +357,7 @@ namespace Wodsoft.ComBoost
             }
 
             var typeInfo = _AgentBuilder.CreateTypeInfo();
-            _TemplateType = typeInfo.AsType();
+            _TemplateType = typeInfo!.AsType();
         }
 
         public T GetTemplate(IDomainContext context)

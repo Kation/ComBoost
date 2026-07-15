@@ -18,8 +18,6 @@ namespace Wodsoft.ComBoost
         {
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
-            if (cancellationToken == null)
-                throw new ArgumentNullException(nameof(cancellationToken));
             _serviceProvider = serviceProvider;
             Filters = new List<IDomainServiceFilter>();
             EventManager = new DomainContextEventManager(serviceProvider.GetRequiredService<IDomainServiceEventManager>());
@@ -46,7 +44,7 @@ namespace Wodsoft.ComBoost
 
         public abstract ClaimsPrincipal User { get; }
 
-        public virtual object GetService(Type serviceType)
+        public virtual object? GetService(Type serviceType)
         {
             if (serviceType == typeof(IDomainContext) || serviceType == typeof(IServiceProvider))
                 return this;

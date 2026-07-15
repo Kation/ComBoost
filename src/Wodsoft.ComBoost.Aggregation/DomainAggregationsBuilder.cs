@@ -68,7 +68,19 @@ namespace Wodsoft.ComBoost.Aggregation
                 BuildType(aggregates);
         }
 
-        private static readonly MethodInfo _UnwrapMethodInfo = typeof(TaskExtensions).GetMethods().First(t => t.Name == nameof(TaskExtensions.Unwrap) && t.IsGenericMethodDefinition);
+        private static readonly MethodInfo _UnwrapMethodInfo = typeof(TaskExtensions).GetMethods().First(t => t.Name == nameof(TaskExtensions.Unwrap) && t.IsGenericMethodDefinition)!;
+        private static readonly MethodInfo _DebugWriteLine = typeof(Debug).GetMethod("WriteLine", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null)!;
+        private static readonly ConstructorInfo _ListTaskConstructor = typeof(List<Task>).GetConstructor(Array.Empty<Type>())!;
+        private static readonly MethodInfo _TaskIsFaultedGetMethod = typeof(Task).GetProperty(nameof(Task.IsFaulted))!.GetGetMethod()!;
+        private static readonly MethodInfo _TaskExceptionGetMethod = typeof(Task).GetProperty(nameof(Task.Exception))!.GetGetMethod()!;
+        private static readonly MethodInfo _ExceptionDispatchInfoCapture = typeof(System.Runtime.ExceptionServices.ExceptionDispatchInfo).GetMethod("Capture", BindingFlags.Public | BindingFlags.Static)!;
+        private static readonly MethodInfo _ExceptionDispatchInfoThrow = typeof(System.Runtime.ExceptionServices.ExceptionDispatchInfo).GetMethod("Throw", BindingFlags.Public | BindingFlags.Instance)!;
+        private static readonly MethodInfo _GetAggregationAsyncMethod = typeof(IDomainAggregator).GetMethod(nameof(IDomainAggregator.GetAggregationAsync))!;
+        private static readonly MethodInfo _ListTaskAdd = typeof(List<Task>).GetMethod(nameof(List<Task>.Add))!;
+        private static readonly MethodInfo _ListTaskCountGetMethod = typeof(List<Task>).GetProperty(nameof(List<Task>.Count))!.GetGetMethod()!;
+        private static readonly MethodInfo _TaskWhenAll = typeof(Task).GetMethod(nameof(Task.WhenAll), BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IEnumerable<>).MakeGenericType(typeof(Task)) }, null)!;
+        private static readonly MethodInfo _TaskCompletedTaskGetMethod = typeof(Task).GetProperty(nameof(Task.CompletedTask))!.GetGetMethod()!;
+        private static readonly MethodInfo _TaskResultGetMethod = typeof(Task<object>).GetProperty(nameof(Task<object>.Result))!.GetGetMethod()!;
 
         private static void BuildType(AggregateAttribute[] aggregates)
         {
@@ -79,7 +91,7 @@ namespace Wodsoft.ComBoost.Aggregation
             //typeBuilder.DefineMethodOverride(aggregateAsyncMethod, typeof(IDomainAggregation).GetMethod(nameof(IDomainAggregation.AggregateAsync)));
             var aggregateAsyncILGenerator = aggregateAsyncMethod.GetILGenerator();
             aggregateAsyncILGenerator.Emit(OpCodes.Ldstr, $"Begain aggregate {type.Name}.");
-            aggregateAsyncILGenerator.Emit(OpCodes.Call, typeof(Debug).GetMethod("WriteLine", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null));
+            aggregateAsyncILGenerator.Emit(OpCodes.Call, _DebugWriteLine);
 
             var constructor = typeBuilder.DefineConstructor(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, CallingConventions.Standard, new Type[] { type });
             constructor.DefineParameter(1, ParameterAttributes.None, "value");
@@ -88,13 +100,15 @@ namespace Wodsoft.ComBoost.Aggregation
             {
                 constructorILGenerator.Emit(OpCodes.Ldarg_0);
                 constructorILGenerator.Emit(OpCodes.Ldarg_1);
-                constructorILGenerator.Emit(property.GetMethod.IsFinal ? OpCodes.Call : OpCodes.Callvirt, property.GetMethod);
-                constructorILGenerator.Emit(property.SetMethod.IsFinal ? OpCodes.Call : OpCodes.Callvirt, property.SetMethod);
+                var propertyGetMethod = property.GetMethod!;
+                var propertySetMethod = property.SetMethod!;
+                constructorILGenerator.Emit(propertyGetMethod.IsFinal ? OpCodes.Call : OpCodes.Callvirt, propertyGetMethod);
+                constructorILGenerator.Emit(propertySetMethod.IsFinal ? OpCodes.Call : OpCodes.Callvirt, propertySetMethod);
             }
             constructorILGenerator.Emit(OpCodes.Ret);
 
             var tasksVariable = aggregateAsyncILGenerator.DeclareLocal(typeof(List<Task>));
-            aggregateAsyncILGenerator.Emit(OpCodes.Newobj, typeof(List<Task>).GetConstructor(Array.Empty<Type>()));
+            aggregateAsyncILGenerator.Emit(OpCodes.Newobj, _ListTaskConstructor);
             aggregateAsyncILGenerator.Emit(OpCodes.Stloc, tasksVariable);
 
             foreach (var aggregateAttribute in aggregates)
@@ -115,7 +129,7 @@ namespace Wodsoft.ComBoost.Aggregation
                     {
                         var overrideProperty = typeBuilder.DefineProperty(property.Name, property.Attributes, property.PropertyType, null);
 
-                        var getMethod = property.GetGetMethod();
+                        var getMethod = property.GetGetMethod()!;
                         var overrideGetMethod = typeBuilder.DefineMethod(getMethod.Name, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.SpecialName);
                         overrideGetMethod.SetReturnType(getMethod.ReturnType);
                         var overrideGetILGenerator = overrideGetMethod.GetILGenerator();
@@ -123,7 +137,7 @@ namespace Wodsoft.ComBoost.Aggregation
                         overrideGetILGenerator.Emit(OpCodes.Call, getMethod);
                         overrideGetILGenerator.Emit(OpCodes.Ret);
 
-                        var setMethod = property.GetSetMethod();
+                        var setMethod = property.GetSetMethod()!;
                         var overrideSetMethod = typeBuilder.DefineMethod(setMethod.Name, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.HideBySig | MethodAttributes.SpecialName);
                         overrideSetMethod.SetParameters(property.PropertyType);
                         var overrideSetILGenerator = overrideSetMethod.GetILGenerator();
@@ -154,11 +168,11 @@ namespace Wodsoft.ComBoost.Aggregation
 
                 foreach (var property in properties)
                 {
-                    Type underlyingType = Nullable.GetUnderlyingType(property.PropertyType);
+                    Type? underlyingType = Nullable.GetUnderlyingType(property.PropertyType);
                     var keyVariable = aggregateAsyncILGenerator.DeclareLocal(property.PropertyType);
                     //Read property
                     aggregateAsyncILGenerator.Emit(OpCodes.Ldarg_0);
-                    aggregateAsyncILGenerator.Emit(OpCodes.Callvirt, property.GetGetMethod());
+                    aggregateAsyncILGenerator.Emit(OpCodes.Callvirt, property.GetGetMethod()!);
                     aggregateAsyncILGenerator.Emit(OpCodes.Stloc, keyVariable);
                     if (property.PropertyType.IsClass || underlyingType != null)
                     {
@@ -166,7 +180,7 @@ namespace Wodsoft.ComBoost.Aggregation
                         if (property.PropertyType.IsValueType)
                         {
                             aggregateAsyncILGenerator.Emit(OpCodes.Ldloca, keyVariable);
-                            aggregateAsyncILGenerator.Emit(OpCodes.Call, property.PropertyType.GetProperty("HasValue").GetMethod);
+                            aggregateAsyncILGenerator.Emit(OpCodes.Call, property.PropertyType.GetProperty("HasValue")!.GetGetMethod()!);
                         }
                         else
                             aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, keyVariable);
@@ -185,7 +199,7 @@ namespace Wodsoft.ComBoost.Aggregation
                     else
                     {
                         aggregateAsyncILGenerator.Emit(OpCodes.Ldloca, keyVariable);
-                        aggregateAsyncILGenerator.Emit(OpCodes.Call, property.PropertyType.GetProperty("Value").GetMethod);
+                        aggregateAsyncILGenerator.Emit(OpCodes.Call, property.PropertyType.GetProperty("Value")!.GetGetMethod()!);
                         aggregateAsyncILGenerator.Emit(OpCodes.Box, underlyingType);
                     }
                     //values[i] = value;
@@ -195,7 +209,7 @@ namespace Wodsoft.ComBoost.Aggregation
                 //tasks.Add(...);
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, tasksVariable);
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldarg_1);
-                var getAggregationMethod = typeof(IDomainAggregator).GetMethod(nameof(IDomainAggregator.GetAggregationAsync)).MakeGenericMethod(aggregateAttribute.AggregationType);
+                var getAggregationMethod = _GetAggregationAsyncMethod.MakeGenericMethod(aggregateAttribute.AggregationType);
                 //aggregator.GetAggregation<T>(keyVariable)
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, valuesVariable);
                 aggregateAsyncILGenerator.Emit(OpCodes.Callvirt, getAggregationMethod);
@@ -205,20 +219,20 @@ namespace Wodsoft.ComBoost.Aggregation
                 var continueILGenerator = continueMethod.GetILGenerator();
                 var continueNotFaultLabel = continueILGenerator.DefineLabel();
                 continueILGenerator.Emit(OpCodes.Ldarg_1);
-                continueILGenerator.Emit(OpCodes.Call, typeof(Task).GetProperty(nameof(Task.IsFaulted)).GetMethod);
+                continueILGenerator.Emit(OpCodes.Call, _TaskIsFaultedGetMethod);
                 continueILGenerator.Emit(OpCodes.Brfalse, continueNotFaultLabel);
                 continueILGenerator.Emit(OpCodes.Ldarg_1);
-                continueILGenerator.Emit(OpCodes.Call, typeof(Task).GetProperty(nameof(Task.Exception)).GetMethod);
-                continueILGenerator.Emit(OpCodes.Call, typeof(System.Runtime.ExceptionServices.ExceptionDispatchInfo).GetMethod("Capture", BindingFlags.Public | BindingFlags.Static));
-                continueILGenerator.Emit(OpCodes.Call, typeof(System.Runtime.ExceptionServices.ExceptionDispatchInfo).GetMethod("Throw", BindingFlags.Public | BindingFlags.Instance));
+                continueILGenerator.Emit(OpCodes.Call, _TaskExceptionGetMethod);
+                continueILGenerator.Emit(OpCodes.Call, _ExceptionDispatchInfoCapture);
+                continueILGenerator.Emit(OpCodes.Call, _ExceptionDispatchInfoThrow);
                 continueILGenerator.MarkLabel(continueNotFaultLabel);
 
 
-                Type nestType;
+                Type? nestType;
                 if (aggregateAttribute.AggregationType == type)
                     nestType = typeBuilder;
                 else
-                    nestType = (Type)typeof(DomainAggregationsBuilder<>).MakeGenericType(aggregateAttribute.AggregationType).GetProperty(nameof(AggregationType), BindingFlags.Public | BindingFlags.Static).GetValue(null);
+                    nestType = (Type?)typeof(DomainAggregationsBuilder<>).MakeGenericType(aggregateAttribute.AggregationType).GetProperty(nameof(AggregationType), BindingFlags.Public | BindingFlags.Static)!.GetValue(null);
                 if (aggregateAttribute.IsNestAggregate && nestType != null)
                 {
                     //var returnMethod = typeBuilder.DefineMethod("return_" + property.Name, MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot, aggregateAttribute.AggregationType, new Type[] { typeof(Task), typeof(object) });
@@ -242,9 +256,9 @@ namespace Wodsoft.ComBoost.Aggregation
                     //.ContinueWith(nest_..., aggregator).Unwrap()
                     aggregateAsyncILGenerator.Emit(OpCodes.Ldarg_0);
                     aggregateAsyncILGenerator.Emit(OpCodes.Ldftn, nestMethod);
-                    aggregateAsyncILGenerator.Emit(OpCodes.Newobj, typeof(Func<,,>).MakeGenericType(getAggregationMethod.ReturnType, typeof(object), getAggregationMethod.ReturnType).GetConstructors()[0]);
+                    aggregateAsyncILGenerator.Emit(OpCodes.Newobj, typeof(Func<,,>).MakeGenericType(getAggregationMethod.ReturnType, typeof(object), getAggregationMethod.ReturnType).GetConstructors()[0]!);
                     aggregateAsyncILGenerator.Emit(OpCodes.Ldarg_1);
-                    aggregateAsyncILGenerator.Emit(OpCodes.Call, getAggregationMethod.ReturnType.GetTypeInfo().GetDeclaredMethods(nameof(Task.ContinueWith)).First(t => t.IsGenericMethodDefinition && t.GetParameters().Length == 2 && t.GetParameters()[1].ParameterType == typeof(object)).MakeGenericMethod(getAggregationMethod.ReturnType));
+                    aggregateAsyncILGenerator.Emit(OpCodes.Call, getAggregationMethod.ReturnType.GetTypeInfo().GetDeclaredMethods(nameof(Task.ContinueWith)).First(t => t.IsGenericMethodDefinition && t.GetParameters().Length == 2 && t.GetParameters()[1].ParameterType == typeof(object))!.MakeGenericMethod(getAggregationMethod.ReturnType));
                     aggregateAsyncILGenerator.Emit(OpCodes.Call, _UnwrapMethodInfo.MakeGenericMethod(aggregateAttribute.AggregationType));
 
                     var nestILGenerator = nestMethod.GetILGenerator();
@@ -252,15 +266,15 @@ namespace Wodsoft.ComBoost.Aggregation
                     var nestValueVariable = nestILGenerator.DeclareLocal(aggregateAttribute.AggregationType);
                     var nestNotFaultLabel = nestILGenerator.DefineLabel();
                     nestILGenerator.Emit(OpCodes.Ldarg_1);
-                    nestILGenerator.Emit(OpCodes.Call, typeof(Task).GetProperty(nameof(Task.IsFaulted)).GetMethod);
+                    nestILGenerator.Emit(OpCodes.Call, _TaskIsFaultedGetMethod);
                     nestILGenerator.Emit(OpCodes.Brfalse, nestNotFaultLabel);
                     nestILGenerator.Emit(OpCodes.Ldarg_1);
-                    nestILGenerator.Emit(OpCodes.Call, typeof(Task).GetProperty(nameof(Task.Exception)).GetMethod);
-                    nestILGenerator.Emit(OpCodes.Call, typeof(System.Runtime.ExceptionServices.ExceptionDispatchInfo).GetMethod("Capture", BindingFlags.Public | BindingFlags.Static));
-                    nestILGenerator.Emit(OpCodes.Call, typeof(System.Runtime.ExceptionServices.ExceptionDispatchInfo).GetMethod("Throw", BindingFlags.Public | BindingFlags.Instance));
+                    nestILGenerator.Emit(OpCodes.Call, _TaskExceptionGetMethod);
+                    nestILGenerator.Emit(OpCodes.Call, _ExceptionDispatchInfoCapture);
+                    nestILGenerator.Emit(OpCodes.Call, _ExceptionDispatchInfoThrow);
                     nestILGenerator.MarkLabel(nestNotFaultLabel);
                     nestILGenerator.Emit(OpCodes.Ldarg_1);
-                    nestILGenerator.Emit(OpCodes.Call, getAggregationMethod.ReturnType.GetProperty(nameof(Task<object>.Result)).GetMethod);
+                    nestILGenerator.Emit(OpCodes.Call, _TaskResultGetMethod);
                     nestILGenerator.Emit(OpCodes.Dup);
                     nestILGenerator.Emit(OpCodes.Stloc, nestValueVariable);
                     //if (valueVariable == null)
@@ -268,14 +282,14 @@ namespace Wodsoft.ComBoost.Aggregation
                     var nestHasValueLabel = nestILGenerator.DefineLabel();
                     nestILGenerator.Emit(OpCodes.Brtrue, nestHasValueLabel);
                     nestILGenerator.Emit(OpCodes.Ldstr, "No value of aggregation.");
-                    nestILGenerator.Emit(OpCodes.Call, typeof(Debug).GetMethod("WriteLine", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null));
+                    nestILGenerator.Emit(OpCodes.Call, _DebugWriteLine);
                     nestILGenerator.Emit(OpCodes.Ldarg_1);
                     nestILGenerator.Emit(OpCodes.Ret);
                     nestILGenerator.MarkLabel(nestHasValueLabel);
                     //else
                     //    return aggregator.AggregateAsync(valueVariable)
                     nestILGenerator.Emit(OpCodes.Ldstr, "Begin aggregate nest aggregation object.");
-                    nestILGenerator.Emit(OpCodes.Call, typeof(Debug).GetMethod("WriteLine", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null));
+                    nestILGenerator.Emit(OpCodes.Call, _DebugWriteLine);
                     nestILGenerator.Emit(OpCodes.Ldarg_2);
                     nestILGenerator.Emit(OpCodes.Castclass, typeof(IDomainAggregator));
                     nestILGenerator.Emit(OpCodes.Ldloc, nestValueVariable);
@@ -291,17 +305,17 @@ namespace Wodsoft.ComBoost.Aggregation
                 //.ContinueWith(continue_...)
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldarg_0);
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldftn, continueMethod);
-                aggregateAsyncILGenerator.Emit(OpCodes.Newobj, typeof(Action<>).MakeGenericType(getAggregationMethod.ReturnType).GetConstructors()[0]);
-                aggregateAsyncILGenerator.Emit(OpCodes.Call, getAggregationMethod.ReturnType.GetTypeInfo().GetDeclaredMethods(nameof(Task.ContinueWith)).First(t => t.GetParameters().Length == 1 && t.ReturnType == typeof(Task)));
-                aggregateAsyncILGenerator.Emit(OpCodes.Call, typeof(List<Task>).GetMethod(nameof(List<Task>.Add)));
+                aggregateAsyncILGenerator.Emit(OpCodes.Newobj, typeof(Action<>).MakeGenericType(getAggregationMethod.ReturnType).GetConstructors()[0]!);
+                aggregateAsyncILGenerator.Emit(OpCodes.Call, getAggregationMethod.ReturnType.GetTypeInfo().GetDeclaredMethods(nameof(Task.ContinueWith)).First(t => t.GetParameters().Length == 1 && t.ReturnType == typeof(Task))!);
+                aggregateAsyncILGenerator.Emit(OpCodes.Call, _ListTaskAdd);
 
 
                 //var valueVariable = task.Result;
                 var continueValueVariable = continueILGenerator.DeclareLocal(aggregateAttribute.AggregationType);
                 continueILGenerator.Emit(OpCodes.Ldstr, "Aggregate completed.");
-                continueILGenerator.Emit(OpCodes.Call, typeof(Debug).GetMethod("WriteLine", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null));
+                continueILGenerator.Emit(OpCodes.Call, _DebugWriteLine);
                 continueILGenerator.Emit(OpCodes.Ldarg_1);
-                continueILGenerator.Emit(OpCodes.Call, getAggregationMethod.ReturnType.GetProperty(nameof(Task<object>.Result)).GetMethod);
+                continueILGenerator.Emit(OpCodes.Call, _TaskResultGetMethod);
                 continueILGenerator.Emit(OpCodes.Dup);
                 continueILGenerator.Emit(OpCodes.Stloc, continueValueVariable);
                 //if (valueVariable == null)
@@ -331,7 +345,7 @@ namespace Wodsoft.ComBoost.Aggregation
                         //this._aggregationField = valueVariable.exposeProperty;
                         continueILGenerator.Emit(OpCodes.Ldarg_0);
                         continueILGenerator.Emit(OpCodes.Ldloc, continueValueVariable);
-                        continueILGenerator.Emit(OpCodes.Callvirt, exposeProperty.GetMethod);
+                        continueILGenerator.Emit(OpCodes.Callvirt, exposeProperty.GetMethod!);
                         continueILGenerator.Emit(OpCodes.Stfld, aggregationField);
                     }
                 }
@@ -363,27 +377,27 @@ namespace Wodsoft.ComBoost.Aggregation
                 var falseLabel = aggregateAsyncILGenerator.DefineLabel();
                 //if (tasksVariable.Count != 0)
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, tasksVariable);
-                aggregateAsyncILGenerator.Emit(OpCodes.Call, typeof(List<Task>).GetProperty(nameof(List<Task>.Count)).GetMethod);
+                aggregateAsyncILGenerator.Emit(OpCodes.Call, _ListTaskCountGetMethod);
                 aggregateAsyncILGenerator.Emit(OpCodes.Brfalse, falseLabel);
                 //    return Task.WhenAll(tasksVariable);
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldstr, $"Waiting aggregate {type.Name} to completed.");
-                aggregateAsyncILGenerator.Emit(OpCodes.Call, typeof(Debug).GetMethod("WriteLine", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null));
+                aggregateAsyncILGenerator.Emit(OpCodes.Call, _DebugWriteLine);
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldloc, tasksVariable);
-                aggregateAsyncILGenerator.Emit(OpCodes.Call, typeof(Task).GetMethod(nameof(Task.WhenAll), BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IEnumerable<>).MakeGenericType(typeof(Task)) }, null));
+                aggregateAsyncILGenerator.Emit(OpCodes.Call, _TaskWhenAll);
                 aggregateAsyncILGenerator.Emit(OpCodes.Br, finalLabel);
 
                 //else
                 //    return Task.CompletedTask;
                 aggregateAsyncILGenerator.MarkLabel(falseLabel);
                 aggregateAsyncILGenerator.Emit(OpCodes.Ldstr, $"End aggregate {type.Name}. Nothing need to aggregate.");
-                aggregateAsyncILGenerator.Emit(OpCodes.Call, typeof(Debug).GetMethod("WriteLine", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null));
-                aggregateAsyncILGenerator.Emit(OpCodes.Call, typeof(Task).GetProperty(nameof(Task.CompletedTask)).GetMethod);
+                aggregateAsyncILGenerator.Emit(OpCodes.Call, _DebugWriteLine);
+                aggregateAsyncILGenerator.Emit(OpCodes.Call, _TaskCompletedTaskGetMethod);
                 aggregateAsyncILGenerator.MarkLabel(finalLabel);
                 aggregateAsyncILGenerator.Emit(OpCodes.Ret);
             }
 
-            AggregationType = typeBuilder.CreateTypeInfo().AsType();
-            Constructor = AggregationType.GetConstructor(new Type[] { type });
+            AggregationType = typeBuilder.CreateTypeInfo()!.AsType();
+            Constructor = AggregationType.GetConstructor(new Type[] { type })!;
         }
 
         public static bool HasAggregation { get; private set; }

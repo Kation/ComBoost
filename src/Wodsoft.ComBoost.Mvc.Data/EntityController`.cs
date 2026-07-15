@@ -118,7 +118,7 @@ namespace Wodsoft.ComBoost.Mvc
             var keys = await GetKeysFromQuery();
             if (keys.Any(t => t == null))
                 return null;
-            var entity = await entityContext.GetAsync(keys);
+            var entity = await entityContext.GetAsync(Array.ConvertAll(keys, key => key!));
             var dto = mapper.Map<TEditDTO>(entity);
             IEditModel<TEditDTO> model = new EditModel<TEditDTO>(dto);
             return model;

@@ -27,7 +27,7 @@ namespace Wodsoft.ComBoost.Aggregation
             return aggregation.AggregateAsync(this).ContinueWith(task =>
             {
                 if (task.IsFaulted)
-                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
+                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception!).Throw();
                 return (T)aggregation;
             });
         }
@@ -39,9 +39,15 @@ namespace Wodsoft.ComBoost.Aggregation
             if (valueType == null)
                 throw new ArgumentNullException(nameof(valueType));
             var builderType = typeof(DomainAggregationsBuilder<>).MakeGenericType(valueType);
-            if (!(bool)builderType.GetProperty("HasAggregation", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).GetValue(null))
+            var hasAggregationProperty = builderType.GetProperty("HasAggregation", BindingFlags.Public | BindingFlags.Static)
+                ?? throw new InvalidOperationException($"Could not find HasAggregation on {builderType.FullName}.");
+            if (!(bool)hasAggregationProperty.GetValue(null)!)
                 return Task.FromResult(value);
-            IDomainAggregation aggregation = (IDomainAggregation)((ConstructorInfo)builderType.GetProperty("Constructor", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null)).Invoke(new object[] { value });
+            var constructorProperty = builderType.GetProperty("Constructor", BindingFlags.NonPublic | BindingFlags.Static)
+                ?? throw new InvalidOperationException($"Could not find Constructor on {builderType.FullName}.");
+            var constructor = (ConstructorInfo?)constructorProperty.GetValue(null)
+                ?? throw new InvalidOperationException($"Constructor is not initialized for {builderType.FullName}.");
+            IDomainAggregation aggregation = (IDomainAggregation)constructor.Invoke(new object[] { value });
             return aggregation.AggregateAsync(this).ContinueWith(task => (object)aggregation);
         }
 

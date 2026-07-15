@@ -23,15 +23,18 @@ namespace Wodsoft.ComBoost.Data.Entity
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
-            Type type = typeof(T);
-            type = context.SupportTypes.FirstOrDefault(t => type.IsAssignableFrom(t));
-            if (type == null)
-                throw new NotSupportedException("数据库上下文不支持该类型实体。");
-            var sourceContext = context.GetType().GetMethod("GetContext").MakeGenericMethod(type).Invoke(context, new object[0]);
-            if (type == typeof(T))
+            Type entityType = typeof(T);
+            entityType = context.SupportTypes.FirstOrDefault(t => entityType.IsAssignableFrom(t))
+                ?? throw new NotSupportedException("数据库上下文不支持该类型实体。");
+            var getContextMethod = context.GetType().GetMethod("GetContext")
+                ?? throw new InvalidOperationException("数据库上下文未实现 GetContext 方法。");
+            var sourceContext = getContextMethod.MakeGenericMethod(entityType).Invoke(context, Array.Empty<object>())
+                ?? throw new InvalidOperationException("无法创建实体上下文。");
+            if (entityType == typeof(T))
                 return (IEntityContext<T>)sourceContext;
-            var wrapperType = typeof(EntityWrappedContext<,>).MakeGenericType(typeof(T), type);
-            var wrappedContext = Activator.CreateInstance(wrapperType, sourceContext);
+            var wrapperType = typeof(EntityWrappedContext<,>).MakeGenericType(typeof(T), entityType);
+            var wrappedContext = Activator.CreateInstance(wrapperType, sourceContext)
+                ?? throw new InvalidOperationException("无法创建包装实体上下文。");
             return (IEntityContext<T>)wrappedContext;
         }
 
@@ -53,7 +56,9 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new ArgumentException("实体类型不能为抽象的。");
             if (!typeof(IEntity).IsAssignableFrom(entityType))
                 throw new ArgumentException("实体类型没有继承“IEntity”接口。");
-            return typeof(IDatabaseContext).GetMethod("GetContext").MakeGenericMethod(entityType).Invoke(context, null);
+            var getContextMethod = typeof(IDatabaseContext).GetMethod("GetContext")
+                ?? throw new InvalidOperationException("IDatabaseContext 未定义 GetContext 方法。");
+            return getContextMethod.MakeGenericMethod(entityType).Invoke(context, null)!;
         }
     }
 }

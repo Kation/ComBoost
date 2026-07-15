@@ -40,8 +40,8 @@ namespace Wodsoft.ComBoost
         {
             if (parameter.ParameterType.IsArray)
             {
-                var claims = context.User.FindAll(Name ?? parameter.Name);
-                var elementType = parameter.ParameterType.GetElementType();
+                var claims = context.User.FindAll(Name ?? parameter.Name!);
+                var elementType = parameter.ParameterType.GetElementType()!;
                 if (elementType == typeof(string))
                     return claims.Select(t => t.Value).ToArray();
                 else
@@ -59,11 +59,11 @@ namespace Wodsoft.ComBoost
             }
             else
             {
-                var claim = context.User.FindFirst(Name ?? parameter.Name);
+                var claim = context.User.FindFirst(Name ?? parameter.Name!);
                 if (claim == null)
                 {
                     if (IsRequired)
-                        throw new DomainServiceException(new ArgumentNullException(parameter.Name, "获取" + (Name ?? parameter.Name) + "的声明值为空。"));
+                        throw new DomainServiceException(new ArgumentException($"获取{Name ?? parameter.Name}的声明值为空。"));
                     if (parameter.ParameterType.IsValueType)
                         return Activator.CreateInstance(parameter.ParameterType);
                     return null;

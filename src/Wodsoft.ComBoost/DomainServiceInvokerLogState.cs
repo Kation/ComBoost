@@ -20,8 +20,9 @@ namespace Wodsoft.ComBoost
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            yield return new KeyValuePair<string, object>("DomainService", Service.FullName);
-            yield return new KeyValuePair<string, object>("DomainMethod", Method.Name);
+            yield return new KeyValuePair<string, object>("DomainService", Service.FullName!);
+            if (Method != null)
+                yield return new KeyValuePair<string, object>("DomainMethod", Method.Name);
         }
 
         IEnumerator IEnumerable.GetEnumerator()

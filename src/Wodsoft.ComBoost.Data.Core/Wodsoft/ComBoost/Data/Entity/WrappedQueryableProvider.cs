@@ -39,7 +39,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 return new WrappedQueryable<T, M>(this, expression);
         }
 
-        public object Execute(Expression expression)
+        public object? Execute(Expression expression)
         {
             return InnerQueryProvider.Execute(expression);
         }

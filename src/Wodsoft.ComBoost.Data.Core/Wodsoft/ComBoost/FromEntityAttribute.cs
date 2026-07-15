@@ -53,7 +53,7 @@ namespace Wodsoft.ComBoost
             var keyType = metadata.KeyProperties[0].ClrType;
             if (keyType.GetTypeInfo().IsValueType)
                 keyType = typeof(Nullable<>).MakeGenericType(keyType);
-            object? value = provider.GetValue(Name ?? parameter.Name, keyType);
+            object? value = provider.GetValue(Name ?? parameter.Name!, keyType);
             if (value == null)
                 if (IsRequired)
                     throw new DomainServiceException(new ArgumentNullException(parameter.Name, "获取" + (Name ?? parameter.Name) + "实体的值为空。"));
@@ -62,7 +62,7 @@ namespace Wodsoft.ComBoost
             var databaseContext = context.GetRequiredService<IDatabaseContext>();
             dynamic entityContext;
             var type = metadata.Type;
-            entityContext = typeof(IDatabaseContext).GetMethod("GetContext").MakeGenericMethod(type).Invoke(databaseContext, new object[0]);
+            entityContext = typeof(IDatabaseContext).GetMethod("GetContext")!.MakeGenericMethod(type).Invoke(databaseContext, new object[0])!;
             object entity = entityContext.GetAsync(value).Result;
             if (IsRequired && entity == null)
                 throw new EntityNotFoundException(parameter.ParameterType, value);

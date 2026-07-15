@@ -23,11 +23,11 @@ namespace Wodsoft.ComBoost.Grpc.Client
             Module = assembly.DefineDynamicModule("default");
         }
 
-        protected internal static ConstructorInfo _TemplateConstructorInfo = typeof(GrpcTemplate).GetConstructor(new Type[] { typeof(GrpcChannel), typeof(CallOptions) });
-        protected internal static MethodInfo _InvokeAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-        protected internal static MethodInfo _InvokeWithReturnValueAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeWithReturnValueAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-        protected internal static MethodInfo _InvokeWithArgumentsAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeWithArgumentsAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-        protected internal static MethodInfo _InvokeWithArgumentsAndReturnValueAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeWithArgumentsAndReturnValueAsync", BindingFlags.NonPublic | BindingFlags.Instance);
+        protected internal static ConstructorInfo _TemplateConstructorInfo = typeof(GrpcTemplate).GetConstructor(new Type[] { typeof(GrpcChannel), typeof(CallOptions) })!;
+        protected internal static MethodInfo _InvokeAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeAsync", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        protected internal static MethodInfo _InvokeWithReturnValueAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeWithReturnValueAsync", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        protected internal static MethodInfo _InvokeWithArgumentsAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeWithArgumentsAsync", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        protected internal static MethodInfo _InvokeWithArgumentsAndReturnValueAsyncMethodInfo = typeof(GrpcTemplate).GetMethod("InvokeWithArgumentsAndReturnValueAsync", BindingFlags.NonPublic | BindingFlags.Instance)!;
 
         public class GrpcTemplate : IDomainTemplate
         {
@@ -113,6 +113,9 @@ namespace Wodsoft.ComBoost.Grpc.Client
         private static Type? _TemplateType;
         private static IDomainGrpcMethodBuilder? _MethodBuilder;
 
+        internal static readonly MethodInfo _MethodBuilderGetMethod = typeof(GrpcTemplateBuilder<T>).GetProperty("MethodBuilder", BindingFlags.Public | BindingFlags.Static)!.GetGetMethod()!;
+        internal static readonly MethodInfo _CreateMethod = typeof(IDomainGrpcMethodBuilder).GetMethod("CreateMethod")!;
+
         public static IDomainGrpcMethodBuilder MethodBuilder => _MethodBuilder ?? throw new InvalidOperationException("Template not build yet.");
 
         internal static void Build(IDomainGrpcMethodBuilder grpcMethodBuilder)
@@ -167,7 +170,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
             foreach (var method in type.GetMethods())
             {
                 if (!typeof(Task).IsAssignableFrom(method.ReturnType))
-                    throw new NotSupportedException($"Return type of {method.DeclaringType.FullName}.{method.Name}({string.Join(",", method.GetParameters().Select(t => t.ParameterType.Name))}) is not a Task type.");
+                    throw new NotSupportedException($"Return type of {method.DeclaringType!.FullName}.{method.Name}({string.Join(",", method.GetParameters().Select(t => t.ParameterType.Name))}) is not a Task type.");
 
                 //Define method override index
                 int methodIndex;
@@ -214,16 +217,16 @@ namespace Wodsoft.ComBoost.Grpc.Client
                     }
                     else
                     {
-                        var methodEndPointProvider = (IDomainGrpcEndPointProvider)Activator.CreateInstance(methodAttr.EndPointProvider);
+                        var methodEndPointProvider = (IDomainGrpcEndPointProvider)Activator.CreateInstance(methodAttr.EndPointProvider)!;
                         methodEndPointProvider.GetEndPoint(method, out methodServiceName, out methodName);
                     }
                 }
                 //Create static Method<,> field and set value
                 var methodField = typeBuilder.DefineField("_Method_" + method.Name + "_" + methodIndex, typeof(Method<,>).MakeGenericType(requestType, responseType), FieldAttributes.Private | FieldAttributes.Static);
-                staticILGenerator.Emit(OpCodes.Call, typeof(GrpcTemplateBuilder<T>).GetProperty("MethodBuilder", BindingFlags.Public | BindingFlags.Static).GetMethod);
+                staticILGenerator.Emit(OpCodes.Call, _MethodBuilderGetMethod);
                 staticILGenerator.Emit(OpCodes.Ldstr, methodServiceName ?? serviceName ?? DomainService.GetServiceName(type));
                 staticILGenerator.Emit(OpCodes.Ldstr, methodName ?? (method.Name + "_" + methodIndex));
-                staticILGenerator.Emit(OpCodes.Callvirt, typeof(IDomainGrpcMethodBuilder).GetMethod("CreateMethod").MakeGenericMethod(requestType, responseType));
+                staticILGenerator.Emit(OpCodes.Callvirt, _CreateMethod.MakeGenericMethod(requestType, responseType));
                 staticILGenerator.Emit(OpCodes.Stsfld, methodField);
 
                 //Create method for class
@@ -249,9 +252,11 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 }
                 else if (parameters.Length > 0 && method.ReturnType == typeof(Task))
                 {
+                    var argumentConstructor = argumentType!.GetConstructor(parameters.Select(t => t.ParameterType).ToArray())
+                        ?? throw new InvalidOperationException($"Could not find constructor for argument type {argumentType.FullName}.");
                     for (int i = 0; i < parameters.Length; i++)
                         ilGenerator.Emit(OpCodes.Ldarg_S, i + 1);
-                    ilGenerator.Emit(OpCodes.Newobj, argumentType!.GetConstructor(parameters.Select(t => t.ParameterType).ToArray()));
+                    ilGenerator.Emit(OpCodes.Newobj, argumentConstructor);
                     ilGenerator.Emit(OpCodes.Call, _InvokeWithArgumentsAsyncMethodInfo.MakeGenericMethod(argumentType));
                 }
                 else if (parameters.Length == 0 && method.ReturnType != typeof(Task))
@@ -260,9 +265,11 @@ namespace Wodsoft.ComBoost.Grpc.Client
                 }
                 else if (parameters.Length > 0 && method.ReturnType != typeof(Task))
                 {
+                    var argumentConstructor = argumentType!.GetConstructor(parameters.Select(t => t.ParameterType).ToArray())
+                        ?? throw new InvalidOperationException($"Could not find constructor for argument type {argumentType.FullName}.");
                     for (int i = 0; i < parameters.Length; i++)
                         ilGenerator.Emit(OpCodes.Ldarg_S, i + 1);
-                    ilGenerator.Emit(OpCodes.Newobj, argumentType!.GetConstructor(parameters.Select(t => t.ParameterType).ToArray()));
+                    ilGenerator.Emit(OpCodes.Newobj, argumentConstructor);
                     ilGenerator.Emit(OpCodes.Call, _InvokeWithArgumentsAndReturnValueAsyncMethodInfo.MakeGenericMethod(argumentType, method.ReturnType.GetGenericArguments()[0]));
                 }
 
@@ -272,7 +279,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
             staticILGenerator.Emit(OpCodes.Ret);
 
             var typeInfo = typeBuilder.CreateTypeInfo();
-            _TemplateType = typeInfo.AsType();
+            _TemplateType = typeInfo!.AsType();
         }
 
         private GrpcChannel _channel;
@@ -286,7 +293,7 @@ namespace Wodsoft.ComBoost.Grpc.Client
 
         public T GetTemplate(IDomainContext context)
         {
-            var template = (T)Activator.CreateInstance(_TemplateType!, _channel, _callOptions);
+            var template = (T)Activator.CreateInstance(_TemplateType!, _channel, _callOptions)!;
             template.Context = context;
             return template;
         }

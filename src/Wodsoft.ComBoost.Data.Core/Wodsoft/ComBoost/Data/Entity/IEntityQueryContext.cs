@@ -35,7 +35,11 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// </summary>
         /// <param name="keys">主键。</param>
         /// <returns>返回实体对象，可能为空。</returns>
-        Task<T> GetAsync(params object[] keys);
+#if NETSTANDARD2_0
+        Task<T?> GetAsync(params object[] keys);
+#else
+        ValueTask<T?> GetAsync(params object[] keys);
+#endif
 
         IQueryable<TChildren> QueryChildren<TChildren>(T item, Expression<Func<T, ICollection<TChildren>>> childrenSelector)
             where TChildren : class;

@@ -8,7 +8,7 @@ namespace Wodsoft.ComBoost.AspNetCore
 {
     public class HttpDomainContextProvider : IDomainContextProvider
     {
-        private readonly DomainAspNetCoreOptions _options;
+        private readonly DomainAspNetCoreOptions? _options;
         public HttpDomainContextProvider(IHttpContextAccessor httpContextAccessor, IOptions<DomainAspNetCoreOptions> options)
         {
             HttpContext = httpContextAccessor?.HttpContext;
@@ -27,8 +27,11 @@ namespace Wodsoft.ComBoost.AspNetCore
         public virtual IDomainContext GetContext()
         {
             if (HttpContext == null)
-                throw new NotSupportedException("There is no http context currently.");            
-            return new HttpDomainContext(HttpContext, _options.AuthenticationHandler(HttpContext));
+                throw new NotSupportedException("There is no http context currently.");
+            if (_options == null)
+                return new HttpDomainContext(HttpContext, HttpContext.User);
+            else
+                return new HttpDomainContext(HttpContext, _options.AuthenticationHandler(HttpContext));
         }
     }
 }

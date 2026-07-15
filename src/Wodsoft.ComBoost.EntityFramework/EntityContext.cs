@@ -154,10 +154,14 @@ namespace Wodsoft.ComBoost.Data.Entity
             return DbSet.SqlQuery(sql, parameters).AsNoTracking().AsQueryable();
         }
 
-        public Task<T> GetAsync(params object[] keys)
+#if NET461
+        public async Task<T?> GetAsync(params object[] keys)
+#else
+        public async ValueTask<T?> GetAsync(params object[] keys)
+#endif
         {
             if (Database.TrackEntity)
-                return DbSet.FindAsync(keys);
+                return await DbSet.FindAsync(keys);
             else
             {
                 ParameterExpression parameter = Expression.Parameter(typeof(T));
@@ -173,7 +177,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                         expression = Expression.AndAlso(expression, equal);
                 }
                 var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
-                return DbSet.AsNoTracking().Where(lambda).FirstOrDefaultAsync();
+                return await DbSet.AsNoTracking().Where(lambda).FirstOrDefaultAsync();
             }
         }
 

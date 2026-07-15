@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Wodsoft.ComBoost
@@ -21,14 +22,14 @@ namespace Wodsoft.ComBoost
         //    GlobalEventManager = new DomainServiceEventManager();
         //}
 
-        private Dictionary<Type, Delegate> _Events;
+        private Dictionary<Type, Delegate?> _Events;
 
         /// <summary>
         /// 实例化领域服务事件管理器。
         /// </summary>
         public DomainServiceEventManager()
         {
-            _Events = new Dictionary<Type, Delegate>();
+            _Events = new Dictionary<Type, Delegate?>();
         }
 
         /// <summary>
@@ -36,7 +37,9 @@ namespace Wodsoft.ComBoost
         /// </summary>
         public DomainServiceEventManager(DomainServiceEventManagerOptions options)
         {
-            _Events = options.GetEvents();
+            _Events = new Dictionary<Type, Delegate?>();
+            foreach (var kvp in options.GetEvents())
+                _Events[kvp.Key] = kvp.Value;
         }
 
         /// <summary>
@@ -44,7 +47,7 @@ namespace Wodsoft.ComBoost
         /// </summary>
         /// <typeparam name="T">事件参数类型。</typeparam>
         /// <returns>返回事件委托。</returns>
-        protected virtual Delegate GetEventDelegate<T>()
+        protected virtual Delegate? GetEventDelegate<T>()
         {
             _Events.TryGetValue(typeof(T), out var d);
             return d;
@@ -55,9 +58,12 @@ namespace Wodsoft.ComBoost
         /// </summary>
         /// <typeparam name="T">事件参数类型。</typeparam>
         /// <param name="value">事件委托。</param>
-        protected virtual void SetEventDelegate<T>(Delegate value)
+        protected virtual void SetEventDelegate<T>(Delegate? value)
         {
-            _Events[typeof(T)] = value;
+            if (value == null)
+                _Events.Remove(typeof(T));
+            else
+                _Events[typeof(T)] = value;
         }
 
         #region 关联事件
@@ -74,7 +80,7 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(handler));
             lock (_Events)
             {
-                Delegate d = GetEventDelegate<T>();
+                Delegate? d = GetEventDelegate<T>();
                 if (d == null)
                     SetEventDelegate<T>(handler);
                 else
@@ -110,23 +116,9 @@ namespace Wodsoft.ComBoost
                 throw new ArgumentNullException(nameof(handler));
             lock (_Events)
             {
-                Delegate d = GetEventDelegate<T>();
+                Delegate? d = GetEventDelegate<T>();
                 if (d != null)
                     SetEventDelegate<T>(Delegate.Remove(d, handler));
-            }
-        }
-
-        internal virtual void RemoveEventHandler(Type type, Delegate handler)
-        {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-            if (handler == null)
-                throw new ArgumentNullException(nameof(handler));
-            lock (_Events)
-            {
-                _Events.TryGetValue(type, out var d);
-                if (d != null)
-                    _Events[type] = Delegate.Remove(d, handler);
             }
         }
 
@@ -145,7 +137,7 @@ namespace Wodsoft.ComBoost
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
-            Delegate d = GetEventDelegate<T>();
+            Delegate? d = GetEventDelegate<T>();
             if (d != null)
                 foreach (var item in d.GetInvocationList().Cast<DomainServiceEventHandler<T>>())
                 {
@@ -155,17 +147,11 @@ namespace Wodsoft.ComBoost
                 }
         }
 
+        private int _Disposed;
         public void Dispose()
         {
-            Dispose(_Disposed);
-        }
-
-        private volatile bool _Disposed;
-        protected void Dispose(bool disposed)
-        {
-            if (disposed)
+            if (Interlocked.Exchange(ref _Disposed, 1) == 1)
                 return;
-            _Disposed = true;
             _Events.Clear();
         }
 

@@ -52,7 +52,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         private static readonly MethodInfo _AllAsyncMethodInfo
             = typeof(QueryableExtensions)
-                .GetTypeInfo().GetDeclaredMethod(nameof(AllAsync));
+                .GetTypeInfo().GetDeclaredMethod(nameof(AllAsync))!;
         public static Task<bool> AllAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
         {
             if (source == null)
@@ -1290,7 +1290,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         private static readonly MethodInfo _ToArrayAsyncMethodInfo
             = typeof(QueryableExtensions)
-                .GetTypeInfo().GetDeclaredMethod(nameof(ToArrayAsync));
+                .GetTypeInfo().GetDeclaredMethod(nameof(ToArrayAsync))!;
         public static Task<TSource[]> ToArrayAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
         {
             if (source == null)
@@ -1313,7 +1313,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(ToDictionaryAsync))
                 .First(t => t.GetGenericArguments().Length == 2 && t.GetParameters().Length == 3);
-        public static Task<Dictionary<TKey, TSource>> ToDictionaryAsync<TSource, TKey>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, CancellationToken cancellationToken = default)
+        public static Task<Dictionary<TKey, TSource>> ToDictionaryAsync<TSource, TKey>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, CancellationToken cancellationToken = default) where TKey : notnull
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -1333,7 +1333,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(ToDictionaryAsync))
                 .First(t => t.GetGenericArguments().Length == 2 && t.GetParameters().Length == 4);
-        public static Task<Dictionary<TKey, TSource>> ToDictionaryAsync<TSource, TKey>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default)
+        public static Task<Dictionary<TKey, TSource>> ToDictionaryAsync<TSource, TKey>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default) where TKey : notnull
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -1355,7 +1355,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(ToDictionaryAsync))
                 .First(t => t.GetGenericArguments().Length == 3 && t.GetParameters().Length == 4);
-        public static Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TSource, TKey, TElement>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, CancellationToken cancellationToken = default)
+        public static Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TSource, TKey, TElement>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, CancellationToken cancellationToken = default) where TKey : notnull
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -1377,7 +1377,7 @@ namespace Wodsoft.ComBoost.Data.Linq
             = typeof(QueryableExtensions)
                 .GetTypeInfo().GetDeclaredMethods(nameof(ToDictionaryAsync))
                 .First(t => t.GetGenericArguments().Length == 3 && t.GetParameters().Length == 5);
-        public static Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TSource, TKey, TElement>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default)
+        public static Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TSource, TKey, TElement>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer, CancellationToken cancellationToken = default) where TKey : notnull
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -1404,7 +1404,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         private static readonly MethodInfo _ToListAsyncMethodInfo
             = typeof(QueryableExtensions)
-                .GetTypeInfo().GetDeclaredMethod(nameof(ToListAsync));
+                .GetTypeInfo().GetDeclaredMethod(nameof(ToListAsync))!;
         public static Task<List<TSource>> ToListAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
         {
             if (source == null)
@@ -1610,7 +1610,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         private static readonly MethodInfo _DeleteAsyncMethodInfo
             = typeof(QueryableExtensions)
-                .GetTypeInfo().GetDeclaredMethod(nameof(DeleteAsync));
+                .GetTypeInfo().GetDeclaredMethod(nameof(DeleteAsync))!;
         public static Task<int> DeleteAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
         {
             if (source == null)
@@ -1627,7 +1627,7 @@ namespace Wodsoft.ComBoost.Data.Linq
 
         private static readonly MethodInfo _UpdateAsyncMethodInfo
             = typeof(QueryableExtensions)
-                .GetTypeInfo().GetDeclaredMethod(nameof(UpdateAsync));
+                .GetTypeInfo().GetDeclaredMethod(nameof(UpdateAsync))!;
         public static Task<int> UpdateAsync<TSource>(this IQueryable<TSource> source, Expression<Func<UpdateCaller<TSource>, UpdateCaller<TSource>>> updater, CancellationToken cancellationToken = default)
         {
             if (source == null)

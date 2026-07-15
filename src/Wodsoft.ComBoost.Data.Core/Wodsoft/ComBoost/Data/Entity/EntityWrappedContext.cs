@@ -72,18 +72,17 @@ namespace Wodsoft.ComBoost.Data.Entity
             LambdaExpression newExpression = (LambdaExpression)wrapper.Visit(expression);
             var propertyType = newExpression.Type.GetGenericArguments()[1];
             var queryable = query.Unwrap<T, M>();
-            queryable = (IQueryable<M>)InnerContext.GetType().GetMethod("Include").MakeGenericMethod(propertyType).Invoke(InnerContext, new object[] { queryable, newExpression });
+            queryable = (IQueryable<M>)InnerContext.GetType().GetMethod("Include")!.MakeGenericMethod(propertyType).Invoke(InnerContext, new object[] { queryable, newExpression })!;
             return queryable.Wrap<T, M>();
         }
 
-        public Task<T> GetAsync(params object[] keys)
+#if NETSTANDARD2_0
+        public async Task<T?> GetAsync(params object[] keys)
+#else
+        public async ValueTask<T?> GetAsync(params object[] keys)
+#endif
         {
-            return InnerContext.GetAsync(keys).ContinueWith(task =>
-            {
-                if (task.Exception!=null)
-                    System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(task.Exception).Throw();
-                return (T)task.Result;
-            });
+            return (T?)(object?)await InnerContext.GetAsync(keys);
         }
 
         public IQueryable<TChildren> QueryChildren<TChildren>(T item, Expression<Func<T, ICollection<TChildren>>> childrenSelector) where TChildren : class

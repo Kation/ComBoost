@@ -44,7 +44,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             if (query == null)
                 throw new ArgumentNullException(nameof(query));
             var parameter = Expression.Parameter(typeof(T));
-            IPropertyMetadata sortProperty = context.Metadata.SortProperty ?? context.Metadata.KeyProperties.FirstOrDefault();
+            IPropertyMetadata? sortProperty = context.Metadata.SortProperty ?? context.Metadata.KeyProperties.FirstOrDefault();
             if (sortProperty == null)
                 throw new InvalidOperationException($"实体“{typeof(T).FullName}”找不到排序字段。");
             dynamic express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(T), sortProperty.ClrType), Expression.Property(parameter, sortProperty.ClrName), parameter);
@@ -71,7 +71,7 @@ namespace Wodsoft.ComBoost.Data.Entity
             Type type = context.Metadata.Type;
             for (int i = 0; i < properties.Length; i++)
             {
-                PropertyInfo property = type.GetProperty(properties[i]);
+                PropertyInfo? property = type.GetProperty(properties[i]);
                 if (property == null)
                     throw new ArgumentException("父级路径错误。");
                 if (member == null)
@@ -82,13 +82,13 @@ namespace Wodsoft.ComBoost.Data.Entity
             }
             Expression equal;
             if (type.GetTypeInfo().IsValueType)
-                equal = Expression.Equal(member, Expression.Constant(value));
+                equal = Expression.Equal(member!, Expression.Constant(value));
             else
             {
                 var propertyMetadata = EntityDescriptor.GetMetadata(type);
                 if (propertyMetadata.KeyProperties.Count > 0)
                     throw new InvalidOperationException("不支持多主键的父级实体类型。");
-                equal = Expression.Equal(Expression.Property(member, type.GetProperty(propertyMetadata.KeyProperties[0].ClrName)), Expression.Constant(value));
+                equal = Expression.Equal(Expression.Property(member, type.GetProperty(propertyMetadata.KeyProperties[0].ClrName)!), Expression.Constant(value));
             }
             var express = Expression.Lambda<Func<T, bool>>(equal, parameter);
             return query.Where(express);
@@ -105,17 +105,19 @@ namespace Wodsoft.ComBoost.Data.Entity
                 throw new ArgumentNullException(nameof(parentIds));
             if (context.Metadata.ParentProperty == null)
                 throw new NotSupportedException("该实体不支持父级元素。");
+            var indexProperty = typeof(T).GetProperty("Index")
+                ?? throw new InvalidOperationException($"实体“{typeof(T).FullName}”未定义 Index 属性。");
             var parameter = Expression.Parameter(typeof(T));
             Expression? equal = null;
             foreach (object parent in parentIds)
             {
-                var item = Expression.Equal(Expression.Property(Expression.Property(parameter, context.Metadata.ParentProperty.ClrName), typeof(T).GetProperty("Index")), Expression.Constant(parent));
+                var item = Expression.Equal(Expression.Property(Expression.Property(parameter, context.Metadata.ParentProperty.ClrName), indexProperty), Expression.Constant(parent));
                 if (equal == null)
                     equal = item;
                 else
                     equal = Expression.Or(equal, item);
             }
-            var express = Expression.Lambda<Func<T, bool>>(equal, parameter);
+            var express = Expression.Lambda<Func<T, bool>>(equal!, parameter);
             return query.Where(express);
 
         }

@@ -143,29 +143,31 @@ namespace Wodsoft.ComBoost.Data.Entity
             DbSet.UpdateRange(items);
         }
 
+#if NETSTANDARD2_0
         public Task<T> GetAsync(params object[] keys)
+#else
+        public async ValueTask<T?> GetAsync(params object[] keys)
+#endif
         {
-#pragma warning disable CS8619 // 值中的引用类型的为 Null 性与目标类型不匹配。
             if (Database.TrackEntity)
-                return DbSet.FindAsync(keys).AsTask();
-            else
+                return await DbSet.FindAsync(keys);
+
+            ParameterExpression parameter = Expression.Parameter(typeof(T));
+            Expression? expression = null;
+            if (Metadata.KeyProperties.Count != keys.Length)
+                throw new InvalidOperationException("Length of keys is difference to entity.");
+            for (int i = 0; i < Metadata.KeyProperties.Count; i++)
             {
-                ParameterExpression parameter = Expression.Parameter(typeof(T));
-                Expression? expression = null;
-                if (Metadata.KeyProperties.Count != keys.Length)
-                    throw new InvalidOperationException("Length of keys is difference to entity.");
-                for (int i = 0; i < Metadata.KeyProperties.Count; i++)
-                {
-                    var equal = Expression.Equal(Expression.Property(parameter, Metadata.KeyProperties[i].ClrName), Expression.Constant(keys[i]));
-                    if (expression == null)
-                        expression = equal;
-                    else
-                        expression = Expression.AndAlso(expression, equal);
-                }
-                var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
-                return DbSet.AsNoTracking().Where(lambda).FirstOrDefaultAsync();
+                var equal = Expression.Equal(Expression.Property(parameter, Metadata.KeyProperties[i].ClrName), Expression.Constant(keys[i]));
+                if (expression == null)
+                    expression = equal;
+                else
+                    expression = Expression.AndAlso(expression, equal);
             }
-#pragma warning restore CS8619 // 值中的引用类型的为 Null 性与目标类型不匹配。
+            if (expression == null)
+                throw new InvalidOperationException("Entity has no key properties.");
+            var lambda = Expression.Lambda<Func<T, bool>>(expression, parameter);
+            return await DbSet.AsNoTracking().Where(lambda).FirstOrDefaultAsync()!;
         }
 
         public void Detach(T item)

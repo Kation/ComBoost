@@ -53,7 +53,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
-            IEntityDescriptor descriptor = (IEntityDescriptor)typeof(EntityDescriptor<>).MakeGenericType(type).GetProperty("Descriptor", BindingFlags.Static | BindingFlags.Public).GetValue(null);
+            IEntityDescriptor descriptor = (IEntityDescriptor)typeof(EntityDescriptor<>).MakeGenericType(type).GetProperty("Descriptor", BindingFlags.Static | BindingFlags.Public)!.GetValue(null)!;
             return descriptor.GetMetadata(type);
         }
 
@@ -79,7 +79,7 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
 
         IEntityMetadata IEntityDescriptor.GetMetadata(Type type)
         {
-            return (IEntityMetadata)typeof(EntityDescriptor<>).MakeGenericType(type).GetProperty("Metadata").GetValue(null);
+            return (IEntityMetadata)typeof(EntityDescriptor<>).MakeGenericType(type).GetProperty("Metadata")!.GetValue(null)!;
         }
 
         IEntityMetadata IEntityDescriptor.GetMetadata<T>()
@@ -128,15 +128,15 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
                 {
                     var type = typeof(T);
                     while (type.Assembly.IsDynamic)
-                        type = type.BaseType;
+                        type = type.BaseType!;
                     var metadataField = type.GetField("Metadata", BindingFlags.Static | BindingFlags.Public);
                     if (metadataField != null)
-                        _Metadata = (IEntityMetadata)metadataField.GetValue(null);
+                        _Metadata = (IEntityMetadata?)metadataField.GetValue(null) ?? new ClrEntityMetadata(type);
                     else
                         _Metadata = new ClrEntityMetadata(type);
                     foreach (var interfaceType in type.GetInterfaces().Where(t => t != typeof(IEntity) && t.GetTypeInfo().GetCustomAttribute<EntityInterfaceAttribute>() != null && typeof(IEntity).IsAssignableFrom(t)))
                     {
-                        typeof(EntityDescriptor<T>).MakeGenericType(interfaceType).GetProperty(nameof(Metadata), BindingFlags.Public | BindingFlags.Static).SetValue(null, _Metadata);
+                        typeof(EntityDescriptor<T>).MakeGenericType(interfaceType).GetProperty(nameof(Metadata), BindingFlags.Public | BindingFlags.Static)!.SetValue(null, _Metadata);
                     }
                 }
                 return _Metadata;

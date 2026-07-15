@@ -7,7 +7,7 @@ namespace Wodsoft.ComBoost
 {
     public class DomainContextAccessor : IDomainContextAccessor
     {
-        private readonly AsyncLocal<IDomainContext> _store = new AsyncLocal<IDomainContext>();
+        private readonly AsyncLocal<IDomainContext?> _store = new AsyncLocal<IDomainContext?>();
 
         public IDomainContext? Context { get => _store.Value; set => _store.Value = value; }
     }

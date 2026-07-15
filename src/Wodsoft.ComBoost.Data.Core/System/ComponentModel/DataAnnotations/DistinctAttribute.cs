@@ -42,7 +42,7 @@ namespace System.ComponentModel.DataAnnotations
             object entity = validationContext.ObjectInstance;
             Type type = validationContext.ObjectType;
             while (type.GetTypeInfo().Assembly.IsDynamic)
-                type = type.GetTypeInfo().BaseType;
+                type = type.GetTypeInfo().BaseType!;
             var databaseContext = validationContext.GetRequiredService<IDatabaseContext>();
             var entityContext = databaseContext.GetDynamicContext(type);
             if (value is string && !IsCaseSensitive)
@@ -55,10 +55,10 @@ namespace System.ComponentModel.DataAnnotations
             if (value is string && IsCaseSensitive)
                 right = Expression.Equal(Expression.Property(parameter, validationContext.MemberName), Expression.Constant(value));
             else
-                right = Expression.Equal(Expression.Call(Expression.Property(parameter, validationContext.MemberName), typeof(string).GetMethod("ToLower", Array.Empty<Type>())), Expression.Constant(value)); 
+                right = Expression.Equal(Expression.Call(Expression.Property(parameter, validationContext.MemberName), typeof(string).GetMethod("ToLower", Array.Empty<Type>())!), Expression.Constant(value)); 
             Expression expression = Expression.And(left, right);
             expression = Expression.Lambda(typeof(Func<,>).MakeGenericType(type, typeof(bool)), expression, parameter);
-            dynamic where = _QWhereMethod.MakeGenericMethod(type).Invoke(null, new[] { entityContext.Query(), expression });
+            dynamic where = _QWhereMethod.MakeGenericMethod(type).Invoke(null, new[] { entityContext.Query(), expression })!;
             int count = ((Task<int>)entityContext.CountAsync(where)).Result; ;
             if (count != 0)
                 if (ErrorMessage != null)
@@ -69,7 +69,7 @@ namespace System.ComponentModel.DataAnnotations
                 return ValidationResult.Success;
         }
 
-        private static MethodInfo _QWhereMethod = typeof(Queryable).GetMethods().Where(t => t.Name == "Where" && t.GetParameters().Length == 2).First();
+        private static readonly MethodInfo _QWhereMethod = typeof(Queryable).GetMethods().Where(t => t.Name == "Where" && t.GetParameters().Length == 2).First();
         //private static MethodInfo _QCountMethod = typeof(Queryable).GetMethods().Where(t => t.Name == "Count" && t.GetParameters().Length == 1).First();
     }
 }

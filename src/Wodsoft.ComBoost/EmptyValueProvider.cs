@@ -68,7 +68,7 @@ namespace Wodsoft.ComBoost
             object? value = GetValue(name);
             if (value == null)
             {
-                if (!_Alias.TryGetValue(name, out string aliasName))
+                if (!_Alias.TryGetValue(name, out string? aliasName))
                     return null;
                 name = aliasName;
                 value = GetValue(name);
@@ -85,6 +85,8 @@ namespace Wodsoft.ComBoost
                 {
                     var currentConverter = TypeDescriptor.GetConverter(currentType);
                     var currentStringValue = currentConverter.ConvertToString(value);
+                    if (currentStringValue == null)
+                        return null;
                     value = converter.ConvertFromString(currentStringValue);
                 }
             }

@@ -12,7 +12,7 @@ namespace Wodsoft.ComBoost.Data.Entity
 
     public class ExpressionWrapper : ExpressionVisitor
     {
-        private static readonly MethodInfo _WrapMethod = typeof(QueryableExtensions).GetMethod("Wrap", new Type[] { typeof(object) });
+        private static readonly MethodInfo _WrapMethod = typeof(QueryableExtensions).GetMethod("Wrap", new Type[] { typeof(object) })!;
         private Type _T, _M;
 
         public ExpressionWrapper(Type target, Type mapped)
@@ -102,7 +102,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                 var value = Expression.Lambda<Func<object>>(Expression.Convert(node, typeof(object))).Compile()();
                 return Expression.Constant(value);
             }
-            else if (node.Expression is MemberExpression && ((MemberExpression)node.Expression).Member.DeclaringType.Name.Contains("<>"))
+            else if (node.Expression is MemberExpression memberExpression && memberExpression.Member.DeclaringType?.Name.Contains("<>") == true)
             {
                 var value = Expression.Lambda<Func<object>>(Expression.Convert(node, typeof(object))).Compile()();
                 return Expression.Constant(value);

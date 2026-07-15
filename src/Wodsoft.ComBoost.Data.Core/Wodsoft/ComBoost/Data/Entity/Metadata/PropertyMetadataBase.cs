@@ -165,14 +165,14 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <typeparam name="T">Attribute type.</typeparam>
         /// <returns></returns>
-        public abstract T[] GetAttributes<T>() where T : Attribute;
+        public abstract IEnumerable<T> GetAttributes<T>() where T : Attribute;
 
         /// <summary>
         /// Get property value from an entity.
         /// </summary>
         /// <param name="entity">Entity.</param>
         /// <returns></returns>
-        public abstract object GetValue(object entity);
+        public abstract object? GetValue(object entity);
 
         /// <summary>
         /// Set property value to an entity.

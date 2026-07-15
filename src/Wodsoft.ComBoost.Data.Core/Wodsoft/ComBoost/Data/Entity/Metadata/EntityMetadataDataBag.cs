@@ -9,29 +9,26 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
 {
     public class EntityMetadataDataBag : DynamicObject
     {
-        private ConcurrentDictionary<string, object> _Values;
+        private ConcurrentDictionary<string, object?> _Values;
 
         public EntityMetadataDataBag()
         {
-            _Values = new ConcurrentDictionary<string, object>();
+            _Values = new ConcurrentDictionary<string, object?>();
         }
 
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        public override bool TryGetMember(GetMemberBinder binder, out object? result)
         {
             _Values.TryGetValue(binder.Name, out result);
             return true;
         }
 
-        public override bool TrySetMember(SetMemberBinder binder, object value)
+        public override bool TrySetMember(SetMemberBinder binder, object? value)
         {
-            _Values.AddOrUpdate(binder.Name, value, (k, v) =>
-            {
-                return value;
-            });
+            _Values.AddOrUpdate(binder.Name, value, (k, v) => value);
             return true;
         }
 
-        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
+        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object? result)
         {
             if (indexes.Length > 1)
                 throw new NotSupportedException();
@@ -42,17 +39,14 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
             return true;
         }
 
-        public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object value)
+        public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object? value)
         {
             if (indexes.Length > 1)
                 throw new NotSupportedException();
             string? key = indexes[0] as string;
             if (string.IsNullOrEmpty(key))
                 throw new NotSupportedException();
-            _Values.AddOrUpdate(key, value, (k, v) =>
-            {
-                return value;
-            });
+            _Values.AddOrUpdate(key, value, (k, v) => value);
             return true;
         }
     }

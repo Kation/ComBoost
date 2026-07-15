@@ -61,7 +61,7 @@ namespace Wodsoft.ComBoost
             }
             else
             {
-                if (!context.DomainContext.User.Identity.IsAuthenticated)
+                if (context.DomainContext.User.Identity?.IsAuthenticated != true)
                     throw new DomainServiceException(new UnauthorizedAccessException("用户未通过身份验证。"));
             }
         }

@@ -22,7 +22,7 @@ namespace Wodsoft.ComBoost.Aggregation
             try
             {
                 var aggregatorService = scope.ServiceProvider.GetRequiredService<IDomainAggregatorService<T>>();
-                var value = await aggregatorService.GetAsync(keys.Select(t=>t.ToString()).ToArray());
+                var value = await aggregatorService.GetAsync(keys.Select(t => t?.ToString() ?? string.Empty).ToArray());
                 if (value != null || next == null)
                     return value;
                 return await next();

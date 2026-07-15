@@ -76,7 +76,7 @@ namespace Wodsoft.ComBoost.Grpc
             throw new NotSupportedException();
         }
 
-        bool IEquatable<DomainGrpcTrace>.Equals(DomainGrpcTrace other)
+        bool IEquatable<DomainGrpcTrace>.Equals(DomainGrpcTrace? other)
         {
             throw new NotSupportedException();
         }

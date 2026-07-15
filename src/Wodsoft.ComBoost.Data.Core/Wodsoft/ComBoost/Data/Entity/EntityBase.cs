@@ -87,14 +87,14 @@ namespace Wodsoft.ComBoost.Data.Entity
         /// 获取实体名称。
         /// </summary>
         /// <returns>返回实体名称。</returns>
-        public override string ToString()
+        public override string? ToString()
         {
             var metadata = EntityDescriptor.GetMetadata(GetType());
             if (metadata.DisplayProperty == null)
                 return base.ToString();
-            object value = metadata.DisplayProperty.GetValue(this);
+            object? value = metadata.DisplayProperty.GetValue(this);
             if (value == null)
-                return "";
+                return null;
             else
                 return value.ToString();
         }

@@ -65,7 +65,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder.UseMethodBuilder(new T());
         }
 
-        private readonly static MethodInfo _UseTemplateMethod = typeof(IComBoostGrpcServiceBuilder).GetMethod("UseTemplate");
+        private readonly static MethodInfo _UseTemplateMethod = typeof(IComBoostGrpcServiceBuilder).GetMethod("UseTemplate")!;
         public static IComBoostGrpcServiceBuilder UseTemplateInAssembly(this IComBoostGrpcServiceBuilder builder, string serviceName, Assembly assembly, CallOptions callOptions = default)
         {
             if (builder == null)

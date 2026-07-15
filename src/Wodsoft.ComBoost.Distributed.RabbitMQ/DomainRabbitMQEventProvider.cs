@@ -35,22 +35,22 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
             _eventOptions = eventOptions ?? throw new ArgumentNullException(nameof(eventOptions));
         }
 
-        private void _connection_CallbackException(object sender, CallbackExceptionEventArgs e)
+        private void _connection_CallbackException(object? sender, CallbackExceptionEventArgs e)
         {
             _logger.LogError(e.Exception, "RabbitMQ connection callback throw exception.");
         }
 
-        private void _connection_ConnectionShutdown(object sender, ShutdownEventArgs e)
+        private void _connection_ConnectionShutdown(object? sender, ShutdownEventArgs e)
         {
             _logger.LogError("RabbitMQ connection shutdown.");
         }
 
-        private void _connection_ConnectionUnblocked(object sender, EventArgs e)
+        private void _connection_ConnectionUnblocked(object? sender, EventArgs e)
         {
             _logger.LogInformation("RabbitMQ connection unblocked.");
         }
 
-        private void _connection_ConnectionBlocked(object sender, ConnectionBlockedEventArgs e)
+        private void _connection_ConnectionBlocked(object? sender, ConnectionBlockedEventArgs e)
         {
             _logger.LogWarning("RabbitMQ connection blocked. " + e.Reason);
         }
@@ -273,7 +273,7 @@ namespace Wodsoft.ComBoost.Distributed.RabbitMQ
                 bool isAcked = false;
                 try
                 {
-                    using (logger.BeginScope(new DomainRabbitMQLogState(typeof(T).FullName, e.Exchange, e.Redelivered, e.DeliveryTag)))
+                    using (logger.BeginScope(new DomainRabbitMQLogState(typeof(T).FullName!, e.Exchange, e.Redelivered, e.DeliveryTag)))
                     {
                         logger.LogInformation("RabbitMQ starting handle event.");
                         var args = JsonSerializer.Deserialize<T>(e.Body.Span)!;

@@ -84,6 +84,8 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public async Task RemoveRange(params TRemoveDTO[] items)
         {
+            if (items.Length == 0)
+                return;
             var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
             var keyList = new List<object[]>();
             var hashKey = new Dictionary<int, TRemoveDTO>();
@@ -108,8 +110,8 @@ namespace Wodsoft.ComBoost.Data.Entity
                 Expression? equal = null;
                 for (int i = 0; i < keyProperties.Count; i++)
                 {
-                    var e = Expression.Equal(Expression.Property(parameter, keyProperties[0].ClrName), Expression.Constant(key[i], keyProperties[i].ClrType));
-                    if (i == 0)
+                    var e = Expression.Equal(Expression.Property(parameter, keyProperties[i].ClrName), Expression.Constant(key[i], keyProperties[i].ClrType));
+                    if (equal == null)
                         equal = e;
                     else
                         equal = Expression.AndAlso(equal, e);
@@ -117,9 +119,9 @@ namespace Wodsoft.ComBoost.Data.Entity
                 if (expression == null)
                     expression = equal;
                 else
-                    expression = Expression.OrElse(expression, equal);
+                    expression = Expression.OrElse(expression, equal!);
             }
-            var predicate = Expression.Lambda<Func<TEntity, bool>>(expression, parameter);
+            var predicate = Expression.Lambda<Func<TEntity, bool>>(expression!, parameter);
             var entities = await _context.Query().Where(predicate).ToDictionaryAsync(t =>
             {
                 int hash = 0;
@@ -161,6 +163,8 @@ namespace Wodsoft.ComBoost.Data.Entity
 
         public async Task UpdateRange(params TEditDTO[] items)
         {
+            if (items.Length == 0)
+                return;
             var keyProperties = EntityDescriptor.GetMetadata<TEntity>().KeyProperties;
             var keyList = new List<object[]>();
             var hashKey = new Dictionary<int, TEditDTO>();
@@ -185,18 +189,18 @@ namespace Wodsoft.ComBoost.Data.Entity
                 Expression? equal = null;
                 for (int i = 0; i < keyProperties.Count; i++)
                 {
-                    var e = Expression.Equal(Expression.Property(parameter, keyProperties[0].ClrName), Expression.Constant(key[i], keyProperties[i].ClrType));
-                    if (i == 0)
+                    var e = Expression.Equal(Expression.Property(parameter, keyProperties[i].ClrName), Expression.Constant(key[i], keyProperties[i].ClrType));
+                    if (equal == null)
                         equal = e;
                     else
                         equal = Expression.AndAlso(equal, e);
-                }
-                if (expression == null)
+            }
+            if (expression == null)
                     expression = equal;
                 else
-                    expression = Expression.OrElse(expression, equal);
+                    expression = Expression.OrElse(expression, equal!);
             }
-            var predicate = Expression.Lambda<Func<TEntity, bool>>(expression, parameter);
+            var predicate = Expression.Lambda<Func<TEntity, bool>>(expression!, parameter);
             var entities = await _context.Query().Where(predicate).ToDictionaryAsync(t =>
             {
                 int hash = 0;

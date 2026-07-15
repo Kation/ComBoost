@@ -17,7 +17,7 @@ namespace Wodsoft.ComBoost.AspNetCore
             Context = accessor.HttpContext;
         }
 
-        public HttpContext Context { get; }
+        public HttpContext? Context { get; }
 
         public Task<AuthenticationResult> AuthenticateAsync()
         {

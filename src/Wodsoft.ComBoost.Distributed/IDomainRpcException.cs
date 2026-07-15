@@ -10,7 +10,7 @@ namespace Wodsoft.ComBoost
 
         string Message { get; }
 
-        string Source { get; }
+        string? Source { get; }
 
         string StackTrace { get; }
 
