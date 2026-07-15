@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Concurrent;
@@ -61,7 +61,35 @@ namespace Wodsoft.ComBoost.Data.Entity
                         }
                     case "UpdateAsync":
                         {
-#if NET6_0_OR_GREATER
+#if NET10_0_OR_GREATER
+                            var method = MapMethod(node.Method);
+                            var updateCaller = (LambdaExpression)((ConstantExpression)node.Arguments[1]).Value!;
+                            var callType = typeof(UpdateSettersBuilder<>).MakeGenericType(updateCaller.ReturnType.GetGenericArguments());
+                            ParameterExpression parameterExpression = Expression.Parameter(callType, "c");
+                            Expression originExpression = updateCaller.Body!;
+                            List<(Type Type, LambdaExpression Property, LambdaExpression Value)> properties = new List<(Type, LambdaExpression, LambdaExpression)>();
+                            while (originExpression.NodeType == ExpressionType.Call)
+                            {
+                                MethodCallExpression methodCallExpression = (MethodCallExpression)originExpression;
+                                if (!methodCallExpression.Method.DeclaringType!.IsGenericType || methodCallExpression.Method.DeclaringType.GetGenericTypeDefinition() != typeof(Wodsoft.ComBoost.Data.Linq.UpdateCaller<>))
+                                    throw new NotSupportedException("更新函数内仅支持调用Property方法。");
+                                //methodCallExpression.Arguments[0]
+                                properties.Add((methodCallExpression.Method.GetGenericArguments()[0], (LambdaExpression)methodCallExpression.Arguments[0], (LambdaExpression)methodCallExpression.Arguments[1]));
+                                originExpression = methodCallExpression.Object!;
+                            }
+                            if (originExpression.NodeType != ExpressionType.Parameter)
+                                throw new NotSupportedException("更新函数内仅支持调用Property方法。");
+                            var setParameter = typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(callType.GetGenericArguments()[0], Type.MakeGenericMethodParameter(0)));
+                            var setMethod = callType.GetMethod("SetProperty", 1, BindingFlags.Public | BindingFlags.Instance, new Type[] { setParameter, setParameter })!;
+                            Expression? expression = null;
+                            foreach (var property in properties)
+                            {
+                                var setMethodInstance = setMethod.MakeGenericMethod(property.Type);
+                                expression = Expression.Call(expression ?? parameterExpression, setMethodInstance, property.Property, property.Value);
+                            }
+                            var call = Expression.Lambda(typeof(Action<>).MakeGenericType(callType), expression!, parameterExpression);
+                            return Expression.Call(method, Visit(node.Arguments[0]), call, node.Arguments[2]);
+#elif NET6_0_OR_GREATER
                             var method = MapMethod(node.Method);
                             var updateCaller = (LambdaExpression)((ConstantExpression)node.Arguments[1]).Value!;
                             var callType = typeof(SetPropertyCalls<>).MakeGenericType(updateCaller.ReturnType.GetGenericArguments());
@@ -171,7 +199,7 @@ namespace Wodsoft.ComBoost.Data.Entity
                         case "UpdateAsync":
 #if NET6_0
                             return typeof(RelationalQueryableExtensions).GetMethod("Execute" + method.Name)!.MakeGenericMethod(method.GetGenericArguments());
-#elif NET9_0
+#elif NET9_0_OR_GREATER
                             return typeof(EntityFrameworkQueryableExtensions).GetMethod("Execute" + method.Name)!.MakeGenericMethod(method.GetGenericArguments());
 #else
                             throw new NotSupportedException("Not support below .NET 6.");

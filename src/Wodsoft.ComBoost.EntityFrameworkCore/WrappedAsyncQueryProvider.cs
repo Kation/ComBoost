@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System;
 using System.Collections.Concurrent;
@@ -98,7 +98,11 @@ namespace Wodsoft.ComBoost.Data.Entity
                         parameters.Add(((ConstantExpression)methodExpression.Arguments[1]).Value);
                         break;
                     case "ExecuteUpdateAsync":
+#if NET10_0_OR_GREATER
+                        parameters.Add(((LambdaExpression)methodExpression.Arguments[1]).Compile());
+#else
                         parameters.Add(((UnaryExpression)methodExpression.Arguments[1]).Operand);
+#endif
                         parameters.Add(((ConstantExpression)methodExpression.Arguments[2]).Value);
                         break;
                     case "ToDictionaryAsync":
