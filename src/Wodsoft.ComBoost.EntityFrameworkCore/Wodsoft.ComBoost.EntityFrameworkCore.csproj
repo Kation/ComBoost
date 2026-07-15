@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Description>ComBoost用于EntityFrameworkCore实现的实体模块。</Description>
-		<TargetFrameworks>netstandard2.1;net6.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;net6.0;net9.0;net10.0</TargetFrameworks>
 		<RootNamespace>Wodsoft.ComBoost.Data.Entity</RootNamespace>
 		<LangVersion>10.0</LangVersion>
 		<Nullable>enable</Nullable>
@@ -25,5 +25,10 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0" />
 	</ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'== 'net10.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
+  </ItemGroup>
 
 </Project>
