@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
@@ -42,6 +43,7 @@ namespace Wodsoft.ComBoost.Mock
                     case DomainDistributedEventFeatures.MustHandle:
                     case DomainDistributedEventFeatures.Delay:
                     case DomainDistributedEventFeatures.Group:
+                    case DomainDistributedEventFeatures.Retry:
                         break;
                     case DomainDistributedEventFeatures.SingleHandler:
                         single = true;
@@ -99,6 +101,16 @@ namespace Wodsoft.ComBoost.Mock
             if (handlers == null)
                 return;
             Task[] tasks;
+            int[] times;
+            if (features.Contains(DomainDistributedEventFeatures.Retry))
+            {
+                var retryTimesAttribute = typeof(T).GetCustomAttribute<DomainDistributedEventRetryTimesAttribute>();
+                if (retryTimesAttribute == null)
+                    throw new InvalidOperationException("A distributed event can retry means that must have \"DomainDistributedEventRetryTimesAttribute\" attribute.");
+                times = retryTimesAttribute.Times;
+            }
+            else
+                times = Array.Empty<int>();
             if (features.Contains(DomainDistributedEventFeatures.SingleHandler))
             {
                 tasks = handlers.Select(async t =>
@@ -108,7 +120,20 @@ namespace Wodsoft.ComBoost.Mock
                     await t.Semaphore.WaitAsync();
                     try
                     {
-                        await t.Delegates[0](args);
+                        for (int i = 0; i <= times.Length; i++)
+                        {
+                            try
+                            {
+                                await t.Delegates[0](args);
+                                break;
+                            }
+                            catch
+                            {
+                                if (i == times.Length)
+                                    break;
+                                await Task.Delay(times[i]);
+                            }
+                        }
                     }
                     finally
                     {
@@ -120,9 +145,22 @@ namespace Wodsoft.ComBoost.Mock
             {
                 tasks = handlers.SelectMany(t => t.Delegates.Select(async x =>
                 {
-                    if (features.Contains(DomainDistributedEventFeatures.Delay) && args is IDomainDistributedDelayEvent delayEvent)
-                        await Task.Delay(delayEvent.Delay);
-                    await x(args);
+                    for (int i = 0; i <= times.Length; i++)
+                    {
+                        try
+                        {
+                            if (features.Contains(DomainDistributedEventFeatures.Delay) && args is IDomainDistributedDelayEvent delayEvent)
+                                await Task.Delay(delayEvent.Delay);
+                            await x(args);
+                            break;
+                        }
+                        catch
+                        {
+                            if (i == times.Length)
+                                break;
+                            await Task.Delay(times[i]);
+                        }
+                    }
                 })).ToArray();
             }
             if (_options.IsAsyncEvent)
