@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Wodsoft.ComBoost.Security;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Wodsoft.ComBoost.Data.Entity.Metadata
 {
@@ -186,5 +187,16 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <returns>Return value if there can be a PropertyInfo.</returns>
         public abstract PropertyInfo? TryGetPropertyInfo();
+
+        /// <summary>
+        /// Try get PropertyInfo from metadata.
+        /// </summary>
+        /// <param name="propertyInfo">Property info.</param>
+        /// <returns>Return true if there can be a PropertyInfo.</returns>
+#if NETSTANDARD2_0
+        public abstract bool TryGetPropertyInfo(out PropertyInfo? propertyInfo);
+#else
+        public abstract bool TryGetPropertyInfo([NotNullWhen(true)] out PropertyInfo? propertyInfo);
+#endif
     }
 }

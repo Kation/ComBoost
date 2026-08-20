@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -170,5 +171,16 @@ namespace Wodsoft.ComBoost.Data.Entity.Metadata
         /// </summary>
         /// <returns>Return value if there can be a PropertyInfo.</returns>
         PropertyInfo? TryGetPropertyInfo();
+
+        /// <summary>
+        /// Try get PropertyInfo from metadata.
+        /// </summary>
+        /// <param name="propertyInfo">Property info.</param>
+        /// <returns>Return true if there can be a PropertyInfo.</returns>
+#if NETSTANDARD2_0
+        bool TryGetPropertyInfo(out PropertyInfo? propertyInfo);
+#else
+        bool TryGetPropertyInfo([NotNullWhen(true)] out PropertyInfo? propertyInfo);
+#endif
     }
 }
