@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -6,9 +6,11 @@ using Wodsoft.ComBoost.Data.Entity;
 
 namespace Wodsoft.ComBoost.Test.Entities
 {
-    public class UserEntity: UserBase
+    public class UserEntity : UserBase
     {
         [Key]
+        public Guid Id { get; set; }
+
         [Required]
         [MaxLength(16)]
         public string UserName { get; set; }
@@ -19,5 +21,11 @@ namespace Wodsoft.ComBoost.Test.Entities
 
         [MaxLength(256)]
         public string Email { get; set; }
+
+        public override void OnCreateCompleted()
+        {
+            if (Id == default)
+                Id = Guid.NewGuid();
+        }
     }
 }

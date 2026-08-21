@@ -1,5 +1,6 @@
-﻿using AutoMapper.Extensions.ExpressionMapping;
+using AutoMapper.Extensions.ExpressionMapping;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -15,10 +16,18 @@ namespace Wodsoft.ComBoost.Mvc.Data.Test
 {
     public class SingleMvcStartup
     {
+        private SqliteConnection _connection;
+        private void CreateConnection()
+        {
+            _connection = new SqliteConnection("Filename=:memory:");
+            _connection.Open();
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            CreateConnection();
             services.AddMvc();
-            services.AddDbContext<DataContext>();
+            services.AddDbContext<DataContext>(options => options.UseSqlite(_connection));
             services.AddEFCoreContext<DataContext>();
             services.AddEntityDtoContext<UserEntity, UserDto>();
             services.AddComBoost()
