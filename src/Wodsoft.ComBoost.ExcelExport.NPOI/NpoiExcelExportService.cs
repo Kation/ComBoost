@@ -59,11 +59,12 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
             if (context is not NpoiExcelExportContext npoiContext)
                 throw new ArgumentException("Specified context is not NpoiExcelExportContext. Please use CreateContext to create a NpoiExcelExportContext.");
             ISheet npoiSheet;
-            if (sheet.Name == null)
+            var sheetName = GetSheetName(sheet);
+            if (sheetName == null)
                 npoiSheet = npoiContext.WorkBook.CreateSheet();
             else
-                npoiSheet = npoiContext.WorkBook.GetSheet(sheet.Name) ?? npoiContext.WorkBook.CreateSheet(sheet.Name);
-
+                npoiSheet = npoiContext.WorkBook.GetSheet(sheetName) ?? npoiContext.WorkBook.CreateSheet(sheetName);
+            
             int rowIndex = sheet.StartRow;
             if (sheet.CreateHeaders)
             {
@@ -78,6 +79,8 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
                 rowIndex += BuildItem(npoiContext, npoiSheet, sheet.Columns, item, rowIndex, sheet.StartColumn);
             }
         }
+
+        protected virtual string? GetSheetName<TExport>(IExcelExportSheet<TExport> sheet) => sheet.Name;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static int CalculateWidth(string text)
@@ -198,7 +201,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
         /// <param name="context">The NPOI export context.</param>
         /// <param name="cell">The header cell.</param>
         /// <param name="column">The column being written.</param>
-        protected virtual void BuildHeaderCell(NpoiExcelExportContext context, ICell cell, IExcelExportColumn column)
+        protected virtual void BuildHeaderCell<TExport>(NpoiExcelExportContext context, ICell cell, IExcelExportColumn<TExport> column)
         {
             cell.SetCellValue(column.Name);
             if (column.Width.HasValue)
