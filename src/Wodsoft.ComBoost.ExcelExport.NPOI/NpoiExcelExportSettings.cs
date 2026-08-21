@@ -34,6 +34,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
             AddWriter(new NpoiExcelExportCellDoubleWriter());
             AddWriter(new NpoiExcelExportCellDecimalWriter());
             AddWriter(new NpoiExcelExportCellDateTimeWriter());
+            AddWriter(new NpoiExcelExportCellDateTimeOffsetWriter());
             AddWriter(new NpoiExcelExportCellEnumWriter());
         }
 
