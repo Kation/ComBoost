@@ -59,7 +59,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
             if (context is not NpoiExcelExportContext npoiContext)
                 throw new ArgumentException("Specified context is not NpoiExcelExportContext. Please use CreateContext to create a NpoiExcelExportContext.");
             ISheet npoiSheet;
-            var sheetName = GetSheetName(sheet);
+            var sheetName = GetSheetName(context, sheet);
             if (sheetName == null)
                 npoiSheet = npoiContext.WorkBook.CreateSheet();
             else
@@ -80,7 +80,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
             }
         }
 
-        protected virtual string? GetSheetName<TExport>(IExcelExportSheet<TExport> sheet) => sheet.Name;
+        protected virtual string? GetSheetName<TExport>(NpoiExcelExportContext context, IExcelExportSheet<TExport> sheet) => sheet.Name;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static int CalculateWidth(string text)
