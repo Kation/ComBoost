@@ -1,9 +1,11 @@
-﻿using System;
+﻿using AutoMapper.QueryableExtensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Wodsoft.ComBoost.Data.Entity;
@@ -20,6 +22,22 @@ namespace Wodsoft.ComBoost.Data
     {
         #region List
 
+        private static readonly MethodInfo _OrderByMethodInfo, _OrderByDescMethodInfo;
+        static EntityDTODomainService()
+        {
+#if NETSTANDARD2_0
+            _OrderByMethodInfo = typeof(Queryable).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Where(t => t.Name == "OrderBy" && t.GetParameters().Length == 2).First();
+            _OrderByDescMethodInfo = typeof(Queryable).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Where(t => t.Name == "OrderByDescending" && t.GetParameters().Length == 2).First();
+#else
+            Type g1 = Type.MakeGenericMethodParameter(0);
+            Type g2 = Type.MakeGenericMethodParameter(1);
+            _OrderByMethodInfo = typeof(Queryable).GetMethod("OrderBy", 2, BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IQueryable<>).MakeGenericType(g1), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(g1, g2)) }, null)!;
+            _OrderByDescMethodInfo = typeof(Queryable).GetMethod("OrderByDescending", 2, BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IQueryable<>).MakeGenericType(g1), typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(g1, g2)) }, null)!;
+#endif
+        }
+
         [EntityViewModelFilter]
         public virtual async Task<IViewModel<TListDTO>> List([FromService] IDTOContext<TListDTO, TCreateDTO, TEditDTO, TRemoveDTO> dtoContext)
         {
@@ -35,11 +53,15 @@ namespace Wodsoft.ComBoost.Data
                 if (sortProperty != null)
                 {
                     var parameter = Expression.Parameter(typeof(TListDTO));
-                    dynamic express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(TListDTO), sortProperty.ClrType), Expression.Property(parameter, sortProperty.ClrName), parameter);
+                    Expression express = Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(TListDTO), sortProperty.ClrType), Expression.Property(parameter, sortProperty.ClrName), parameter);
                     if (EntityDescriptor.GetMetadata<TListDTO>().IsSortDescending)
-                        queryable = Queryable.OrderByDescending(queryable, express);
+                    {
+                        queryable = (IQueryable<TListDTO>)_OrderByMethodInfo.MakeGenericMethod(typeof(TListDTO), sortProperty.ClrType).Invoke(null, new object[] { queryable, express })!;
+                    }
                     else
-                        queryable = Queryable.OrderBy(queryable, express);
+                    {
+                        queryable = (IQueryable<TListDTO>)_OrderByDescMethodInfo.MakeGenericMethod(typeof(TListDTO), sortProperty.ClrType).Invoke(null, new object[] { queryable, express })!;
+                    }
                 }
             }
             ViewModel<TListDTO> model = new ViewModel<TListDTO>(queryable);
