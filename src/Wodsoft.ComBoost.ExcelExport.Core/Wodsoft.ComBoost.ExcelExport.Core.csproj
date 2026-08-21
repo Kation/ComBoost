@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Wodsoft.ComBoost.ExcelExport</RootNamespace>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <Import Project="../../common.props" />
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.ExcelExport.Abstractions\Wodsoft.ComBoost.ExcelExport.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net7.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <Import Project="../../common.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wodsoft.ComBoost.Data.Core\Wodsoft.ComBoost.Data.Core.csproj" />
+    <ProjectReference Include="..\Wodsoft.ComBoost.ExcelExport.Core\Wodsoft.ComBoost.ExcelExport.Core.csproj" />
+  </ItemGroup>
+
+</Project>
