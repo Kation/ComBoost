@@ -59,7 +59,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
             if (context is not NpoiExcelExportContext npoiContext)
                 throw new ArgumentException("Specified context is not NpoiExcelExportContext. Please use CreateContext to create a NpoiExcelExportContext.");
             ISheet npoiSheet;
-            var sheetName = GetSheetName(context, sheet);
+            var sheetName = GetSheetName(npoiContext, sheet);
             if (sheetName == null)
                 npoiSheet = npoiContext.WorkBook.CreateSheet();
             else
