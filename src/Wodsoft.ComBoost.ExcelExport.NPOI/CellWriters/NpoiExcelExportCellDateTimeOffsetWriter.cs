@@ -9,7 +9,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI.CellWriters
     public class NpoiExcelExportCellDateTimeOffsetWriter : INpoiExcelExportCellWriter
     {
         /// <inheritdoc />
-        public bool CanWrite(Type type) => type == typeof(DateTime);
+        public bool CanWrite(Type type) => type == typeof(DateTimeOffset);
 
         /// <inheritdoc />
         public void Write<TExport>(IExcelExportColumn<TExport> column, ICell cell, TExport item)
