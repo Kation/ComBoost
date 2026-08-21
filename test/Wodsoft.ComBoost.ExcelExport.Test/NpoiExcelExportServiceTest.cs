@@ -493,6 +493,12 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
             Assert.Equal(30, npoiSheet.GetRow(2)!.GetCell(3)!.NumericCellValue);
         }
 
+        [Fact]
+        public void ExcelExportSheetTest()
+        {
+            _service.GetExportSheet<SampleOrderExportItem>();
+        }
+
         private static string GetColumnDataFormat(ISheet sheet, int column)
         {
             var columnStyle = sheet.GetColumnStyle(column);

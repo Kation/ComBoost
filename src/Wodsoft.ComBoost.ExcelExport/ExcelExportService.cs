@@ -502,10 +502,14 @@ namespace Wodsoft.ComBoost.ExcelExport
         {
             var func = (Func<IPropertyMetadata, IExcelExportColumn<TExport>>)_CreateColumnCache.GetOrAdd(property.ClrType, type =>
             {
-                var createMethod = typeof(ExcelExportSheetMetadataAccessor).GetMethod("CreateColumn", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!.MakeGenericMethod(typeof(TExport), type);
+#if NETSTANDARD2_0
+                var createMethod = typeof(ExcelExportSheetMetadataAccessor).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).First(t => t.Name == "CreateColumn" && t.IsGenericMethodDefinition && t.GetGenericArguments().Length == 2)!.MakeGenericMethod(typeof(TExport), type);
+#else
+                var createMethod = typeof(ExcelExportSheetMetadataAccessor).GetMethod("CreateColumn", 2, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null, [typeof(IPropertyMetadata)], null)!.MakeGenericMethod(typeof(TExport), type);
+#endif
                 var parameter = Expression.Parameter(typeof(IPropertyMetadata));
-                return Expression.Lambda(typeof(Func<>).MakeGenericType(typeof(IExcelExportColumn<,>).MakeGenericType(typeof(TExport), type)),
-                    Expression.Call(createMethod, parameter), parameter).Compile();
+                return Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(IPropertyMetadata), typeof(IExcelExportColumn<TExport>)),
+                    Expression.Convert(Expression.Call(createMethod, parameter), typeof(IExcelExportColumn<TExport>)), parameter).Compile();
             });
             return func(property);
         }

@@ -43,6 +43,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test.Models
 
     public class SampleOrderExportItem
     {
+        [Key]
         public string? Name { get; set; }
 
         //[ExcelExportExpandable]
