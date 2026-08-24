@@ -101,6 +101,35 @@ namespace Wodsoft.ComBoost.ExcelExport
         }
 
         /// <summary>
+        /// Builds an export column for the specified property of <typeparamref name="TExport"/>.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="propertyName">The CLR property name.</param>
+        /// <returns>The generated column, including features from export attributes.</returns>
+        /// <exception cref="ArgumentException">No property named <paramref name="propertyName"/> exists on <typeparamref name="TExport"/>.</exception>
+        public virtual IExcelExportColumn<TExport> GetExportColumn<TExport>(string propertyName)
+        {
+            var metadata = EntityDescriptor.GetMetadata<TExport>();
+            var property = metadata.GetProperty(propertyName) ?? throw new ArgumentException("Property not found.");
+            return GetColumn<TExport>(property);
+        }
+
+        /// <summary>
+        /// Builds an export column for the property selected by <paramref name="propertySelector"/>.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="propertySelector">A property access expression on <typeparamref name="TExport"/>.</param>
+        /// <returns>The generated column, including features from export attributes.</returns>
+        /// <exception cref="InvalidOperationException">The expression is not a property access, or the property is not found in metadata.</exception>
+        public virtual IExcelExportColumn<TExport> GetExportColumn<TExport, TProperty>(Expression<Func<TExport, TProperty>> propertySelector)
+        {
+            var metadata = EntityDescriptor.GetMetadata<TExport>(); MemberExpression propertyExpression = propertySelector.Body as MemberExpression ?? throw new InvalidOperationException("Lambda expression must specifically a property.");
+            var property = metadata.GetProperty(propertyExpression.Member.Name) ?? throw new InvalidOperationException($"Sheet doesn't exist any column with CLR property of \"{propertyExpression.Member}\".");
+            return GetColumn<TExport>(property);
+        }
+
+        /// <summary>
         /// Creates a column for the specified property and applies export attributes.
         /// </summary>
         /// <typeparam name="TExport">The exported item type.</typeparam>
