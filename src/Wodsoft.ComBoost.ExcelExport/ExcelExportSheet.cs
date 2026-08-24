@@ -54,7 +54,7 @@ namespace Wodsoft.ComBoost.ExcelExport
         public IList<IExcelExportSheetFeature> Features { get; }
 
         /// <inheritdoc />
-        public bool CreateHeaders { get; set; }
+        public bool CreateHeaders { get; set; } = true;
 
         /// <inheritdoc />
         public int StartRow { get; set; }
@@ -65,7 +65,12 @@ namespace Wodsoft.ComBoost.ExcelExport
         /// <inheritdoc />
         public IExcelExportSheet<TExport> Clone()
         {
-            return new ExcelExportSheet<TExport>(Name, new List<IExcelExportColumn<TExport>>(Columns), new List<IExcelExportSheetFeature>(Features));
+            return new ExcelExportSheet<TExport>(Name, new List<IExcelExportColumn<TExport>>(Columns), new List<IExcelExportSheetFeature>(Features))
+            {
+                CreateHeaders = CreateHeaders, 
+                StartRow = StartRow, 
+                StartColumn = StartColumn
+            };
         }
 
         /// <inheritdoc />
