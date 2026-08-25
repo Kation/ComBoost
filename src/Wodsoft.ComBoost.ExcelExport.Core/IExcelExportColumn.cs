@@ -65,6 +65,14 @@ namespace Wodsoft.ComBoost.ExcelExport
     public interface IExcelExportColumn<TExport> : IExcelExportColumn
     {
         /// <summary>
+        /// Creates a column that reads a different value while keeping the current name, width, and features.
+        /// </summary>
+        /// <typeparam name="TNewValue">The new value type.</typeparam>
+        /// <param name="reader">A function that reads the value from an exported item.</param>
+        /// <returns>A new column instance.</returns>
+        IExcelExportColumn<TExport, TNewValue> Override<TNewValue>(Func<TExport, TNewValue> reader);
+
+        /// <summary>
         /// Creates a shallow copy of this column, including its features.
         /// </summary>
         /// <returns>A cloned column instance.</returns>
@@ -84,14 +92,6 @@ namespace Wodsoft.ComBoost.ExcelExport
         /// <param name="instance">The exported item.</param>
         /// <returns>The value to write.</returns>
         TValue Read(TExport instance);
-
-        /// <summary>
-        /// Creates a column that reads a different value while keeping the current name, width, and features.
-        /// </summary>
-        /// <typeparam name="TNewValue">The new value type.</typeparam>
-        /// <param name="reader">A function that reads the value from an exported item.</param>
-        /// <returns>A new column instance.</returns>
-        IExcelExportColumn<TExport, TNewValue> Override<TNewValue>(Func<TExport, TNewValue> reader);
 
         /// <summary>
         /// Creates a shallow copy of this column, including its features.
