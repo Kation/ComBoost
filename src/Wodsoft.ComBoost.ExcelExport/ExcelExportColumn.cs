@@ -64,9 +64,6 @@ namespace Wodsoft.ComBoost.ExcelExport
         public IList<IExcelExportColumnFeature> Features { get; }
 
         /// <inheritdoc />
-        public abstract IExcelExportColumn<TExport> Override<TValue>(Func<TExport, TValue> reader);
-
-        /// <inheritdoc />
 #if NETSTANDARD2_0
         public bool TryGetFeature<T>(out T? feature) where T : class, IExcelExportColumnFeature
 #else
@@ -135,7 +132,7 @@ namespace Wodsoft.ComBoost.ExcelExport
         public override Type Type => typeof(TValue);
 
         /// <inheritdoc />
-        public override IExcelExportColumn<TExport> Override<TNewValue>(Func<TExport, TNewValue> reader)
+        public IExcelExportColumn<TExport, TNewValue> Override<TNewValue>(Func<TExport, TNewValue> reader)
         {
             return new ExcelExportColumn<TExport, TNewValue>(this, reader, new List<IExcelExportColumnFeature>(Features));
         }
