@@ -84,7 +84,7 @@ namespace Wodsoft.ComBoost.ExcelExport
     /// </summary>
     /// <typeparam name="TExport">The exported item type.</typeparam>
     /// <typeparam name="TValue">The value type written to the cell.</typeparam>
-    public interface IExcelExportColumn<TExport, TValue>
+    public interface IExcelExportColumn<TExport, TValue> : IExcelExportColumn<TExport>
     {
         /// <summary>
         /// Reads the column value from the specified item.
@@ -97,6 +97,6 @@ namespace Wodsoft.ComBoost.ExcelExport
         /// Creates a shallow copy of this column, including its features.
         /// </summary>
         /// <returns>A cloned column instance.</returns>
-        IExcelExportColumn<TExport, TValue> Clone();
+        new IExcelExportColumn<TExport, TValue> Clone();
     }
 }
