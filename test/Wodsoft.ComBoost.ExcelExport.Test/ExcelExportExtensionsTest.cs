@@ -32,6 +32,39 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         }
 
         [Fact]
+        public void GetClrColumn_ByPropertySelector_WhenDerivedModelSelectsBaseProperty_ReturnsColumn()
+        {
+            var titleProperty = typeof(ChildExportModel).GetProperty(nameof(BaseExportModel.Title));
+            var titleColumn = new ExcelExportColumn<ChildExportModel, string?>("Title", titleProperty, x => x.Title);
+            var countColumn = new ExcelExportColumn<ChildExportModel, int>("Count", typeof(ChildExportModel).GetProperty(nameof(ChildExportModel.Count)), x => x.Count);
+            var sheet = new ExcelExportSheet<ChildExportModel>(new List<IExcelExportColumn<ChildExportModel>>
+            {
+                titleColumn,
+                countColumn
+            });
+
+            var actual = sheet.GetClrColumn(x => x.Title);
+
+            Assert.Same(titleColumn, actual);
+            Assert.Equal(typeof(BaseExportModel), actual.ClrProperty!.DeclaringType);
+        }
+
+        [Fact]
+        public void GetClrColumn_ByPropertySelector_WhenDerivedModelSelectsBasePropertyViaCast_ReturnsColumn()
+        {
+            var titleProperty = typeof(ChildExportModel).GetProperty(nameof(BaseExportModel.Title));
+            var titleColumn = new ExcelExportColumn<ChildExportModel, string?>("Title", titleProperty, x => x.Title);
+            var sheet = new ExcelExportSheet<ChildExportModel>(new List<IExcelExportColumn<ChildExportModel>>
+            {
+                titleColumn
+            });
+
+            var actual = sheet.GetClrColumn(x => ((BaseExportModel)x).Title);
+
+            Assert.Same(titleColumn, actual);
+        }
+
+        [Fact]
         public void GetClrColumn_ByPropertySelector_ThrowsWhenExpressionIsNotProperty()
         {
             var sheet = CreateSheet(CreateNameColumn());
@@ -164,6 +197,16 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
 
         private sealed class DerivedSampleExportItem : SampleExportItem
         {
+        }
+
+        private class BaseExportModel
+        {
+            public string? Title { get; set; }
+        }
+
+        private sealed class ChildExportModel : BaseExportModel
+        {
+            public int Count { get; set; }
         }
     }
 }

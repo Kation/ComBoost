@@ -23,7 +23,8 @@ namespace Wodsoft.ComBoost.ExcelExport
         public static IExcelExportColumn<TExport> GetClrColumn<TExport, TProperty>(this IExcelExportSheet<TExport> sheet, Expression<Func<TExport, TProperty>> propertySelector)
         {
             MemberExpression propertyExpression = propertySelector.Body as MemberExpression ?? throw new InvalidOperationException("Lambda expression must specifically a property.");
-            var column = sheet.Columns.FirstOrDefault(t => t.ClrProperty?.GetGetMethod()?.GetBaseDefinition() == ((PropertyInfo)propertyExpression.Member).GetGetMethod()?.GetBaseDefinition()) ?? throw new InvalidOperationException($"Sheet doesn't exist any column with CLR property of \"{propertyExpression.Member}\".");
+            var selectedProperty = (PropertyInfo)propertyExpression.Member;
+            var column = sheet.Columns.FirstOrDefault(t => IsSameClrProperty(t.ClrProperty, selectedProperty)) ?? throw new InvalidOperationException($"Sheet doesn't exist any column with CLR property of \"{propertyExpression.Member}\".");
             return column;
         }
 
@@ -39,6 +40,28 @@ namespace Wodsoft.ComBoost.ExcelExport
         {
             var column = sheet.Columns.FirstOrDefault(t => t.ClrProperty?.Name == clrName) ?? throw new InvalidOperationException($"Sheet doesn't exist any column with CLR property name of \"{clrName}\".");
             return column;
+        }
+
+        private static bool IsSameClrProperty(PropertyInfo? columnProperty, PropertyInfo selectedProperty)
+        {
+            if (columnProperty == null)
+                return false;
+
+            var columnGetter = columnProperty.GetGetMethod(true);
+            var selectedGetter = selectedProperty.GetGetMethod(true);
+            if (columnGetter != null && selectedGetter != null)
+            {
+                if (columnGetter.Module == selectedGetter.Module && columnGetter.MetadataToken == selectedGetter.MetadataToken)
+                    return true;
+
+                var columnBase = columnGetter.GetBaseDefinition();
+                var selectedBase = selectedGetter.GetBaseDefinition();
+                if (columnBase.Module == selectedBase.Module && columnBase.MetadataToken == selectedBase.MetadataToken)
+                    return true;
+            }
+
+            return columnProperty.Name == selectedProperty.Name
+                && columnProperty.DeclaringType == selectedProperty.DeclaringType;
         }
 
         /// <summary>
