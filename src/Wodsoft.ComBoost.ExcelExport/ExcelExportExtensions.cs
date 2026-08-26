@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace Wodsoft.ComBoost.ExcelExport
@@ -22,7 +23,7 @@ namespace Wodsoft.ComBoost.ExcelExport
         public static IExcelExportColumn<TExport> GetClrColumn<TExport, TProperty>(this IExcelExportSheet<TExport> sheet, Expression<Func<TExport, TProperty>> propertySelector)
         {
             MemberExpression propertyExpression = propertySelector.Body as MemberExpression ?? throw new InvalidOperationException("Lambda expression must specifically a property.");
-            var column = sheet.Columns.FirstOrDefault(t => t.ClrProperty == propertyExpression.Member) ?? throw new InvalidOperationException($"Sheet doesn't exist any column with CLR property of \"{propertyExpression.Member}\".");
+            var column = sheet.Columns.FirstOrDefault(t => t.ClrProperty?.GetGetMethod()?.GetBaseDefinition() == ((PropertyInfo)propertyExpression.Member).GetGetMethod()?.GetBaseDefinition()) ?? throw new InvalidOperationException($"Sheet doesn't exist any column with CLR property of \"{propertyExpression.Member}\".");
             return column;
         }
 
@@ -72,8 +73,7 @@ namespace Wodsoft.ComBoost.ExcelExport
         public static IExcelExportSheet<TExport> OverrideColumn<TExport, TProperty, TValue>(this IExcelExportSheet<TExport> sheet, Expression<Func<TExport, TProperty>> propertySelector, Func<TExport, TValue> valueReader)
         {
             var column = GetClrColumn(sheet, propertySelector);
-            var newColumn = column.Clone();
-            newColumn.Override(valueReader);
+            var newColumn = column.Override(valueReader);
             ReplaceColumn(sheet, column, newColumn);
             return sheet;
         }
@@ -92,9 +92,8 @@ namespace Wodsoft.ComBoost.ExcelExport
         public static IExcelExportSheet<TExport> OverrideColumn<TExport, TProperty, TValue>(this IExcelExportSheet<TExport> sheet, Expression<Func<TExport, TProperty>> propertySelector, Func<TProperty, TValue> valueConverter)
         {
             var column = GetClrColumn(sheet, propertySelector);
-            var newColumn = column.Clone();
             var reader = propertySelector.Compile();
-            newColumn.Override(obj => valueConverter(reader(obj)));
+            var newColumn = column.Override(obj => valueConverter(reader(obj)));
             ReplaceColumn(sheet, column, newColumn);
             return sheet;
         }
