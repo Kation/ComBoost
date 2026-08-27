@@ -150,6 +150,11 @@ namespace Wodsoft.ComBoost.ExcelExport
             var displayFormatAttr = property.GetAttribute<DisplayFormatAttribute>();
             if (displayFormatAttr != null && displayFormatAttr.DataFormatString is not null)
                 column.Features.Add(new ExcelExportDataFormatFeature(ConvertToExcelFormat(displayFormatAttr.DataFormatString)));
+            else
+            {
+                if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTimeOffset))
+                    column.Features.Add(new ExcelExportDataFormatFeature("yyyy-MM-dd HH:mm:ss"));
+            }
             var expandAttribute = property.GetAttribute<ExcelExportExpandableAttribute>();
             if (expandAttribute != null)
             {

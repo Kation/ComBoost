@@ -12,7 +12,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI.CellWriters
         public bool CanWrite(Type type) => type == typeof(float);
 
         /// <inheritdoc />
-        public void Write<TExport>(IExcelExportColumn<TExport> column, ICell cell, TExport item)
+        public void Write<TExport>(NpoiExcelExportService service, NpoiExcelExportContext context, IExcelExportColumn<TExport> column, ICell cell, TExport item)
         {
             if (column.Type != typeof(float) && column.Type != typeof(float?))
                 throw new InvalidOperationException("Invalid type of column.");
@@ -32,7 +32,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI.CellWriters
             {
                 throw new ArgumentException($"Export column does not implement \"{typeof(IExcelExportColumn<TExport, float>).FullName}\" or \"{typeof(IExcelExportColumn<TExport, float?>).FullName}\".");
             }
-            cell.SetCellValue(value);
+            service.WriteCell(context, cell, column, item, value);
         }
     }
 }

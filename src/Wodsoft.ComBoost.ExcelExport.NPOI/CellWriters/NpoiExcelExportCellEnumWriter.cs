@@ -18,7 +18,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI.CellWriters
         public bool CanWrite(Type type) => type.IsEnum;
 
         /// <inheritdoc />
-        public void Write<TExport>(IExcelExportColumn<TExport> column, ICell cell, TExport item)
+        public void Write<TExport>(NpoiExcelExportService service, NpoiExcelExportContext context, IExcelExportColumn<TExport> column, ICell cell, TExport item)
         {
             var enumType = Nullable.GetUnderlyingType(column.Type) ?? column.Type;
             if (!enumType.IsEnum)
@@ -31,7 +31,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI.CellWriters
             var cache = _caches.GetOrAdd(enumType, static t => new EnumFormatCache(t));
             var formatted = cache.Format(value);
             if (formatted is not null)
-                cell.SetCellValue(formatted);
+                service.WriteCell(context, cell, column, item, formatted);
         }
 
         private static object? ReadColumnValue<TExport>(IExcelExportColumn<TExport> column, TExport item)

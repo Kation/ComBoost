@@ -4,7 +4,7 @@ using System;
 namespace Wodsoft.ComBoost.ExcelExport.NPOI.CellWriters
 {
     /// <summary>
-    /// Writes <see cref="DateTime"/> values to NPOI cells.
+    /// Writes <see cref="DateTimeOffset"/> values to NPOI cells.
     /// </summary>
     public class NpoiExcelExportCellDateTimeOffsetWriter : INpoiExcelExportCellWriter
     {
@@ -12,7 +12,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI.CellWriters
         public bool CanWrite(Type type) => type == typeof(DateTimeOffset);
 
         /// <inheritdoc />
-        public void Write<TExport>(IExcelExportColumn<TExport> column, ICell cell, TExport item)
+        public void Write<TExport>(NpoiExcelExportService service, NpoiExcelExportContext context, IExcelExportColumn<TExport> column, ICell cell, TExport item)
         {
             if (column.Type != typeof(DateTimeOffset) && column.Type != typeof(DateTimeOffset?))
                 throw new InvalidOperationException("Invalid type of column.");
@@ -32,7 +32,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI.CellWriters
             {
                 throw new ArgumentException($"Export column does not implement \"{typeof(IExcelExportColumn<TExport, DateTimeOffset>).FullName}\" or \"{typeof(IExcelExportColumn<TExport, DateTimeOffset?>).FullName}\".");
             }
-            cell.SetCellValue(value.LocalDateTime);
+            service.WriteCell(context, cell, column, item, value.LocalDateTime);
         }
     }
 }

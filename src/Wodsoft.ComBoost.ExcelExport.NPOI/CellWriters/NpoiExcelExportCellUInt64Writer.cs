@@ -12,7 +12,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI.CellWriters
         public bool CanWrite(Type type) => type == typeof(ulong);
 
         /// <inheritdoc />
-        public void Write<TExport>(IExcelExportColumn<TExport> column, ICell cell, TExport item)
+        public void Write<TExport>(NpoiExcelExportService service, NpoiExcelExportContext context, IExcelExportColumn<TExport> column, ICell cell, TExport item)
         {
             if (column.Type != typeof(ulong) && column.Type != typeof(ulong?))
                 throw new InvalidOperationException("Invalid type of column.");
@@ -33,7 +33,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI.CellWriters
                 throw new ArgumentException($"Export column does not implement \"{typeof(IExcelExportColumn<TExport, ulong>).FullName}\" or \"{typeof(IExcelExportColumn<TExport, ulong?>).FullName}\".");
             }
             // Excel numeric cells are double-based, so large UInt64 values may lose precision.
-            cell.SetCellValue((double)value);
+            service.WriteCell(context, cell, column, item, (double)value);
         }
     }
 }

@@ -21,6 +21,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
             Assert.True(context.Settings.TryGetWriter(typeof(string), out _));
             Assert.True(context.Settings.TryGetWriter(typeof(int), out _));
             Assert.True(context.Settings.TryGetWriter(typeof(DateTime), out _));
+            Assert.True(context.Settings.TryGetWriter(typeof(DateTimeOffset), out _));
             Assert.True(context.Settings.TryGetWriter(typeof(SampleStatus), out _));
         }
 
@@ -180,6 +181,131 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
             Assert.Equal(1.5, row.GetCell(4)!.NumericCellValue);
             Assert.Equal(9.99, row.GetCell(5)!.NumericCellValue);
             Assert.Equal(createdAt, row.GetCell(6)!.DateCellValue);
+        }
+
+        [Fact]
+        public void Export_DateTimeAndDateTimeOffset_WritesExcelDateValues()
+        {
+            var createdAt = new DateTime(2024, 5, 6, 12, 30, 0, DateTimeKind.Unspecified);
+            var occurredAt = new DateTimeOffset(2024, 5, 6, 20, 30, 0, TimeSpan.FromHours(8));
+            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
+            {
+                new ExcelExportColumn<SampleExportItem, DateTime>("CreatedAt", null, x => x.CreatedAt),
+                new ExcelExportColumn<SampleExportItem, DateTimeOffset>("OccurredAt", null, x => x.OccurredAt),
+            })
+            {
+                CreateHeaders = true
+            };
+            var items = new[]
+            {
+                new SampleExportItem { CreatedAt = createdAt, OccurredAt = occurredAt }
+            };
+
+            using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, items);
+            var npoiSheet = workbook.GetSheet("Sheet1");
+            var row = npoiSheet.GetRow(1)!;
+            var dateTimeCell = row.GetCell(0)!;
+            var dateTimeOffsetCell = row.GetCell(1)!;
+
+            var stream = File.Open("test.xlsx", FileMode.Create);
+            workbook.Write(stream);
+
+            Assert.Equal("CreatedAt", ExcelExportTestHelper.GetStringCell(npoiSheet, 0, 0));
+            Assert.Equal("OccurredAt", ExcelExportTestHelper.GetStringCell(npoiSheet, 0, 1));
+            Assert.Equal(CellType.Numeric, dateTimeCell.CellType);
+            Assert.Equal(createdAt, dateTimeCell.DateCellValue);
+            Assert.Equal(CellType.Numeric, dateTimeOffsetCell.CellType);
+            Assert.Equal(occurredAt.LocalDateTime, dateTimeOffsetCell.DateCellValue);
+        }
+
+        [Fact]
+        public void Export_NullableDateTimeAndDateTimeOffset_WritesValuesAndRemovesNullCells()
+        {
+            var createdAt = new DateTime(2024, 5, 6, 12, 30, 0, DateTimeKind.Unspecified);
+            var occurredAt = new DateTimeOffset(2024, 5, 6, 20, 30, 0, TimeSpan.FromHours(8));
+            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
+            {
+                new ExcelExportColumn<SampleExportItem, DateTime?>("OptionalCreatedAt", null, x => x.OptionalCreatedAt),
+                new ExcelExportColumn<SampleExportItem, DateTimeOffset?>("OptionalOccurredAt", null, x => x.OptionalOccurredAt),
+            })
+            {
+                CreateHeaders = true
+            };
+            var items = new[]
+            {
+                new SampleExportItem { OptionalCreatedAt = createdAt, OptionalOccurredAt = occurredAt },
+                new SampleExportItem { OptionalCreatedAt = null, OptionalOccurredAt = null },
+            };
+
+            using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, items);
+            var npoiSheet = workbook.GetSheet("Sheet1");
+            var valueRow = npoiSheet.GetRow(1)!;
+            var nullRow = npoiSheet.GetRow(2)!;
+
+            Assert.Equal(createdAt, valueRow.GetCell(0)!.DateCellValue);
+            Assert.Equal(occurredAt.LocalDateTime, valueRow.GetCell(1)!.DateCellValue);
+            Assert.Null(nullRow.GetCell(0));
+            Assert.Null(nullRow.GetCell(1));
+        }
+
+        [Fact]
+        public void Export_DateTimeAndDateTimeOffset_AppliesExcelDataFormat()
+        {
+            var createdAt = new DateTime(2024, 5, 6, 12, 30, 0, DateTimeKind.Unspecified);
+            var occurredAt = new DateTimeOffset(2024, 5, 6, 20, 30, 0, TimeSpan.FromHours(8));
+            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
+            {
+                new ExcelExportColumn<SampleExportItem, DateTime>("CreatedAt", null, x => x.CreatedAt),
+                new ExcelExportColumn<SampleExportItem, DateTimeOffset>("OccurredAt", null, x => x.OccurredAt),
+            })
+            {
+                CreateHeaders = true
+            };
+            sheet.Columns[0].Features.Add(new ExcelExportDataFormatFeature("yyyy-mm-dd hh:mm:ss"));
+            sheet.Columns[1].Features.Add(new ExcelExportDataFormatFeature("yyyy-mm-dd hh:mm:ss"));
+
+            using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, new[]
+            {
+                new SampleExportItem { CreatedAt = createdAt, OccurredAt = occurredAt }
+            });
+            var npoiSheet = workbook.GetSheet("Sheet1");
+
+            Assert.Equal("yyyy-mm-dd hh:mm:ss", GetColumnDataFormat(npoiSheet, 0));
+            Assert.Equal("yyyy-mm-dd hh:mm:ss", GetColumnDataFormat(npoiSheet, 1));
+            Assert.Equal(createdAt, npoiSheet.GetRow(1)!.GetCell(0)!.DateCellValue);
+            Assert.Equal(occurredAt.LocalDateTime, npoiSheet.GetRow(1)!.GetCell(1)!.DateCellValue);
+        }
+
+        [Fact]
+        public void Export_GetExportSheet_WritesDateTimeAndDateTimeOffsetProperties()
+        {
+            var createdAt = new DateTime(2024, 5, 6, 12, 30, 0, DateTimeKind.Unspecified);
+            var occurredAt = new DateTimeOffset(2024, 5, 6, 20, 30, 0, TimeSpan.FromHours(8));
+            var sheet = _service.GetExportSheet<SampleDateTimeExportItem>();
+            sheet.CreateHeaders = true;
+
+            using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, new[]
+            {
+                new SampleDateTimeExportItem
+                {
+                    Id = 1,
+                    CreatedAt = createdAt,
+                    OptionalCreatedAt = createdAt,
+                    OccurredAt = occurredAt,
+                    OptionalOccurredAt = occurredAt
+                }
+            });
+            var npoiSheet = workbook.GetSheetAt(0);
+            var createdAtIndex = sheet.Columns.ToList().FindIndex(t => t.ClrProperty?.Name == nameof(SampleDateTimeExportItem.CreatedAt));
+            var occurredAtIndex = sheet.Columns.ToList().FindIndex(t => t.ClrProperty?.Name == nameof(SampleDateTimeExportItem.OccurredAt));
+            var row = npoiSheet.GetRow(1)!;
+
+            Assert.True(createdAtIndex >= 0);
+            Assert.True(occurredAtIndex >= 0);
+            Assert.Equal(typeof(DateTime), sheet.Columns[createdAtIndex].Type);
+            Assert.Equal(typeof(DateTimeOffset), sheet.Columns[occurredAtIndex].Type);
+            Assert.Equal(createdAt, row.GetCell(createdAtIndex)!.DateCellValue);
+            Assert.Equal(occurredAt.LocalDateTime, row.GetCell(occurredAtIndex)!.DateCellValue);
         }
 
         [Fact]

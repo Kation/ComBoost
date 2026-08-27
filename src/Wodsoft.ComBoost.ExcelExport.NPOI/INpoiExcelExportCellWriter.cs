@@ -1,4 +1,4 @@
-﻿using NPOI.SS.UserModel;
+using NPOI.SS.UserModel;
 
 namespace Wodsoft.ComBoost.ExcelExport.NPOI
 {
@@ -18,9 +18,11 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
         /// Writes the column value of <paramref name="item"/> to <paramref name="cell"/>.
         /// </summary>
         /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="service">The NPOI export service used to write the cell.</param>
+        /// <param name="context">The NPOI export context.</param>
         /// <param name="column">The column that supplies the value.</param>
         /// <param name="cell">The target cell.</param>
         /// <param name="item">The exported item.</param>
-        void Write<TExport>(IExcelExportColumn<TExport> column, ICell cell, TExport item);
+        void Write<TExport>(NpoiExcelExportService service, NpoiExcelExportContext context, IExcelExportColumn<TExport> column, ICell cell, TExport item);
     }
 }

@@ -20,6 +20,12 @@ namespace Wodsoft.ComBoost.ExcelExport.Test.Models
 
         public DateTime CreatedAt { get; set; }
 
+        public DateTime? OptionalCreatedAt { get; set; }
+
+        public DateTimeOffset OccurredAt { get; set; }
+
+        public DateTimeOffset? OptionalOccurredAt { get; set; }
+
         public SampleStatus Status { get; set; }
     }
 
@@ -50,5 +56,19 @@ namespace Wodsoft.ComBoost.ExcelExport.Test.Models
         public List<SampleOrderLine> Orders { get; set; } = new();
 
         public int Age { get; set; }
+    }
+
+    public class SampleDateTimeExportItem
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime? OptionalCreatedAt { get; set; }
+
+        public DateTimeOffset OccurredAt { get; set; }
+
+        public DateTimeOffset? OptionalOccurredAt { get; set; }
     }
 }

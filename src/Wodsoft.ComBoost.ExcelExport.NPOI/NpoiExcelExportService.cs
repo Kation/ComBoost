@@ -64,7 +64,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
                 npoiSheet = npoiContext.WorkBook.CreateSheet();
             else
                 npoiSheet = npoiContext.WorkBook.GetSheet(sheetName) ?? npoiContext.WorkBook.CreateSheet(sheetName);
-            
+
             int rowIndex = sheet.StartRow;
             if (sheet.CreateHeaders)
             {
@@ -316,7 +316,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
             if (column.TryGetFeature<IExcelExportDataFormatFeature>(out var dataFormatFeature) && dataFormatFeature.DataFormat != null)
             {
                 style = (XSSFCellStyle)sheet.Workbook.CreateCellStyle();
-                style.DataFormat = sheet.Workbook.CreateDataFormat().GetFormat(dataFormatFeature.DataFormat);
+                style.DataFormat = sheet.Workbook.CreateDataFormat().GetFormat(GetDataFormat<TExport>(context, sheet, column, dataFormatFeature.DataFormat));
             }
             if (column.TryGetFeature<IExcelExportColorFeature>(out var colorFeature))
             {
@@ -328,6 +328,8 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
             if (style != null)
                 sheet.SetDefaultColumnStyle(columnIndex, style);
         }
+
+        protected virtual string GetDataFormat<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column, string dataFormat) => dataFormat;
 
         private int BuildItem<TExport>(NpoiExcelExportContext context, ISheet sheet, IEnumerable<IExcelExportColumn<TExport>> columns, TExport item, int rowIndex, int columnIndex)
         {
@@ -470,9 +472,79 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
                 if (!context.Settings.TryGetWriter(valueType, out writer))
                     throw new NotSupportedException($"No writer of type \"{valueType.FullName}\" found.");
             }
-            writer.Write(column, cell, item);
+            writer.Write(this, context, column, cell, item);
             if (context.Settings.CreateCellForNullValue == false && cell.CellType == CellType.Blank)
                 cell.Row.RemoveCell(cell);
+        }
+
+        /// <summary>
+        /// Writes a boolean value to the specified cell.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="cell">The target cell.</param>
+        /// <param name="column">The column being written.</param>
+        /// <param name="item">The exported item.</param>
+        /// <param name="value">The boolean value.</param>
+        public virtual void WriteCell<TExport>(NpoiExcelExportContext context, ICell cell, IExcelExportColumn<TExport> column, TExport item, bool value)
+        {
+            cell.SetCellValue(value);
+        }
+
+        /// <summary>
+        /// Writes a date and time value to the specified cell.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="cell">The target cell.</param>
+        /// <param name="column">The column being written.</param>
+        /// <param name="item">The exported item.</param>
+        /// <param name="value">The date and time value.</param>
+        public virtual void WriteCell<TExport>(NpoiExcelExportContext context, ICell cell, IExcelExportColumn<TExport> column, TExport item, DateTime value)
+        {
+            cell.SetCellValue(value);
+        }
+
+        /// <summary>
+        /// Writes a numeric value to the specified cell.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="cell">The target cell.</param>
+        /// <param name="column">The column being written.</param>
+        /// <param name="item">The exported item.</param>
+        /// <param name="value">The numeric value.</param>
+        public virtual void WriteCell<TExport>(NpoiExcelExportContext context, ICell cell, IExcelExportColumn<TExport> column, TExport item, double value)
+        {
+            cell.SetCellValue(value);
+        }
+
+        /// <summary>
+        /// Writes a text value to the specified cell.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="cell">The target cell.</param>
+        /// <param name="column">The column being written.</param>
+        /// <param name="item">The exported item.</param>
+        /// <param name="value">The text value.</param>
+        public virtual void WriteCell<TExport>(NpoiExcelExportContext context, ICell cell, IExcelExportColumn<TExport> column, TExport item, string value)
+        {
+            cell.SetCellValue(value);
+        }
+
+        /// <summary>
+        /// Writes rich text to the specified cell.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="cell">The target cell.</param>
+        /// <param name="column">The column being written.</param>
+        /// <param name="item">The exported item.</param>
+        /// <param name="value">The rich text value.</param>
+        public virtual void WriteCell<TExport>(NpoiExcelExportContext context, ICell cell, IExcelExportColumn<TExport> column, TExport item, IRichTextString value)
+        {
+            cell.SetCellValue(value);
         }
     }
 }
