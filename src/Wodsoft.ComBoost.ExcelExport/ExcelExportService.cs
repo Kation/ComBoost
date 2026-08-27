@@ -526,15 +526,15 @@ namespace Wodsoft.ComBoost.ExcelExport
             return new ExcelExportColumn<TExport, TValue>(property.Name, propertyInfo, reader);
         }
 
-        private static readonly ConcurrentDictionary<Type, Delegate> _CreateColumnCache = new ConcurrentDictionary<Type, Delegate>();
+        private static readonly ConcurrentDictionary<IPropertyMetadata, Delegate> _CreateColumnCache = new ConcurrentDictionary<IPropertyMetadata, Delegate>();
         public static IExcelExportColumn<TExport> CreateColumn<TExport>(IPropertyMetadata property)
         {
-            var func = (Func<IPropertyMetadata, IExcelExportColumn<TExport>>)_CreateColumnCache.GetOrAdd(property.ClrType, type =>
+            var func = (Func<IPropertyMetadata, IExcelExportColumn<TExport>>)_CreateColumnCache.GetOrAdd(property, p =>
             {
 #if NETSTANDARD2_0
-                var createMethod = typeof(ExcelExportSheetMetadataAccessor).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).First(t => t.Name == "CreateColumn" && t.IsGenericMethodDefinition && t.GetGenericArguments().Length == 2)!.MakeGenericMethod(typeof(TExport), type);
+                var createMethod = typeof(ExcelExportSheetMetadataAccessor).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).First(t => t.Name == "CreateColumn" && t.IsGenericMethodDefinition && t.GetGenericArguments().Length == 2)!.MakeGenericMethod(typeof(TExport), p.ClrType);
 #else
-                var createMethod = typeof(ExcelExportSheetMetadataAccessor).GetMethod("CreateColumn", 2, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null, [typeof(IPropertyMetadata)], null)!.MakeGenericMethod(typeof(TExport), type);
+                var createMethod = typeof(ExcelExportSheetMetadataAccessor).GetMethod("CreateColumn", 2, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null, [typeof(IPropertyMetadata)], null)!.MakeGenericMethod(typeof(TExport), p.ClrType);
 #endif
                 var parameter = Expression.Parameter(typeof(IPropertyMetadata));
                 return Expression.Lambda(typeof(Func<,>).MakeGenericType(typeof(IPropertyMetadata), typeof(IExcelExportColumn<TExport>)),
