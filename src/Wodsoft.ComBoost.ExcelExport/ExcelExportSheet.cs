@@ -48,7 +48,7 @@ namespace Wodsoft.ComBoost.ExcelExport
         public IList<IExcelExportColumn<TExport>> Columns { get; }
 
         /// <inheritdoc />
-        public string? Name { get; }
+        public string? Name { get; set; }
 
         /// <inheritdoc />
         public IList<IExcelExportSheetFeature> Features { get; }

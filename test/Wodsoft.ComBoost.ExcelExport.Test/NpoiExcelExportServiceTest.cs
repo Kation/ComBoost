@@ -32,7 +32,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_ThrowsWhenContextIsNotNpoi()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
             var fakeContext = new FakeExcelExportContext();
 
             var ex = Assert.Throws<ArgumentException>(() =>
@@ -44,7 +44,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public async Task ExportAsync_ThrowsWhenContextIsNotNpoi()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
             var fakeContext = new FakeExcelExportContext();
 
             var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
@@ -56,7 +56,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_WithHeaders_WritesHeaderAndDataRows()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet("People");
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service, "People");
             var items = new[]
             {
                 new SampleExportItem { Name = "Alice", Age = 30, Score = 90 },
@@ -79,7 +79,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_WithoutHeaders_StartsWithData()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
             sheet.CreateHeaders = false;
             var items = new[] { new SampleExportItem { Name = "Alice", Age = 30, Score = 90 } };
 
@@ -93,7 +93,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_WithNullSheetName_CreatesDefaultSheet()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet(null);
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service, null);
             var items = new[] { new SampleExportItem { Name = "Alice", Age = 1, Score = 1 } };
 
             using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, items);
@@ -105,7 +105,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_RespectsStartRowAndStartColumn()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
             sheet.StartRow = 2;
             sheet.StartColumn = 1;
             var items = new[] { new SampleExportItem { Name = "Alice", Age = 30, Score = 90 } };
@@ -121,7 +121,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_EmptySource_WritesHeadersOnly()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
 
             using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, Array.Empty<SampleExportItem>());
             var npoiSheet = workbook.GetSheet("Sheet1");
@@ -133,7 +133,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public async Task ExportAsync_MatchesSyncResults()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet("Async");
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service, "Async");
             var items = new[]
             {
                 new SampleExportItem { Name = "Alice", Age = 30, Score = 90 },
@@ -159,7 +159,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         public void Export_WritesRepresentativeTypes()
         {
             var createdAt = new DateTime(2024, 5, 6, 12, 30, 0, DateTimeKind.Unspecified);
-            var sheet = ExcelExportTestHelper.CreateTypedSheet();
+            var sheet = ExcelExportTestHelper.CreateTypedSheet(_service);
             var items = new[]
             {
                 new SampleExportItem
@@ -192,14 +192,9 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         {
             var createdAt = new DateTime(2024, 5, 6, 12, 30, 0, DateTimeKind.Unspecified);
             var occurredAt = new DateTimeOffset(2024, 5, 6, 20, 30, 0, TimeSpan.FromHours(8));
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, DateTime>("CreatedAt", null, x => x.CreatedAt),
-                new ExcelExportColumn<SampleExportItem, DateTimeOffset>("OccurredAt", null, x => x.OccurredAt),
-            })
-            {
-                CreateHeaders = true
-            };
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.CreatedAt), nameof(SampleExportItem.OccurredAt));
             var items = new[]
             {
                 new SampleExportItem { CreatedAt = createdAt, OccurredAt = occurredAt }
@@ -227,14 +222,9 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         {
             var createdAt = new DateTime(2024, 5, 6, 12, 30, 0, DateTimeKind.Unspecified);
             var occurredAt = new DateTimeOffset(2024, 5, 6, 20, 30, 0, TimeSpan.FromHours(8));
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, DateTime?>("OptionalCreatedAt", null, x => x.OptionalCreatedAt),
-                new ExcelExportColumn<SampleExportItem, DateTimeOffset?>("OptionalOccurredAt", null, x => x.OptionalOccurredAt),
-            })
-            {
-                CreateHeaders = true
-            };
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.OptionalCreatedAt), nameof(SampleExportItem.OptionalOccurredAt));
             var items = new[]
             {
                 new SampleExportItem { OptionalCreatedAt = createdAt, OptionalOccurredAt = occurredAt },
@@ -257,16 +247,11 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         {
             var createdAt = new DateTime(2024, 5, 6, 12, 30, 0, DateTimeKind.Unspecified);
             var occurredAt = new DateTimeOffset(2024, 5, 6, 20, 30, 0, TimeSpan.FromHours(8));
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, DateTime>("CreatedAt", null, x => x.CreatedAt),
-                new ExcelExportColumn<SampleExportItem, DateTimeOffset>("OccurredAt", null, x => x.OccurredAt),
-            })
-            {
-                CreateHeaders = true
-            };
-            sheet.Columns[0].Features.Add(new ExcelExportDataFormatFeature("yyyy-mm-dd hh:mm:ss"));
-            sheet.Columns[1].Features.Add(new ExcelExportDataFormatFeature("yyyy-mm-dd hh:mm:ss"));
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.CreatedAt), nameof(SampleExportItem.OccurredAt));
+            sheet.Columns[0].SetDataFormat("yyyy-mm-dd hh:mm:ss");
+            sheet.Columns[1].SetDataFormat("yyyy-mm-dd hh:mm:ss");
 
             using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, new[]
             {
@@ -318,14 +303,9 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         {
             var date = new DateOnly(2024, 5, 6);
             var time = new TimeOnly(12, 30, 0);
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, DateOnly>("Date", null, x => x.Date),
-                new ExcelExportColumn<SampleExportItem, TimeOnly>("Time", null, x => x.Time),
-            })
-            {
-                CreateHeaders = true
-            };
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.Date), nameof(SampleExportItem.Time));
             var items = new[]
             {
                 new SampleExportItem { Date = date, Time = time }
@@ -351,14 +331,9 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         {
             var date = new DateOnly(2024, 5, 6);
             var time = new TimeOnly(12, 30, 0);
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, DateOnly?>("OptionalDate", null, x => x.OptionalDate),
-                new ExcelExportColumn<SampleExportItem, TimeOnly?>("OptionalTime", null, x => x.OptionalTime),
-            })
-            {
-                CreateHeaders = true
-            };
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.OptionalDate), nameof(SampleExportItem.OptionalTime));
             var items = new[]
             {
                 new SampleExportItem { OptionalDate = date, OptionalTime = time },
@@ -381,16 +356,11 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         {
             var date = new DateOnly(2024, 5, 6);
             var time = new TimeOnly(12, 30, 0);
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, DateOnly>("Date", null, x => x.Date),
-                new ExcelExportColumn<SampleExportItem, TimeOnly>("Time", null, x => x.Time),
-            })
-            {
-                CreateHeaders = true
-            };
-            sheet.Columns[0].Features.Add(new ExcelExportDataFormatFeature("yyyy-mm-dd"));
-            sheet.Columns[1].Features.Add(new ExcelExportDataFormatFeature("hh:mm:ss"));
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.Date), nameof(SampleExportItem.Time));
+            sheet.Columns[0].SetDataFormat("yyyy-mm-dd");
+            sheet.Columns[1].SetDataFormat("hh:mm:ss");
 
             using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, new[]
             {
@@ -440,7 +410,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_NullValues_RemovesCellByDefault()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
             var items = new[] { new SampleExportItem { Name = null, Age = 30, Score = null } };
 
             using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, items);
@@ -456,7 +426,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         {
             var settings = new NpoiExcelExportSettings { CreateCellForNullValue = true };
             var context = new NpoiExcelExportContext(null, settings);
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
             var items = new[] { new SampleExportItem { Name = null, Age = 30, Score = null } };
 
             using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, items, context);
@@ -471,13 +441,10 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_UnsupportedType_ThrowsNotSupportedException()
         {
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, Guid>("Id", null, _ => Guid.NewGuid()),
-            })
-            {
-                CreateHeaders = true
-            };
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.Name));
+            sheet.OverrideColumn(x => x.Name, (SampleExportItem _) => Guid.NewGuid());
 
             var context = (NpoiExcelExportContext)_service.CreateContext();
             try
@@ -496,12 +463,10 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_ColumnWidth_UsesExplicitAndAutoWidth()
         {
-            var columns = new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, string?>("Name", null, x => x.Name) { Width = 4000 },
-                new ExcelExportColumn<SampleExportItem, int>("Age", null, x => x.Age),
-            };
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", columns) { CreateHeaders = true };
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.Name), nameof(SampleExportItem.Age));
+            sheet.GetClrColumn(x => x.Name).Width = 4000;
             var items = new[] { new SampleExportItem { Name = "Alice", Age = 30 } };
 
             using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, items);
@@ -514,7 +479,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_ColorFeature_AppliesHeaderStyle()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
             sheet.Columns[0].Features.Add(new ExcelExportColorFeature(
                 headerBackground: [0xFF, 0x00, 0x00],
                 headerForeground: [0xFF, 0xFF, 0xFF],
@@ -533,16 +498,11 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         public void Export_ColumnFormat_WritesValueWithExcelDataFormat()
         {
             var createdAt = new DateTime(2024, 5, 6, 12, 30, 0, DateTimeKind.Unspecified);
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, DateTime>("CreatedAt", null, x => x.CreatedAt),
-                new ExcelExportColumn<SampleExportItem, decimal>("DecimalValue", null, x => x.DecimalValue),
-            })
-            {
-                CreateHeaders = true
-            };
-            sheet.Columns[0].Features.Add(new ExcelExportDataFormatFeature("yyyy-mm-dd"));
-            sheet.Columns[1].Features.Add(new ExcelExportDataFormatFeature("0.00"));
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.CreatedAt), nameof(SampleExportItem.DecimalValue));
+            sheet.Columns[0].SetDataFormat("yyyy-mm-dd");
+            sheet.Columns[1].SetDataFormat("0.00");
 
             var items = new[]
             {
@@ -567,13 +527,9 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_EnumWriter_WritesDisplayName()
         {
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, SampleStatus>("Status", null, x => x.Status),
-            })
-            {
-                CreateHeaders = true
-            };
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.Status));
 
             var items = new[]
             {
@@ -591,7 +547,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_CommentFeature_WritesHeaderComment()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
             sheet.Columns[0].Features.Add(new ExcelExportCommentFeature("备注说明"));
 
             using var workbook = ExcelExportTestHelper.ExportToWorkbook(
@@ -606,7 +562,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_ValidationFeature_AddsDataValidation()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
             sheet.Columns[0].Features.Add(new ExcelExportValidationFeature(["A", "B", "C"]));
 
             using var workbook = ExcelExportTestHelper.ExportToWorkbook(
@@ -625,14 +581,9 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_EnumValidationFeature_AddsDataValidation()
         {
-            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, SampleStatus>("Status", null, x => x.Status),
-            })
-            {
-                CreateHeaders = true
-            };
-            sheet.Columns[0].Features.Add(new ExcelExportValidationFeature(ExcelExportEnumHelper.GetDisplayNames(typeof(SampleStatus))));
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.KeepClrColumns(nameof(SampleExportItem.Status));
 
             using var workbook = ExcelExportTestHelper.ExportToWorkbook(
                 _service, sheet, new[] { new SampleExportItem { Status = SampleStatus.Draft } });
@@ -646,7 +597,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Context_Write_ProducesReadableWorkbook_AndThrowsAfterDispose()
         {
-            var sheet = ExcelExportTestHelper.CreateBasicSheet();
+            var sheet = ExcelExportTestHelper.CreateBasicSheet(_service);
             var items = new[] { new SampleExportItem { Name = "Alice", Age = 30, Score = 1 } };
             var context = (NpoiExcelExportContext)_service.CreateContext();
             _service.Export(context, sheet, items);
@@ -668,7 +619,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_ExpandingHeaders_MergeHeader_WritesParentAndChildRows()
         {
-            var sheet = ExcelExportTestHelper.CreateOrderSheet(mergeHeader: true);
+            var sheet = ExcelExportTestHelper.CreateOrderSheet(_service, mergeHeader: true);
             var items = new[]
             {
                 new SampleOrderExportItem
@@ -710,7 +661,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void Export_ExpandingHeaders_WithoutMerge_SkipsParentHeader()
         {
-            var sheet = ExcelExportTestHelper.CreateOrderSheet(mergeHeader: false);
+            var sheet = ExcelExportTestHelper.CreateOrderSheet(_service, mergeHeader: false);
             var items = new[]
             {
                 new SampleOrderExportItem
@@ -746,12 +697,6 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
             Assert.Equal(3, npoiSheet.GetRow(2)!.GetCell(1)!.NumericCellValue);
             Assert.Equal(4, npoiSheet.GetRow(2)!.GetCell(2)!.NumericCellValue);
             Assert.Equal(30, npoiSheet.GetRow(2)!.GetCell(3)!.NumericCellValue);
-        }
-
-        [Fact]
-        public void ExcelExportSheetTest()
-        {
-            _service.GetExportSheet<SampleOrderExportItem>();
         }
 
         private static string GetColumnDataFormat(ISheet sheet, int column)

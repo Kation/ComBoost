@@ -7,34 +7,53 @@ namespace Wodsoft.ComBoost.ExcelExport.Test.Helpers
 {
     internal static class ExcelExportTestHelper
     {
-        public static ExcelExportSheet<SampleExportItem> CreateBasicSheet(string? name = "Sheet1")
+        public static IExcelExportSheet<TExport> KeepClrColumns<TExport>(this IExcelExportSheet<TExport> sheet, params string[] clrNames)
         {
-            return new ExcelExportSheet<SampleExportItem>(name, new List<IExcelExportColumn<SampleExportItem>>
-            {
-                new ExcelExportColumn<SampleExportItem, string?>("Name", null, x => x.Name),
-                new ExcelExportColumn<SampleExportItem, int>("Age", null, x => x.Age),
-                new ExcelExportColumn<SampleExportItem, int?>("Score", null, x => x.Score),
-            })
-            {
-                CreateHeaders = true
-            };
+            var columns = new List<IExcelExportColumn<TExport>>(clrNames.Length);
+            foreach (var name in clrNames)
+                columns.Add(sheet.GetClrColumn(name));
+            sheet.Columns.Clear();
+            foreach (var column in columns)
+                sheet.Columns.Add(column);
+            return sheet;
         }
 
-        public static ExcelExportSheet<SampleExportItem> CreateTypedSheet(string? name = "Sheet1")
+        public static void SetDataFormat<TExport>(this IExcelExportColumn<TExport> column, string format)
         {
-            return new ExcelExportSheet<SampleExportItem>(name, new List<IExcelExportColumn<SampleExportItem>>
+            for (int i = column.Features.Count - 1; i >= 0; i--)
             {
-                new ExcelExportColumn<SampleExportItem, string?>("Name", null, x => x.Name),
-                new ExcelExportColumn<SampleExportItem, bool>("Active", null, x => x.Active),
-                new ExcelExportColumn<SampleExportItem, int>("Age", null, x => x.Age),
-                new ExcelExportColumn<SampleExportItem, long>("LongValue", null, x => x.LongValue),
-                new ExcelExportColumn<SampleExportItem, double>("DoubleValue", null, x => x.DoubleValue),
-                new ExcelExportColumn<SampleExportItem, decimal>("DecimalValue", null, x => x.DecimalValue),
-                new ExcelExportColumn<SampleExportItem, DateTime>("CreatedAt", null, x => x.CreatedAt),
-            })
-            {
-                CreateHeaders = true
-            };
+                if (column.Features[i] is IExcelExportDataFormatFeature)
+                    column.Features.RemoveAt(i);
+            }
+            column.Features.Add(new ExcelExportDataFormatFeature(format));
+        }
+
+        public static IExcelExportSheet<SampleExportItem> CreateBasicSheet(IExcelExportService service, string? name = "Sheet1")
+        {
+            var sheet = service.GetExportSheet<SampleExportItem>();
+            sheet.KeepClrColumns(
+                nameof(SampleExportItem.Name),
+                nameof(SampleExportItem.Age),
+                nameof(SampleExportItem.Score));
+            sheet.Name = name;
+            sheet.CreateHeaders = true;
+            return sheet;
+        }
+
+        public static IExcelExportSheet<SampleExportItem> CreateTypedSheet(IExcelExportService service, string? name = "Sheet1")
+        {
+            var sheet = service.GetExportSheet<SampleExportItem>();
+            sheet.KeepClrColumns(
+                nameof(SampleExportItem.Name),
+                nameof(SampleExportItem.Active),
+                nameof(SampleExportItem.Age),
+                nameof(SampleExportItem.LongValue),
+                nameof(SampleExportItem.DoubleValue),
+                nameof(SampleExportItem.DecimalValue),
+                nameof(SampleExportItem.CreatedAt));
+            sheet.Name = name;
+            sheet.CreateHeaders = true;
+            return sheet;
         }
 
         public static XSSFWorkbook ExportToWorkbook(
@@ -63,31 +82,15 @@ namespace Wodsoft.ComBoost.ExcelExport.Test.Helpers
             }
         }
 
-        public static ExcelExportSheet<SampleOrderExportItem> CreateOrderSheet(bool mergeHeader)
+        public static IExcelExportSheet<SampleOrderExportItem> CreateOrderSheet(IExcelExportService service, bool mergeHeader)
         {
-            var orderColumns = new List<IExcelExportColumn>
-            {
-                new ExcelExportColumn<SampleOrderLine, int>("Id", null, x => x.Id),
-                new ExcelExportColumn<SampleOrderLine, int>("Qty", null, x => x.Qty),
-            };
-            var ordersColumn = new ExcelExportColumn<SampleOrderExportItem, List<SampleOrderLine>>("Orders", null, x => x.Orders);
-            ordersColumn.Features.Add(new ExcelExportExpandingFeature<SampleOrderExportItem>(
-                typeof(SampleOrderLine),
-                orderColumns,
-                x => x.Orders)
-            {
-                MergeHeader = mergeHeader
-            });
-
-            return new ExcelExportSheet<SampleOrderExportItem>("Sheet1", new List<IExcelExportColumn<SampleOrderExportItem>>
-            {
-                new ExcelExportColumn<SampleOrderExportItem, string?>("Name", null, x => x.Name),
-                ordersColumn,
-                new ExcelExportColumn<SampleOrderExportItem, int>("Age", null, x => x.Age),
-            })
-            {
-                CreateHeaders = true
-            };
+            var sheet = service.GetExportSheet<SampleOrderExportItem>();
+            sheet.Name = "Sheet1";
+            sheet.CreateHeaders = true;
+            var ordersColumn = sheet.GetClrColumn(x => x.Orders);
+            Assert.True(ordersColumn.TryGetFeature<IExcelExportExpandingFeature<SampleOrderExportItem>>(out var expanding));
+            ((ExcelExportExpandingFeature<SampleOrderExportItem>)expanding!).MergeHeader = mergeHeader;
+            return sheet;
         }
 
         public static async Task<XSSFWorkbook> ExportToWorkbookAsync(

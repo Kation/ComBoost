@@ -14,9 +14,9 @@ namespace Wodsoft.ComBoost.ExcelExport
         IList<IExcelExportColumn<TExport>> Columns { get; }
 
         /// <summary>
-        /// Gets the sheet name, or <see langword="null"/> to use the workbook default name.
+        /// Gets or sets the sheet name, or <see langword="null"/> to use the workbook default name.
         /// </summary>
-        string? Name { get; }
+        string? Name { get; set; }
 
         /// <summary>
         /// Gets the features attached to this sheet.

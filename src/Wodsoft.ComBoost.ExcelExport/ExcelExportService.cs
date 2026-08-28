@@ -77,7 +77,7 @@ namespace Wodsoft.ComBoost.ExcelExport
         }
 
         private readonly ConcurrentDictionary<Type, Func<ExcelExportService, IPropertyMetadata, IExcelExportColumn>> _getColumnCache = new ConcurrentDictionary<Type, Func<ExcelExportService, IPropertyMetadata, IExcelExportColumn>>();
-        private static readonly MethodInfo _GetColumnMethod = typeof(ExcelExportService).GetMethod("GetColumn", BindingFlags.Public | BindingFlags.NonPublic)!;
+        private static readonly MethodInfo _GetColumnMethod = typeof(ExcelExportService).GetMethod("GetColumn", BindingFlags.Instance | BindingFlags.NonPublic)!;
         private List<IExcelExportColumn> GetColumns(Type type)
         {
             var getColumnFunc = _getColumnCache.GetOrAdd(type, t =>
@@ -153,12 +153,12 @@ namespace Wodsoft.ComBoost.ExcelExport
             else
             {
                 if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTimeOffset) || property.ClrType == typeof(DateTime?) || property.ClrType == typeof(DateTimeOffset?))
-                    column.Features.Add(new ExcelExportDataFormatFeature(CultureInfo.CurrentUICulture.DateTimeFormat.FullDateTimePattern));
+                    column.Features.Add(new ExcelExportDataFormatFeature(ConvertToExcelFormat(CultureInfo.CurrentUICulture.DateTimeFormat.FullDateTimePattern)));
 #if NET6_0_OR_GREATER
                 else if (property.ClrType == typeof(DateOnly) || property.ClrType == typeof(DateOnly?))
-                    column.Features.Add(new ExcelExportDataFormatFeature(CultureInfo.CurrentUICulture.DateTimeFormat.LongDatePattern));
+                    column.Features.Add(new ExcelExportDataFormatFeature(ConvertToExcelFormat(CultureInfo.CurrentUICulture.DateTimeFormat.LongDatePattern)));
                 else if (property.ClrType == typeof(TimeOnly) || property.ClrType == typeof(TimeOnly?))
-                    column.Features.Add(new ExcelExportDataFormatFeature(CultureInfo.CurrentUICulture.DateTimeFormat.ShortTimePattern));
+                    column.Features.Add(new ExcelExportDataFormatFeature(ConvertToExcelFormat(CultureInfo.CurrentUICulture.DateTimeFormat.ShortTimePattern)));
 #endif
             }
             var expandAttribute = property.GetAttribute<ExcelExportExpandableAttribute>();

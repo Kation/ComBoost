@@ -1,6 +1,7 @@
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
+using NPOI.XSSF.Streaming;
 using NPOI.XSSF.UserModel;
 using Org.BouncyCastle.Asn1.X509;
 using System.Collections.Concurrent;
@@ -357,6 +358,9 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
                 else
                 {
                     var cell = row.GetCell(x + columnIndex) ?? row.CreateCell(x + columnIndex);
+                    //var sheetColumn = ((SXSSFSheet)sheet).GetColumn(x + columnIndex);
+                    //if (sheetColumn != null && cell.CellStyle != sheetColumn.ColumnStyle)
+                    //    cell.CellStyle = sheetColumn.ColumnStyle;
                     BuildItemCell(context, cell, column, item);
                     x++;
                 }

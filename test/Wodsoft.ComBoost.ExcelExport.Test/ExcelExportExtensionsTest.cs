@@ -1,15 +1,20 @@
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Wodsoft.ComBoost.ExcelExport.NPOI;
+using Wodsoft.ComBoost.ExcelExport.Test.Helpers;
 using Wodsoft.ComBoost.ExcelExport.Test.Models;
 
 namespace Wodsoft.ComBoost.ExcelExport.Test
 {
     public class ExcelExportExtensionsTest
     {
+        private readonly NpoiExcelExportService _service = new();
+
         [Fact]
         public void GetClrColumn_ByPropertySelector_ReturnsMatchingColumn()
         {
-            var nameColumn = CreateNameColumn();
-            var sheet = CreateSheet(nameColumn, CreateAgeColumn());
+            var sheet = CreateSheet(nameof(SampleExportItem.Name), nameof(SampleExportItem.Age));
+            var nameColumn = sheet.GetClrColumn(x => x.Name);
 
             var actual = sheet.GetClrColumn(x => x.Name);
 
@@ -19,55 +24,40 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void GetClrColumn_ByPropertySelector_MatchesInheritedProperty()
         {
-            var nameProperty = typeof(SampleExportItem).GetProperty(nameof(SampleExportItem.Name));
-            var nameColumn = new ExcelExportColumn<DerivedSampleExportItem, string?>("Name", nameProperty, x => x.Name);
-            var sheet = new ExcelExportSheet<DerivedSampleExportItem>(new List<IExcelExportColumn<DerivedSampleExportItem>>
-            {
-                nameColumn
-            });
+            var sheet = _service.GetExportSheet<DerivedSampleExportItem>();
 
             var actual = sheet.GetClrColumn(x => x.Name);
 
-            Assert.Same(nameColumn, actual);
+            Assert.Equal(nameof(SampleExportItem.Name), actual.ClrProperty!.Name);
+            Assert.Equal(typeof(SampleExportItem), actual.ClrProperty.DeclaringType);
         }
 
         [Fact]
         public void GetClrColumn_ByPropertySelector_WhenDerivedModelSelectsBaseProperty_ReturnsColumn()
         {
-            var titleProperty = typeof(ChildExportModel).GetProperty(nameof(BaseExportModel.Title));
-            var titleColumn = new ExcelExportColumn<ChildExportModel, string?>("Title", titleProperty, x => x.Title);
-            var countColumn = new ExcelExportColumn<ChildExportModel, int>("Count", typeof(ChildExportModel).GetProperty(nameof(ChildExportModel.Count)), x => x.Count);
-            var sheet = new ExcelExportSheet<ChildExportModel>(new List<IExcelExportColumn<ChildExportModel>>
-            {
-                titleColumn,
-                countColumn
-            });
+            var sheet = _service.GetExportSheet<ChildExportModel>();
 
             var actual = sheet.GetClrColumn(x => x.Title);
 
-            Assert.Same(titleColumn, actual);
-            Assert.Equal(typeof(BaseExportModel), actual.ClrProperty!.DeclaringType);
+            Assert.Equal(nameof(BaseExportModel.Title), actual.ClrProperty!.Name);
+            Assert.Equal(typeof(BaseExportModel), actual.ClrProperty.DeclaringType);
+            Assert.Same(actual, sheet.GetClrColumn(nameof(ChildExportModel.Title)));
         }
 
         [Fact]
         public void GetClrColumn_ByPropertySelector_WhenDerivedModelSelectsBasePropertyViaCast_ReturnsColumn()
         {
-            var titleProperty = typeof(ChildExportModel).GetProperty(nameof(BaseExportModel.Title));
-            var titleColumn = new ExcelExportColumn<ChildExportModel, string?>("Title", titleProperty, x => x.Title);
-            var sheet = new ExcelExportSheet<ChildExportModel>(new List<IExcelExportColumn<ChildExportModel>>
-            {
-                titleColumn
-            });
+            var sheet = _service.GetExportSheet<ChildExportModel>();
 
             var actual = sheet.GetClrColumn(x => ((BaseExportModel)x).Title);
 
-            Assert.Same(titleColumn, actual);
+            Assert.Same(sheet.GetClrColumn(x => x.Title), actual);
         }
 
         [Fact]
         public void GetClrColumn_ByPropertySelector_ThrowsWhenExpressionIsNotProperty()
         {
-            var sheet = CreateSheet(CreateNameColumn());
+            var sheet = CreateSheet(nameof(SampleExportItem.Name));
 
             var ex = Assert.Throws<InvalidOperationException>(() => sheet.GetClrColumn(x => x.Name + "!"));
 
@@ -77,7 +67,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void GetClrColumn_ByPropertySelector_ThrowsWhenColumnDoesNotExist()
         {
-            var sheet = CreateSheet(CreateAgeColumn());
+            var sheet = CreateSheet(nameof(SampleExportItem.Age));
 
             Assert.Throws<InvalidOperationException>(() => sheet.GetClrColumn(x => x.Name));
         }
@@ -85,8 +75,8 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void GetClrColumn_ByName_ReturnsMatchingColumn()
         {
-            var ageColumn = CreateAgeColumn();
-            var sheet = CreateSheet(CreateNameColumn(), ageColumn);
+            var sheet = CreateSheet(nameof(SampleExportItem.Name), nameof(SampleExportItem.Age));
+            var ageColumn = sheet.GetClrColumn(nameof(SampleExportItem.Age));
 
             var actual = sheet.GetClrColumn(nameof(SampleExportItem.Age));
 
@@ -96,7 +86,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void GetClrColumn_ByName_ThrowsWhenColumnDoesNotExist()
         {
-            var sheet = CreateSheet(CreateNameColumn());
+            var sheet = CreateSheet(nameof(SampleExportItem.Name));
 
             var ex = Assert.Throws<InvalidOperationException>(() => sheet.GetClrColumn("Missing"));
 
@@ -106,10 +96,10 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void ReplaceColumn_ReplacesColumnAtSameIndex()
         {
-            var nameColumn = CreateNameColumn();
-            var ageColumn = CreateAgeColumn();
-            var replacement = new ExcelExportColumn<SampleExportItem, string?>("FullName", Property(nameof(SampleExportItem.Name)), x => x.Name);
-            var sheet = CreateSheet(nameColumn, ageColumn);
+            var sheet = CreateSheet(nameof(SampleExportItem.Name), nameof(SampleExportItem.Age));
+            var nameColumn = sheet.GetClrColumn(x => x.Name);
+            var ageColumn = sheet.GetClrColumn(x => x.Age);
+            var replacement = nameColumn.Override(x => x.Name);
 
             var result = sheet.ReplaceColumn(nameColumn, replacement);
 
@@ -122,9 +112,9 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void ReplaceColumn_ThrowsWhenOldColumnIsNotOnSheet()
         {
-            var sheet = CreateSheet(CreateNameColumn());
-            var otherColumn = CreateAgeColumn();
-            var replacement = CreateAgeColumn();
+            var sheet = CreateSheet(nameof(SampleExportItem.Name));
+            var otherColumn = _service.GetExportColumn<SampleExportItem, int>(x => x.Age);
+            var replacement = otherColumn.Override(x => x.Age);
 
             Assert.Throws<InvalidOperationException>(() => sheet.ReplaceColumn(otherColumn, replacement));
         }
@@ -132,10 +122,10 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void OverrideColumn_WithValueReader_ReplacesColumnValue()
         {
-            var nameColumn = CreateNameColumn();
+            var sheet = CreateSheet(nameof(SampleExportItem.Name), nameof(SampleExportItem.Age));
+            var nameColumn = sheet.GetClrColumn(x => x.Name);
             nameColumn.Width = 20;
             nameColumn.Features.Add(new ExcelExportCommentFeature("hint"));
-            var sheet = CreateSheet(nameColumn, CreateAgeColumn());
             var item = new SampleExportItem { Name = "Alice" };
 
             var result = sheet.OverrideColumn(x => x.Name, x => x.Name + "!");
@@ -156,7 +146,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void OverrideColumn_WithValueConverter_ConvertsPropertyValue()
         {
-            var sheet = CreateSheet(CreateNameColumn(), CreateAgeColumn());
+            var sheet = CreateSheet(nameof(SampleExportItem.Name), nameof(SampleExportItem.Age));
             var item = new SampleExportItem { Name = "Alice" };
 
             sheet.OverrideColumn(x => x.Name, (string? name) => name?.ToUpperInvariant());
@@ -169,25 +159,16 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
         [Fact]
         public void OverrideColumn_ThrowsWhenColumnDoesNotExist()
         {
-            var sheet = CreateSheet(CreateAgeColumn());
+            var sheet = CreateSheet(nameof(SampleExportItem.Age));
 
             Assert.Throws<InvalidOperationException>(() =>
                 sheet.OverrideColumn(x => x.Name, x => x.Name));
         }
 
-        private static ExcelExportSheet<SampleExportItem> CreateSheet(params IExcelExportColumn<SampleExportItem>[] columns)
+        private IExcelExportSheet<SampleExportItem> CreateSheet(params string[] clrNames)
         {
-            return new ExcelExportSheet<SampleExportItem>(new List<IExcelExportColumn<SampleExportItem>>(columns));
-        }
-
-        private static ExcelExportColumn<SampleExportItem, string?> CreateNameColumn()
-        {
-            return new ExcelExportColumn<SampleExportItem, string?>("Name", Property(nameof(SampleExportItem.Name)), x => x.Name);
-        }
-
-        private static ExcelExportColumn<SampleExportItem, int> CreateAgeColumn()
-        {
-            return new ExcelExportColumn<SampleExportItem, int>("Age", Property(nameof(SampleExportItem.Age)), x => x.Age);
+            var sheet = _service.GetExportSheet<SampleExportItem>();
+            return sheet.KeepClrColumns(clrNames);
         }
 
         private static PropertyInfo Property(string name)
@@ -201,6 +182,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
 
         private class BaseExportModel
         {
+            [Key]
             public string? Title { get; set; }
         }
 

@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using Wodsoft.ComBoost.ExcelExport;
 
 namespace Wodsoft.ComBoost.ExcelExport.Test.Models
 {
     public class SampleExportItem
     {
+        [Key]
         public string? Name { get; set; }
 
         public int Age { get; set; }
@@ -52,6 +54,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test.Models
 
     public class SampleOrderLine
     {
+        [Key]
         public int Id { get; set; }
 
         public int Qty { get; set; }
@@ -62,7 +65,7 @@ namespace Wodsoft.ComBoost.ExcelExport.Test.Models
         [Key]
         public string? Name { get; set; }
 
-        //[ExcelExportExpandable]
+        [ExcelExportExpandable]
         public List<SampleOrderLine> Orders { get; set; } = new();
 
         public int Age { get; set; }
