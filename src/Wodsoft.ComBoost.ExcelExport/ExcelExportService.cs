@@ -153,7 +153,13 @@ namespace Wodsoft.ComBoost.ExcelExport
             else
             {
                 if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTimeOffset) || property.ClrType == typeof(DateTime?) || property.ClrType == typeof(DateTimeOffset?))
-                    column.Features.Add(new ExcelExportDataFormatFeature("yyyy-MM-dd HH:mm:ss"));
+                    column.Features.Add(new ExcelExportDataFormatFeature(CultureInfo.CurrentUICulture.DateTimeFormat.FullDateTimePattern));
+#if NET6_0_OR_GREATER
+                else if (property.ClrType == typeof(DateOnly) || property.ClrType == typeof(DateOnly?))
+                    column.Features.Add(new ExcelExportDataFormatFeature(CultureInfo.CurrentUICulture.DateTimeFormat.LongDatePattern));
+                else if (property.ClrType == typeof(TimeOnly) || property.ClrType == typeof(TimeOnly?))
+                    column.Features.Add(new ExcelExportDataFormatFeature(CultureInfo.CurrentUICulture.DateTimeFormat.ShortTimePattern));
+#endif
             }
             var expandAttribute = property.GetAttribute<ExcelExportExpandableAttribute>();
             if (expandAttribute != null)

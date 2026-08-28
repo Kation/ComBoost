@@ -22,6 +22,10 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
             Assert.True(context.Settings.TryGetWriter(typeof(int), out _));
             Assert.True(context.Settings.TryGetWriter(typeof(DateTime), out _));
             Assert.True(context.Settings.TryGetWriter(typeof(DateTimeOffset), out _));
+#if NET6_0_OR_GREATER
+            Assert.True(context.Settings.TryGetWriter(typeof(DateOnly), out _));
+            Assert.True(context.Settings.TryGetWriter(typeof(TimeOnly), out _));
+#endif
             Assert.True(context.Settings.TryGetWriter(typeof(SampleStatus), out _));
         }
 
@@ -307,6 +311,131 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
             Assert.Equal(createdAt, row.GetCell(createdAtIndex)!.DateCellValue);
             Assert.Equal(occurredAt.LocalDateTime, row.GetCell(occurredAtIndex)!.DateCellValue);
         }
+
+#if NET6_0_OR_GREATER
+        [Fact]
+        public void Export_DateOnlyAndTimeOnly_WritesExcelDateValues()
+        {
+            var date = new DateOnly(2024, 5, 6);
+            var time = new TimeOnly(12, 30, 0);
+            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
+            {
+                new ExcelExportColumn<SampleExportItem, DateOnly>("Date", null, x => x.Date),
+                new ExcelExportColumn<SampleExportItem, TimeOnly>("Time", null, x => x.Time),
+            })
+            {
+                CreateHeaders = true
+            };
+            var items = new[]
+            {
+                new SampleExportItem { Date = date, Time = time }
+            };
+
+            using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, items);
+            var npoiSheet = workbook.GetSheet("Sheet1");
+            var row = npoiSheet.GetRow(1)!;
+            var dateCell = row.GetCell(0)!;
+            var timeCell = row.GetCell(1)!;
+
+            Assert.Equal("Date", ExcelExportTestHelper.GetStringCell(npoiSheet, 0, 0));
+            Assert.Equal("Time", ExcelExportTestHelper.GetStringCell(npoiSheet, 0, 1));
+            Assert.Equal(CellType.Numeric, dateCell.CellType);
+            Assert.Equal(date.ToDateTime(TimeOnly.MinValue), dateCell.DateCellValue);
+            Assert.Equal(CellType.Numeric, timeCell.CellType);
+            Assert.Equal(time.ToTimeSpan().TotalDays, timeCell.NumericCellValue, 10);
+            Assert.Equal(time.ToTimeSpan(), timeCell.DateCellValue!.Value.TimeOfDay);
+        }
+
+        [Fact]
+        public void Export_NullableDateOnlyAndTimeOnly_WritesValuesAndRemovesNullCells()
+        {
+            var date = new DateOnly(2024, 5, 6);
+            var time = new TimeOnly(12, 30, 0);
+            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
+            {
+                new ExcelExportColumn<SampleExportItem, DateOnly?>("OptionalDate", null, x => x.OptionalDate),
+                new ExcelExportColumn<SampleExportItem, TimeOnly?>("OptionalTime", null, x => x.OptionalTime),
+            })
+            {
+                CreateHeaders = true
+            };
+            var items = new[]
+            {
+                new SampleExportItem { OptionalDate = date, OptionalTime = time },
+                new SampleExportItem { OptionalDate = null, OptionalTime = null },
+            };
+
+            using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, items);
+            var npoiSheet = workbook.GetSheet("Sheet1");
+            var valueRow = npoiSheet.GetRow(1)!;
+            var nullRow = npoiSheet.GetRow(2)!;
+
+            Assert.Equal(date.ToDateTime(TimeOnly.MinValue), valueRow.GetCell(0)!.DateCellValue);
+            Assert.Equal(time.ToTimeSpan(), valueRow.GetCell(1)!.DateCellValue!.Value.TimeOfDay);
+            Assert.Null(nullRow.GetCell(0));
+            Assert.Null(nullRow.GetCell(1));
+        }
+
+        [Fact]
+        public void Export_DateOnlyAndTimeOnly_AppliesExcelDataFormat()
+        {
+            var date = new DateOnly(2024, 5, 6);
+            var time = new TimeOnly(12, 30, 0);
+            var sheet = new ExcelExportSheet<SampleExportItem>("Sheet1", new List<IExcelExportColumn<SampleExportItem>>
+            {
+                new ExcelExportColumn<SampleExportItem, DateOnly>("Date", null, x => x.Date),
+                new ExcelExportColumn<SampleExportItem, TimeOnly>("Time", null, x => x.Time),
+            })
+            {
+                CreateHeaders = true
+            };
+            sheet.Columns[0].Features.Add(new ExcelExportDataFormatFeature("yyyy-mm-dd"));
+            sheet.Columns[1].Features.Add(new ExcelExportDataFormatFeature("hh:mm:ss"));
+
+            using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, new[]
+            {
+                new SampleExportItem { Date = date, Time = time }
+            });
+            var npoiSheet = workbook.GetSheet("Sheet1");
+
+            Assert.Equal("yyyy-mm-dd", GetColumnDataFormat(npoiSheet, 0));
+            Assert.Equal("hh:mm:ss", GetColumnDataFormat(npoiSheet, 1));
+            Assert.Equal(date.ToDateTime(TimeOnly.MinValue), npoiSheet.GetRow(1)!.GetCell(0)!.DateCellValue);
+            Assert.Equal(time.ToTimeSpan(), npoiSheet.GetRow(1)!.GetCell(1)!.DateCellValue!.Value.TimeOfDay);
+        }
+
+        [Fact]
+        public void Export_GetExportSheet_WritesDateOnlyAndTimeOnlyProperties()
+        {
+            var date = new DateOnly(2024, 5, 6);
+            var time = new TimeOnly(12, 30, 0);
+            var sheet = _service.GetExportSheet<SampleDateTimeExportItem>();
+            sheet.CreateHeaders = true;
+
+            using var workbook = ExcelExportTestHelper.ExportToWorkbook(_service, sheet, new[]
+            {
+                new SampleDateTimeExportItem
+                {
+                    Id = 1,
+                    Date = date,
+                    OptionalDate = date,
+                    Time = time,
+                    OptionalTime = time
+                }
+            });
+            var npoiSheet = workbook.GetSheetAt(0);
+            var dateIndex = sheet.Columns.ToList().FindIndex(t => t.ClrProperty?.Name == nameof(SampleDateTimeExportItem.Date));
+            var timeIndex = sheet.Columns.ToList().FindIndex(t => t.ClrProperty?.Name == nameof(SampleDateTimeExportItem.Time));
+            var row = npoiSheet.GetRow(1)!;
+
+            Assert.True(dateIndex >= 0);
+            Assert.True(timeIndex >= 0);
+            Assert.Equal(typeof(DateOnly), sheet.Columns[dateIndex].Type);
+            Assert.Equal(typeof(TimeOnly), sheet.Columns[timeIndex].Type);
+            Assert.Equal(date.ToDateTime(TimeOnly.MinValue), row.GetCell(dateIndex)!.DateCellValue);
+            Assert.Equal(time.ToTimeSpan(), row.GetCell(timeIndex)!.DateCellValue!.Value.TimeOfDay);
+        }
+#endif
 
         [Fact]
         public void Export_NullValues_RemovesCellByDefault()

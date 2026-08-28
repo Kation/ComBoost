@@ -26,6 +26,16 @@ namespace Wodsoft.ComBoost.ExcelExport.Test.Models
 
         public DateTimeOffset? OptionalOccurredAt { get; set; }
 
+#if NET6_0_OR_GREATER
+        public DateOnly Date { get; set; }
+
+        public DateOnly? OptionalDate { get; set; }
+
+        public TimeOnly Time { get; set; }
+
+        public TimeOnly? OptionalTime { get; set; }
+#endif
+
         public SampleStatus Status { get; set; }
     }
 
@@ -70,5 +80,15 @@ namespace Wodsoft.ComBoost.ExcelExport.Test.Models
         public DateTimeOffset OccurredAt { get; set; }
 
         public DateTimeOffset? OptionalOccurredAt { get; set; }
+
+#if NET6_0_OR_GREATER
+        public DateOnly Date { get; set; }
+
+        public DateOnly? OptionalDate { get; set; }
+
+        public TimeOnly Time { get; set; }
+
+        public TimeOnly? OptionalTime { get; set; }
+#endif
     }
 }
