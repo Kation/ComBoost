@@ -206,9 +206,6 @@ namespace Wodsoft.ComBoost.ExcelExport.Test
             var dateTimeCell = row.GetCell(0)!;
             var dateTimeOffsetCell = row.GetCell(1)!;
 
-            var stream = File.Open("test.xlsx", FileMode.Create);
-            workbook.Write(stream);
-
             Assert.Equal("CreatedAt", ExcelExportTestHelper.GetStringCell(npoiSheet, 0, 0));
             Assert.Equal("OccurredAt", ExcelExportTestHelper.GetStringCell(npoiSheet, 0, 1));
             Assert.Equal(CellType.Numeric, dateTimeCell.CellType);
