@@ -81,6 +81,13 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
             }
         }
 
+        /// <summary>
+        /// Gets the workbook sheet name used for the export, or <see langword="null"/> to create an unnamed sheet.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="sheet">The export sheet definition.</param>
+        /// <returns>The sheet name, or <see langword="null"/> to use the workbook default.</returns>
         protected virtual string? GetSheetName<TExport>(NpoiExcelExportContext context, IExcelExportSheet<TExport> sheet) => sheet.Name;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -308,7 +315,7 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
             {
                 var helper = sheet.GetDataValidationHelper();
                 var values = validationFeature.Validations as string[] ?? validationFeature.Validations.ToArray();
-                var constraint = helper.CreateExplicitListConstraint(values);
+                var constraint = helper.CreateExplicitListConstraint(FormatValidations(context, sheet, column, values));
                 var addressList = new CellRangeAddressList(dataStartRow, ValidationEndRow, columnIndex, columnIndex);
                 var validation = helper.CreateValidation(constraint, addressList);
                 validation.SuppressDropDownArrow = true;
@@ -330,6 +337,26 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
                 sheet.SetDefaultColumnStyle(columnIndex, style);
         }
 
+        /// <summary>
+        /// Formats the values written to a column's data validation list.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="sheet">The NPOI sheet.</param>
+        /// <param name="column">The column that owns the validation.</param>
+        /// <param name="sources">The raw validation values from the column feature.</param>
+        /// <returns>The values written to the Excel list constraint.</returns>
+        protected virtual string[] FormatValidations<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column, string[] sources) => sources;
+
+        /// <summary>
+        /// Gets the Excel data format string applied to a column.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="sheet">The NPOI sheet.</param>
+        /// <param name="column">The column being formatted.</param>
+        /// <param name="dataFormat">The data format from the column feature.</param>
+        /// <returns>The Excel data format string.</returns>
         protected virtual string GetDataFormat<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column, string dataFormat) => dataFormat;
 
         private int BuildItem<TExport>(NpoiExcelExportContext context, ISheet sheet, IEnumerable<IExcelExportColumn<TExport>> columns, TExport item, int rowIndex, int columnIndex)
