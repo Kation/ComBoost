@@ -196,7 +196,10 @@ namespace Wodsoft.ComBoost.ExcelExport
             var enumType = Nullable.GetUnderlyingType(column.Type) ?? column.Type;
             if (enumType.IsEnum)
             {
-                column.Features.Add(new ExcelExportValidationFeature(ExcelExportEnumHelper.GetDisplayNames(enumType)));
+                if (enumType == column.Type)
+                    column.Features.Add(new ExcelExportValidationFeature(ExcelExportEnumHelper.GetDisplayNames(enumType, false)));
+                else
+                    column.Features.Add(new ExcelExportValidationFeature(ExcelExportEnumHelper.GetDisplayNames(enumType, true)));
             }
             var widthAttr = property.GetAttribute<ExcelExportWidthAttribute>();
             if (widthAttr != null)

@@ -14,16 +14,34 @@ namespace Wodsoft.ComBoost.ExcelExport
         /// Gets the display names of all public static fields on an enumeration type.
         /// </summary>
         /// <param name="enumType">The enumeration type.</param>
-        /// <returns>The display names in field declaration order.</returns>
-        public static string[] GetDisplayNames(Type enumType)
+        /// <param name="includeEmpty">
+        /// <see langword="true"/> to prepend an empty string, typically for nullable enum columns;
+        /// otherwise, <see langword="false"/>.
+        /// </param>
+        /// <returns>
+        /// The display names in field declaration order.
+        /// When <paramref name="includeEmpty"/> is <see langword="true"/>, the first item is an empty string.
+        /// </returns>
+        public static string[] GetDisplayNames(Type enumType, bool includeEmpty)
         {
             if (!enumType.IsEnum)
                 throw new ArgumentException($"Type \"{enumType.FullName}\" is not an enum type.", nameof(enumType));
 
             var fields = enumType.GetFields(BindingFlags.Static | BindingFlags.Public);
-            var displayNames = new string[fields.Length];
-            for (int i = 0; i < fields.Length; i++)
-                displayNames[i] = GetDisplayName(fields[i]);
+            string[] displayNames;
+            if (includeEmpty)
+            {
+                displayNames = new string[fields.Length + 1];
+                displayNames[0] = string.Empty;
+                for (int i = 0; i < fields.Length; i++)
+                    displayNames[i + 1] = GetDisplayName(fields[i]);
+            }
+            else
+            {
+                displayNames = new string[fields.Length];
+                for (int i = 0; i < fields.Length; i++)
+                    displayNames[i] = GetDisplayName(fields[i]);
+            }
             return displayNames;
         }
 

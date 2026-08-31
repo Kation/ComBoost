@@ -204,8 +204,10 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
         }
 
         /// <summary>
-        /// Applies header styling and comments to a header cell.
+        /// Writes a header cell: the column name, width, header colors from <see cref="GetColumnHeaderColor{TExport}"/>,
+        /// and the header comment from <see cref="GetColumnHeaderComment{TExport}"/>.
         /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
         /// <param name="context">The NPOI export context.</param>
         /// <param name="cell">The header cell.</param>
         /// <param name="column">The column being written.</param>
@@ -216,31 +218,27 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
                 cell.Row.Sheet.SetColumnWidth(cell.ColumnIndex, column.Width.Value);
             else if (!string.IsNullOrEmpty(column.Name))
                 cell.Row.Sheet.SetColumnWidth(cell.ColumnIndex, CalculateWidth(column.Name));
-            if (column.TryGetFeature<IExcelExportColorFeature>(out var colorFeature))
+            var headerColor = GetColumnHeaderColor(context, cell.Sheet, column);
+            if (!headerColor.Background.IsEmpty || !headerColor.Foreground.IsEmpty)
             {
-                if (colorFeature.HasHeaderBackground || colorFeature.HasHeaderForeground)
-                {
-                    var style = context.GetStyle(colorFeature.HeaderBackground, colorFeature.HeaderForeground);
-                    if (style != null)
-                        cell.CellStyle = style;
-                }
+                var style = context.GetStyle(headerColor.Background, headerColor.Foreground);
+                if (style != null)
+                    cell.CellStyle = style;
             }
-            if (column.TryGetFeature<IExcelExportCommentFeature>(out var commentFeature))
+            var headerComment = GetColumnHeaderComment(context, cell.Sheet, column);
+            if (headerComment != null)
             {
-                if (commentFeature.HeaderComment != null)
-                {
-                    var helper = context.WorkBook.XssfWorkbook.GetCreationHelper();
-                    var drawing = cell.Row.Sheet.CreateDrawingPatriarch();
-                    var anchor = helper.CreateClientAnchor();
-                    anchor.Col1 = cell.ColumnIndex;
-                    anchor.Col2 = cell.ColumnIndex + 1;
-                    anchor.Row1 = cell.RowIndex;
-                    anchor.Row2 = cell.RowIndex + 1;
-                    var comment = (XSSFComment)drawing.CreateCellComment(anchor);
-                    comment.String = helper.CreateRichTextString(commentFeature.HeaderComment);
-                    comment.Address = new CellAddress(cell.RowIndex, cell.ColumnIndex);
-                    cell.CellComment = comment;
-                }
+                var helper = context.WorkBook.XssfWorkbook.GetCreationHelper();
+                var drawing = cell.Row.Sheet.CreateDrawingPatriarch();
+                var anchor = helper.CreateClientAnchor();
+                anchor.Col1 = cell.ColumnIndex;
+                anchor.Col2 = cell.ColumnIndex + 1;
+                anchor.Row1 = cell.RowIndex;
+                anchor.Row2 = cell.RowIndex + 1;
+                var comment = (XSSFComment)drawing.CreateCellComment(anchor);
+                comment.String = helper.CreateRichTextString(headerComment);
+                comment.Address = new CellAddress(cell.RowIndex, cell.ColumnIndex);
+                cell.CellComment = comment;
             }
         }
 
@@ -299,7 +297,9 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
         }
 
         /// <summary>
-        /// Applies column-level styles such as data format, colors, and validation.
+        /// Applies column-level validation, data format, and content colors.
+        /// Values come from <see cref="GetColumnValidations{TExport}"/>, <see cref="GetColumnDataFormat{TExport}"/>,
+        /// and <see cref="GetColumnContentColor{TExport}"/>.
         /// </summary>
         /// <typeparam name="TExport">The exported item type.</typeparam>
         /// <param name="context">The NPOI export context.</param>
@@ -310,54 +310,122 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
         /// <param name="style">An existing style to extend, or <see langword="null"/> to create one when needed.</param>
         protected virtual void BuildColumnStyle<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column, int dataStartRow, int columnIndex, XSSFCellStyle? style)
         {
-            if (column.TryGetFeature<IExcelExportValidationFeature>(out var validationFeature)
-                && validationFeature.Validations.Count > 0)
+            var validations = GetColumnValidations(context, sheet, column);
+            if (validations != null)
             {
                 var helper = sheet.GetDataValidationHelper();
-                var values = validationFeature.Validations as string[] ?? validationFeature.Validations.ToArray();
-                var constraint = helper.CreateExplicitListConstraint(FormatValidations(context, sheet, column, values));
+                var constraint = helper.CreateExplicitListConstraint(validations);
                 var addressList = new CellRangeAddressList(dataStartRow, ValidationEndRow, columnIndex, columnIndex);
                 var validation = helper.CreateValidation(constraint, addressList);
                 validation.SuppressDropDownArrow = true;
                 sheet.AddValidationData(validation);
             }
-            if (column.TryGetFeature<IExcelExportDataFormatFeature>(out var dataFormatFeature) && dataFormatFeature.DataFormat != null)
+            var dataFormat = GetColumnDataFormat(context, sheet, column);
+            if (dataFormat != null)
             {
                 style = (XSSFCellStyle)sheet.Workbook.CreateCellStyle();
-                style.DataFormat = sheet.Workbook.CreateDataFormat().GetFormat(GetDataFormat<TExport>(context, sheet, column, dataFormatFeature.DataFormat));
+                style.DataFormat = sheet.Workbook.CreateDataFormat().GetFormat(dataFormat);
             }
-            if (column.TryGetFeature<IExcelExportColorFeature>(out var colorFeature))
+            var contentColor = GetColumnContentColor(context, sheet, column);
+            if (!contentColor.Background.IsEmpty || !contentColor.Foreground.IsEmpty)
             {
-                if (colorFeature.HasContentBackground || colorFeature.HasContentForeground)
-                {
-                    style = context.GetStyle(colorFeature.ContentBackground, colorFeature.ContentForeground, style);
-                }
+                style = context.GetStyle(contentColor.Background, contentColor.Foreground, style);
             }
             if (style != null)
                 sheet.SetDefaultColumnStyle(columnIndex, style);
         }
 
         /// <summary>
-        /// Formats the values written to a column's data validation list.
+        /// Gets the values for a column's Excel list validation, or <see langword="null"/> when the column has none.
         /// </summary>
         /// <typeparam name="TExport">The exported item type.</typeparam>
         /// <param name="context">The NPOI export context.</param>
         /// <param name="sheet">The NPOI sheet.</param>
-        /// <param name="column">The column that owns the validation.</param>
-        /// <param name="sources">The raw validation values from the column feature.</param>
-        /// <returns>The values written to the Excel list constraint.</returns>
-        protected virtual string[] FormatValidations<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column, string[] sources) => sources;
+        /// <param name="column">The column that may own a validation feature.</param>
+        /// <returns>The list constraint values, or <see langword="null"/> if validation is not applied.</returns>
+        protected virtual string[]? GetColumnValidations<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column)
+        {
+            if (column.TryGetFeature<IExcelExportValidationFeature>(out var validationFeature)
+                && validationFeature.Validations.Count > 0)
+            {
+                return validationFeature.Validations as string[] ?? validationFeature.Validations.ToArray();
+            }
+            return null;
+        }
 
         /// <summary>
-        /// Gets the Excel data format string applied to a column.
+        /// Gets the Excel data format string for a column, or <see langword="null"/> when the column has none.
         /// </summary>
         /// <typeparam name="TExport">The exported item type.</typeparam>
         /// <param name="context">The NPOI export context.</param>
         /// <param name="sheet">The NPOI sheet.</param>
-        /// <param name="column">The column being formatted.</param>
-        /// <param name="dataFormat">The data format from the column feature.</param>
-        /// <returns>The Excel data format string.</returns>
-        protected virtual string GetDataFormat<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column, string dataFormat) => dataFormat;
+        /// <param name="column">The column that may own a data format feature.</param>
+        /// <returns>The Excel data format string, or <see langword="null"/> if no format is applied.</returns>
+        protected virtual string? GetColumnDataFormat<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column)
+        {
+            if (column.TryGetFeature<IExcelExportDataFormatFeature>(out var dataFormatFeature) && dataFormatFeature.DataFormat != null)
+            {
+                return dataFormatFeature.DataFormat;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the background and foreground colors used for a column's data cells.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="sheet">The NPOI sheet.</param>
+        /// <param name="column">The column that may own a color feature.</param>
+        /// <returns>The content colors, or a default value with empty spans when none are set.</returns>
+        protected virtual ColumnColor GetColumnContentColor<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column)
+        {
+            if (column.TryGetFeature<IExcelExportColorFeature>(out var colorFeature))
+            {
+                if (colorFeature.HasContentBackground || colorFeature.HasContentForeground)
+                {
+                    return new(colorFeature.ContentBackground, colorFeature.ContentForeground);
+                }
+            }
+            return default;
+        }
+
+        /// <summary>
+        /// Gets the background and foreground colors used for a column's header cell.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="sheet">The NPOI sheet.</param>
+        /// <param name="column">The column that may own a color feature.</param>
+        /// <returns>The header colors, or a default value with empty spans when none are set.</returns>
+        protected virtual ColumnColor GetColumnHeaderColor<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column)
+        {
+            if (column.TryGetFeature<IExcelExportColorFeature>(out var colorFeature))
+            {
+                if (colorFeature.HasHeaderBackground || colorFeature.HasHeaderForeground)
+                {
+                    return new(colorFeature.HeaderBackground, colorFeature.HeaderForeground);
+                }
+            }
+            return default;
+        }
+
+        /// <summary>
+        /// Gets the comment written on a column's header cell, or <see langword="null"/> when the column has none.
+        /// </summary>
+        /// <typeparam name="TExport">The exported item type.</typeparam>
+        /// <param name="context">The NPOI export context.</param>
+        /// <param name="sheet">The NPOI sheet.</param>
+        /// <param name="column">The column that may own a comment feature.</param>
+        /// <returns>The header comment text, or <see langword="null"/> if no comment is applied.</returns>
+        protected virtual string? GetColumnHeaderComment<TExport>(NpoiExcelExportContext context, ISheet sheet, IExcelExportColumn<TExport> column)
+        {
+            if (column.TryGetFeature<IExcelExportCommentFeature>(out var commentFeature))
+            {
+                return commentFeature.HeaderComment;
+            }
+            return null;
+        }
 
         private int BuildItem<TExport>(NpoiExcelExportContext context, ISheet sheet, IEnumerable<IExcelExportColumn<TExport>> columns, TExport item, int rowIndex, int columnIndex)
         {
@@ -576,6 +644,34 @@ namespace Wodsoft.ComBoost.ExcelExport.NPOI
         public virtual void WriteCell<TExport>(NpoiExcelExportContext context, ICell cell, IExcelExportColumn<TExport> column, TExport item, IRichTextString value)
         {
             cell.SetCellValue(value);
+        }
+
+        /// <summary>
+        /// RGB background and foreground colors for a column header or data cell.
+        /// Empty spans mean the corresponding color is not set.
+        /// </summary>
+        public ref struct ColumnColor
+        {
+            /// <summary>
+            /// The background color as RGB bytes, or an empty span.
+            /// </summary>
+            public ReadOnlySpan<byte> Background;
+
+            /// <summary>
+            /// The foreground color as RGB bytes, or an empty span.
+            /// </summary>
+            public ReadOnlySpan<byte> Foreground;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ColumnColor"/> struct.
+            /// </summary>
+            /// <param name="background">The background RGB bytes, or an empty span.</param>
+            /// <param name="foreground">The foreground RGB bytes, or an empty span.</param>
+            public ColumnColor(ReadOnlySpan<byte> background, ReadOnlySpan<byte> foreground)
+            {
+                Background = background;
+                Foreground = foreground;
+            }
         }
     }
 }
