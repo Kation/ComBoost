@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -11,6 +11,9 @@ namespace Wodsoft.ComBoost
     /// 领域上下文接口。
     /// </summary>
     public interface IDomainContext : IServiceProvider
+#if NET8_0_OR_GREATER
+        , Microsoft.Extensions.DependencyInjection.IKeyedServiceProvider
+#endif
     {
         /// <summary>
         /// 服务取消令牌。
@@ -41,5 +44,10 @@ namespace Wodsoft.ComBoost
         /// 获取用户主体声明。
         /// </summary>
         ClaimsPrincipal User { get; }
+
+        /// <summary>
+        /// 获取服务提供器。
+        /// </summary>
+        IServiceProvider Services { get; }
     }
 }

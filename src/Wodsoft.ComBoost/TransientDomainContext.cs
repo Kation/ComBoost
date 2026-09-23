@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -30,6 +30,8 @@ namespace Wodsoft.ComBoost
 
         public ClaimsPrincipal User => _innerContext.User;
 
+        public IServiceProvider Services => _scope.ServiceProvider;
+
         public void Dispose()
         {
             _scope.Dispose();
@@ -43,5 +45,21 @@ namespace Wodsoft.ComBoost
                 return _innerContext.ValueProvider;
             return _scope.ServiceProvider.GetService(serviceType);
         }
+
+#if NET8_0_OR_GREATER
+
+        object? IKeyedServiceProvider.GetKeyedService(Type serviceType, object? serviceKey)
+        {
+            if (_scope.ServiceProvider is IKeyedServiceProvider keyedServiceProvider)
+                return keyedServiceProvider.GetKeyedService(serviceType, serviceKey);
+            throw new NotSupportedException("Not support keyed services.");
+        }
+
+        object IKeyedServiceProvider.GetRequiredKeyedService(Type serviceType, object? serviceKey)
+        {
+            return _scope.ServiceProvider.GetRequiredKeyedService(serviceType, serviceKey);
+        }
+
+#endif
     }
 }

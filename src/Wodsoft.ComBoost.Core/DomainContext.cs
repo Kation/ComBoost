@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -44,6 +44,8 @@ namespace Wodsoft.ComBoost
 
         public abstract ClaimsPrincipal User { get; }
 
+        public IServiceProvider Services => _serviceProvider;
+
         public virtual object? GetService(Type serviceType)
         {
             if (serviceType == typeof(IDomainContext) || serviceType == typeof(IServiceProvider))
@@ -52,5 +54,21 @@ namespace Wodsoft.ComBoost
                 return ValueProvider;
             return _serviceProvider.GetService(serviceType);
         }
+
+#if NET8_0_OR_GREATER
+
+        object? IKeyedServiceProvider.GetKeyedService(Type serviceType, object? serviceKey)
+        {
+            if (_serviceProvider is IKeyedServiceProvider keyedServiceProvider)
+                return keyedServiceProvider.GetKeyedService(serviceType, serviceKey);
+            throw new NotSupportedException("Not support keyed services.");
+        }
+
+        object IKeyedServiceProvider.GetRequiredKeyedService(Type serviceType, object? serviceKey)
+        {
+            return _serviceProvider.GetRequiredKeyedService(serviceType, serviceKey);
+        }
+
+#endif
     }
 }
